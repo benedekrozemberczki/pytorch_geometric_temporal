@@ -1,6 +1,3 @@
-Little Ball of Fur Datasets
+PyTorcg Geometric Temporal Datasets
 ========================
 
-.. automodule:: littleballoffur.dataset.dataset_reader
-    :members:
-    :undoc-members:
