@@ -5,11 +5,9 @@
 [docs-url]: https://pytorch-geometric.readthedocs.io/en/latest/?badge=latest
 [coverage-image]: https://codecov.io/gh/benedekrozemberczki/pytorch_geometric_temporal/branch/master/graph/badge.svg
 [coverage-url]: https://codecov.io/github/benedekrozemberczki/pytorch_geometric_temporal?branch=master
-[contributing-image]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
-[contributing-url]: https://github.com/rusty1s/pytorch_geometric/blob/master/CONTRIBUTING.md
 
 <p align="center">
-  <img width="40%" src="https://raw.githubusercontent.com/rusty1s/pytorch_geometric/master/docs/source/_static/img/pyg_logo_text.svg?sanitize=true" />
+  <img width="90%" src="https://raw.githubusercontent.com/rusty1s/pytorch_geometric/master/docs/source/_static/img/pyg_logo_text.svg?sanitize=true" />
 </p>
 
 --------------------------------------------------------------------------------
@@ -18,6 +16,5 @@
 [![Build Status][build-image]][build-url]
 [![Docs Status][docs-image]][docs-url]
 [![Code Coverage][coverage-image]][coverage-url]
-[![Contributing][contributing-image]][contributing-url]
 
 **[Documentation](https://pytorch-geometric.readthedocs.io)** | **[External Resources](https://pytorch-geometric.readthedocs.io/en/latest/notes/resources.html)**
