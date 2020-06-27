@@ -1,3 +1,4 @@
+[pypi-image]: https://badge.fury.io/py/torch-geometric-temporal.svg
 [pypi-url]: https://pypi.python.org/pypi/torch-geometric-temporal
 [build-image]: https://travis-ci.org/benedekrozemberczki/pytorch_geometric_temporal.svg?branch=master
 [build-url]: https://travis-ci.org/benedekrozemberczki/pytorch_geometric_temporal
