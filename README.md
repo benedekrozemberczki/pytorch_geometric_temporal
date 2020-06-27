@@ -1,1 +1,1 @@
-# pytorch_temporal_geometric
+# pytorch_geometric_temporal
