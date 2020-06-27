@@ -1,0 +1,11 @@
+tqdm
+numpy
+sphinx
+sphinx_rtd_theme
+python-louvain
+sklearn
+scipy
+pygsp
+gensim
+pandas
+six
