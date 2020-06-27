@@ -1,0 +1,27 @@
+language: shell
+
+os:
+  - linux
+  - osx
+
+env:
+  jobs:
+    - PYTHON_VERSION=3.6
+
+install:
+  - source script/conda.sh
+  - conda create --yes -n test python="${PYTHON_VERSION}"
+  - source activate test
+  - pip install scipy
+  - pip install codecov
+  - python setup.py install
+script:
+  - python setup.py test
+after_success:
+  - codecov
+notifications:
+    recipients:
+      - benedek.rozemberczki@gmail.com
+    on_success: always
+    on_failure: always
+
