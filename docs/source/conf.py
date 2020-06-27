@@ -1,7 +1,7 @@
 import datetime
 import sphinx_rtd_theme
 import doctest
-import littleballoffur
+import pytorch_geometric_temporal
 
 extensions = [
     'sphinx.ext.autodoc',
