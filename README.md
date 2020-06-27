@@ -1,4 +1,4 @@
-[pypi-url]: https://pypi.python.org/pypi/torch-geometric
+[pypi-url]: https://pypi.python.org/pypi/torch-geometric-temporal
 [build-image]: https://travis-ci.org/rusty1s/pytorch_geometric.svg?branch=master
 [build-url]: https://travis-ci.org/rusty1s/pytorch_geometric
 [docs-image]: https://readthedocs.org/projects/pytorch-geometric/badge/?version=latest
