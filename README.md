@@ -1,7 +1,7 @@
 [pypi-url]: https://pypi.python.org/pypi/torch-geometric-temporal
 [build-image]: https://travis-ci.org/benedekrozemberczki/pytorch_geometric_temporal.svg?branch=master
 [build-url]: https://travis-ci.org/benedekrozemberczki/pytorch_geometric_temporal
-[docs-image]: https://readthedocs.org/projects/pytorch-geometric/badge/?version=latest
+[docs-image]: https://readthedocs.org/projects/pytorch-geometric-temporal/badge/?version=latest
 [docs-url]: https://pytorch-geometric.readthedocs.io/en/latest/?badge=latest
 [coverage-image]: https://codecov.io/gh/rusty1s/pytorch_geometric/branch/master/graph/badge.svg
 [coverage-url]: https://codecov.io/github/rusty1s/pytorch_geometric?branch=master
