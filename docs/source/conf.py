@@ -17,7 +17,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 author = 'Benedek Rozemberczki'
-project = 'Little Ball of Fur'
+project = 'PyTorch Geometric Temporal'
 copyright = '{}, {}'.format(datetime.datetime.now().year, author)
 
 html_theme = 'sphinx_rtd_theme'
@@ -32,7 +32,7 @@ html_theme_options = {
     'logo_only': True,
 }
 
-html_logo = '_static/img/littleballoffur_logo_text.jpg'
+html_logo = '_static/img/logo_text.jpg'
 html_static_path = ['_static']
 html_context = {'css_files': ['_static/css/custom.css']}
 
