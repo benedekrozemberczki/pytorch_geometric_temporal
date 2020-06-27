@@ -3,8 +3,8 @@
 [build-url]: https://travis-ci.org/benedekrozemberczki/pytorch_geometric_temporal
 [docs-image]: https://readthedocs.org/projects/pytorch-geometric-temporal/badge/?version=latest
 [docs-url]: https://pytorch-geometric.readthedocs.io/en/latest/?badge=latest
-[coverage-image]: https://codecov.io/gh/rusty1s/pytorch_geometric/branch/master/graph/badge.svg
-[coverage-url]: https://codecov.io/github/rusty1s/pytorch_geometric?branch=master
+[coverage-image]: https://codecov.io/gh/benedekrozemberczki/pytorch_geometric_temporal/branch/master/graph/badge.svg
+[coverage-url]: https://codecov.io/github/benedekrozemberczki/pytorch_geometric_temporal?branch=master
 [contributing-image]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
 [contributing-url]: https://github.com/rusty1s/pytorch_geometric/blob/master/CONTRIBUTING.md
 
