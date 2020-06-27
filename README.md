@@ -7,7 +7,7 @@
 [coverage-url]: https://codecov.io/github/benedekrozemberczki/pytorch_geometric_temporal?branch=master
 
 <p align="center">
-  <img width="90%" src="https://raw.githubusercontent.com/rusty1s/pytorch_geometric/master/docs/source/_static/img/pyg_logo_text.svg?sanitize=true" />
+  <img width="90%" src="https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/docs/source/_static/img/text_logo.jpg?sanitize=true" />
 </p>
 
 --------------------------------------------------------------------------------
