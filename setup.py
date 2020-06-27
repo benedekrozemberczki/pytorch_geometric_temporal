@@ -12,7 +12,7 @@ setup(
   packages = find_packages(),
   version = "0.0.1",
   license = "MIT",
-  description = "A general purpose library for subsampling large graphs.",
+  description = "A Temporal Extension Library for PyTorch Geometric.",
   author = "Benedek Rozemberczki",
   author_email = "benedek.rozemberczki@gmail.com",
   url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal",
