@@ -17,4 +17,4 @@
 [![Docs Status][docs-image]][docs-url]
 [![Code Coverage][coverage-image]][coverage-url]
 
-**[Documentation](https://pytorch-geometric.readthedocs.io)** | **[External Resources](https://pytorch-geometric.readthedocs.io/en/latest/notes/resources.html)**
+**[Documentation](https://pytorch-geometric-temporal.readthedocs.io)** | **[External Resources](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/resources.html)**
