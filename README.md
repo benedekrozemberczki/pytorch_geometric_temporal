@@ -24,8 +24,6 @@
 
 In detail, the following temporal graph neural networks were implemented.
 
-**Pseudo Dynamic Graph Neural Networks**
-
 **Discrete Stacked Dynamic Graph Neural Networks**
 
 **Discrete Integrated Dynamic Graph Neural Networks**
