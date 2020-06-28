@@ -6,15 +6,21 @@ os:
 
 env:
   jobs:
-    - PYTHON_VERSION=3.6
+    - TORCH_VERSION=1.5.0 PYTHON_VERSION=3.7 IDX=cpu
 
 install:
   - source script/conda.sh
   - conda create --yes -n test python="${PYTHON_VERSION}"
   - source activate test
-  - pip install scipy
+  - conda install pytorch=${TORCH_VERSION} torchvision ${TOOLKIT} -c pytorch --yes
+  - pip install torch-scatter==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
+  - pip install torch-sparse==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
+  - pip install torch-cluster==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
+  - pip install torch-spline-conv==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
+  - pip install torch-geometric
   - pip install codecov
-  - python setup.py install
+  - pip install sphinx sphinx_rtd_theme
+  - pip install .[test]
 script:
   - python setup.py test
 after_success:

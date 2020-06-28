@@ -1,16 +1,10 @@
-from torch_geometric_temporal.nn import DummyLayer
+from torch_geometric_temporal.nn import 
 
-def test_dummy_layer():
+def test_gconv_lstm_layer():
     """
     Testing the Dummy Layer.
     """
 
-    layer = DummyLayer()
+    layer = GConvLSTM(32, 32)
 
-    assert layer.x == 1
-    assert type(layer.x) == int
-
-    layer = DummyLayer(x=2)
-
-    assert layer.x == 2
-    assert type(layer.x) == int
+    assert layer.in_channel == 32
