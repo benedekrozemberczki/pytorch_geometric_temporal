@@ -20,8 +20,10 @@
 
 **[Documentation](https://pytorch-geometric-temporal.readthedocs.io)** | **[External Resources](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/resources.html)**
 
-**Methods included**
+**Methods Included**
 
 In detail, the following temporal graph neural networks were implemented.
 
-**Discrete Dynamic Graph Neural Networks**
+**Discrete Stacked Dynamic Graph Neural Networks**
+
+**Discrete Integrated Dynamic Graph Neural Networks**
