@@ -29,3 +29,5 @@ In detail, the following temporal graph neural networks were implemented.
 **Discrete Stacked Dynamic Graph Neural Networks**
 
 **Discrete Integrated Dynamic Graph Neural Networks**
+
+**Continuous Recurrent Neural Network Based Graph Neural Networks**
