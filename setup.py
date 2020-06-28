@@ -1,6 +1,10 @@
 from setuptools import find_packages, setup
 
-install_requires = ["networkx",
+install_requires = ["torch",
+                    "numpy",
+                    "networkx",
+                    "scipy",
+                    "tqdm",
                     "six"]
 
 setup_requires = ['pytest-runner']
