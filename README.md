@@ -51,3 +51,9 @@ $ pip install torch-geometric-temporal
 where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101` or `cu102` depending on your PyTorch installation.
 
 
+## Running tests
+
+```
+$ python setup.py test
+```
+
