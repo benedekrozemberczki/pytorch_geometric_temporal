@@ -53,6 +53,7 @@ class GConvLSTM(torch.nn.Module):
         return C
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
-        C = self.set_cell_state(X, C)
         H = self.set_hidden_state(X, H)
+        C = self.set_cell_state(X, C)
+        return H, C
     
