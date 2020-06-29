@@ -10,8 +10,10 @@ class GConvLSTM(torch.nn.Module):
     Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
 
     Args:
-        number_of_nodes (int): Number of nodes. Default is 100.
-        seed (int): Random seed. Default is 42.
+        in channels (int): Number of input features.
+        out_channels (int): Number of output features.
+        K (int): Chebyshev filter size.
+        number_of_nodes (int): Number of vertices.
     """
     def __init__(self, in_channels, out_channels, K, number_of_nodes):
         super(GConvLSTM, self).__init__()
@@ -101,6 +103,7 @@ class GConvLSTM(torch.nn.Module):
         zeros(self.b_c)
         zeros(self.b_o)
 
+
     def set_hidden_state(self, X, H):
         if H is None:
             H = torch.zeros(self.number_of_nodes, self.out_channels)
@@ -112,6 +115,7 @@ class GConvLSTM(torch.nn.Module):
             C = torch.zeros(self.number_of_nodes, self.out_channels)
         return C
 
+
     def calculate_input_gate(self, X, edge_index, edge_weight, H, C):
         I = self.conv_x_i(X, edge_index, edge_weight)
         I = I + self.conv_h_i(H, edge_index, edge_weight)
@@ -120,6 +124,7 @@ class GConvLSTM(torch.nn.Module):
         I = torch.sigmoid(I) 
         return I
 
+
     def calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
         F = self.conv_x_f(X, edge_index, edge_weight)
         F = F + self.conv_h_f(H, edge_index, edge_weight)
@@ -127,6 +132,7 @@ class GConvLSTM(torch.nn.Module):
         F = F + self.b_f
         F = torch.sigmoid(F) 
         return F
+
 
     def calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
         T = self.conv_x_c(X, edge_index, edge_weight)
@@ -144,13 +150,16 @@ class GConvLSTM(torch.nn.Module):
         O = torch.sigmoid(O) 
         return O
 
+
     def calculate_hidden_state(self, O, C):
         H = O * torch.tanh(C)
         return H
 
+
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         """
-        Making a forward pass.
+        Making a forward pass. If edge weights are not present the forward pass
+        defaults to an unweighted graph.
 
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node features.
