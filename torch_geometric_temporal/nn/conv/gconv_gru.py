@@ -60,9 +60,9 @@ class GConvGRU(torch.nn.Module):
 
 
     def _create_parameters_and_layers(self):
-        self._create_input_gate_parameters_and_layers()
-        self._create_forget_gate_parameters_and_layers()
-        self._create_cell_state_parameters_and_layers()
+        self._create_update_gate_parameters_and_layers()
+        self._create_reset_gate_parameters_and_layers()
+        self._create_candidate_state_parameters_and_layers()
 
 
 
@@ -71,40 +71,27 @@ class GConvGRU(torch.nn.Module):
             H = torch.zeros(self.number_of_nodes, self.out_channels)
         return H
 
-    def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
-        I = self.conv_x_i(X, edge_index, edge_weight)
-        I = I + self.conv_h_i(H, edge_index, edge_weight)
-        I = I + (self.w_c_i * C)
-        I = I + self.b_i
-        I = torch.sigmoid(I) 
-        return I
+    def _calculate_update_gate(self, X, edge_index, edge_weight, H):
+        Z = self.conv_x_z(X, edge_index, edge_weight)
+        Z = Z + self.conv_h_z(H, edge_index, edge_weight)
+        Z = torch.sigmoid(Z) 
+        return Z
 
 
-    def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
+    def _calculate_reset_gate(self, X, edge_index, edge_weight, H):
         F = self.conv_x_f(X, edge_index, edge_weight)
         F = F + self.conv_h_f(H, edge_index, edge_weight)
-        F = F + (self.w_c_f * C)
-        F = F + self.b_f
         F = torch.sigmoid(F) 
         return F
 
 
-    def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
+    def _calculate_candidate_state(self, X, edge_index, edge_weight, H, C, I, F):
         T = self.conv_x_c(X, edge_index, edge_weight)
         T = T + self.conv_h_c(T, edge_index, edge_weight)
         T = T + self.b_c
         T = torch.tanh(T)
         C = F*C + I*T  
         return C
-
-    def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
-        O = self.conv_x_o(X, edge_index, edge_weight)
-        O = O + self.conv_h_o(H, edge_index, edge_weight)
-        O = O + (self.w_c_o * C)
-        O = O + self.b_o
-        O = torch.sigmoid(O) 
-        return O
-
 
     def _calculate_hidden_state(self, O, C):
         H = O * torch.tanh(C)
