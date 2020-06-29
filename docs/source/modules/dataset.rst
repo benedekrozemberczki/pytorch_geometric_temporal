@@ -1,3 +1,3 @@
-PyTorcg Geometric Temporal Datasets
+PyTorch Geometric Temporal Datasets
 ========================
 
