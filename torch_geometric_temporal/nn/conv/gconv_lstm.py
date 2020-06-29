@@ -73,6 +73,7 @@ class GConvLSTM(torch.nn.Module):
         glorot(self.w_cf)
         zeros(self.b_i)
         zeros(self.b_f)
+        zeros(self.b_c)
 
     def set_hidden_state(self, X, H):
         if H is None:
@@ -102,6 +103,7 @@ class GConvLSTM(torch.nn.Module):
         return F
 
     def calculate_cell_state(self, X, edge_index, edge_weight, H, C):
+
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         H = self.set_hidden_state(X, H)
