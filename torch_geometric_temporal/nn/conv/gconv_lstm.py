@@ -32,6 +32,21 @@ class GConvLSTM(torch.nn.Module):
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
 
 
+    def create_forget_gate_parameters_and_layers(self):
+
+        self.conv_x_f = ChebConv(in_channels=self.in_channels,
+                                 out_channels=self.out_channels,
+                                 K=self.K)
+
+        self.conv_h_f = ChebConv(in_channels=self.out_channels,
+                                 out_channels=self.out_channels,
+                                 K=self.K) 
+
+        self.w_cf = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
+        self.b_f = Parameter(torch.Tensor(1, self.out_channels))
+
+
+
     def create_parameters_and_layers(self):
         self.create_input_gate_parameters_and_layers()
 
