@@ -55,5 +55,6 @@ class GConvLSTM(torch.nn.Module):
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         H = self.set_hidden_state(X, H)
         C = self.set_cell_state(X, C)
+        I = self.convolution_x_i(X, edge_index, edge_weight)
         return H, C
     
