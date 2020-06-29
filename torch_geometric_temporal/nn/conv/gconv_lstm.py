@@ -149,13 +149,14 @@ class GConvLSTM(torch.nn.Module):
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         """
-        Sampling nodes randomly.
+        Making a forward pass.
 
         Arg types:
             * **graph** *(NetworkX graph)* - The graph to be sampled from.
 
         Return types:
-            * **new_graph** *(NetworkX graph)* - The graph of sampled nodes.
+            * **H** *(PyTorch Float Tensor)* - Hidden states matrix for all nodes.
+            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
         H = self.set_hidden_state(X, H)
         C = self.set_cell_state(X, C)
