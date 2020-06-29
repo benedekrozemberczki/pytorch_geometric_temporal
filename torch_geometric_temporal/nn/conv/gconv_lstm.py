@@ -5,7 +5,13 @@ from torch_geometric.nn.inits import glorot, zeros
 
 
 class GConvLSTM(torch.nn.Module):
+    r"""An implementation of random node sampling. Nodes are sampled with uniform
+    probability. `"For details about the algorithm see this paper." <https://www.pnas.org/content/102/12/4221>`_
 
+    Args:
+        number_of_nodes (int): Number of nodes. Default is 100.
+        seed (int): Random seed. Default is 42.
+    """
     def __init__(self, in_channels, out_channels, K, number_of_nodes):
         super(GConvLSTM, self).__init__()
 
@@ -142,6 +148,15 @@ class GConvLSTM(torch.nn.Module):
         return H
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
+        """
+        Sampling nodes randomly.
+
+        Arg types:
+            * **graph** *(NetworkX graph)* - The graph to be sampled from.
+
+        Return types:
+            * **new_graph** *(NetworkX graph)* - The graph of sampled nodes.
+        """
         H = self.set_hidden_state(X, H)
         C = self.set_cell_state(X, C)
         I = self.calculate_input_gate(X, edge_index, edge_weight, H, C)

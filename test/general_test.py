@@ -3,7 +3,6 @@ import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.conv import GConvLSTM
 
-
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
 
     graph = nx.watts_strogatz_graph(number_of_nodes, edge_per_node, 0.5)
@@ -18,10 +17,8 @@ def create_mock_data(number_of_nodes, edge_per_node, in_channels):
 
 
 def _create_mock_states(number_of_nodes, out_channels):
-
     H = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     C = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
-
     return H, C
 
 
