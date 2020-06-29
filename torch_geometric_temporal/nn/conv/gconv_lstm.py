@@ -33,6 +33,7 @@ class GConvLSTM(torch.nn.Module):
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
 
 
+
     def create_forget_gate_parameters_and_layers(self):
 
         self.conv_x_f = ChebConv(in_channels=self.in_channels,
@@ -46,6 +47,8 @@ class GConvLSTM(torch.nn.Module):
         self.w_c_f = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
 
+
+
     def create_cell_state_parameters_and_layers(self):
 
         self.conv_x_c = ChebConv(in_channels=self.in_channels,
@@ -57,6 +60,7 @@ class GConvLSTM(torch.nn.Module):
                                  K=self.K) 
 
         self.b_c = Parameter(torch.Tensor(1, self.out_channels))
+
 
 
     def create_output_gate_parameters_and_layers(self):
@@ -119,7 +123,7 @@ class GConvLSTM(torch.nn.Module):
 
     def calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
         T = self.conv_x_c(X, edge_index, edge_weight)
-        T = T + self.conv_h_f(T, edge_index, edge_weight)
+        T = T + self.conv_h_c(T, edge_index, edge_weight)
         T = T + self.b_c
         T = torch.tanh(T)
         C = F*C + I*T  
@@ -144,5 +148,6 @@ class GConvLSTM(torch.nn.Module):
         F = self.calculate_forget_gate(X, edge_index, edge_weight, H, C)
         C = self.calculate_cell_state(X, edge_index, edge_weight, H, C, I, F)
         O = self.calculate_output_gate(X, edge_index, edge_weight, H, C)
+        H = self.calculate_hidden_state(O, C)
         return H, C
     
