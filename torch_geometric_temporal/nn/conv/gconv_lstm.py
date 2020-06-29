@@ -6,9 +6,8 @@ from torch_geometric.nn.inits import glorot, zeros
 
 class GConvLSTM(object):
 
-    def __init__(self, feature_in_channels, hidden_in_channels, out_channels):
+    def __init__(self, feature_in_channels, K, out_channels):
         self.feature_in_channels = feature_in_channels
-        self.hidden_in_channels = hidden_in_channels
         self.out_channels = out_channels
 
 
@@ -20,10 +19,10 @@ class GConvLSTM(object):
         return H
          
 
-    def set_cell_state(self, X, c):
-        if c is None:
-            c = torch.Tensor(1, self.out_channels)
-        return c
+    def set_cell_state(self, X, C):
+        if C is None:
+            C = torch.Tensor(X.shape[0], self.out_channels)
+        return C
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, c=None):
         c = self.set_cell_state(X, c)
