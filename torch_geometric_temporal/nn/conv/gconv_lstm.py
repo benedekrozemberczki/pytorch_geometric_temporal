@@ -130,7 +130,7 @@ class GConvLSTM(torch.nn.Module):
         O = O + self.conv_h_o(H, edge_index, edge_weight)
         O = O + (self.w_c_o * C)
         O = O + self.b_o
-        O = torch.sigmoid(F) 
+        O = torch.sigmoid(O) 
         return O
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
