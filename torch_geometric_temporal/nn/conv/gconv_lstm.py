@@ -69,11 +69,13 @@ class GConvLSTM(torch.nn.Module):
 
 
     def set_parameters(self):
-        glorot(self.w_ci)
-        glorot(self.w_cf)
+        glorot(self.w_c_i)
+        glorot(self.w_c_f)
+        glorot(self.w_c_o)
         zeros(self.b_i)
         zeros(self.b_f)
         zeros(self.b_c)
+        zeros(self.b_o)
 
     def set_hidden_state(self, X, H):
         if H is None:
@@ -89,7 +91,7 @@ class GConvLSTM(torch.nn.Module):
     def calculate_input_gate(self, X, edge_index, edge_weight, H, C):
         I = self.conv_x_i(X, edge_index, edge_weight)
         I = I + self.conv_h_i(H, edge_index, edge_weight)
-        I = I + (self.w_ci * C)
+        I = I + (self.w_c_i * C)
         I = I + self.b_i
         I = torch.sigmoid(I) 
         return I
@@ -97,7 +99,7 @@ class GConvLSTM(torch.nn.Module):
     def calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
         F = self.conv_x_f(X, edge_index, edge_weight)
         F = F + self.conv_h_f(H, edge_index, edge_weight)
-        F = F + (self.w_cf * C)
+        F = F + (self.w_c_f * C)
         F = F + self.b_f
         F = torch.sigmoid(F) 
         return F
@@ -109,6 +111,14 @@ class GConvLSTM(torch.nn.Module):
         T = torch.tanh(T)
         C = F*C + I*T  
         return C
+
+    def calculate_output_gate(self, X, edge_index, edge_weight, H, C):
+        O = self.conv_x_o(X, edge_index, edge_weight)
+        O = O + self.conv_h_o(H, edge_index, edge_weight)
+        O = O + (self.w_c_o * C)
+        O = O + self.b_o
+        O = torch.sigmoid(F) 
+        return O
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         H = self.set_hidden_state(X, H)
