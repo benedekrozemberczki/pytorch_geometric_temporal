@@ -27,93 +27,50 @@ class GConvGRU(torch.nn.Module):
         self._set_parameters()
 
 
-    def _create_input_gate_parameters_and_layers(self):
+    def _create_update_gate_parameters_and_layers(self):
 
-        self.conv_x_i = ChebConv(in_channels=self.in_channels,
+        self.conv_x_z = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  K=self.K)
 
-        self.conv_h_i = ChebConv(in_channels=self.out_channels,
+        self.conv_h_z = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  K=self.K) 
 
-        self.w_c_i = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
-        self.b_i = Parameter(torch.Tensor(1, self.out_channels))
 
+    def _create_reset_gate_parameters_and_layers(self):
 
-
-    def _create_forget_gate_parameters_and_layers(self):
-
-        self.conv_x_f = ChebConv(in_channels=self.in_channels,
+        self.conv_x_r = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  K=self.K)
 
-        self.conv_h_f = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K) 
-
-        self.w_c_f = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
-        self.b_f = Parameter(torch.Tensor(1, self.out_channels))
-
-
-
-    def _create_cell_state_parameters_and_layers(self):
-
-        self.conv_x_c = ChebConv(in_channels=self.in_channels,
+        self.conv_h_r = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  K=self.K)
 
-        self.conv_h_c = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K) 
 
-        self.b_c = Parameter(torch.Tensor(1, self.out_channels))
+    def _create_candidate_state_parameters_and_layers(self):
 
-
-
-    def _create_output_gate_parameters_and_layers(self):
-
-        self.conv_x_o = ChebConv(in_channels=self.in_channels,
+        self.conv_x_h = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  K=self.K)
 
-        self.conv_h_o = ChebConv(in_channels=self.out_channels,
+        self.conv_h_h = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K) 
-
-        self.w_c_o = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
-        self.b_o = Parameter(torch.Tensor(1, self.out_channels))
-
+                                 K=self.K)
 
 
     def _create_parameters_and_layers(self):
         self._create_input_gate_parameters_and_layers()
         self._create_forget_gate_parameters_and_layers()
         self._create_cell_state_parameters_and_layers()
-        self._create_output_gate_parameters_and_layers()
 
-
-    def _set_parameters(self):
-        glorot(self.w_c_i)
-        glorot(self.w_c_f)
-        glorot(self.w_c_o)
-        zeros(self.b_i)
-        zeros(self.b_f)
-        zeros(self.b_c)
-        zeros(self.b_o)
 
 
     def _set_hidden_state(self, X, H):
         if H is None:
             H = torch.zeros(self.number_of_nodes, self.out_channels)
         return H
-         
-
-    def _set_cell_state(self, X, C):
-        if C is None:
-            C = torch.zeros(self.number_of_nodes, self.out_channels)
-        return C
-
 
     def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
         I = self.conv_x_i(X, edge_index, edge_weight)
@@ -155,7 +112,7 @@ class GConvGRU(torch.nn.Module):
         return H
 
 
-    def forward(self, X, edge_index, edge_weight=None, H=None, C=None):
+    def forward(self, X, edge_index, edge_weight=None, H=None):
         """
         Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. If the hidden state and cell state 
@@ -167,11 +124,9 @@ class GConvGRU(torch.nn.Module):
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
             * **edge_weight** *(PyTorch Long Tensor)* - Edge weight vector (optional).
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes (optional).
-            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes (optional).
 
         Return types:
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
-            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)
         C = self._set_cell_state(X, C)
