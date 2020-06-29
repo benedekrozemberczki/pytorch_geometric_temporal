@@ -13,16 +13,16 @@ class GConvLSTM(object):
         self.number_of_nodes = number_of_nodes
 
         self.create_parameters_and_layers()
-        self.reset_parameters()
+        self.set_parameters()
 
 
 
-    def create_input_parameters_and_layers(self):
+    def create_input_gate_parameters_and_layers(self):
         self.convolution_x_i = ChebConv(in_channels=self.in_channels,
                                        out_channels=self.out_channels,
                                        K=self.K)
 
-        self.convonlution_h_i = ChebConv(in_channels=self.in_channels,
+        self.convonlution_h_i = ChebConv(in_channels=self.out_channels,
                                        out_channels=self.out_channels,
                                        K=self.K) 
 
@@ -30,12 +30,15 @@ class GConvLSTM(object):
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
 
 
+    def 
+
+
     def create_parameters_and_layers(self):
-        self.create_input_parameters_and_layers()
+        self.create_input_gate_parameters_and_layers()
 
 
 
-    def reset_parameters(self):
+    def set_parameters(self):
         pass
 
     def set_hidden_state(self, X, H):
