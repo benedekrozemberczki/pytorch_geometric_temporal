@@ -79,19 +79,17 @@ class GConvGRU(torch.nn.Module):
 
 
     def _calculate_reset_gate(self, X, edge_index, edge_weight, H):
-        F = self.conv_x_f(X, edge_index, edge_weight)
-        F = F + self.conv_h_f(H, edge_index, edge_weight)
-        F = torch.sigmoid(F) 
-        return F
+        R = self.conv_x_r(X, edge_index, edge_weight)
+        R = R + self.conv_h_r(H, edge_index, edge_weight)
+        R = torch.sigmoid(R) 
+        return R
 
 
-    def _calculate_candidate_state(self, X, edge_index, edge_weight, H, C, I, F):
-        T = self.conv_x_c(X, edge_index, edge_weight)
-        T = T + self.conv_h_c(T, edge_index, edge_weight)
-        T = T + self.b_c
-        T = torch.tanh(T)
-        C = F*C + I*T  
-        return C
+    def _calculate_candidate_state(self, X, edge_index, edge_weight, H, R):
+        H_t = self.conv_x_h(X, edge_index, edge_weight)
+        H_t = H_t + self.conv_h_h(H*R, edge_index, edge_weight)
+        H_t = torch.tanh(H_t)
+        return H_t
 
     def _calculate_hidden_state(self, O, C):
         H = O * torch.tanh(C)
