@@ -114,7 +114,7 @@ class GConvGRU(torch.nn.Module):
         H = self._set_hidden_state(X, H)
         Z = self._calculate_update_gate(X, edge_index, edge_weight, H)
         R = self._calculate_reset_gate(X, edge_index, edge_weight, H)
-        H_hat = self._calculate_candidate_state(X, edge_index, edge_weight, H, R)
-        H = self._calculate_hidden_state(O, C)
-        return H, C
+        H_t = self._calculate_candidate_state(X, edge_index, edge_weight, H, R)
+        H = self._calculate_hidden_state(H, H_t)
+        return H
     
