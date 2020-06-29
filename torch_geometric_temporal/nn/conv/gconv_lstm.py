@@ -6,7 +6,7 @@ from torch_geometric.nn.inits import glorot, zeros
 
 class GConvLSTM(object):
 
-    def __init__(self, feature_in_channels, out_channels, K, number_of_nodes):
+    def __init__(self, in_channels, out_channels, K, number_of_nodes):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
