@@ -11,7 +11,13 @@ class GConvLSTM(object):
         self.out_channels = out_channels
         self.K = K
         self.number_of_nodes = number_of_nodes
+
+        self.create_parameters_and_layers()
         self.reset_parameters()
+
+
+    def create_parameters_and_layers(self):
+        pass
 
 
     def reset_parameters(self):
