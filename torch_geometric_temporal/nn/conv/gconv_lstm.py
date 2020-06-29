@@ -62,6 +62,7 @@ class GConvLSTM(torch.nn.Module):
     def create_parameters_and_layers(self):
         self.create_input_gate_parameters_and_layers()
         self.create_forget_gate_parameters_and_layers()
+        self.create_cell_state_parameters_and_layers()
 
 
 
