@@ -20,13 +20,13 @@ class GConvLSTM(torch.nn.Module):
 
     def create_input_gate_parameters_and_layers(self):
 
-        self.convolution_x_i = ChebConv(in_channels=self.in_channels,
-                                        out_channels=self.out_channels,
-                                        K=self.K)
+        self.conv_x_i = ChebConv(in_channels=self.in_channels,
+                                 out_channels=self.out_channels,
+                                 K=self.K)
 
-        self.convonlution_h_i = ChebConv(in_channels=self.out_channels,
-                                         out_channels=self.out_channels,
-                                         K=self.K) 
+        self.conv_h_i = ChebConv(in_channels=self.out_channels,
+                                 out_channels=self.out_channels,
+                                 K=self.K) 
 
         self.w_ci = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
@@ -34,6 +34,8 @@ class GConvLSTM(torch.nn.Module):
 
     def create_parameters_and_layers(self):
         self.create_input_gate_parameters_and_layers()
+
+
 
 
 
@@ -52,9 +54,17 @@ class GConvLSTM(torch.nn.Module):
             C = torch.zeros(self.number_of_nodes, self.out_channels)
         return C
 
+    def calculate_input_gate(self, X, edge_index, edge_weight, H, C):
+        I = self.conv_x_i(X, edge_index, edge_weight)
+        I = I + self.conv_x_i(X, edge_index, edge_weight)
+        I = I + (self.w_ci *self.C)
+        I = I + self.b_i
+        I = torch.nn.functional.sigmoid(I) 
+        return I
+
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         H = self.set_hidden_state(X, H)
         C = self.set_cell_state(X, C)
-        I = self.convolution_x_i(X, edge_index, edge_weight)
+        I = self.calculate_input_gate(X, edge_index, edge_weight, H, C)
         return H, C
     

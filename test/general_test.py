@@ -21,6 +21,7 @@ def _create_mock_states(number_of_nodes, out_channels):
 
     H = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     C = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
+
     return H, C
 
 
