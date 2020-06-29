@@ -16,8 +16,23 @@ class GConvLSTM(object):
         self.reset_parameters()
 
 
+
+    def create_input_parameters_and_layers(self):
+        self.convolution_x_i = ChebConv(in_channels=self.in_channels,
+                                       out_channels=self.out_channels,
+                                       K=self.K)
+
+        self.convonlution_h_i = ChebConv(in_channels=self.in_channels,
+                                       out_channels=self.out_channels,
+                                       K=self.K) 
+
+        self.w_ci = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
+        self.b_i = Parameter(torch.Tensor(1, self.out_channels))
+
+
     def create_parameters_and_layers(self):
-        pass
+        self.create_input_parameters_and_layers()
+
 
 
     def reset_parameters(self):
