@@ -5,8 +5,9 @@ from torch_geometric.nn.inits import glorot, zeros
 
 
 class GConvLSTM(torch.nn.Module):
-    r"""An implementation of random node sampling. Nodes are sampled with uniform
-    probability. `"For details about the algorithm see this paper." <https://www.pnas.org/content/102/12/4221>`_
+    r"""An implementation of the Chebyshev Graph Convolutional Long Short Term Memory
+    Cell. For details see this paper: `"Structured Sequence Modeling with Graph 
+    Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
 
     Args:
         number_of_nodes (int): Number of nodes. Default is 100.
