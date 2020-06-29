@@ -57,7 +57,9 @@ class GConvLSTM(torch.nn.Module):
 
     def set_parameters(self):
         glorot(self.w_ci)
+        glorot(self.w_cf)
         zeros(self.b_i)
+        zeros(self.b_f)
 
     def set_hidden_state(self, X, H):
         if H is None:
