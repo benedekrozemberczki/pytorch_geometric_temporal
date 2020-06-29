@@ -152,7 +152,11 @@ class GConvLSTM(torch.nn.Module):
         Making a forward pass.
 
         Arg types:
-            * **graph** *(NetworkX graph)* - The graph to be sampled from.
+            * **X** *(PyTorch Float Tensor)* - Node features.
+            * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
+            * **edge_weight** *(PyTorch Long Tensor)* - Edge weight vector (optional).
+            * **H** *(NetworkX graph)* - Hidden states matrix for all nodes (optional).
+            * **C** *(NetworkX graph)* - Cell state matrix for all nodes (optional).
 
         Return types:
             * **H** *(PyTorch Float Tensor)* - Hidden states matrix for all nodes.
