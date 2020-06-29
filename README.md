@@ -24,15 +24,7 @@
 
 In detail, the following temporal graph neural networks were implemented.
 
-**Graph Convolutional Recurrent Networks**
-
-**Discrete Stacked Dynamic Graph Neural Networks**
-
-**Discrete Integrated Dynamic Graph Neural Networks**
-
-**Continuous Recurrent Neural Network Based Graph Neural Networks**
-
-**Continuous Point Process Based Graph Neural Networks**
+* **[GConvLSTM](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.gconv_lstm.GConvLSTM)** from Adamic *et al.*: [Search In Power-Law Networks](https://arxiv.org/abs/cs/0103016) (Physical Review E 2001)
 
 
 ## Installation
