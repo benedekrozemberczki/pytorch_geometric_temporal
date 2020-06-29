@@ -8,6 +8,4 @@ https://s3.eu-central-1.amazonaws.com/pytorch-geometric.com/whl/torch-1.5.0/torc
 pytorch_geometric
 sphinx>=3
 sphinx_rtd_theme
-sphinx
-sphinx_rtd_theme
 six
