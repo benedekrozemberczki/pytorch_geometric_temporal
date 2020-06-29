@@ -13,7 +13,7 @@ class GConvLSTM(torch.nn.Module):
         in channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Chebyshev filter size.
-        number_of_nodes (int): Number of vertices.
+        number_of_nodes (int): Number of vertices in the graph.
     """
     def __init__(self, in_channels, out_channels, K, number_of_nodes):
         super(GConvLSTM, self).__init__()
@@ -164,8 +164,8 @@ class GConvLSTM(torch.nn.Module):
             * **X** *(PyTorch Float Tensor)* - Node features.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
             * **edge_weight** *(PyTorch Long Tensor)* - Edge weight vector (optional).
-            * **H** *(NetworkX graph)* - Hidden states matrix for all nodes (optional).
-            * **C** *(NetworkX graph)* - Cell state matrix for all nodes (optional).
+            * **H** *(PyTorch Float Tensor)* - Hidden states matrix for all nodes (optional).
+            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes (optional).
 
         Return types:
             * **H** *(PyTorch Float Tensor)* - Hidden states matrix for all nodes.
