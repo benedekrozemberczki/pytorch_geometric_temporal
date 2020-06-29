@@ -24,7 +24,6 @@ class GConvGRU(torch.nn.Module):
         self.number_of_nodes = number_of_nodes
 
         self._create_parameters_and_layers()
-        self._set_parameters()
 
 
     def _create_update_gate_parameters_and_layers(self):
