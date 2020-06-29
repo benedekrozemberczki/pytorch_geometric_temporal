@@ -99,9 +99,8 @@ class GConvGRU(torch.nn.Module):
     def forward(self, X, edge_index, edge_weight=None, H=None):
         """
         Making a forward pass. If edge weights are not present the forward pass
-        defaults to an unweighted graph. If the hidden state and cell state 
-        matrices are not present when the forward pass is called these are
-        initialized with zeros.
+        defaults to an unweighted graph. If the hidden state matrix is not present
+        when the forward pass is called it is initialized with zeros.
 
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node features.
@@ -113,11 +112,9 @@ class GConvGRU(torch.nn.Module):
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)
-        C = self._set_cell_state(X, C)
-        I = self._calculate_input_gate(X, edge_index, edge_weight, H, C)
-        F = self._calculate_forget_gate(X, edge_index, edge_weight, H, C)
-        C = self._calculate_cell_state(X, edge_index, edge_weight, H, C, I, F)
-        O = self._calculate_output_gate(X, edge_index, edge_weight, H, C)
+        Z = self._calculate_update_gate(X, edge_index, edge_weight, H)
+        R = self._calculate_reset_gate(X, edge_index, edge_weight, H)
+        H_hat = self._calculate_candidate_state(X, edge_index, edge_weight, H, R)
         H = self._calculate_hidden_state(O, C)
         return H, C
     
