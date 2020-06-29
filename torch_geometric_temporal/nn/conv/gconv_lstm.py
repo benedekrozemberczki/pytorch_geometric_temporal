@@ -102,13 +102,19 @@ class GConvLSTM(torch.nn.Module):
         F = torch.sigmoid(F) 
         return F
 
-    def calculate_cell_state(self, X, edge_index, edge_weight, H, C):
-
+    def calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
+        T = self.conv_x_c(X, edge_index, edge_weight)
+        T = T + self.conv_h_f(T, edge_index, edge_weight)
+        T = T + self.b_c
+        T = torch.tanh(T)
+        C = F*C + I*T  
+        return C
 
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         H = self.set_hidden_state(X, H)
         C = self.set_cell_state(X, C)
         I = self.calculate_input_gate(X, edge_index, edge_weight, H, C)
         F = self.calculate_forget_gate(X, edge_index, edge_weight, H, C)
+        C = self.calculate_cell_state(X, edge_index, edge_weight, H, C, I, F)
         return H, C
     
