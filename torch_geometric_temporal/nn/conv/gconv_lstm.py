@@ -10,7 +10,7 @@ class GConvLSTM(torch.nn.Module):
     Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
 
     Args:
-        in channels (int): Number of input features.
+        in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Chebyshev filter size.
         number_of_nodes (int): Number of vertices in the graph.
