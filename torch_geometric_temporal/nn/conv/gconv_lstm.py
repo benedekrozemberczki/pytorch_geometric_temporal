@@ -57,7 +57,7 @@ class GConvLSTM(torch.nn.Module):
     def calculate_input_gate(self, X, edge_index, edge_weight, H, C):
         I = self.conv_x_i(X, edge_index, edge_weight)
         I = I + self.conv_h_i(H, edge_index, edge_weight)
-        I = I + (self.w_ci *C)
+        I = I + (self.w_ci * C)
         I = I + self.b_i
         I = torch.sigmoid(I) 
         return I
