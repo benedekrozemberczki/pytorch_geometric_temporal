@@ -10,7 +10,7 @@ def create_mock_data(number_of_nodes, edge_per_node, in_channels):
 
     edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
 
-    edge_weight = torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[0], 1)))
+    edge_weight = torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
 
     X = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
 
