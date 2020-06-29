@@ -4,10 +4,10 @@ from torch_geometric.nn import ChebConv
 from torch_geometric.nn.inits import glorot, zeros
 
 
-class GConvLSTM(object):
+class GConvLSTM(torch.nn.Module):
 
     def __init__(self, in_channels, out_channels, K, number_of_nodes):
-
+        super(GConvLSTM, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
