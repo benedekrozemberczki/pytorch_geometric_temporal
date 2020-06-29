@@ -2,7 +2,7 @@ from torch_geometric_temporal.nn import GConvLSTM
 
 def test_gconv_lstm_layer():
     """
-    Testing the Dummy Layer.
+    Testing the GConvLSTM Layer.
     """
 
     layer = GConvLSTM(in_channels=32, out_channels=64, K=2, number_of_nodes=100)
