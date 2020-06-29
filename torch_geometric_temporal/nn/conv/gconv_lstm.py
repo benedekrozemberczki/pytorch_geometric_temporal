@@ -158,7 +158,9 @@ class GConvLSTM(torch.nn.Module):
     def forward(self, X, edge_index, edge_weight=None, H=None, C=None):
         """
         Making a forward pass. If edge weights are not present the forward pass
-        defaults to an unweighted graph.
+        defaults to an unweighted graph. If the hidden state and cell state 
+        matrices are not present when the forward pass is called these are
+        initialized with zeros.
 
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node features.
