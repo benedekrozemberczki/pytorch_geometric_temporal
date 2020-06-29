@@ -1,4 +1,4 @@
-from torch_geometric_temporal.nn import GConvLSTM
+from torch_geometric_temporal.nn.conv import GConvLSTM
 
 def test_gconv_lstm_layer():
     """
