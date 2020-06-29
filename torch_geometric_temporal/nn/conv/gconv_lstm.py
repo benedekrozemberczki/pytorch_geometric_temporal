@@ -133,6 +133,10 @@ class GConvLSTM(torch.nn.Module):
         O = torch.sigmoid(O) 
         return O
 
+    def calculate_hidden_state(self, O, C):
+        H = O * torch.tanh(C)
+        return H
+
     def __call__(self, X, edge_index, edge_weight=None, H=None, C=None):
         H = self.set_hidden_state(X, H)
         C = self.set_cell_state(X, C)
