@@ -7,6 +7,7 @@ from torch_geometric.nn.inits import glorot, zeros
 class GConvLSTM(object):
 
     def __init__(self, in_channels, out_channels, K, number_of_nodes):
+
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
@@ -18,19 +19,17 @@ class GConvLSTM(object):
 
 
     def create_input_gate_parameters_and_layers(self):
+
         self.convolution_x_i = ChebConv(in_channels=self.in_channels,
-                                       out_channels=self.out_channels,
-                                       K=self.K)
+                                        out_channels=self.out_channels,
+                                        K=self.K)
 
         self.convonlution_h_i = ChebConv(in_channels=self.out_channels,
-                                       out_channels=self.out_channels,
-                                       K=self.K) 
+                                         out_channels=self.out_channels,
+                                         K=self.K) 
 
         self.w_ci = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
-
-
-    def 
 
 
     def create_parameters_and_layers(self):
@@ -39,7 +38,8 @@ class GConvLSTM(object):
 
 
     def set_parameters(self):
-        pass
+        glorot(self.w_ci)
+        zeros(self.b_i)
 
     def set_hidden_state(self, X, H):
         if H is None:
