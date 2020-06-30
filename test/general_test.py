@@ -35,8 +35,7 @@ def test_gconv_lstm_layer():
 
     X, edge_index, edge_weight = create_mock_data(number_of_nodes, edge_per_node, in_channels)
 
-    layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels,
-                      K=K, number_of_nodes=number_of_nodes)
+    layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
 
 
     H, C = layer(X, edge_index)
@@ -68,8 +67,7 @@ def test_gconv_gru_layer():
 
     X, edge_index, edge_weight = create_mock_data(number_of_nodes, edge_per_node, in_channels)
 
-    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels,
-                     K=K, number_of_nodes=number_of_nodes)
+    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K)
 
 
     H = layer(X, edge_index)

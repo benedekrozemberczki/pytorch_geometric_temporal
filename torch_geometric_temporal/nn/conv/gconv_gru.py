@@ -13,15 +13,13 @@ class GConvGRU(torch.nn.Module):
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Chebyshev filter size.
-        number_of_nodes (int): Number of vertices in the graph.
     """
-    def __init__(self, in_channels, out_channels, K, number_of_nodes):
+    def __init__(self, in_channels, out_channels, K):
         super(GConvGRU, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
-        self.number_of_nodes = number_of_nodes
 
         self._create_parameters_and_layers()
 
@@ -68,7 +66,7 @@ class GConvGRU(torch.nn.Module):
 
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(self.number_of_nodes, self.out_channels)
+            H = torch.zeros(X.shape[0], self.out_channels)
         return H
 
     def _calculate_update_gate(self, X, edge_index, edge_weight, H):

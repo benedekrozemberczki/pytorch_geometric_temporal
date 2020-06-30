@@ -13,15 +13,13 @@ class GConvLSTM(torch.nn.Module):
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Chebyshev filter size.
-        number_of_nodes (int): Number of vertices in the graph.
     """
-    def __init__(self, in_channels, out_channels, K, number_of_nodes):
+    def __init__(self, in_channels, out_channels, K):
         super(GConvLSTM, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
-        self.number_of_nodes = number_of_nodes
 
         self._create_parameters_and_layers()
         self._set_parameters()
@@ -37,7 +35,7 @@ class GConvLSTM(torch.nn.Module):
                                  out_channels=self.out_channels,
                                  K=self.K) 
 
-        self.w_c_i = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
+        self.w_c_i = Parameter(torch.Tensor(1, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
 
 
@@ -52,7 +50,7 @@ class GConvLSTM(torch.nn.Module):
                                  out_channels=self.out_channels,
                                  K=self.K) 
 
-        self.w_c_f = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
+        self.w_c_f = Parameter(torch.Tensor(1, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
 
 
@@ -81,7 +79,7 @@ class GConvLSTM(torch.nn.Module):
                                  out_channels=self.out_channels,
                                  K=self.K) 
 
-        self.w_c_o = Parameter(torch.Tensor(self.number_of_nodes, self.out_channels))
+        self.w_c_o = Parameter(torch.Tensor(1, self.out_channels))
         self.b_o = Parameter(torch.Tensor(1, self.out_channels))
 
 
@@ -105,13 +103,13 @@ class GConvLSTM(torch.nn.Module):
 
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(self.number_of_nodes, self.out_channels)
+            H = torch.zeros(X.shape[0], self.out_channels)
         return H
          
 
     def _set_cell_state(self, X, C):
         if C is None:
-            C = torch.zeros(self.number_of_nodes, self.out_channels)
+            C = torch.zeros(X.shape[0], self.out_channels)
         return C
 
 
