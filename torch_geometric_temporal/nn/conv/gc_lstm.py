@@ -27,8 +27,8 @@ class GCLSTM(torch.nn.Module):
     def _create_input_gate_parameters_and_layers(self):
 
         self.conv_i = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
+                               out_channels=self.out_channels,
+                               K=self.K)
 
         self.W_i = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
@@ -46,28 +46,21 @@ class GCLSTM(torch.nn.Module):
 
     def _create_cell_state_parameters_and_layers(self):
 
-        self.conv_x_c = ChebConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
+        self.conv_c = ChebConv(in_channels=self.out_channels,
+                               out_channels=self.out_channels,
+                               K=self.K)
 
-        self.conv_h_c = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
-
+        self.W_c = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_c = Parameter(torch.Tensor(1, self.out_channels))
 
 
     def _create_output_gate_parameters_and_layers(self):
 
-        self.conv_x_o = ChebConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
+        self.conv_o = ChebConv(in_channels=self.in_channels,
+                               out_channels=self.out_channels,
+                               K=self.K)
 
-        self.conv_h_o = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
-
-        self.w_c_o = Parameter(torch.Tensor(1, self.out_channels))
+        self.W_o = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_o = Parameter(torch.Tensor(1, self.out_channels))
 
 
@@ -81,7 +74,8 @@ class GCLSTM(torch.nn.Module):
     def _set_parameters(self):
         glorot(self.W_i)
         glorot(self.W_f)
-        glorot(self.w_c_o)
+        glorot(self.W_c)
+        glorot(self.W_o)
         zeros(self.b_i)
         zeros(self.b_f)
         zeros(self.b_c)
@@ -117,17 +111,16 @@ class GCLSTM(torch.nn.Module):
 
 
     def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
-        T = self.conv_x_c(X, edge_index, edge_weight)
-        T = T + self.conv_h_c(T, edge_index, edge_weight)
+        T = torch.matmul(X, self.W_c)
+        T = T + self.conv_h_c(H, edge_index, edge_weight)
         T = T + self.b_c
         T = torch.tanh(T)
         C = F*C + I*T
         return C
 
     def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
-        O = self.conv_x_o(X, edge_index, edge_weight)
+        O = torch.matmul(X, self.W_o)
         O = O + self.conv_h_o(H, edge_index, edge_weight)
-        O = O + (self.w_c_o*C)
         O = O + self.b_o
         O = torch.sigmoid(O)
         return O
