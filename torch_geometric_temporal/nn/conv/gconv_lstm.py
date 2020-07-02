@@ -143,11 +143,6 @@ class GConvLSTM(torch.nn.Module):
         return O
 
 
-    def _calculate_hidden_state(self, O, C):
-        H = O * torch.tanh(C)
-        return H
-
-
     def forward(self, X, edge_index, edge_weight=None, H=None, C=None):
         """
         Making a forward pass. If edge weights are not present the forward pass
@@ -172,6 +167,6 @@ class GConvLSTM(torch.nn.Module):
         F = self._calculate_forget_gate(X, edge_index, edge_weight, H, C)
         C = self._calculate_cell_state(X, edge_index, edge_weight, H, C, I, F)
         O = self._calculate_output_gate(X, edge_index, edge_weight, H, C)
-        H = self._calculate_hidden_state(O, C)
+        H = O * torch.tanh(C)
         return H, C
     
