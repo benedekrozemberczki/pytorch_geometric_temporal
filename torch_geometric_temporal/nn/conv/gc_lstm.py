@@ -4,7 +4,7 @@ from torch_geometric.nn import ChebConv
 from torch_geometric.nn.inits import glorot, zeros
 
 
-class GC_LSTM(torch.nn.Module):
+class GCLSTM(torch.nn.Module):
     r"""An implementation of the Chebyshev Graph Convolutional Long Short Term Memory
     Cell. For details see this paper: `"Structured Sequence Modeling with Graph
     Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
@@ -15,7 +15,7 @@ class GC_LSTM(torch.nn.Module):
         K (int): Chebyshev filter size.
     """
     def __init__(self, in_channels, out_channels, K):
-        super(GC_LSTM, self).__init__()
+        super(GCLSTM, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
