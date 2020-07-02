@@ -60,10 +60,9 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_h_c = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K) 
+                                 K=self.K)
 
         self.b_c = Parameter(torch.Tensor(1, self.out_channels))
-
 
 
     def _create_output_gate_parameters_and_layers(self):
@@ -74,11 +73,10 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_h_o = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K) 
+                                 K=self.K)
 
         self.w_c_o = Parameter(torch.Tensor(1, self.out_channels))
         self.b_o = Parameter(torch.Tensor(1, self.out_channels))
-
 
 
     def _create_parameters_and_layers(self):
