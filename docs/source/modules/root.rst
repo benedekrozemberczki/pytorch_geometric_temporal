@@ -20,3 +20,7 @@ Discrete Integrated Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.conv.gc_lstm
     :members:
     :undoc-members:
+
+.. automodule:: torch_geometric_temporal.nn.conv.lrgcn
+    :members:
+    :undoc-members:
