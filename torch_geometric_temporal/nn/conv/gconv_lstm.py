@@ -128,7 +128,7 @@ class GConvLSTM(torch.nn.Module):
 
     def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
         T = self.conv_x_c(X, edge_index, edge_weight)
-        T = T + self.conv_h_c(T, edge_index, edge_weight)
+        T = T + self.conv_h_c(H, edge_index, edge_weight)
         T = T + self.b_c
         T = torch.tanh(T)
         C = F*C + I*T
