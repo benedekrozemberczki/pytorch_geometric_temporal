@@ -100,7 +100,7 @@ class GConvLSTM(torch.nn.Module):
         if H is None:
             H = torch.zeros(X.shape[0], self.out_channels)
         return H
-         
+
 
     def _set_cell_state(self, X, C):
         if C is None:
@@ -113,7 +113,7 @@ class GConvLSTM(torch.nn.Module):
         I = I + self.conv_h_i(H, edge_index, edge_weight)
         I = I + (self.w_c_i*C)
         I = I + self.b_i
-        I = torch.sigmoid(I) 
+        I = torch.sigmoid(I)
         return I
 
 
@@ -122,7 +122,7 @@ class GConvLSTM(torch.nn.Module):
         F = F + self.conv_h_f(H, edge_index, edge_weight)
         F = F + (self.w_c_f*C)
         F = F + self.b_f
-        F = torch.sigmoid(F) 
+        F = torch.sigmoid(F)
         return F
 
 
@@ -131,7 +131,7 @@ class GConvLSTM(torch.nn.Module):
         T = T + self.conv_h_c(T, edge_index, edge_weight)
         T = T + self.b_c
         T = torch.tanh(T)
-        C = F*C + I*T  
+        C = F*C + I*T
         return C
 
     def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
