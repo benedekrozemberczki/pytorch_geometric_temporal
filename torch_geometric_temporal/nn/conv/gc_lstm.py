@@ -40,15 +40,11 @@ class GCLSTM(torch.nn.Module):
 
     def _create_forget_gate_parameters_and_layers(self):
 
-        self.conv_x_f = ChebConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
-
         self.conv_h_f = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  K=self.K)
 
-        self.w_c_f = Parameter(torch.Tensor(1, self.out_channels))
+        self.W_f = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
 
 
@@ -88,7 +84,7 @@ class GCLSTM(torch.nn.Module):
 
     def _set_parameters(self):
         glorot(self.w_c_i)
-        glorot(self.w_c_f)
+        glorot(self.W_f)
         glorot(self.w_c_o)
         zeros(self.b_i)
         zeros(self.b_f)
@@ -118,9 +114,8 @@ class GCLSTM(torch.nn.Module):
 
 
     def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
-        F = self.conv_x_f(X, edge_index, edge_weight)
+        F = torch.matmul(X, self.W_f)
         F = F + self.conv_h_f(H, edge_index, edge_weight)
-        F = F + (self.w_c_f*C)
         F = F + self.b_f
         F = torch.sigmoid(F)
         return F
