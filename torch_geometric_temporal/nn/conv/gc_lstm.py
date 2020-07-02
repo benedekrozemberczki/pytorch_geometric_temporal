@@ -5,8 +5,8 @@ from torch_geometric.nn.inits import glorot, zeros
 
 
 class GCLSTM(torch.nn.Module):
-    r"""An implementation of the Chebyshev Graph Convolutional Long Short Term Memory
-    Cell. For details see this paper: `"GC-LSTM: Graph Convolution Embedded LSTM
+    r"""An implementation of the the Integrated Graph Convolutional Long Short Term
+    Memory Cell. For details see this paper: `"GC-LSTM: Graph Convolution Embedded LSTM
     for Dynamic Link Prediction." <https://arxiv.org/abs/1812.04206>`_
 
     Args:
