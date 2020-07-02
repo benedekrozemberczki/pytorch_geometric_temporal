@@ -6,7 +6,7 @@ from torch_geometric.nn.inits import glorot, zeros
 
 class GConvLSTM(torch.nn.Module):
     r"""An implementation of the Chebyshev Graph Convolutional Long Short Term Memory
-    Cell. For details see this paper: `"Structured Sequence Modeling with Graph 
+    Cell. For details see this paper: `"Structured Sequence Modeling with Graph
     Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
 
     Args:
@@ -20,7 +20,6 @@ class GConvLSTM(torch.nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
-
         self._create_parameters_and_layers()
         self._set_parameters()
 
@@ -33,11 +32,10 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_h_i = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K) 
+                                 K=self.K)
 
         self.w_c_i = Parameter(torch.Tensor(1, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
-
 
 
     def _create_forget_gate_parameters_and_layers(self):
@@ -48,11 +46,10 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_h_f = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K) 
+                                 K=self.K)
 
         self.w_c_f = Parameter(torch.Tensor(1, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
-
 
 
     def _create_cell_state_parameters_and_layers(self):
