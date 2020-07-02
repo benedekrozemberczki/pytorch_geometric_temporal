@@ -111,7 +111,7 @@ class GConvLSTM(torch.nn.Module):
     def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
         I = self.conv_x_i(X, edge_index, edge_weight)
         I = I + self.conv_h_i(H, edge_index, edge_weight)
-        I = I + (self.w_c_i * C)
+        I = I + (self.w_c_i*C)
         I = I + self.b_i
         I = torch.sigmoid(I) 
         return I
@@ -120,7 +120,7 @@ class GConvLSTM(torch.nn.Module):
     def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
         F = self.conv_x_f(X, edge_index, edge_weight)
         F = F + self.conv_h_f(H, edge_index, edge_weight)
-        F = F + (self.w_c_f * C)
+        F = F + (self.w_c_f*C)
         F = F + self.b_f
         F = torch.sigmoid(F) 
         return F
@@ -137,7 +137,7 @@ class GConvLSTM(torch.nn.Module):
     def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
         O = self.conv_x_o(X, edge_index, edge_weight)
         O = O + self.conv_h_o(H, edge_index, edge_weight)
-        O = O + (self.w_c_o * C)
+        O = O + (self.w_c_o*C)
         O = O + self.b_o
         O = torch.sigmoid(O) 
         return O
