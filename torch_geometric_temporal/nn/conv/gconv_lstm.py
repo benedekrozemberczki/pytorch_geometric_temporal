@@ -139,7 +139,7 @@ class GConvLSTM(torch.nn.Module):
         O = O + self.conv_h_o(H, edge_index, edge_weight)
         O = O + (self.w_c_o*C)
         O = O + self.b_o
-        O = torch.sigmoid(O) 
+        O = torch.sigmoid(O)
         return O
 
 
@@ -151,7 +151,7 @@ class GConvLSTM(torch.nn.Module):
     def forward(self, X, edge_index, edge_weight=None, H=None, C=None):
         """
         Making a forward pass. If edge weights are not present the forward pass
-        defaults to an unweighted graph. If the hidden state and cell state 
+        defaults to an unweighted graph. If the hidden state and cell state
         matrices are not present when the forward pass is called these are
         initialized with zeros.
 
@@ -174,4 +174,3 @@ class GConvLSTM(torch.nn.Module):
         O = self._calculate_output_gate(X, edge_index, edge_weight, H, C)
         H = O * torch.tanh(C)
         return H, C
-    
