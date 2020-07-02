@@ -56,7 +56,7 @@ class GCLSTM(torch.nn.Module):
 
     def _create_output_gate_parameters_and_layers(self):
 
-        self.conv_o = ChebConv(in_channels=self.in_channels,
+        self.conv_o = ChebConv(in_channels=self.out_channels,
                                out_channels=self.out_channels,
                                K=self.K)
 
@@ -120,7 +120,7 @@ class GCLSTM(torch.nn.Module):
 
     def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
         O = torch.matmul(X, self.W_o)
-        O = O + self.conv_h_o(H, edge_index, edge_weight)
+        O = O + self.conv_o(H, edge_index, edge_weight)
         O = O + self.b_o
         O = torch.sigmoid(O)
         return O
