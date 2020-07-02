@@ -26,23 +26,19 @@ class GCLSTM(torch.nn.Module):
 
     def _create_input_gate_parameters_and_layers(self):
 
-        self.conv_x_i = ChebConv(in_channels=self.in_channels,
+        self.conv_i = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  K=self.K)
 
-        self.conv_h_i = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
-
-        self.w_c_i = Parameter(torch.Tensor(1, self.out_channels))
+        self.W_i = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
 
 
     def _create_forget_gate_parameters_and_layers(self):
 
-        self.conv_h_f = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K)
+        self.conv_f = ChebConv(in_channels=self.out_channels,
+                               out_channels=self.out_channels,
+                               K=self.K)
 
         self.W_f = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
@@ -83,7 +79,7 @@ class GCLSTM(torch.nn.Module):
 
 
     def _set_parameters(self):
-        glorot(self.w_c_i)
+        glorot(self.W_i)
         glorot(self.W_f)
         glorot(self.w_c_o)
         zeros(self.b_i)
@@ -105,9 +101,8 @@ class GCLSTM(torch.nn.Module):
 
 
     def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
-        I = self.conv_x_i(X, edge_index, edge_weight)
-        I = I + self.conv_h_i(H, edge_index, edge_weight)
-        I = I + (self.w_c_i*C)
+        I = torch.matmul(X, self.W_i)
+        I = I + self.conv_i(H, edge_index, edge_weight)
         I = I + self.b_i
         I = torch.sigmoid(I)
         return I
@@ -115,7 +110,7 @@ class GCLSTM(torch.nn.Module):
 
     def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
         F = torch.matmul(X, self.W_f)
-        F = F + self.conv_h_f(H, edge_index, edge_weight)
+        F = F + self.conv_f(H, edge_index, edge_weight)
         F = F + self.b_f
         F = torch.sigmoid(F)
         return F
