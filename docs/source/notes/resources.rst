@@ -1,6 +1,6 @@
 External resources
 ==================
 
-* AUTHOR A, AUTHOR B, AUTHOR C: **Name of paper A.** `Paper <https://arxiv.org/pdf/cs/0103016.pdf>`_, `Code <https://arxiv.org/pdf/cs/0103016.pdf>`_, 
+* Youngjoo Seo, Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst: **Structured Sequence Modeling With Graph Convolutional Recurrent Networks** `Paper <https://arxiv.org/abs/1612.07659>`_, `Code <https://github.com/youngjoo-epfl/gconvRNN>`_, 
 
 * Jinyin Chen, Xuanheng Xu, Yangyang Wu, Haibin Zheng: **GC-LSTM: Graph Convolution Embedded LSTM for Dynamic Link Prediction** `Paper <https://arxiv.org/abs/1812.04206>`_
