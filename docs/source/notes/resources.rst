@@ -5,4 +5,4 @@ External resources
 
 * Jinyin Chen, Xuanheng Xu, Yangyang Wu, Haibin Zheng: **GC-LSTM: Graph Convolution Embedded LSTM for Dynamic Link Prediction** `Paper <https://arxiv.org/abs/1812.04206>`_
 
-* Jia Li, Zhichao Han, Hong Cheng, Jiao Su, Pengyun Wang, Jianfeng Zhang, Lujia Pan: **Predicting Path Failure In Time-Evolving Graphs** `Paper <https://arxiv.org/abs/1905.03994>`_, `Code <https://github.com/youngjoo-epfl/gconvRNN>`_, 
+* Jia Li, Zhichao Han, Hong Cheng, Jiao Su, Pengyun Wang, Jianfeng Zhang, Lujia Pan: **Predicting Path Failure In Time-Evolving Graphs** `Paper <https://arxiv.org/abs/1905.03994>`_, `Code <https://github.com/chocolates/Predicting-Path-Failure-In-Time-Evolving-Graphs>`_, 
