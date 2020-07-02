@@ -61,7 +61,6 @@ class GConvGRU(torch.nn.Module):
         self._create_candidate_state_parameters_and_layers()
 
 
-
     def _set_hidden_state(self, X, H):
         if H is None:
             H = torch.zeros(X.shape[0], self.out_channels)
@@ -70,7 +69,7 @@ class GConvGRU(torch.nn.Module):
     def _calculate_update_gate(self, X, edge_index, edge_weight, H):
         Z = self.conv_x_z(X, edge_index, edge_weight)
         Z = Z + self.conv_h_z(H, edge_index, edge_weight)
-        Z = torch.sigmoid(Z) 
+        Z = torch.sigmoid(Z)
         return Z
 
 
@@ -86,6 +85,7 @@ class GConvGRU(torch.nn.Module):
         H_tilde = H_tilde + self.conv_h_h(H*R, edge_index, edge_weight)
         H_tilde = torch.tanh(H_tilde)
         return H_tilde
+
 
     def _calculate_hidden_state(self, Z, H, H_tilde):
         H = Z*H + (1-Z)*H_tilde
