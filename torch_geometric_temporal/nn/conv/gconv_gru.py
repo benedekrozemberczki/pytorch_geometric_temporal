@@ -115,4 +115,3 @@ class GConvGRU(torch.nn.Module):
         H_tilde = self._calculate_candidate_state(X, edge_index, edge_weight, H, R)
         H = self._calculate_hidden_state(Z, H, H_tilde)
         return H
-    
