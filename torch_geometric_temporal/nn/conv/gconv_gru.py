@@ -18,7 +18,6 @@ class GConvGRU(torch.nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
-
         self._create_parameters_and_layers()
 
 
@@ -65,6 +64,7 @@ class GConvGRU(torch.nn.Module):
         if H is None:
             H = torch.zeros(X.shape[0], self.out_channels)
         return H
+
 
     def _calculate_update_gate(self, X, edge_index, edge_weight, H):
         Z = self.conv_x_z(X, edge_index, edge_weight)
