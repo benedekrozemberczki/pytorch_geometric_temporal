@@ -13,3 +13,7 @@ Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.conv.gconv_lstm
     :members:
     :undoc-members:
+
+.. automodule:: torch_geometric_temporal.nn.conv.gc_lstm
+    :members:
+    :undoc-members:
