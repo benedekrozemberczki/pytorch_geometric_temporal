@@ -30,7 +30,7 @@ class GConvGRU(torch.nn.Module):
 
         self.conv_h_z = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K) 
+                                 K=self.K)
 
 
     def _create_reset_gate_parameters_and_layers(self):
