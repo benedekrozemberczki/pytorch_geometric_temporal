@@ -6,7 +6,8 @@ from torch_geometric.nn.inits import glorot, zeros
 
 class LRGCN(torch.nn.Module):
     r"""An implementation of the Long Short Term Memory Relational
-    Graph Convolution Layer. For details see this paper: `"." <https://arxiv.org/abs/1612.07659>`_
+    Graph Convolution Layer. For details see this paper: `"Predicting Path
+    Failure In Time-Evolving Graphs." <https://arxiv.org/abs/1905.03994>`_
 
     Args:
         in_channels (int): Number of input features.
