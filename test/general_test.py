@@ -131,14 +131,16 @@ def test_lrgcn_layer():
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
     edge_relations = create_mock_edge_weight(edge_index)
 
-    layer = LRGCN(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = LRGCN(in_channels=in_channels,
+                  out_channels=out_channels,
+                  num_relations=num_relations)
 
-    H, C = layer(X, edge_index, edge_weight)
+    H, C = layer(X, edge_index, edge_relations)
 
     assert H.shape == (number_of_nodes, out_channels)
     assert C.shape == (number_of_nodes, out_channels)
 
-    H, C = layer(X, edge_index, edge_weight, H, C)
+    H, C = layer(X, edge_index, edge_relations, H, C)
 
     assert H.shape == (number_of_nodes, out_channels)
     assert C.shape == (number_of_nodes, out_channels)
