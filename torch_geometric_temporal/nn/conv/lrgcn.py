@@ -22,7 +22,7 @@ class LRGCN(torch.nn.Module):
         self.out_channels = out_channels
         self.num_relations = num_relations
         self.num_bases = num_bases
-        self._create_parameters_and_layers()
+        self._create_layers()
 
 
     def _create_input_gate_parameters_and_layers(self):
@@ -77,7 +77,7 @@ class LRGCN(torch.nn.Module):
                                  num_bases=self.num_bases)
 
 
-    def _create_parameters_and_layers(self):
+    def _create_layers(self):
         self._create_input_gate_parameters_and_layers()
         self._create_forget_gate_parameters_and_layers()
         self._create_cell_state_parameters_and_layers()
