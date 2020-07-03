@@ -25,7 +25,7 @@ class LRGCN(torch.nn.Module):
         self._create_layers()
 
 
-    def _create_input_gate_parameters_and_layers(self):
+    def _create_input_gate_layers(self):
 
         self.conv_x_i = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
@@ -38,7 +38,7 @@ class LRGCN(torch.nn.Module):
                                  num_bases=self.num_bases)
 
 
-    def _create_forget_gate_parameters_and_layers(self):
+    def _create_forget_gate_layers(self):
 
         self.conv_x_f = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
@@ -51,7 +51,7 @@ class LRGCN(torch.nn.Module):
                                  num_bases=self.num_bases)
 
 
-    def _create_cell_state_parameters_and_layers(self):
+    def _create_cell_state_layers(self):
 
         self.conv_x_c = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
@@ -64,7 +64,7 @@ class LRGCN(torch.nn.Module):
                                  num_bases=self.num_bases)
 
 
-    def _create_output_gate_parameters_and_layers(self):
+    def _create_output_gate_layers(self):
 
         self.conv_x_o = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
@@ -78,10 +78,10 @@ class LRGCN(torch.nn.Module):
 
 
     def _create_layers(self):
-        self._create_input_gate_parameters_and_layers()
-        self._create_forget_gate_parameters_and_layers()
-        self._create_cell_state_parameters_and_layers()
-        self._create_output_gate_parameters_and_layers()
+        self._create_input_gate_layers()
+        self._create_forget_gate_layers()
+        self._create_cell_state_layers()
+        self._create_output_gate_layers()
 
 
     def _set_hidden_state(self, X, H):
