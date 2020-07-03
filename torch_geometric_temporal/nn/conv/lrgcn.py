@@ -13,6 +13,7 @@ class LRGCN(torch.nn.Module):
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         num_relations (int): Number of relations.
+        num_bases (int): Number of bases.
     """
     def __init__(self, in_channels, out_channels, num_relations, num_bases):
         super(LRGCN, self).__init__()
