@@ -106,8 +106,6 @@ class LRGCN(torch.nn.Module):
     def _calculate_forget_gate(self, X, edge_index, edge_type, H, C):
         F = self.conv_x_f(X, edge_index, edge_type)
         F = F + self.conv_h_f(H, edge_index, edge_type)
-        F = F + (self.w_c_f*C)
-        F = F + self.b_f
         F = torch.sigmoid(F)
         return F
 
