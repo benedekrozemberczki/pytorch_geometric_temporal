@@ -26,11 +26,11 @@ class LRGCN(torch.nn.Module):
 
     def _create_input_gate_parameters_and_layers(self):
 
-        self.conv_x_i = ChebConv(in_channels=self.in_channels,
+        self.conv_x_i = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
-        self.conv_h_i = ChebConv(in_channels=self.out_channels,
+        self.conv_h_i = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
@@ -40,11 +40,11 @@ class LRGCN(torch.nn.Module):
 
     def _create_forget_gate_parameters_and_layers(self):
 
-        self.conv_x_f = ChebConv(in_channels=self.in_channels,
+        self.conv_x_f = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
-        self.conv_h_f = ChebConv(in_channels=self.out_channels,
+        self.conv_h_f = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
@@ -54,11 +54,11 @@ class LRGCN(torch.nn.Module):
 
     def _create_cell_state_parameters_and_layers(self):
 
-        self.conv_x_c = ChebConv(in_channels=self.in_channels,
+        self.conv_x_c = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
-        self.conv_h_c = ChebConv(in_channels=self.out_channels,
+        self.conv_h_c = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
@@ -67,11 +67,11 @@ class LRGCN(torch.nn.Module):
 
     def _create_output_gate_parameters_and_layers(self):
 
-        self.conv_x_o = ChebConv(in_channels=self.in_channels,
+        self.conv_x_o = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
-        self.conv_h_o = ChebConv(in_channels=self.out_channels,
+        self.conv_h_o = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
                                  num_relations=self.num_relations)
 
