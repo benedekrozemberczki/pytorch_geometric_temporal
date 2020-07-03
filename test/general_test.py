@@ -18,6 +18,9 @@ def create_mock_states(number_of_nodes, out_channels):
 
 
 def create_mock_edge_weight(edge_index):
+    """
+    Creating a mock edge weight tensor.
+    """
     return torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
 
 def create_mock_edge_relations(edge_index, num_relations):
