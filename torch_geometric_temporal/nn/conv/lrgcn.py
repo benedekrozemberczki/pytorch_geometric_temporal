@@ -139,7 +139,6 @@ class LRGCN(torch.nn.Module):
     def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
         T = self.conv_x_c(X, edge_index, edge_weight)
         T = T + self.conv_h_c(H, edge_index, edge_weight)
-        T = T + self.b_c
         T = torch.tanh(T)
         C = F*C + I*T
         return C
@@ -147,8 +146,6 @@ class LRGCN(torch.nn.Module):
     def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
         O = self.conv_x_o(X, edge_index, edge_weight)
         O = O + self.conv_h_o(H, edge_index, edge_weight)
-        O = O + (self.w_c_o*C)
-        O = O + self.b_o
         O = torch.sigmoid(O)
         return O
 
