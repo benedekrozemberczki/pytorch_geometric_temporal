@@ -23,7 +23,6 @@ class LRGCN(torch.nn.Module):
         self.num_relations = num_relations
         self.num_bases = num_bases
         self._create_parameters_and_layers()
-        self._set_parameters()
 
 
     def _create_input_gate_parameters_and_layers(self):
