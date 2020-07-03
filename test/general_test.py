@@ -1,26 +1,27 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.conv import GConvLSTM, GConvGRU, GCLSTM
+from torch_geometric_temporal.nn.conv import GConvLSTM, GConvGRU, GCLSTM, LRGCN
 
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
-
     graph = nx.watts_strogatz_graph(number_of_nodes, edge_per_node, 0.5)
-
     edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
-
-    edge_weight = torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
-
     X = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
+    return X, edge_index
 
-    return X, edge_index, edge_weight
 
-
-def _create_mock_states(number_of_nodes, out_channels):
+def create_mock_states(number_of_nodes, out_channels):
     H = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     C = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     return H, C
+
+
+def create_mock_edge_weight(edge_index):
+    return torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
+
+def create_mock_edge_relations(edge_index, num_relations):
+    return torch.LongTensor(np.random.choice(num_relations, edge_index.shape[1], replace=True))
 
 
 def test_gconv_lstm_layer():
@@ -33,7 +34,8 @@ def test_gconv_lstm_layer():
     out_channels = 16
     K = 2
 
-    X, edge_index, edge_weight = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
 
     layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
 
@@ -65,7 +67,8 @@ def test_gconv_gru_layer():
     out_channels = 16
     K = 2
 
-    X, edge_index, edge_weight = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
 
     layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K)
 
@@ -93,7 +96,8 @@ def test_gc_lstm_layer():
     out_channels = 16
     K = 2
 
-    X, edge_index, edge_weight = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
 
     layer = GCLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
 
@@ -102,6 +106,32 @@ def test_gc_lstm_layer():
     assert H.shape == (number_of_nodes, out_channels)
     assert C.shape == (number_of_nodes, out_channels)
     
+
+    H, C = layer(X, edge_index, edge_weight)
+
+    assert H.shape == (number_of_nodes, out_channels)
+    assert C.shape == (number_of_nodes, out_channels)
+
+    H, C = layer(X, edge_index, edge_weight, H, C)
+
+    assert H.shape == (number_of_nodes, out_channels)
+    assert C.shape == (number_of_nodes, out_channels)
+
+
+def test_lrgcn_layer():
+    """
+    Testing the LRGCN Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    num_relations = 5
+
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_relations = create_mock_edge_weight(edge_index)
+
+    layer = LRGCN(in_channels=in_channels, out_channels=out_channels, K=K)
 
     H, C = layer(X, edge_index, edge_weight)
 
