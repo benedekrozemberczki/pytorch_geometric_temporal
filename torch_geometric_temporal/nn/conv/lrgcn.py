@@ -14,12 +14,13 @@ class LRGCN(torch.nn.Module):
         out_channels (int): Number of output features.
         num_relations (int): Number of relations.
     """
-    def __init__(self, in_channels, out_channels, num_relations):
+    def __init__(self, in_channels, out_channels, num_relations, num_bases):
         super(LRGCN, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.num_relations = num_relations
+        self.num_bases = num_bases
         self._create_parameters_and_layers()
         self._set_parameters()
 
@@ -28,11 +29,13 @@ class LRGCN(torch.nn.Module):
 
         self.conv_x_i = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.conv_h_i = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.w_c_i = Parameter(torch.Tensor(1, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
@@ -42,11 +45,13 @@ class LRGCN(torch.nn.Module):
 
         self.conv_x_f = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.conv_h_f = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.w_c_f = Parameter(torch.Tensor(1, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
@@ -56,11 +61,13 @@ class LRGCN(torch.nn.Module):
 
         self.conv_x_c = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.conv_h_c = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.b_c = Parameter(torch.Tensor(1, self.out_channels))
 
@@ -69,11 +76,13 @@ class LRGCN(torch.nn.Module):
 
         self.conv_x_o = RGCNConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.conv_h_o = RGCNConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 num_relations=self.num_relations)
+                                 num_relations=self.num_relations,
+                                 num_bases=self.num_bases)
 
         self.w_c_o = Parameter(torch.Tensor(1, self.out_channels))
         self.b_o = Parameter(torch.Tensor(1, self.out_channels))
