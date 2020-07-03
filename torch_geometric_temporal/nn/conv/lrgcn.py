@@ -96,16 +96,6 @@ class LRGCN(torch.nn.Module):
         self._create_output_gate_parameters_and_layers()
 
 
-    def _set_parameters(self):
-        glorot(self.w_c_i)
-        glorot(self.w_c_f)
-        glorot(self.w_c_o)
-        zeros(self.b_i)
-        zeros(self.b_f)
-        zeros(self.b_c)
-        zeros(self.b_o)
-
-
     def _set_hidden_state(self, X, H):
         if H is None:
             H = torch.zeros(X.shape[0], self.out_channels)
