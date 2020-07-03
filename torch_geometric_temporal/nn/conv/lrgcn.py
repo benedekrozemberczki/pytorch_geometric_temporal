@@ -38,9 +38,6 @@ class LRGCN(torch.nn.Module):
                                  num_relations=self.num_relations,
                                  num_bases=self.num_bases)
 
-        self.w_c_i = Parameter(torch.Tensor(1, self.out_channels))
-        self.b_i = Parameter(torch.Tensor(1, self.out_channels))
-
 
     def _create_forget_gate_parameters_and_layers(self):
 
