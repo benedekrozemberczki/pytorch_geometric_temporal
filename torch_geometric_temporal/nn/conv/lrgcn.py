@@ -121,8 +121,6 @@ class LRGCN(torch.nn.Module):
     def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
         I = self.conv_x_i(X, edge_index, edge_weight)
         I = I + self.conv_h_i(H, edge_index, edge_weight)
-        I = I + (self.w_c_i*C)
-        I = I + self.b_i
         I = torch.sigmoid(I)
         return I
 
@@ -142,6 +140,7 @@ class LRGCN(torch.nn.Module):
         T = torch.tanh(T)
         C = F*C + I*T
         return C
+
 
     def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
         O = self.conv_x_o(X, edge_index, edge_weight)
