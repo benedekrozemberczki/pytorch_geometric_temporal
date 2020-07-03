@@ -5,6 +5,9 @@ from torch_geometric_temporal.nn.conv import GConvLSTM, GConvGRU, GCLSTM, LRGCN
 
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
+    """
+    Creating a mock feature matrix and edge index.
+    """
     graph = nx.watts_strogatz_graph(number_of_nodes, edge_per_node, 0.5)
     edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
     X = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
