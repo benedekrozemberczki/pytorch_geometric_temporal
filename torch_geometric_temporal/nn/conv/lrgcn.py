@@ -97,33 +97,33 @@ class LRGCN(torch.nn.Module):
         return C
 
 
-    def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
-        I = self.conv_x_i(X, edge_index, edge_weight)
-        I = I + self.conv_h_i(H, edge_index, edge_weight)
+    def _calculate_input_gate(self, X, edge_index, edge_type, H, C):
+        I = self.conv_x_i(X, edge_index, edge_type)
+        I = I + self.conv_h_i(H, edge_index, edge_type)
         I = torch.sigmoid(I)
         return I
 
 
-    def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
-        F = self.conv_x_f(X, edge_index, edge_weight)
-        F = F + self.conv_h_f(H, edge_index, edge_weight)
+    def _calculate_forget_gate(self, X, edge_index, edge_type, H, C):
+        F = self.conv_x_f(X, edge_index, edge_type)
+        F = F + self.conv_h_f(H, edge_index, edge_type)
         F = F + (self.w_c_f*C)
         F = F + self.b_f
         F = torch.sigmoid(F)
         return F
 
 
-    def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
-        T = self.conv_x_c(X, edge_index, edge_weight)
-        T = T + self.conv_h_c(H, edge_index, edge_weight)
+    def _calculate_cell_state(self, X, edge_index, edge_type, H, C, I, F):
+        T = self.conv_x_c(X, edge_index, edge_type)
+        T = T + self.conv_h_c(H, edge_index, edge_type)
         T = torch.tanh(T)
         C = F*C + I*T
         return C
 
 
-    def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
-        O = self.conv_x_o(X, edge_index, edge_weight)
-        O = O + self.conv_h_o(H, edge_index, edge_weight)
+    def _calculate_output_gate(self, X, edge_index, edge_type, H, C):
+        O = self.conv_x_o(X, edge_index, edge_type)
+        O = O + self.conv_h_o(H, edge_index, edge_type)
         O = torch.sigmoid(O)
         return O
 
