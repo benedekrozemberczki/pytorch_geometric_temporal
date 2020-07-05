@@ -14,7 +14,9 @@ install_requires = ["torch",
 
 setup_requires = ['pytest-runner']
 
-tests_require = ['pytest', 'pytest-cov', 'mock']
+tests_require = ['pytest',
+                 'pytest-cov',
+                 'mock']
 
 setup(
   name = "torch_geometric_temporal",
