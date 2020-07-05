@@ -61,3 +61,9 @@ where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101` or `cu102` d
 $ python setup.py test
 ```
 
+
+## License
+
+
+- [GNU General Public License v3.0](https://github.com/benedekrozemberczki/karateclub/blob/master/LICENSE)
+
