@@ -15,7 +15,7 @@ class LRGCN(torch.nn.Module):
         num_relations (int): Number of relations.
         num_bases (int): Number of bases.
     """
-    def __init__(self, in_channels: int, out_channels: int
+    def __init__(self, in_channels: int, out_channels: int,
                  num_relations: int, num_bases: int):
         super(LRGCN, self).__init__()
 
@@ -132,7 +132,7 @@ class LRGCN(torch.nn.Module):
 
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
-                edge_weight: torch.FloatTensor=None, H: torch.FloatTensor=None, C: torch.FloatTensor=None):
+                edge_type: torch.LongTensor, H: torch.FloatTensor=None, C: torch.FloatTensor=None):
         """
         Making a forward pass. If the hidden state and cell state matrices are 
         not present when the forward pass is called these are initialized with zeros.
