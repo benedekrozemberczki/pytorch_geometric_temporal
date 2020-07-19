@@ -12,7 +12,7 @@ class GConvGRU(torch.nn.Module):
         out_channels (int): Number of output features.
         K (int): Chebyshev filter size.
     """
-    def __init__(self, in_channels, out_channels, K):
+    def __init__(self, in_channels: int, out_channels: int, K: int):
         super(GConvGRU, self).__init__()
 
         self.in_channels = in_channels
