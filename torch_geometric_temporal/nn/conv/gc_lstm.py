@@ -132,7 +132,7 @@ class GCLSTM(torch.nn.Module):
 
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
-                edge_weight=None, H=None, C=None):
+                edge_weight: torch.FloatTensor=None, H: torch.FloatTensor=None, C: torch.FloatTensor=None):
         """
         Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. If the hidden state and cell state
