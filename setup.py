@@ -21,7 +21,7 @@ tests_require = ['pytest',
 setup(
   name = "torch_geometric_temporal",
   packages = find_packages(),
-  version = "0.0.4",
+  version = "0.0.5",
   license = "MIT",
   description = "A Temporal Extension Library for PyTorch Geometric.",
   author = "Benedek Rozemberczki",
