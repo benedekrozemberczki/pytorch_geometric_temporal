@@ -15,7 +15,8 @@ class LRGCN(torch.nn.Module):
         num_relations (int): Number of relations.
         num_bases (int): Number of bases.
     """
-    def __init__(self, in_channels, out_channels, num_relations, num_bases):
+    def __init__(self, in_channels: int, out_channels: int
+                 num_relations: int, num_bases: int):
         super(LRGCN, self).__init__()
 
         self.in_channels = in_channels
