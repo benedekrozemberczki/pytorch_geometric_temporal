@@ -39,6 +39,23 @@ In detail, the following temporal graph neural networks were implemented.
 
 
 
+
+**Citing**
+
+If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the folowing citation:
+
+```bibtex
+@misc{rozemberczki_temporal,
+      author = {Benedek, Rozemberczki},
+      title = {{PyTorch Geometric Temporal}},
+      year = {2020},
+      publisher = {GitHub},
+      journal = {GitHub repository},
+      howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
+}
+```
+
+
 ## Installation
 
 To install the binaries for PyTorch 1.5.0, simply run
