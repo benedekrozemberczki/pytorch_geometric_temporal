@@ -22,7 +22,13 @@ keywords = ["machine-learning",
             "deep-learning",
             "deeplearning",
             "machine learning",
-            "deep learning"]
+            "deep learning",
+            "graph",
+            "dynamic graph",
+            "embedding",
+            "dynamic embedding",
+            "graph convolution",
+            "gcn"]
 
 setup(
   name = "torch_geometric_temporal",
