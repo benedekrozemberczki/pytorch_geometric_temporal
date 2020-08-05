@@ -32,7 +32,9 @@ keywords = ["machine-learning",
             "graph neural network",
             "graph attention",
             "lstm",
-            "temporal network"]
+            "temporal network",
+            "representation learning",
+            "learning"]
 
 setup(
   name = "torch_geometric_temporal",
