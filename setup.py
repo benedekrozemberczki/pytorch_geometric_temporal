@@ -28,7 +28,10 @@ keywords = ["machine-learning",
             "embedding",
             "dynamic embedding",
             "graph convolution",
-            "gcn"]
+            "gcn",
+            "graph neural network",
+            "graph attention",
+            "lstm"]
 
 setup(
   name = "torch_geometric_temporal",
