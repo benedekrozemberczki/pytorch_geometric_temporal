@@ -45,7 +45,7 @@ setup(
   author = "Benedek Rozemberczki",
   author_email = "benedek.rozemberczki@gmail.com",
   url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal",
-  download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00004.tar.gz",
+  download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00005.tar.gz",
   keywords = keywords,
   install_requires = install_requires,
   setup_requires = setup_requires,
