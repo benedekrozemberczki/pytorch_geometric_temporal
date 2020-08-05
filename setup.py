@@ -35,11 +35,9 @@ setup(
   setup_requires = setup_requires,
   tests_require = tests_require,
   python_requires='>=3.6',
-  classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Build Tools",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.6",
-  ],
+  classifiers = ["Development Status :: 3 - Alpha",
+                 "Intended Audience :: Developers",
+                 "Topic :: Software Development :: Build Tools",
+                 "License :: OSI Approved :: MIT License",
+                 "Programming Language :: Python :: 3.6"],
 )
