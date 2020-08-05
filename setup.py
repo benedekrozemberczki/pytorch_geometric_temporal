@@ -18,7 +18,10 @@ tests_require = ['pytest',
                  'pytest-cov',
                  'mock']
 
-keywords = ["machine-learning", "deep-learning", "deeplearning"]
+keywords = ["machine-learning",
+            "deep-learning",
+            "deeplearning",
+            "machine learning"]
 
 setup(
   name = "torch_geometric_temporal",
