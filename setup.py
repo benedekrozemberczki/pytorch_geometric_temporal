@@ -18,6 +18,8 @@ tests_require = ['pytest',
                  'pytest-cov',
                  'mock']
 
+keywords = ["machine-learning", "deep-learning", "deeplearning"]
+
 setup(
   name = "torch_geometric_temporal",
   packages = find_packages(),
@@ -28,7 +30,7 @@ setup(
   author_email = "benedek.rozemberczki@gmail.com",
   url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal",
   download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00004.tar.gz",
-  keywords = ["machine-learning", "deep-learning", "deeplearning"],
+  keywords = keywords,
   install_requires = install_requires,
   setup_requires = setup_requires,
   tests_require = tests_require,
