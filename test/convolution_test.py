@@ -168,12 +168,12 @@ def test_dygrencoder_layer():
     """
     number_of_nodes = 100
     edge_per_node = 10
-    in_channels = 32
+    in_channels = 8
 
     conv_out_channels = 16
     conv_num_layers = 1
     conv_aggr = "add"
-    lstm_out_channels = 16
+    lstm_out_channels = 8
     lstm_num_layers = 1
 
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
