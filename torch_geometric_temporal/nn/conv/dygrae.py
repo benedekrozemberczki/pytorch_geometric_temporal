@@ -57,4 +57,6 @@ class DyGrEncoder(torch.nn.Module):
         H_tilde = H_tilde[None, :, :]
         if H is None and C is None: 
             H_tilde, (H, C) = self.recurrent_layer(H_tilde)
+        elif H is not None and C is not None: 
+            H_tilde, (H, C) = self.recurrent_layer(H_tilde, (H, C))
         return H_tilde, H, C
