@@ -10,7 +10,8 @@ class DyGrEncoder(torch.nn.Module):
     Args:
         conv_out_channels (int): Number of neurons in GGCN.
         conv_num_layers (int): Number of Gated Graph Convolutions.
-        conv_aggr (str): Aggregation scheme to use - one of add/sum/mean.
+        conv_aggr (str): Aggregation scheme to use
+            (:obj:`"add"`, :obj:`"mean"`, :obj:`"max"`).
         lstm_out_channels (int): Number of LSTM channels.
         lstm_num_layers (int): Number of neurons in LSTM.
     """
@@ -46,9 +47,9 @@ class DyGrEncoder(torch.nn.Module):
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node features.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
-            * **edge_weight** *(PyTorch Float Tensor)* - Edge weight vector (optional).
-            * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes (optional).
-            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes (optional).
+            * **edge_weight** *(PyTorch Float Tensor, optional)* - Edge weight vector.
+            * **H** *(PyTorch Float Tensor, optional)* - Hidden state matrix for all nodes.
+            * **C** *(PyTorch Float Tensor, optional)* - Cell state matrix for all nodes.
 
         Return types:
             * **H_tilde** *(PyTorch Float Tensor)* - Output matrix for all nodes.
