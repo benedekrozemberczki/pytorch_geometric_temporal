@@ -176,10 +176,18 @@ def test_dygrencoder_layer():
     lstm_out_channels = 16
     lstm_num_layers = 1
 
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
+
     layer = DyGrEncoder(conv_out_channels = conv_out_channels,
                         conv_num_layers = conv_num_layers,
                         conv_aggr = conv_aggr,
                         lstm_out_channels = lstm_out_channels,
                         lstm_num_layers = lstm_num_layers)
+
+
+    H = layer(X, edge_index)
+
+    H = layer(X, edge_index, edge_weight)
 
     assert 1 == 1
