@@ -53,6 +53,8 @@ class DyGrEncoder(torch.nn.Module):
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
-        H = self.conv_layer(X, edge_index, edge_weight)
-        print(self.H.shape)
-        return H
+        H_tilde = self.conv_layer(X, edge_index, edge_weight)
+        H_tilde = H_tilde[None, :, :]
+        if H is None and C is None: 
+            H_tilde, (H, C) = self.recurrent_layer(H_tilde)
+        return H_tilde, H, C
