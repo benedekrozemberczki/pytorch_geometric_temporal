@@ -45,12 +45,12 @@ class DyGrEncoder(torch.nn.Module):
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node features.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
-            * **edge_weight** *(PyTorch Float Tensor)* - Edge weight vector.
+            * **edge_weight** *(PyTorch Float Tensor)* - Edge weight vector (optional).
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes (optional).
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes (optional).
 
         Return types:
-            * **H_tilde** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
+            * **H_tilde** *(PyTorch Float Tensor)* - Output matrix for all nodes.
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
