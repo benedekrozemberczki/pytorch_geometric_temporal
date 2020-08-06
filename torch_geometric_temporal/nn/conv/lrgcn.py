@@ -131,8 +131,8 @@ class LRGCN(torch.nn.Module):
         return H
 
 
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
-                edge_type: torch.LongTensor, H: torch.FloatTensor=None, C: torch.FloatTensor=None):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_type: torch.LongTensor,
+                H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
         """
         Making a forward pass. If the hidden state and cell state matrices are 
         not present when the forward pass is called these are initialized with zeros.
