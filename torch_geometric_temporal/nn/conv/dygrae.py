@@ -13,9 +13,10 @@ class DyGrEncoder(torch.nn.Module):
         num_relations (int): Number of relations.
         num_bases (int): Number of bases.
     """
-    def __init__(self, in_channels: int, out_channels: int,
+    def __init__(self, conv_channels: int, conv_num_layers: int=2, conv_aggr: str="add",
+                 lstm_out_channels: int,
                  num_relations: int, num_bases: int):
-        super(LRGCN, self).__init__()
+        super(DyGrEncoder, self).__init__()
 
         self.conv_out_channels = conv_out_channels
         self.lstm_out_channels = lstm_out_channels
