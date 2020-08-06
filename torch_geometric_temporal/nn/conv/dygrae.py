@@ -1,3 +1,4 @@
+import torch
 from torch.nn import LSTM
 from torch_geometric.nn import GatedGraphConv
 
@@ -12,8 +13,8 @@ class DyGrEncoder(torch.nn.Module):
         num_relations (int): Number of relations.
         num_bases (int): Number of bases.
     """
-    def __init__(self, conv_channels: int, conv_num_layers: int=2, conv_aggr: str="add",
-                 lstm_out_channels: int, lstm_num_layers: int=1):
+    def __init__(self, conv_channels: int, conv_num_layers: int, conv_aggr: str,
+                 lstm_out_channels: int, lstm_num_layers: int):
         super(DyGrEncoder, self).__init__()
 
         self.conv_out_channels = conv_out_channels

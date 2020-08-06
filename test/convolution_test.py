@@ -168,7 +168,10 @@ def test_dygrencoder_layer():
     """
     number_of_nodes = 100
     edge_per_node = 10
-    in_channels = 64
-    out_channels = 16
-    K = 2
+    in_channels = 32
+    conv_channels = 16
+    conv_num_layers = 1
+    conv_aggr = "add"
+    lstm_out_channels = 16
+    lstm_num_layers = 1
     assert 1 == 1
