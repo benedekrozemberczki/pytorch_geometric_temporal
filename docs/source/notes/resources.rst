@@ -7,6 +7,6 @@ External resources
 
 * Jia Li, Zhichao Han, Hong Cheng, Jiao Su, Pengyun Wang, Jianfeng Zhang, Lujia Pan: **Predicting Path Failure In Time-Evolving Graphs** `Paper <https://arxiv.org/abs/1905.03994>`_, `Code <https://github.com/chocolates/Predicting-Path-Failure-In-Time-Evolving-Graphs>`_, 
 
-*  Aynaz Taheri, Tanya Berger-Wolf : **Predictive Temporal Embedding of Dynamic Graphs** `Paper <https://ieeexplore.ieee.org/document/9073186>`_, `Code <https://github.com/chocolates/Predicting-Path-Failure-In-Time-Evolving-Graphs>`_, 
+*  Aynaz Taheri, Tanya Berger-Wolf : **Predictive Temporal Embedding of Dynamic Graphs** `Paper <https://ieeexplore.ieee.org/document/9073186>`_
 
 * Jia Li, Zhichao Han, Hong Cheng, Jiao Su, Pengyun Wang, Jianfeng Zhang, Lujia Pan: **Predicting Path Failure In Time-Evolving Graphs** `Paper <https://arxiv.org/abs/1905.03994>`_, `Code <https://github.com/chocolates/Predicting-Path-Failure-In-Time-Evolving-Graphs>`_, 
