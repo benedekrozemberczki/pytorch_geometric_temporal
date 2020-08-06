@@ -50,6 +50,7 @@ class DyGrEncoder(torch.nn.Module):
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes (optional).
 
         Return types:
+            * **H_tilde** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
