@@ -9,4 +9,4 @@ External resources
 
 *  Aynaz Taheri, Tanya Berger-Wolf : **Predictive Temporal Embedding of Dynamic Graphs** `Paper <https://ieeexplore.ieee.org/document/9073186>`_
 
-* Jia Li, Zhichao Han, Hong Cheng, Jiao Su, Pengyun Wang, Jianfeng Zhang, Lujia Pan: **Learning to Represent the Evolution of Dynamic Graphs with Recurrent Models** `Paper <https://arxiv.org/abs/1905.03994>`_, `Code <https://github.com/chocolates/Predicting-Path-Failure-In-Time-Evolving-Graphs>`_, 
+* Aynaz Taheri, Kevin Gimpel, Tanya Berger-Wolf: **Learning to Represent the Evolution of Dynamic Graphs with Recurrent Models** `Paper <https://arxiv.org/abs/1905.03994>`_, `Code <https://github.com/chocolates/Predicting-Path-Failure-In-Time-Evolving-Graphs>`_, 
