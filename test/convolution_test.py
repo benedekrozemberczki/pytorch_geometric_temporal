@@ -186,8 +186,10 @@ def test_dygrencoder_layer():
                         lstm_num_layers = lstm_num_layers)
 
 
-    H = layer(X, edge_index)
+    H_tilde, C, H = layer(X, edge_index)
 
-    H = layer(X, edge_index, edge_weight)
+    H_tilde, C, H = layer(X, edge_index, edge_weight)
+
+    H_tilde, C, H = layer(X, edge_index, edge_weight, C, H)
 
     assert 1 == 1
