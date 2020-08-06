@@ -18,9 +18,10 @@ class DyGrEncoder(torch.nn.Module):
         super(DyGrEncoder, self).__init__()
 
         self.conv_out_channels = conv_out_channels
+        self.conv_num_layers = conv_num_layers
+        self.conv_aggr = conv_aggr
         self.lstm_out_channels = lstm_out_channels
-        self.num_relations = num_relations
-        self.num_bases = num_bases
+        self.lstm_num_layers = lstm_num_layers
         self._create_layers()
 
 
