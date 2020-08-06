@@ -8,10 +8,10 @@ class DyGrEncoder(torch.nn.Module):
     of Dynamic Graphs." <https://ieeexplore.ieee.org/document/9073186>`_
 
     Args:
-        conv_out_channels (int): Number of input features.
-        conv_num_layers (int): Number of output features.
-        conv_aggr (str): Number of relations.
-        lstm_out_channels (int): Number of bases.
+        conv_out_channels (int): Number of convolution channels.
+        conv_num_layers (int): Number of Gated Graph Convolutions.
+        conv_aggr (str): Aggregation scheme to use - one of add/sum/mean.
+        lstm_out_channels (int): Number of LSTM channels.
         lstm_num_layers (int): Number of LSTM cells.
     """
     def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str,
