@@ -160,3 +160,15 @@ def test_lrgcn_layer():
 
     assert H.shape == (number_of_nodes, out_channels)
     assert C.shape == (number_of_nodes, out_channels)
+
+
+def test_dygrencoder_layer():
+    """
+    Testing the DyGrEncoder Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    K = 2
+    assert 1 == 1
