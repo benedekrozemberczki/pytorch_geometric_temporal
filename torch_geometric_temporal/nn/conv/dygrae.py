@@ -4,10 +4,10 @@ from torch_geometric.nn import GatedGraphConv
 from torch_geometric.nn.inits import glorot, zeros
 
 
-class LRGCN(torch.nn.Module):
-    r"""An implementation of the Long Short Term Memory Relational
-    Graph Convolution Layer. For details see this paper: `"Predicting Path
-    Failure In Time-Evolving Graphs." <https://arxiv.org/abs/1905.03994>`_
+class DyGrEncoder(torch.nn.Module):
+    r"""An implementation of the integrated Gated Graph Convolution Long Short
+    Term Memory Layer. For details see this paper: `"Predictive Temporal Embedding
+    of Dynamic Graphs." <https://ieeexplore.ieee.org/document/9073186>`_
 
     Args:
         in_channels (int): Number of input features.
