@@ -142,9 +142,9 @@ class GCLSTM(torch.nn.Module):
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node features.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
-            * **edge_weight** *(PyTorch Long Tensor)* - Edge weight vector (optional).
-            * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes (optional).
-            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes (optional).
+            * **edge_weight** *(PyTorch Long Tensor, optional)* - Edge weight vector.
+            * **H** *(PyTorch Float Tensor, optional)* - Hidden state matrix for all nodes.
+            * **C** *(PyTorch Float Tensor, optional)* - Cell state matrix for all nodes.
 
         Return types:
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
