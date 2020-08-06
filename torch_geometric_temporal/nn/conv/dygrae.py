@@ -8,11 +8,11 @@ class DyGrEncoder(torch.nn.Module):
     of Dynamic Graphs." <https://ieeexplore.ieee.org/document/9073186>`_
 
     Args:
-        conv_out_channels (int): Number of convolution channels.
+        conv_out_channels (int): Number of neurons in GGCN.
         conv_num_layers (int): Number of Gated Graph Convolutions.
         conv_aggr (str): Aggregation scheme to use - one of add/sum/mean.
         lstm_out_channels (int): Number of LSTM channels.
-        lstm_num_layers (int): Number of LSTM cells.
+        lstm_num_layers (int): Number of neurons in LSTM.
     """
     def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str,
                  lstm_out_channels: int, lstm_num_layers: int):
