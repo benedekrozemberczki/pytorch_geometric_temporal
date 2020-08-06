@@ -169,9 +169,17 @@ def test_dygrencoder_layer():
     number_of_nodes = 100
     edge_per_node = 10
     in_channels = 32
-    conv_channels = 16
+
+    conv_out_channels = 16
     conv_num_layers = 1
     conv_aggr = "add"
     lstm_out_channels = 16
     lstm_num_layers = 1
+
+    layer = DyGrEncoder(conv_out_channels = conv_out_channels,
+                        conv_num_layers = conv_num_layers,
+                        conv_aggr = conv_aggr,
+                        lstm_out_channels = lstm_out_channels,
+                        lstm_num_layers = lstm_num_layers)
+
     assert 1 == 1

@@ -13,7 +13,7 @@ class DyGrEncoder(torch.nn.Module):
         num_relations (int): Number of relations.
         num_bases (int): Number of bases.
     """
-    def __init__(self, conv_channels: int, conv_num_layers: int, conv_aggr: str,
+    def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str,
                  lstm_out_channels: int, lstm_num_layers: int):
         super(DyGrEncoder, self).__init__()
 
@@ -30,6 +30,7 @@ class DyGrEncoder(torch.nn.Module):
                                          num_layers = self.conv_num_layers,
                                          aggr = self.conv_aggr,
                                          bias = True)
+
         self.recurrent_layer = LSTM(input_size = self.conv_out_channels,
                                     hidden_size = self.lstm_out_channels,
                                     num_layers = self.lstm_num_layers)
