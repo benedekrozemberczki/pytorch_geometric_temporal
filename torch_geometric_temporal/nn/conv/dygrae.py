@@ -1,9 +1,6 @@
 import torch
-from torch.nn import Parameter
-from torch_geometric.nn import GatedGraphConv
-from torch_geometric.nn.inits import glorot, zeros
 from torch.nn import LSTM
-
+from torch_geometric.nn import GatedGraphConv
 
 class DyGrEncoder(torch.nn.Module):
     r"""An implementation of the integrated Gated Graph Convolution Long Short
