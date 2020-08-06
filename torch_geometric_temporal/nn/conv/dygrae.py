@@ -26,8 +26,13 @@ class DyGrEncoder(torch.nn.Module):
 
 
     def _create_layers(self):
-        self.conv_layer = GatedGraphConv()
-        self.recurrent_layer = LSTM()
+        self.conv_layer = GatedGraphConv(out_channels = self.conv_out_channels,
+                                         num_layers = self.conv_num_layers,
+                                         aggr = self.conv_aggr,
+                                         bias = True)
+        self.recurrent_layer = LSTM(input_size = self.conv_out_channels,
+                                    hidden_size = self.lstm_out_channels,
+                                    num_layers = self.lstm_num_layers)
 
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
@@ -48,4 +53,5 @@ class DyGrEncoder(torch.nn.Module):
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
         H = self.conv_layer(X, edge_index, edge_weight)
+        print(self.H.shape)
         return H
