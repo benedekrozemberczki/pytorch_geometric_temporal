@@ -38,8 +38,8 @@ class DyGrEncoder(torch.nn.Module):
                                     num_layers = self.lstm_num_layers)
 
 
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
-                edge_weight: torch.FloatTensor=None, H: torch.FloatTensor=None, C: torch.FloatTensor=None):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
+                H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
         """
         Making a forward pass. If the hidden state and cell state matrices are 
         not present when the forward pass is called these are initialized with zeros.
