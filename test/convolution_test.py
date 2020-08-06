@@ -171,7 +171,7 @@ def test_dygrencoder_layer():
     in_channels = 8
 
     conv_out_channels = 16
-    conv_num_layers = 1
+    conv_num_layers = 3
     conv_aggr = "add"
     lstm_out_channels = 8
     lstm_num_layers = 1
