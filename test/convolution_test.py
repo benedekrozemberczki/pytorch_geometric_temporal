@@ -188,8 +188,13 @@ def test_dygrencoder_layer():
 
     H_tilde, C, H = layer(X, edge_index)
 
+    print(H_tilde.shape, C.shape, H.shape)
+
     H_tilde, C, H = layer(X, edge_index, edge_weight)
+
+    print(H_tilde.shape, C.shape, H.shape)
 
     H_tilde, C, H = layer(X, edge_index, edge_weight, C, H)
 
+    print(H_tilde.shape, C.shape, H.shape)
     assert 1 == 1
