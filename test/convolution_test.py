@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.conv import GConvLSTM, GConvGRU
-from torch_geometric_temporal.nn.conv import GCLSTM, LRGCN 
+from torch_geometric_temporal.nn.conv import GCLSTM, LRGCN, DyGrEncoder
 
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
