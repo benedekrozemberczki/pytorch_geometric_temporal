@@ -20,6 +20,9 @@
 
 **[Documentation](https://pytorch-geometric-temporal.readthedocs.io)** | **[External Resources](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/resources.html)**
 
+
+--------------------------------------------------------------------------------
+
 **Methods Included**
 
 In detail, the following temporal graph neural networks were implemented.
@@ -47,7 +50,11 @@ For a quick start, check out the [examples](https://github.com/benedekrozembercz
 
 If you notice anything unexpected, please open an [issue](https://benedekrozemberczki/pytorch_geometric_temporal/issues). If you are missing a specific method, feel free to open a [feature request](https://github.com/rusty1s/pytorch_geometric/issues).
 
+
+--------------------------------------------------------------------------------
+
 **Citing**
+
 
 If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the folowing citation:
 
@@ -61,6 +68,9 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
       howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
 }
 ```
+
+--------------------------------------------------------------------------------
+
 **Installation**
 
 To install the dependencies and the library PyTorch 1.6.0, simply run
@@ -77,12 +87,16 @@ $ pip install torch-geometric-temporal
 where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101` or `cu102` depending on your PyTorch installation.
 
 
+--------------------------------------------------------------------------------
+
 **Running tests**
 
 ```
 $ python setup.py test
 ```
 
+
+--------------------------------------------------------------------------------
 
 **License**
 
