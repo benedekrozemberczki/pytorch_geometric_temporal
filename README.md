@@ -61,9 +61,7 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
       howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
 }
 ```
-
-
-## Installation
+**Installation**
 
 To install the dependencies and the library PyTorch 1.6.0, simply run
 
