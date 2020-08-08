@@ -58,12 +58,14 @@ class DyGrEncoder(torch.nn.Module):
         """
         H_tilde = self.conv_layer(X, edge_index, edge_weight)
         H_tilde = H_tilde[None, :, :]
-        if H is None and C is None: 
+        if H is None and C is None:
             H_tilde, (H, C) = self.recurrent_layer(H_tilde)
-        elif H is not None and C is not None: 
+        elif H is not None and C is not None:
             H = H[None, :, :]
             C = C[None, :, :]
             H_tilde, (H, C) = self.recurrent_layer(H_tilde, (H, C))
+        else:
+            raise ValueError("Invalid hidden state and cell matrices.")
         H_tilde = H_tilde.squeeze()
         H = H.squeeze()
         C = C.squeeze()
