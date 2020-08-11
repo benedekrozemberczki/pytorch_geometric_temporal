@@ -103,6 +103,7 @@ $ pip install torch-sparse==latest+${CUDA} -f https://pytorch-geometric.com/whl/
 $ pip install torch-cluster==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.5.0.html
 $ pip install torch-spline-conv==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.5.0.html
 $ pip install torch-geometric
+$ pip install torch-geometric-temporal
 ```
 
 where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101` or `cu102` depending on your PyTorch installation.
