@@ -29,11 +29,30 @@
 **A simple example**
 
 PyTorch Geometric Temporal makes implementing Dynamic and Temporal Graph Neural Networks quite easy -- see the accompanying [tutorial]().
-For example, this is all it takes to implement a [graph convolutional GRU network](https://arxiv.org/abs/1612.07659):
+For example, this is all it takes to implement a recurrent graph convolutional network with two consecutive [graph convolutional GRU](https://arxiv.org/abs/1612.07659) cells and a linear layer:
 
 ```python
 import torch
+import torch.nn.functional as F
+from torch_geometric_temporal.nn.conv import GConvGRU
 
+class RecurrentGCN(torch.nn.Module):
+
+    def __init__(self, node_features, num_classes):
+        super(RecurrentGCN, self).__init__()
+        self.recurrent_1 = GConvGRU(node_features, 32, 5)
+        self.recurrent_2 = GConvGRU(32, 16, 5)
+        self.linear = torch.nn.Linear(16, num_classes)
+
+    def forward(self, x, edge_index, edge_weight):
+        x = self.recurrent_1(x, edge_index, edge_weight)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.recurrent_2(x, edge_index, edge_weight)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.linear(x)
+        return F.log_softmax(x, dim=1)
 ```
 --------------------------------------------------------------------------------
 
