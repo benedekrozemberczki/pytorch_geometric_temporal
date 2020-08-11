@@ -20,7 +20,15 @@
 
 **[Documentation](https://pytorch-geometric-temporal.readthedocs.io)** | **[Paper]()** | **[External Resources](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/resources.html)** | **[Datasets]()**
 
+--------------------------------------------------------------------------------
 
+PyTorch Geometric Temporal makes implementing Dynamic and Temporal Graph Neural Networks a breeze (see [here](https://pytorch-geometric.readthedocs.io/en/latest/notes/create_gnn.html) for the accompanying tutorial).
+For example, this is all it takes to implement the [edge convolutional layer](https://arxiv.org/abs/1801.07829):
+
+```python
+import torch
+
+```
 --------------------------------------------------------------------------------
 
 **Methods Included**
