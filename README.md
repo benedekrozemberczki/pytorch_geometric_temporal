@@ -22,6 +22,8 @@
 
 --------------------------------------------------------------------------------
 
+**A simple example**
+
 PyTorch Geometric Temporal makes implementing Dynamic and Temporal Graph Neural Networks quite easy -- see the accompanying [tutorial]().
 For example, this is all it takes to implement a [graph convolutional GRU network](https://arxiv.org/abs/1612.07659):
 
