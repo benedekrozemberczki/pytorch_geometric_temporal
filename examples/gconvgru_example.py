@@ -40,13 +40,10 @@ class RecurrentGCN(torch.nn.Module):
         return F.log_softmax(x, dim=1)
 
 
-model = RecurrentGCN(node_features_=100, num_classes=10)
+model = RecurrentGCN(node_features=100, num_classes=10)
 
-x, edge_index = create_mock_data(1000, 15, 10)
+x, edge_index = create_mock_data(1000, 15, 100)
 
 edge_weight = create_mock_edge_weight(edge_index)
 
 scores = model(x, edge_index, edge_weight)
-
-print(scores.shape)
-
