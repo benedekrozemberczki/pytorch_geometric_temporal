@@ -22,8 +22,8 @@
 
 *PyTorch Geometric Temporal* is a temporal (dynamic) extension library for [PyTorch Geometric](https://github.com/rusty1s/pytorch_geometric).
 
-It consists of various dynamic and temporal geometric deep learning methods from a variety of published research papers.
-In addition, it consists of an easy-to-use dataset loader for dynamic and temporal graphs, gpu-support, and a number of benchmark datasets  with temporal and dynamic graphs (you can create your own).
+The library consists of various dynamic and temporal geometric deep learning methods from a variety of published research papers.
+In addition, it consists of an easy-to-use dataset loader for dynamic and temporal graphs, gpu-support, and a number of benchmark datasets  with temporal and dynamic graphs (you can also create your own datasets).
 
 --------------------------------------------------------------------------------
 
