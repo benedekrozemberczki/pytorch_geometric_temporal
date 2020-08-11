@@ -72,7 +72,6 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
 --------------------------------------------------------------------------------
 
 **Installation**
---------------------------------------------------------------------------------
 
 **PyTorch 1.6.0**
 
