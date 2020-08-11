@@ -20,6 +20,11 @@
 
 **[Documentation](https://pytorch-geometric-temporal.readthedocs.io)** | **[Paper]()** | **[External Resources](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/resources.html)** | **[Datasets]()**
 
+*PyTorch Geometric Temporal* learning extension library for [PyTorch Geometric](https://github.com/rusty1s/pytorch_geometric).
+
+It consists of various methods for deep learning on graphs and other irregular structures, also known as *[geometric deep learning](http://geometricdeeplearning.com/)*, from a variety of published papers.
+In addition, it consists of an easy-to-use mini-batch loader for many small and single giant graphs, multi gpu-support, a large number of common benchmark datasets (based on simple interfaces to create your own), and helpful transforms, both for learning on arbitrary graphs as well as on 3D meshes or point clouds.
+
 --------------------------------------------------------------------------------
 
 **A simple example**
