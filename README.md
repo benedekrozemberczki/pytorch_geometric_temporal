@@ -22,7 +22,7 @@
 
 --------------------------------------------------------------------------------
 
-PyTorch Geometric Temporal makes implementing Dynamic and Temporal Graph Neural Networks a breeze (see [here](https://pytorch-geometric.readthedocs.io/en/latest/notes/create_gnn.html) for the accompanying tutorial).
+PyTorch Geometric Temporal makes implementing Dynamic and Temporal Graph Neural Networks a breeze (see [here]() for the accompanying tutorial).
 For example, this is all it takes to implement the [edge convolutional layer](https://arxiv.org/abs/1801.07829):
 
 ```python
