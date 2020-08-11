@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch_geometric_temporal.nn.conv import GConvGRU
 
+
 class Net(torch.nn.Module):
     def __init__(self, node_features, num_classes):
         super(Net, self).__init__()
