@@ -94,7 +94,7 @@ where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101` or `cu102` d
 | **Windows** | ✅    | ❌     | ✅      | ✅      |
 | **macOS**   | ✅    |        |         |         |
 
-### PyTorch 1.5.0/1.5.1
+**PyTorch 1.5.0/1.5.1**
 
 To install the binaries for PyTorch 1.5.0/1.5.1, simply run
 
