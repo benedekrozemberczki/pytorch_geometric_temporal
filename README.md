@@ -186,7 +186,7 @@ $ python setup.py test
 
 ```
 $ cd examples
-$ python gcn.py
+$ python gconvgru_example.py
 ```
 
 --------------------------------------------------------------------------------
