@@ -180,11 +180,17 @@ where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu100` or `cu101` d
 ```
 $ python setup.py test
 ```
+--------------------------------------------------------------------------------
+
+**Running examples**
+
+```
+$ cd examples
+$ python gcn.py
+```
 
 --------------------------------------------------------------------------------
 
 **License**
 
-
 - [GNU General Public License v3.0](https://github.com/benedekrozemberczki/karateclub/blob/master/LICENSE)
-
