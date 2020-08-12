@@ -88,7 +88,7 @@ For a quick start, check out the [examples](https://github.com/benedekrozembercz
 **Citing**
 
 
-If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the folowing citation:
+<p align="justify">If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the folowing citation:</p>
 
 ```bibtex
 @misc{rozemberczki_temporal,
