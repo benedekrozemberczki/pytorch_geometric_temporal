@@ -88,7 +88,7 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 **Citing**
 
 
-<p align="justify">If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the folowing citation:</p>
+If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the folowing citation:
 
 ```bibtex
 @misc{rozemberczki_temporal,
