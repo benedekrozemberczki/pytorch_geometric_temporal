@@ -25,15 +25,16 @@ class EvolveGCNH(torch.nn.Module):
 
 
     def _create_layers(self):
-        self.conv_layer = GatedGraphConv(out_channels = self.conv_out_channels,
-                                         num_layers = self.conv_num_layers,
-                                         aggr = self.conv_aggr,
-                                         bias = True)
 
-        self.recurrent_layer = LSTM(input_size = self.conv_out_channels,
-                                    hidden_size = self.lstm_out_channels,
-                                    num_layers = self.lstm_num_layers)
+        self.recurrent_layer = GRU(input_size = self.lstm_in_channels,
+                                   hidden_size = self.lstm_out_channels,
+                                   num_layers = 1)
 
+
+        self.conv_layer = GCNConv(in_channels = self.conv_out_channels,
+                                  out_channels = self.conv_num_layers,
+                                  aggr = self.conv_aggr,
+                                  bias = True)
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
                 H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
