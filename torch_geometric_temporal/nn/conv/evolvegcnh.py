@@ -1,5 +1,5 @@
 import torch
-from torch.nn import LSTM
+from torch.nn import GRU
 from torch_geometric.nn import GCNConv
 
 class EvolveGCNH(torch.nn.Module):
