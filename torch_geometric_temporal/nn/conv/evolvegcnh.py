@@ -32,7 +32,8 @@ class EvolveGCNH(torch.nn.Module):
 
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
-                                  out_channels = self.out_channels)
+                                  out_channels = self.out_channels,
+                                  bias = False)
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
                 H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
