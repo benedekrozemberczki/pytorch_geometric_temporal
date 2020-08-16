@@ -15,12 +15,11 @@ class EvolveGCNH(torch.nn.Module):
         lstm_out_channels (int): Number of LSTM channels.
         lstm_num_layers (int): Number of neurons in LSTM.
     """
-    def __init__(self, conv_out_channels: int, lstm_in_channels: int, lstm_out_channels: int):
+    def __init__(self, in_channels: int, out_channels: int):
         super(EvolveGCNH, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.num_layers = num_layers
         self._create_layers()
 
 
@@ -28,15 +27,15 @@ class EvolveGCNH(torch.nn.Module):
 
         self.recurrent_layer = GRU(input_size = self.in_channels,
                                    hidden_size = self.in_channels,
-                                   num_layers = self.num_layers)
+                                   num_layers = 1)
 
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
                                   out_channels = self.out_channels,
                                   bias = False)
 
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
-                H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
+    def forward(self, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
+                H: torch.FloatTensor=None, W: torch.FloatTensor=None) -> torch.FloatTensor:
         """
         Making a forward pass. If the hidden state and cell state matrices are 
         not present when the forward pass is called these are initialized with zeros.
@@ -53,14 +52,10 @@ class EvolveGCNH(torch.nn.Module):
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
-        H_tilde = self.conv_layer(X, edge_index, edge_weight)
-        H_tilde = H_tilde[None, :, :]
-        if H is None and C is None:
-            H_tilde, (H, C) = self.recurrent_layer(H_tilde)
-        elif H is not None and C is not None:
-            H = H[None, :, :]
-            C = C[None, :, :]
-            H_tilde, (H, C) = self.recurrent_layer(H_tilde, (H, C))
+        if H is None and W is None:
+            pass
+        elif H is not None and W is not None:
+            pass
         else:
             raise ValueError("Invalid hidden state and cell matrices.")
         H_tilde = H_tilde.squeeze()
