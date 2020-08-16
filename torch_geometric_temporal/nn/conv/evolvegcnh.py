@@ -18,23 +18,21 @@ class EvolveGCNH(torch.nn.Module):
     def __init__(self, conv_out_channels: int, lstm_in_channels: int, lstm_out_channels: int):
         super(EvolveGCNH, self).__init__()
 
-        self.conv_out_channels = conv_out_channels
-        self.lstm_in_channels = lstm_in_channels
-        self.lstm_out_channels = lstm_out_channels
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.num_layers = num_layers
         self._create_layers()
 
 
     def _create_layers(self):
 
-        self.recurrent_layer = GRU(input_size = self.lstm_in_channels,
-                                   hidden_size = self.lstm_out_channels,
-                                   num_layers = 1)
+        self.recurrent_layer = GRU(input_size = self.in_channels,
+                                   hidden_size = self.in_channels,
+                                   num_layers = self.num_layers)
 
 
-        self.conv_layer = GCNConv(in_channels = self.conv_out_channels,
-                                  out_channels = self.conv_num_layers,
-                                  aggr = self.conv_aggr,
-                                  bias = True)
+        self.conv_layer = GCNConv(in_channels = self.in_channels,
+                                  out_channels = self.out_channels)
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
                 H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
