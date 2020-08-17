@@ -4,8 +4,8 @@ from torch_geometric.nn import GCNConv
 from torch_geometric.nn import TopKPooling
 
 
-class EvolveGCNH(torch.nn.Module):
-    r"""An implementation of the Evolving Graph Convolutional Hidden Layer.
+class EvolveGCNO(torch.nn.Module):
+    r"""An implementation of the Evolving Graph Convolutional without Hidden Layer.
     For details see this paper: `"EvolveGCN: Evolving Graph Convolutional 
     Networks for Dynamic Graph." <https://arxiv.org/abs/1902.10191>`_
 
