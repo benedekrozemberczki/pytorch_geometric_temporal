@@ -36,8 +36,8 @@ class EvolveGCNH(torch.nn.Module):
                                   out_channels = self.in_channels,
                                   bias = False)
 
-    def forward(self, X: torch.FloatTensor=None, edge_index: torch.LongTensor,
-                edge_weight: torch.FloatTensor=None, W: torch.FloatTensor=None) -> torch.FloatTensor:
+    def forward(self, X: torch.FloatTensor=None, edge_index: torch.LongTensor, 
+                edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
         """
         Making a forward pass. If the hidden state and cell state matrices are 
         not present when the forward pass is called these are initialized with zeros.
@@ -50,12 +50,10 @@ class EvolveGCNH(torch.nn.Module):
 
         Return types:
             * **H_tilde** *(PyTorch Float Tensor)* - Output matrix for all nodes.
-            * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
-            * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
         X_tilde = self.pooling(X, edge_index)
         X_tilde = X_tilde[None, :, :]
-        W = self.conv_layer.weights
+        W = self.conv_layer.weighs
         X_tilde, W = self.recurrent_layer(X_tilde, W)
         print(X_tilde.shape, W.shape)
         return X_tilde
