@@ -10,12 +10,8 @@ class EvolveGCNH(torch.nn.Module):
     Networks for Dynamic Graph." <https://arxiv.org/abs/1902.10191>`_
 
     Args:
-        conv_out_channels (int): Number of neurons in GGCN.
-        conv_num_layers (int): Number of Gated Graph Convolutions.
-        conv_aggr (str): Aggregation scheme to use
-            (:obj:`"add"`, :obj:`"mean"`, :obj:`"max"`).
-        lstm_out_channels (int): Number of LSTM channels.
-        lstm_num_layers (int): Number of neurons in LSTM.
+        num_of_nodes (int): Number of vertices.
+        in_channels (int): Number of filters.
     """
     def __init__(self, num_of_nodes: int, in_channels: int):
         super(EvolveGCNH, self).__init__()
@@ -37,7 +33,7 @@ class EvolveGCNH(torch.nn.Module):
 
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
-                                  out_channels = self.out_channels,
+                                  out_channels = self.in_channels,
                                   bias = False)
 
     def forward(self, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None,
