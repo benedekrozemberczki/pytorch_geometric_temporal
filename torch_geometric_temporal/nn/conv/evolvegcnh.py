@@ -39,14 +39,12 @@ class EvolveGCNH(torch.nn.Module):
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, 
                 edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
         """
-        Making a forward pass. If the hidden state and cell state matrices are 
-        not present when the forward pass is called these are initialized with zeros.
+        Making a forward pass.
 
         Arg types:
             * **X** *(PyTorch Float Tensor)* - Node embedding.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
             * **edge_weight** *(PyTorch Float Tensor, optional)* - Edge weight vector.
-            * **W** *(PyTorch Float Tensor, optional)* - Cell state matrix for all nodes.
 
         Return types:
             * **H_tilde** *(PyTorch Float Tensor)* - Output matrix for all nodes.
