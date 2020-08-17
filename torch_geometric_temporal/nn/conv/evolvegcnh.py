@@ -53,7 +53,7 @@ class EvolveGCNH(torch.nn.Module):
         """
         X_tilde = self.pooling_layer(X, edge_index)
         X_tilde = X_tilde[0][None, :, :]
-        W = self.conv_layer.weigth
+        W = self.conv_layer.weight
         X_tilde, W = self.recurrent_layer(X_tilde, W)
         print(X_tilde.shape, W.shape)
         return X_tilde
