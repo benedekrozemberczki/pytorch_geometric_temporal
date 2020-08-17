@@ -14,7 +14,7 @@ class EvolveGCNO(torch.nn.Module):
         in_channels (int): Number of filters.
     """
     def __init__(self, num_of_nodes: int, in_channels: int):
-        super(EvolveGCNH, self).__init__()
+        super(EvolveGCNO, self).__init__()
 
         self.num_of_nodes = num_of_nodes
         self.in_channels = in_channels
