@@ -5,9 +5,9 @@ from torch_geometric.nn import TopKPooling
 
 
 class EvolveGCNH(torch.nn.Module):
-    r"""An implementation of the integrated Gated Graph Convolution Long Short
-    Term Memory Layer. For details see this paper: `"Predictive Temporal Embedding
-    of Dynamic Graphs." <https://ieeexplore.ieee.org/document/9073186>`_
+    r"""An implementation of the Evolving Graph Convolutional Hidden Layer.
+    For details see this paper: `"EvolveGCN: Evolving Graph Convolutional 
+    Networks for Dynamic Graph." <https://arxiv.org/abs/1902.10191>`_
 
     Args:
         conv_out_channels (int): Number of neurons in GGCN.
