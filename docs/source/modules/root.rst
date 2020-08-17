@@ -6,29 +6,34 @@ PyTorch Geometric Temporal
 
 Discrete Stacked Convolutional Layers
 --------------
-.. automodule:: torch_geometric_temporal.nn.conv.gconv_gru
+.. automodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
     :members:
     :undoc-members:
 
-.. automodule:: torch_geometric_temporal.nn.conv.gconv_lstm
+.. automodule:: torch_geometric_temporal.nn.recurrent.gconv_lstm
     :members:
     :undoc-members:
 
 Discrete Integrated Convolutional Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.conv.gc_lstm
+.. automodule:: torch_geometric_temporal.nn.recurrent.gc_lstm
     :members:
     :undoc-members:
 
-.. automodule:: torch_geometric_temporal.nn.conv.lrgcn
+.. automodule:: torch_geometric_temporal.nn.recurrent.lrgcn
     :members:
     :undoc-members:
 
-.. automodule:: torch_geometric_temporal.nn.conv.dygrae
+.. automodule:: torch_geometric_temporal.nn.recurrent.dygrae
     :members:
     :undoc-members:
 
-.. automodule:: torch_geometric_temporal.nn.conv.evolvegcnh
+.. automodule:: torch_geometric_temporal.nn.recurrent.evolvegcnh
+    :members:
+    :undoc-members:
+
+
+.. automodule:: torch_geometric_temporal.nn.recurrent.evolvegcno
     :members:
     :undoc-members:
