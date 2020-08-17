@@ -74,6 +74,9 @@ In detail, the following temporal graph neural networks were implemented.
 
 * **[DyGrEncoder](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.conv.dygrae.DyGrEncoder)** from Taheri *et al.*: [Learning to Represent the Evolution of Dynamic Graphs with Recurrent Models](https://dl.acm.org/doi/10.1145/3308560.3316581) (WWW 2019)
 
+* **[EvolveGCNH](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.conv.evolvegcnh.EvolveGCNH)** from Taheri *et al.*: [EvolveGCN: Evolving Graph Convolutional Networks for Dynamic Graphs](https://dl.acm.org/doi/10.1145/3308560.3316581) (WWW 2019)
+
+
 --------------------------------------------------------------------------------
 
 
