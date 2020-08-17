@@ -27,6 +27,10 @@ class EvolveGCNH(torch.nn.Module):
 
     def _create_layers(self):
 
+        self.ratio = self.num_of_nodes / self.in_channels
+
+        self.pooling_layer = TopKPooling(self.in_channels, self.ratio)
+
         self.recurrent_layer = GRU(input_size = self.in_channels,
                                    hidden_size = self.in_channels,
                                    num_layers = 1)
