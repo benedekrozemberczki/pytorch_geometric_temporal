@@ -203,3 +203,21 @@ def test_dygrencoder_layer():
     assert H_tilde.shape == (number_of_nodes, lstm_out_channels)
     assert C.shape == (number_of_nodes, lstm_out_channels)
     assert H.shape == (number_of_nodes, lstm_out_channels)
+
+def test_lrgcn_layer():
+    """
+    Testing the Evolve GCN-H Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 8
+
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
+
+    layer = EvolveGCNH(in_channels = in_channels,
+                        num_of_nodes = number_of_nodes)
+
+
+    X = layer(X, edge_index)
+    print(X.shape)
