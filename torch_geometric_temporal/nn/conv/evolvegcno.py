@@ -23,10 +23,6 @@ class EvolveGCNO(torch.nn.Module):
 
     def _create_layers(self):
 
-        self.ratio = self.in_channels / self.num_of_nodes
-
-        self.pooling_layer = TopKPooling(self.in_channels, self.ratio)
-
         self.recurrent_layer = LSTM(input_size = self.in_channels,
                                     hidden_size = self.in_channels,
                                     num_layers = 1)
@@ -49,10 +45,8 @@ class EvolveGCNO(torch.nn.Module):
         Return types:
             * **X** *(PyTorch Float Tensor)* - Output matrix for all nodes.
         """
-        X_tilde = self.pooling_layer(X, edge_index)
-        X_tilde = X_tilde[0][None, :, :]
         W = self.conv_layer.weight[None, :, :]
-        X_tilde, W = self.recurrent_layer(X_tilde, W)
+        W = self.recurrent_layer(X_tilde, W)
         self.conv_layer.weight = torch.nn.Parameter(W.squeeze())
         X = self.conv_layer(X, edge_index, edge_weight)
         return X
