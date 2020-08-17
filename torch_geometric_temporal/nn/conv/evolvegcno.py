@@ -15,7 +15,6 @@ class EvolveGCNO(torch.nn.Module):
     def __init__(self, in_channels: int):
         super(EvolveGCNO, self).__init__()
 
-        self.num_of_nodes = num_of_nodes
         self.in_channels = in_channels
         self._create_layers()
 
