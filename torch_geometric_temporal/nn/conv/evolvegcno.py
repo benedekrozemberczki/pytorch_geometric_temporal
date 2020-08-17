@@ -10,7 +10,6 @@ class EvolveGCNO(torch.nn.Module):
     Networks for Dynamic Graph." <https://arxiv.org/abs/1902.10191>`_
 
     Args:
-        num_of_nodes (int): Number of vertices.
         in_channels (int): Number of filters.
     """
     def __init__(self, in_channels: int):
