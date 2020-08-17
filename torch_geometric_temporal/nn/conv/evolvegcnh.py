@@ -23,7 +23,7 @@ class EvolveGCNH(torch.nn.Module):
 
     def _create_layers(self):
 
-        self.ratio = self.num_of_nodes / self.in_channels
+        self.ratio = self.in_channels / self.num_of_nodes
 
         self.pooling_layer = TopKPooling(self.in_channels, self.ratio)
 
@@ -51,9 +51,9 @@ class EvolveGCNH(torch.nn.Module):
         Return types:
             * **H_tilde** *(PyTorch Float Tensor)* - Output matrix for all nodes.
         """
-        X_tilde = self.pooling(X, edge_index)
-        X_tilde = X_tilde[None, :, :]
-        W = self.conv_layer.weighs
+        X_tilde = self.pooling_layer(X, edge_index)
+        X_tilde = X_tilde[0][None, :, :]
+        W = self.conv_layer.weigth
         X_tilde, W = self.recurrent_layer(X_tilde, W)
         print(X_tilde.shape, W.shape)
         return X_tilde
