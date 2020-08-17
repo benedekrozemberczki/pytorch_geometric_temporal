@@ -27,9 +27,9 @@ class EvolveGCNO(torch.nn.Module):
 
         self.pooling_layer = TopKPooling(self.in_channels, self.ratio)
 
-        self.recurrent_layer = GRU(input_size = self.in_channels,
-                                   hidden_size = self.in_channels,
-                                   num_layers = 1)
+        self.recurrent_layer = LSTM(input_size = self.in_channels,
+                                    hidden_size = self.in_channels,
+                                    num_layers = 1)
 
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
