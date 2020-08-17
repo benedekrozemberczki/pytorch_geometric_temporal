@@ -43,7 +43,7 @@ class EvolveGCNO(torch.nn.Module):
             * **X** *(PyTorch Float Tensor)* - Output matrix for all nodes.
         """
         W = self.conv_layer.weight[None, :, :]
-        W = self.recurrent_layer(X_tilde, W)
+        W, _ = self.recurrent_layer(W)
         self.conv_layer.weight = torch.nn.Parameter(W.squeeze())
         X = self.conv_layer(X, edge_index, edge_weight)
         return X
