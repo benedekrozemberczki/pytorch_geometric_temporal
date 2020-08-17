@@ -55,6 +55,6 @@ class EvolveGCNH(torch.nn.Module):
         X_tilde = X_tilde[0][None, :, :]
         W = self.conv_layer.weight[None, :, :]
         X_tilde, W = self.recurrent_layer(X_tilde, W)
-        self.conv_layer.weight = W.squeeze()
-        X = self.conv_layer(x, edge_index, edge_weight)
+        self.conv_layer.weight = torch.nn.Parameter(W.squeeze())
+        X = self.conv_layer(X, edge_index, edge_weight)
         return X_tilde
