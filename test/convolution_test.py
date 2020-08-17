@@ -204,7 +204,7 @@ def test_dygrencoder_layer():
     assert C.shape == (number_of_nodes, lstm_out_channels)
     assert H.shape == (number_of_nodes, lstm_out_channels)
 
-def test_lrgcn_layer():
+def test_evolve_gcn_h_layer():
     """
     Testing the Evolve GCN-H Layer.
     """
