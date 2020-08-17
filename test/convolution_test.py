@@ -238,9 +238,7 @@ def test_evolve_gcn_o_layer():
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
     edge_weight = create_mock_edge_weight(edge_index)
 
-    layer = EvolveGCNO(in_channels = in_channels,
-                       num_of_nodes = number_of_nodes)
-
+    layer = EvolveGCNO(in_channels = in_channels)
 
     X = layer(X, edge_index)
     
