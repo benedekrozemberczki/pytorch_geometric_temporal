@@ -36,7 +36,7 @@ class EvolveGCNH(torch.nn.Module):
                                   out_channels = self.in_channels,
                                   bias = False)
 
-    def forward(self, X: torch.FloatTensor=None, edge_index: torch.LongTensor, 
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, 
                 edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
         """
         Making a forward pass. If the hidden state and cell state matrices are 
