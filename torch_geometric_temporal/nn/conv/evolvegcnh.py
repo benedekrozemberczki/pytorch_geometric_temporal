@@ -53,13 +53,9 @@ class EvolveGCNH(torch.nn.Module):
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
             * **C** *(PyTorch Float Tensor)* - Cell state matrix for all nodes.
         """
-        if H is None and W is None:
-            pass
-        elif H is not None and W is not None:
-            pass
-        else:
-            raise ValueError("Invalid hidden state and cell matrices.")
-        H_tilde = H_tilde.squeeze()
-        H = H.squeeze()
-        C = C.squeeze()
-        return H_tilde, H, C
+        X_tilde = self.pooling(X, edge_index)
+        X_tilde = X_tilde[None, :, :]
+        W = self.conv_layer.weights
+        X_tilde, W = self.recurrent_layer(X_tilde, W)
+        print(X_tilde.shape, W.shape)
+        return X_tilde
