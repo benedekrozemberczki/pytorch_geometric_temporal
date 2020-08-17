@@ -216,7 +216,7 @@ def test_evolve_gcn_h_layer():
     edge_weight = create_mock_edge_weight(edge_index)
 
     layer = EvolveGCNH(in_channels = in_channels,
-                        num_of_nodes = number_of_nodes)
+                       num_of_nodes = number_of_nodes)
 
 
     X = layer(X, edge_index)
