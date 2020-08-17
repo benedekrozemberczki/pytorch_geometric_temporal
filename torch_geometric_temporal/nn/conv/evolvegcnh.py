@@ -1,6 +1,8 @@
 import torch
 from torch.nn import GRU
 from torch_geometric.nn import GCNConv
+from torch_geometric.nn import TopKPooling
+
 
 class EvolveGCNH(torch.nn.Module):
     r"""An implementation of the integrated Gated Graph Convolution Long Short
