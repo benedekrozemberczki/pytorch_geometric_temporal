@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import networkx as nx
 import torch.nn.functional as F
-from torch_geometric_temporal.nn.conv import GConvGRU
+from torch_geometric_temporal.nn.recurrent import GConvGRU
 
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
