@@ -17,11 +17,11 @@ class EvolveGCNH(torch.nn.Module):
         lstm_out_channels (int): Number of LSTM channels.
         lstm_num_layers (int): Number of neurons in LSTM.
     """
-    def __init__(self, in_channels: int, out_channels: int):
+    def __init__(self, num_of_nodes: int, in_channels: int):
         super(EvolveGCNH, self).__init__()
 
+        self.num_of_nodes = num_of_nodes
         self.in_channels = in_channels
-        self.out_channels = out_channels
         self._create_layers()
 
 
