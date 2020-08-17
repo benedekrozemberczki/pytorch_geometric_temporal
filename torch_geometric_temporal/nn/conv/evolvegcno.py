@@ -1,7 +1,6 @@
 import torch
-from torch.nn import GRU
+from torch.nn import LSTM
 from torch_geometric.nn import GCNConv
-from torch_geometric.nn import TopKPooling
 
 
 class EvolveGCNO(torch.nn.Module):
