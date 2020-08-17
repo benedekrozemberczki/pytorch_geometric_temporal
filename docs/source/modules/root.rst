@@ -4,8 +4,9 @@ PyTorch Geometric Temporal
 .. contents:: Contents
     :local:
 
-Discrete Stacked Convolutional Layers
+Discrete Recurrent Graph Convolutional Layers
 --------------
+
 .. automodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
     :members:
     :undoc-members:
@@ -13,9 +14,6 @@ Discrete Stacked Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.recurrent.gconv_lstm
     :members:
     :undoc-members:
-
-Discrete Integrated Convolutional Layers
---------------
 
 .. automodule:: torch_geometric_temporal.nn.recurrent.gc_lstm
     :members:
@@ -32,7 +30,6 @@ Discrete Integrated Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.recurrent.evolvegcnh
     :members:
     :undoc-members:
-
 
 .. automodule:: torch_geometric_temporal.nn.recurrent.evolvegcno
     :members:
