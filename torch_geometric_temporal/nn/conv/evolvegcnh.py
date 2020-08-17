@@ -47,7 +47,7 @@ class EvolveGCNH(torch.nn.Module):
             * **edge_weight** *(PyTorch Float Tensor, optional)* - Edge weight vector.
 
         Return types:
-            * **H_tilde** *(PyTorch Float Tensor)* - Output matrix for all nodes.
+            * **X** *(PyTorch Float Tensor)* - Output matrix for all nodes.
         """
         X_tilde = self.pooling_layer(X, edge_index)
         X_tilde = X_tilde[0][None, :, :]
@@ -55,4 +55,4 @@ class EvolveGCNH(torch.nn.Module):
         X_tilde, W = self.recurrent_layer(X_tilde, W)
         self.conv_layer.weight = torch.nn.Parameter(W.squeeze())
         X = self.conv_layer(X, edge_index, edge_weight)
-        return X_tilde
+        return X
