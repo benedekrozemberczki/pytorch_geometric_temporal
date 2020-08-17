@@ -220,4 +220,5 @@ def test_lrgcn_layer():
 
 
     X = layer(X, edge_index)
-    print(X.shape)
+    
+    assert X.shape == (number_of_nodes, in_channels)
