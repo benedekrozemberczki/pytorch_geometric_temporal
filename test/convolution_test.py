@@ -222,3 +222,8 @@ def test_evolve_gcn_h_layer():
     X = layer(X, edge_index)
     
     assert X.shape == (number_of_nodes, in_channels)
+
+
+    X = layer(X, edge_index, edge_weight)
+    
+    assert X.shape == (number_of_nodes, in_channels)
