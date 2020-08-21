@@ -52,7 +52,7 @@ class EvolveGCNH(torch.nn.Module):
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
                                   out_channels = self.in_channels,
-                                  imroved = self.improved,
+                                  improved = self.improved,
                                   cached = self.cached,
                                   normalize = self.normalize,
                                   add_self_loops = self.add_self_loops,
