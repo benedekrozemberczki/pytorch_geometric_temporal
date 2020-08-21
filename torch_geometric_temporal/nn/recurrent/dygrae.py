@@ -12,19 +12,16 @@ class DyGrEncoder(torch.nn.Module):
         conv_num_layers (int): Number of Gated Graph Convolutions.
         conv_aggr (str): Aggregation scheme to use
             (:obj:`"add"`, :obj:`"mean"`, :obj:`"max"`).
-        conv_bias (bool, optional): If set to :obj:`False`, the layer will not learn
-            an additive bias. (default: :obj:`True`)
         lstm_out_channels (int): Number of LSTM channels.
         lstm_num_layers (int): Number of neurons in LSTM.
     """
     def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str,
-                 conv_bias: bool=True, lstm_out_channels: int, lstm_num_layers: int):
+                 lstm_out_channels: int, lstm_num_layers: int):
         super(DyGrEncoder, self).__init__()
 
         self.conv_out_channels = conv_out_channels
         self.conv_num_layers = conv_num_layers
         self.conv_aggr = conv_aggr
-        self.conv_bias = conv_bias
         self.lstm_out_channels = lstm_out_channels
         self.lstm_num_layers = lstm_num_layers
         self._create_layers()
