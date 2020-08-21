@@ -53,11 +53,15 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_x_i = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.conv_h_i = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.w_c_i = Parameter(torch.Tensor(1, self.out_channels))
         self.b_i = Parameter(torch.Tensor(1, self.out_channels))
@@ -67,11 +71,15 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_x_f = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.conv_h_f = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.w_c_f = Parameter(torch.Tensor(1, self.out_channels))
         self.b_f = Parameter(torch.Tensor(1, self.out_channels))
@@ -81,11 +89,15 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_x_c = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.conv_h_c = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.b_c = Parameter(torch.Tensor(1, self.out_channels))
 
@@ -94,11 +106,15 @@ class GConvLSTM(torch.nn.Module):
 
         self.conv_x_o = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.conv_h_o = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.w_c_o = Parameter(torch.Tensor(1, self.out_channels))
         self.b_o = Parameter(torch.Tensor(1, self.out_channels))
