@@ -50,11 +50,15 @@ class GConvGRU(torch.nn.Module):
 
         self.conv_x_z = ChebConv(in_channels=self.in_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
         self.conv_h_z = ChebConv(in_channels=self.out_channels,
                                  out_channels=self.out_channels,
-                                 K=self.K)
+                                 K=self.K,
+                                 normalization=self.normalization,
+                                 bias=self.bias)
 
 
     def _create_reset_gate_parameters_and_layers(self):
