@@ -24,7 +24,8 @@ class EvolveGCNO(torch.nn.Module):
         add_self_loops (bool, optional): If set to :obj:`False`, will not add
             self-loops to the input graph. (default: :obj:`True`)
     """
-    def __init__(self, in_channels: int):
+    def __init__(self, in_channels: int, improved: bool=False, cached: bool=False,
+                 normalize: bool=True, add_self_loops: bool=True):
         super(EvolveGCNO, self).__init__()
 
         self.in_channels = in_channels
