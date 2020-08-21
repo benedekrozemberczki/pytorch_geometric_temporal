@@ -10,6 +10,19 @@ class EvolveGCNO(torch.nn.Module):
 
     Args:
         in_channels (int): Number of filters.
+        improved (bool, optional): If set to :obj:`True`, the layer computes
+            :math:`\mathbf{\hat{A}}` as :math:`\mathbf{A} + 2\mathbf{I}`.
+            (default: :obj:`False`)
+        cached (bool, optional): If set to :obj:`True`, the layer will cache
+            the computation of :math:`\mathbf{\hat{D}}^{-1/2} \mathbf{\hat{A}}
+            \mathbf{\hat{D}}^{-1/2}` on first execution, and will use the
+            cached version for further executions.
+            This parameter should only be set to :obj:`True` in transductive
+            learning scenarios. (default: :obj:`False`)
+        normalize (bool, optional): Whether to add self-loops and apply
+            symmetric normalization. (default: :obj:`True`)
+        add_self_loops (bool, optional): If set to :obj:`False`, will not add
+            self-loops to the input graph. (default: :obj:`True`)
     """
     def __init__(self, in_channels: int):
         super(EvolveGCNO, self).__init__()
