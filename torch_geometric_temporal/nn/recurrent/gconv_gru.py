@@ -34,8 +34,8 @@ class GConvGRU(torch.nn.Module):
         bias (bool, optional): If set to :obj:`False`, the layer will not learn
             an additive bias. (default: :obj:`True`)
     """
-    def __init__(self, in_channels: int, out_channels: int, K: int):
-
+    def __init__(self, in_channels: int, out_channels: int, K: int,
+                 normalization: str="sym", bias: bool=True):
         super(GConvGRU, self).__init__()
 
         self.in_channels = in_channels
