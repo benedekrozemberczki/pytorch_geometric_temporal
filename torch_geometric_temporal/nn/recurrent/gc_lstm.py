@@ -89,7 +89,9 @@ class GCLSTM(torch.nn.Module):
 
         self.conv_o = ChebConv(in_channels=self.out_channels,
                                out_channels=self.out_channels,
-                               K=self.K)
+                               K=self.K,
+                               normalization=self.normalization,
+                               bias=self.bias)
 
         self.W_o = Parameter(torch.Tensor(self.in_channels, self.out_channels))
         self.b_o = Parameter(torch.Tensor(1, self.out_channels))
