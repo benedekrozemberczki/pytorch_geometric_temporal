@@ -25,16 +25,18 @@ class EvolveGCNH(torch.nn.Module):
             symmetric normalization. (default: :obj:`True`)
         add_self_loops (bool, optional): If set to :obj:`False`, will not add
             self-loops to the input graph. (default: :obj:`True`)
-        bias (bool, optional): If set to :obj:`False`, the layer will not learn
-            an additive bias. (default: :obj:`True`)
     """
     def __init__(self, num_of_nodes: int, in_channels: int, improved: bool=False,
-                 cached: bool=False, normalize: bool=True, add_self_loops: bool=True,
-                 bias: bool=True):
+                 cached: bool=False, normalize: bool=True, add_self_loops: bool=True):
         super(EvolveGCNH, self).__init__()
 
         self.num_of_nodes = num_of_nodes
         self.in_channels = in_channels
+        self.improved = improved
+        self.cached = cached
+        self.normalize = normalize
+        self.add_self_loops = add_self_loops
+        self.bias = bias
         self._create_layers()
 
 
