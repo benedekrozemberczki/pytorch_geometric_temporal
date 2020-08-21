@@ -1,10 +1,4 @@
 Installation
 ============
 
-The installation of PyTorch Geometric Temporal requires the presence of certain prerequisites. These prerequisites are the following:
-
-* Python version that is above 3.7
-*
-*
-
-
+The installation of PyTorch Geometric Temporal requires the presence of certain prerequisites. These are described in great detail in the installation description of `PyTorch Geometric <http://www.python.org/>`_.
