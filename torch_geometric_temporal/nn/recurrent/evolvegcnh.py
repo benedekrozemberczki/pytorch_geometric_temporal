@@ -36,7 +36,6 @@ class EvolveGCNH(torch.nn.Module):
         self.cached = cached
         self.normalize = normalize
         self.add_self_loops = add_self_loops
-        self.bias = bias
         self._create_layers()
 
 
@@ -53,6 +52,10 @@ class EvolveGCNH(torch.nn.Module):
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
                                   out_channels = self.in_channels,
+                                  imroved = self.improved,
+                                  cached = self.cached,
+                                  normalize = self.normalize,
+                                  add_self_loops = self.add_self_loops,
                                   bias = False)
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, 
