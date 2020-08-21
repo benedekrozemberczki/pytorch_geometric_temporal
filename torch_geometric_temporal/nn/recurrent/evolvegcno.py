@@ -28,6 +28,10 @@ class EvolveGCNO(torch.nn.Module):
         super(EvolveGCNO, self).__init__()
 
         self.in_channels = in_channels
+        self.improved = improved
+        self.cached = cached
+        self.normalize = normalize
+        self.add_self_loops = add_self_loops
         self._create_layers()
 
 
