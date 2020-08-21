@@ -45,6 +45,10 @@ class EvolveGCNO(torch.nn.Module):
 
         self.conv_layer = GCNConv(in_channels = self.in_channels,
                                   out_channels = self.in_channels,
+                                  improved = self.improved,
+                                  cached = self.cached,
+                                  normalize = self.normalize,
+                                  add_self_loops = self.add_self_loops,
                                   bias = False)
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, 
