@@ -41,6 +41,8 @@ class GConvGRU(torch.nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.K = K
+        self.normalization = normalization
+        self.bias = bias
         self._create_parameters_and_layers()
 
 
