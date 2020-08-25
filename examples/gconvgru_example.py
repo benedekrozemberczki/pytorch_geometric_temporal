@@ -1,4 +1,5 @@
 import torch
+import random
 import numpy as np
 import networkx as nx
 import torch.nn.functional as F
@@ -21,6 +22,12 @@ def create_mock_edge_weight(edge_index):
     """
     return torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
 
+def create_mock_target(number_of_nodes, number_of_classes):
+    """
+    Creating a mock target vector.
+    """
+    return torch.LongTensor([random.randint(0, number_of_classes-1) for node in range(number_of_nodes)])
+
 
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features, num_classes):
@@ -40,10 +47,23 @@ class RecurrentGCN(torch.nn.Module):
         return F.log_softmax(x, dim=1)
 
 
-model = RecurrentGCN(node_features=100, num_classes=10)
+node_features = 100
+node_count = 1000
+num_classes = 10
+edge_per_node = 15
 
-x, edge_index = create_mock_data(1000, 15, 100)
+model = RecurrentGCN(node_features=node_feature, num_classes=num_classes)
 
-edge_weight = create_mock_edge_weight(edge_index)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 
-scores = model(x, edge_index, edge_weight)
+model.train()
+
+for epoch in range(200):
+    optimizer.zero_grad()
+    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+    edge_weight = create_mock_edge_weight(edge_index)
+    scores = model(x, edge_index, edge_weight)
+    target = create_mock_target(node_count, num_classes)
+    loss = F.nll_loss(scores, target)
+    loss.backward()
+    optimizer.step()
