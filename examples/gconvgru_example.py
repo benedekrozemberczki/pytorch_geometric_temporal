@@ -51,14 +51,17 @@ node_features = 100
 node_count = 1000
 num_classes = 10
 edge_per_node = 15
+epochs = 200
+learning_rate = 0.01
+weight_decay = 5e-4
 
 model = RecurrentGCN(node_features=node_feature, num_classes=num_classes)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
 model.train()
 
-for epoch in range(200):
+for epoch in range(epochs):
     optimizer.zero_grad()
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
     edge_weight = create_mock_edge_weight(edge_index)
