@@ -3,7 +3,7 @@ import random
 import numpy as np
 import networkx as nx
 import torch.nn.functional as F
-from torch_geometric_temporal.nn.recurrent import GCLSTM
+from torch_geometric_temporal.nn.recurrent import GConvLSTM
 
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
@@ -32,8 +32,8 @@ def create_mock_target(number_of_nodes, number_of_classes):
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features, num_classes):
         super(RecurrentGCN, self).__init__()
-        self.recurrent_1 = GCLSTM(node_features, 32, 5)
-        self.recurrent_2 = GCLSTM(32, 16, 5)
+        self.recurrent_1 = GConvLSTM(node_features, 32, 5)
+        self.recurrent_2 = GConvLSTM(32, 16, 5)
         self.linear = torch.nn.Linear(16, num_classes)
 
     def forward(self, x, edge_index, edge_weight):
