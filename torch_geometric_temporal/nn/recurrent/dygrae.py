@@ -15,7 +15,7 @@ class DyGrEncoder(torch.nn.Module):
         lstm_out_channels (int): Number of LSTM channels.
         lstm_num_layers (int): Number of neurons in LSTM.
     """
-    def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str="mean",
+    def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str,
                  lstm_out_channels: int, lstm_num_layers: int):
         super(DyGrEncoder, self).__init__()
         assert conv_aggr in ["mean", "add", "max"], "Wrong aggregator."
