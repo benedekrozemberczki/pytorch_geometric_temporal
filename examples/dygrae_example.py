@@ -22,6 +22,7 @@ def create_mock_edge_weight(edge_index):
     """
     return torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
 
+
 def create_mock_target(number_of_nodes, number_of_classes):
     """
     Creating a mock target vector.
