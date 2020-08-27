@@ -64,7 +64,7 @@ model.train()
 for epoch in range(epochs):
     optimizer.zero_grad()
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    edge_relations = create_mock_edge_weight(edge_index, num_relations)
+    edge_relations = create_mock_edge_relations(edge_index, num_relations)
     scores = model(x, edge_index, edge_relations)
     target = create_mock_target(node_count, num_classes)
     loss = F.nll_loss(scores, target)
