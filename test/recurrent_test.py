@@ -201,8 +201,8 @@ def test_dygrencoder_layer():
     H_tilde, H, C = layer(X, edge_index, edge_weight, H, C)
 
     assert H_tilde.shape == (number_of_nodes, lstm_out_channels)
-    assert C.shape == (number_of_nodes, lstm_out_channels)
     assert H.shape == (number_of_nodes, lstm_out_channels)
+    assert C.shape == (number_of_nodes, lstm_out_channels)
 
 def test_evolve_gcn_h_layer():
     """
