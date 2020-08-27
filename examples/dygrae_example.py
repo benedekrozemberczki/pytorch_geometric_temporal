@@ -45,7 +45,7 @@ class RecurrentGCN(torch.nn.Module):
         return F.log_softmax(h, dim=1)
 
 
-node_features = 100
+node_features = 16
 node_count = 1000
 num_classes = 10
 edge_per_node = 15
