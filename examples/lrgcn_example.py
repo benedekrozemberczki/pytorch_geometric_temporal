@@ -16,11 +16,12 @@ def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     return X, edge_index
 
 
-def create_mock_edge_weight(edge_index):
+def create_mock_edge_relations(edge_index, num_relations):
     """
-    Creating a mock edge weight tensor.
+    Creating a mock relation type tensor.
     """
-    return torch.FloatTensor(np.random.uniform(0, 1, (edge_index.shape[1])))
+    return torch.LongTensor(np.random.choice(num_relations, edge_index.shape[1], replace=True))
+
 
 def create_mock_target(number_of_nodes, number_of_classes):
     """
@@ -30,22 +31,22 @@ def create_mock_target(number_of_nodes, number_of_classes):
 
 
 class RecurrentGCN(torch.nn.Module):
-    def __init__(self, node_features, num_classes):
+    def __init__(self, node_features, num_relations, num_classes):
         super(RecurrentGCN, self).__init__()
-        self.recurrent_1 = DyGrEncoder(node_features, 32, "mean", 32, 1)
-        self.recurrent_2 = DyGrEncoder(32, 32, "mean", 32, 1)
+        self.recurrent_1 = LRGCN(node_features, 32, "mean", 32, 1)
+        self.recurrent_2 = LRGCN(32, 32, "mean", 32, 1)
         self.linear = torch.nn.Linear(32, num_classes)
 
     def forward(self, x, edge_index, edge_weight):
-        _, h, c = self.recurrent_1(x, edge_index, edge_weight)
-        _, h, c = self.recurrent_2(x, edge_index, edge_weight, h, c)
+        _, h, _ = self.recurrent_1(x, edge_index, edge_weight)
+        _, h, _ = self.recurrent_2(x, edge_index, edge_weight, h)
         h = F.relu(h)
         h = F.dropout(h, training=self.training)
         h = self.linear(h)
         return F.log_softmax(h, dim=1)
 
 
-node_features = 16
+node_features = 128
 node_count = 1000
 num_classes = 10
 edge_per_node = 15
