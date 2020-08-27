@@ -18,7 +18,7 @@ class DyGrEncoder(torch.nn.Module):
     def __init__(self, conv_out_channels: int, conv_num_layers: int, conv_aggr: str="mean",
                  lstm_out_channels: int, lstm_num_layers: int):
         super(DyGrEncoder, self).__init__()
-
+        assert conv_aggr in ["mean", "add", "max"], "Wrong aggregator."
         self.conv_out_channels = conv_out_channels
         self.conv_num_layers = conv_num_layers
         self.conv_aggr = conv_aggr
