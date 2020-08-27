@@ -38,8 +38,8 @@ class RecurrentGCN(torch.nn.Module):
         self.linear = torch.nn.Linear(32, num_classes)
 
     def forward(self, x, edge_index, edge_weight):
-        _, h, c = self.recurrent_1(x, edge_index, edge_weight)
-        _, h, c = self.recurrent_2(x, edge_index, edge_weight, h, c)
+        h, _, _ = self.recurrent_1(x, edge_index, edge_weight)
+        h, _, _ = self.recurrent_2(h, edge_index, edge_weight)
         h = F.relu(h)
         h = F.dropout(h, training=self.training)
         h = self.linear(h)
