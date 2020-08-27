@@ -198,7 +198,7 @@ def test_dygrencoder_layer():
     assert H.shape == (number_of_nodes, lstm_out_channels)
     assert C.shape == (number_of_nodes, lstm_out_channels)
 
-    H_tilde, H, C = layer(X, edge_index, edge_weight, C, H)
+    H_tilde, H, C = layer(X, edge_index, edge_weight, H, C)
 
     assert H_tilde.shape == (number_of_nodes, lstm_out_channels)
     assert C.shape == (number_of_nodes, lstm_out_channels)
