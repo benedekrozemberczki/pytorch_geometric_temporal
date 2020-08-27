@@ -186,19 +186,19 @@ def test_dygrencoder_layer():
                         lstm_num_layers = lstm_num_layers)
 
 
-    H_tilde, C, H = layer(X, edge_index)
+    H_tilde, H, C = layer(X, edge_index)
 
     assert H_tilde.shape == (number_of_nodes, lstm_out_channels)
     assert C.shape == (number_of_nodes, lstm_out_channels)
     assert H.shape == (number_of_nodes, lstm_out_channels)
 
-    H_tilde, C, H = layer(X, edge_index, edge_weight)
+    H_tilde, H, C = layer(X, edge_index, edge_weight)
 
     assert H_tilde.shape == (number_of_nodes, lstm_out_channels)
     assert C.shape == (number_of_nodes, lstm_out_channels)
     assert H.shape == (number_of_nodes, lstm_out_channels)
 
-    H_tilde, C, H = layer(X, edge_index, edge_weight, C, H)
+    H_tilde, H, C = layer(X, edge_index, edge_weight, C, H)
 
     assert H_tilde.shape == (number_of_nodes, lstm_out_channels)
     assert C.shape == (number_of_nodes, lstm_out_channels)
