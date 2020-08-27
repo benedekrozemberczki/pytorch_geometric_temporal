@@ -33,9 +33,9 @@ def create_mock_target(number_of_nodes, number_of_classes):
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features, num_relations, num_classes):
         super(RecurrentGCN, self).__init__()
-        self.recurrent_1 = LRGCN(node_features, 32, "mean", 32, 1)
-        self.recurrent_2 = LRGCN(32, 32, "mean", 32, 1)
-        self.linear = torch.nn.Linear(32, num_classes)
+        self.recurrent_1 = LRGCN(node_features, 16, num_relations, 5)
+        self.recurrent_2 = LRGCN(16, 8,  num_relations, 5)
+        self.linear = torch.nn.Linear(8, num_classes)
 
     def forward(self, x, edge_index, edge_weight):
         h, _, _ = self.recurrent_1(x, edge_index, edge_weight)
@@ -46,6 +46,7 @@ class RecurrentGCN(torch.nn.Module):
         return F.log_softmax(h, dim=1)
 
 
+num_relations = 8
 node_features = 128
 node_count = 1000
 num_classes = 10
@@ -54,7 +55,7 @@ epochs = 200
 learning_rate = 0.01
 weight_decay = 5e-4
 
-model = RecurrentGCN(node_features=node_features, num_classes=num_classes)
+model = RecurrentGCN(node_features=node_features, num_relations=num_relations, num_classes=num_classes)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
@@ -63,8 +64,8 @@ model.train()
 for epoch in range(epochs):
     optimizer.zero_grad()
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    edge_weight = create_mock_edge_weight(edge_index)
-    scores = model(x, edge_index, edge_weight)
+    edge_relations = create_mock_edge_weight(edge_index, num_relations)
+    scores = model(x, edge_index, edge_relations)
     target = create_mock_target(node_count, num_classes)
     loss = F.nll_loss(scores, target)
     loss.backward()
