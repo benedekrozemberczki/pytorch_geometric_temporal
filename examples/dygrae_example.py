@@ -60,7 +60,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=
 
 model.train()
 
-for epoch in range(epochs):
+for _ in range(epochs):
     optimizer.zero_grad()
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
     edge_weight = create_mock_edge_weight(edge_index)

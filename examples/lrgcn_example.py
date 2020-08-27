@@ -38,8 +38,8 @@ class RecurrentGCN(torch.nn.Module):
         self.linear = torch.nn.Linear(8, num_classes)
 
     def forward(self, x, edge_index, edge_weight):
-        h, _, _ = self.recurrent_1(x, edge_index, edge_weight)
-        h, _, _ = self.recurrent_2(h, edge_index, edge_weight)
+        h, _,  = self.recurrent_1(x, edge_index, edge_weight)
+        h, _,  = self.recurrent_2(h, edge_index, edge_weight)
         h = F.relu(h)
         h = F.dropout(h, training=self.training)
         h = self.linear(h)
@@ -61,7 +61,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=
 
 model.train()
 
-for epoch in range(epochs):
+for _ in range(epochs):
     optimizer.zero_grad()
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
     edge_relations = create_mock_edge_relations(edge_index, num_relations)
