@@ -5,7 +5,6 @@ import networkx as nx
 import torch.nn.functional as F
 from torch_geometric_temporal.nn.recurrent import GConvGRU
 
-
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
     Creating a mock feature matrix and edge index.
@@ -55,7 +54,7 @@ epochs = 200
 learning_rate = 0.01
 weight_decay = 5e-4
 
-model = RecurrentGCN(node_features=node_feature, num_classes=num_classes)
+model = RecurrentGCN(node_features=node_features, num_classes=num_classes)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
