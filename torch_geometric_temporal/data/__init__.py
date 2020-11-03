@@ -1,1 +1,1 @@
-from .discrete import DiscreteTemporalSignalStaticGraph
+from .discrete import *
