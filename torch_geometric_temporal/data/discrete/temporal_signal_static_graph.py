@@ -11,10 +11,10 @@ class StaticGraphDiscreteTemporalSignal(object):
         self._targets = targets
 
     def _get_edge_index(self):
-        return self._edge_index
+        return torch.LongTensor(self._edge_index)
 
     def _get_edge_attr(self):
-        return self._edge_attr
+        return torch.FloatTensor(self._edge_attr)
 
     def _get_features(self)
         return torch.FloatTensor(self._features[t])
@@ -31,6 +31,7 @@ class StaticGraphDiscreteTemporalSignal(object):
         edge_index = self._get_edge_index()
         edge_attr = self._get_edge_attr()
         y = self._get_target()
+
         snapshot = Data(x = x, edge_index = edge_index,
                         edge_attr = edge_attr, y = y)
 
