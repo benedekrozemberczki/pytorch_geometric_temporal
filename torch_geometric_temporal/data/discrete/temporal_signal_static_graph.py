@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from torch_geometric_temporal import Data
+from torch_geometric.data import Data
 
 class StaticGraphDiscreteTemporalSignal(object):
 
@@ -11,22 +11,34 @@ class StaticGraphDiscreteTemporalSignal(object):
         self._targets = targets
 
     def _get_edge_index(self):
-        return torch.LongTensor(self._edge_index)
+        if self._edge_index is None:
+            return self._edge_index
+        else:
+            return torch.LongTensor(self._edge_index)
 
     def _get_edge_attr(self):
-        return torch.FloatTensor(self._edge_attr)
+        if self._edge_attr is None:
+            return self._edge_attr
+        else:
+            return torch.FloatTensor(self._edge_attr)
 
-    def _get_features(self)
-        return torch.FloatTensor(self._features[t])
+    def _get_features(self):
+        if self._features[t] is None:
+            return self._features[t]
+        else:        
+            return torch.FloatTensor(self._features[t])
 
     def _get_target(self):
-        if self.targets[t].dtype.kind == 'i':
-            return torch.LongTensor(self._targets[t])
-        else self.targets[t].dtype.kind == 'f':
-            return torch.FloatTensor(self._targets[t])
+        if self._targets[t] is None:
+           return self._targets[t]
+        else:
+            if self.targets[t].dtype.kind == 'i':
+                return torch.LongTensor(self._targets[t])
+            elif self.targets[t].dtype.kind == 'f':
+                return torch.FloatTensor(self._targets[t])
+         
 
-
-    def _generate_snapshot(self)
+    def _generate_snapshot(self):
         x = self._get_features()
         edge_index = self._get_edge_index()
         edge_attr = self._get_edge_attr()
