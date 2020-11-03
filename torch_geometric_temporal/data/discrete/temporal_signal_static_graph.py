@@ -9,10 +9,18 @@ class StaticGraphDiscreteTemporalSignal(object):
         self.features = features
         self.targets = targets
 
+
+    def _get_edges(self):
+        pass
+
+
     def __next__(self):
         self.t = t + 1
         if self.t <= len(self.features):
-            return (self.edges, self.edge_weight, self.features[target], self.targets[t])
+          
+            feature = self.features[t]
+            target = self.targets[t] 
+            return (self.edges, self.edge_weight, feature, target)
         else:
             raise StopIteration
 
