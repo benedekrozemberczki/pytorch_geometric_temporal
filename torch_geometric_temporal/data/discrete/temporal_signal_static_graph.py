@@ -13,6 +13,9 @@ class StaticGraphDiscreteTemporalSignal(object):
     def _get_edges(self):
         pass
 
+    def _get_edge_weights(self):
+        pass
+
 
     def __next__(self):
         self.t = t + 1
