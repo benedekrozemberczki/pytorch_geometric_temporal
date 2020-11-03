@@ -8,6 +8,14 @@ class DiscreteTemporalSignalStaticGraph(object):
         self.features = features
         self.targets = targets
 
+    def __next__(self):
+        self.t = t + 1
+
+
+    def __iter__(self):
+        self.t = 0
+
+
 
     
 
