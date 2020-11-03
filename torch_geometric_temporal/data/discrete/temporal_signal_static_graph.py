@@ -19,6 +19,9 @@ class StaticGraphDiscreteTemporalSignal(object):
     def _get_features(self)
         pass
 
+    def _get_target(self):
+        pass
+
     def __next__(self):
         self.t = t + 1
         if self.t <= len(self.features):
