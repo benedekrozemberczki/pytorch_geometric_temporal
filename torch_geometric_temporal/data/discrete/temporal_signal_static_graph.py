@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from torch_geometric_temporal.data import GraphSnapshot
 
 class StaticGraphDiscreteTemporalSignal(object):
 
