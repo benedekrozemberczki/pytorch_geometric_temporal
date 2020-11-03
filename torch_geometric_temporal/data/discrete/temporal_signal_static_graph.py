@@ -4,10 +4,10 @@ import numpy as np
 class StaticGraphDiscreteTemporalSignal(object):
 
     def __init__(self, edges, edge_weight, features, targets):
-        self.edges = edges
-        self.edge_weight = edge_weight
-        self.features = features
-        self.targets = targets
+        self._edges = edges
+        self._edge_weight = edge_weight
+        self._features = features
+        self._targets = targets
 
 
     def _get_edges(self):
@@ -18,7 +18,6 @@ class StaticGraphDiscreteTemporalSignal(object):
 
     def _get_features(self)
         pass
-
 
     def __next__(self):
         self.t = t + 1
