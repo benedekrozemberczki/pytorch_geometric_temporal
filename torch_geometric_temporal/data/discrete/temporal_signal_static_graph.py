@@ -1,6 +1,6 @@
 
 
-class DiscreteTemporalSignalStaticGraph(object):
+class StaticGraphDiscreteTemporalSignal(object):
 
     def __init__(self, edges, edge_weight, features, targets):
         self.edges = edges
@@ -11,9 +11,9 @@ class DiscreteTemporalSignalStaticGraph(object):
     def __next__(self):
         self.t = t + 1
 
-
     def __iter__(self):
         self.t = 0
+        return self
 
 
 
