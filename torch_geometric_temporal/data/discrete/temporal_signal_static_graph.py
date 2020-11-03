@@ -11,10 +11,10 @@ class StaticGraphDiscreteTemporalSignal(object):
         self._targets = targets
 
     def _get_edge_index(self):
-        pass
+        return self._edge_index
 
     def _get_edge_weight(self):
-        pass
+        return self._edge_weight
 
     def _get_features(self)
         pass
