@@ -29,10 +29,13 @@ class StaticGraphDiscreteTemporalSignal(object):
             return torch.FloatTensor(self._features[t])
 
     def _get_target(self):
-        if self.targets[t].dtype.kind == 'i':
-            return torch.LongTensor(self._targets[t])
-        elif self.targets[t].dtype.kind == 'f':
-            return torch.FloatTensor(self._targets[t])
+        if self.targets[t] is None:
+            return self.targets[t]
+        else:
+            if self.targets[t].dtype.kind == 'i':
+                return torch.LongTensor(self._targets[t])
+            elif self.targets[t].dtype.kind == 'f':
+                return torch.FloatTensor(self._targets[t])
          
 
     def _get_snapshot(self):
