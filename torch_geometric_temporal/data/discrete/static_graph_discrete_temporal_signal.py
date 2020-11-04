@@ -11,13 +11,22 @@ class StaticGraphDiscreteTemporalSignal(object):
         self._targets = targets
 
     def _get_edge_index(self):
-        return torch.LongTensor(self._edge_index)
+        if self._edge_index is None:
+            return self._edge_index
+        else:
+            return torch.LongTensor(self._edge_index)
 
     def _get_edge_attr(self):
-        return torch.FloatTensor(self._edge_attr)
+        if self._edge_attr is None:
+            return self._edge_attr
+        else:
+            return torch.FloatTensor(self._edge_attr)
 
-    def _get_features(self):        
-        return torch.FloatTensor(self._features[t])
+    def _get_features(self): 
+        if self._features[t]:
+            return self._features[t]
+        else:       
+            return torch.FloatTensor(self._features[t])
 
     def _get_target(self):
         if self.targets[t].dtype.kind == 'i':
