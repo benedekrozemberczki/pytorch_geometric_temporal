@@ -1,4 +1,4 @@
-PyTorch Geometric Temporal Datasets
+PyTorch Geometric Temporal Dataset
 ========================
 
 .. contents:: Contents
