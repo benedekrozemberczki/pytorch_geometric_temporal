@@ -7,6 +7,6 @@ PyTorch Geometric Temporal Datasets
 Discrete Recurrent Graph Convolutional Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.data.recurrent.gconv_gru
+.. automodule:: torch_geometric_temporal.data.discrete.static_graph_discrete_temporal_signal
     :members:
     :undoc-members:
