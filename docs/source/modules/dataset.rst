@@ -7,6 +7,10 @@ PyTorch Geometric Temporal Dataset
 Datasets
 -----------------------
 
+.. automodule:: torch_geometric_temporal.data.discrete.dataset.chickenpox
+    :members:
+    :undoc-members:
+
 Discrete Temporal Signal Iterators
 --------------
 
