@@ -13,15 +13,18 @@ class ChickenpoxDatasetLoader(object):
         url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/discrete/chickenpox.json"
         self.dataset = json.loads(urllib.request.urlopen(url).read())
 
+    def _get_edges(self):
+        self.edges = np.array(self.dataset["edges"]).T
+
     def get_dataset(self):
-        edges = np.array(self.dataset["edges"]).T
-        edge_weights = np.ones(edges.shape[1])
+        self._get_edges()
+
+        edge_weights = np.ones(self.edges.shape[1])
         features = []
         targets = []
         for time in range(self.dataset["time_periods"]):
             features.append(np.array(self.dataset[str(time)]["y"]))
             targets.append(np.array(self.dataset[str(time)]["X"]))
-        ds = StaticGraphDiscreteSignal(edges, edge_weights, features, targets)
-        return ds
+        return StaticGraphDiscreteSignal(self.edges, edge_weights, features, targets)
  
         
