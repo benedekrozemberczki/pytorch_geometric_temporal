@@ -7,6 +7,9 @@ from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import 
 class ChickenpoxDatasetLoader(object):
 
     def __init__(self):
+        """A dataset of county level cases of chicken pox. Nodes are counties,
+           edges are neighbourhoods, features are weekly changes in the case count.
+         """
         self._read_web_data()
 
     def _read_web_data(self):
@@ -32,6 +35,7 @@ class ChickenpoxDatasetLoader(object):
             self.targets.append(np.array(self._dataset[str(time)]["y"]))
 
     def get_dataset(self):
+        """Returning the Hungarian Chickenpox cases data iterator."""
         self._get_edges()
         self._get_edge_weights()
         self._get_features()
