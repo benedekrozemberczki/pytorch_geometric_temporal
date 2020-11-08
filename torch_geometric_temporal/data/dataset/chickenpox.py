@@ -25,6 +25,11 @@ class ChickenpoxDatasetLoader(object):
         for time in range(self._dataset["time_periods"]):
             self.features.append(np.array(self._dataset[str(time)]["X"]))
 
+    def _get_targets(self):
+
+        self.targets = []
+        for time in range(self._dataset["time_periods"]):
+            self.targets.append(np.array(self._dataset[str(time)]["y"]))
 
     def get_dataset(self):
         self._get_edges()
