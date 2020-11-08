@@ -1,5 +1,6 @@
 import io
 import json
+from six.moves import urllib
 
 class ChickenpoxDataset(object):
 
