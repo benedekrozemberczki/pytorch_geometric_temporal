@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from torch_geometric.data import Data
 
-class StaticGraphDiscreteTemporalSignal(object):
+class StaticGraphDiscreteSignal(object):
 
     def __init__(self, edge_index, edge_attr, features, targets):
         self._edge_index = edge_index

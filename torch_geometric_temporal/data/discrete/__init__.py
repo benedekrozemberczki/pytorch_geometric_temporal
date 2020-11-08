@@ -1,1 +1,1 @@
-from .static_graph_discrete_temporal_signal import StaticGraphDiscreteTemporalSignal
+from .static_graph_discrete_signal import StaticGraphDiscreteSignal
