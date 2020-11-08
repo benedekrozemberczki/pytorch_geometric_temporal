@@ -1,6 +1,7 @@
-from torch_geometric_temporal.data.dataset import ChickenpoxDataset
+from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 
 
 def test_chickenpox():
-    dataset = ChickenpoxDataset()
-    assert 1 == 1
+    loader = ChickenpoxDatasetLoader()
+    dataset = loader.get_dataset()
+    assert dataset.edge_index.shape == (2, 102)

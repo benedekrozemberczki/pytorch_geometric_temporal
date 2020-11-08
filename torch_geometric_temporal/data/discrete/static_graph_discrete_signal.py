@@ -5,10 +5,10 @@ from torch_geometric.data import Data
 class StaticGraphDiscreteSignal(object):
 
     def __init__(self, edge_index, edge_attr, features, targets):
-        self._edge_index = edge_index
-        self._edge_attr = edge_attr
-        self._features = features
-        self._targets = targets
+        self.edge_index = edge_index
+        self.edge_attr = edge_attr
+        self.features = features
+        self.targets = targets
 
     def _get_edge_index(self):
         if self._edge_index is None:

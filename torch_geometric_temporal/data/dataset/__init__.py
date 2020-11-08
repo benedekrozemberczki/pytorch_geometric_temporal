@@ -1,1 +1,1 @@
-from .chickenpox import ChickenpoxDataset
+from .chickenpox import ChickenpoxDatasetLoader
