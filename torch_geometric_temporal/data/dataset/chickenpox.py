@@ -1,7 +1,8 @@
-
+import io
+import json
 
 class ChickenpoxDataset(object):
 
     def __init__(self):
-        pass
+        return self
         
