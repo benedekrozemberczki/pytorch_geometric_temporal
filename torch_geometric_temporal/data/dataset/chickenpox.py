@@ -14,12 +14,14 @@ class ChickenpoxDatasetLoader(object):
         self.dataset = json.loads(urllib.request.urlopen(url).read())
 
     def _get_edges(self):
-        self.edges = np.array(self.dataset["edges"]).T
+        self._edges = np.array(self.dataset["edges"]).T
+
+    def _get_edge_weights(self):
+        self._edge_weights = np.ones(self._edges.shape[1])
 
     def get_dataset(self):
         self._get_edges()
-
-        edge_weights = np.ones(self.edges.shape[1])
+        self._get_edge_weights()
         features = []
         targets = []
         for time in range(self.dataset["time_periods"]):
