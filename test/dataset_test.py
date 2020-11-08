@@ -7,4 +7,7 @@ def test_chickenpox():
     for epoch in range(3):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 102)
-            assert snapshot.edge_weight.shape == (1, 102)
+            assert snapshot.edge_attr.shape == (102, )
+            assert snapshot.x.shape == (20, 21)
+            assert snapshot.y.shape == (20, )
+
