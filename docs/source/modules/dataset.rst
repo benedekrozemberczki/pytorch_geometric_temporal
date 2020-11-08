@@ -7,7 +7,7 @@ PyTorch Geometric Temporal Dataset
 Datasets
 -----------------------
 
-.. automodule:: torch_geometric_temporal.data.discrete.dataset.chickenpox
+.. automodule:: torch_geometric_temporal.data.dataset.chickenpox
     :members:
     :undoc-members:
 
