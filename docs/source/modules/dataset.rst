@@ -4,6 +4,9 @@ PyTorch Geometric Temporal Dataset
 .. contents:: Contents
     :local:
 
+Datasets
+-----------------------
+
 Discrete Temporal Signal Iterators
 --------------
 
