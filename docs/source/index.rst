@@ -3,6 +3,8 @@
 PyTorch Geometric Temporal Documentation
 ==================================
 
+*PyTorch Geometric Temporal* is an temporal graph neural network extension library for `PyTorch Geometric <https://networkx.github.io/>`_.
+
 .. code-block:: latex
 
     >@misc{rozemberczki_temporal,
