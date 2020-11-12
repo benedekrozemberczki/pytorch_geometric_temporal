@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU
+from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU, DCRNN
 from torch_geometric_temporal.nn.recurrent import GCLSTM, LRGCN, DyGrEncoder
 from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO
 
@@ -86,6 +86,33 @@ def test_gconv_gru_layer():
 
     layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K)
 
+
+    H = layer(X, edge_index)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+
+def test_dcrnn_layer():
+    """
+    Testing the DCRNN Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    K = 2
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
+
+    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=K)
 
     H = layer(X, edge_index)
 
