@@ -19,7 +19,7 @@ class StaticGraphDiscreteSignal(object):
         features (): Node feature tensor.
         targets (): Node label (target) tensor.
     """
-    def __init__(self, edge_index: np.ndarray, edge_weight: np.ndarray, features, targets):
+    def __init__(self, edge_index: Edge_Index, edge_weight: Edge_Weight, features, targets):
         self.edge_index = edge_index
         self.edge_weight = edge_weight
         self.features = features
