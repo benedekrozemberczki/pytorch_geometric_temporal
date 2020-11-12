@@ -12,14 +12,14 @@ Datasets
     :undoc-members:
 
 Discrete Temporal Signal Iterators
---------------
+----------------------------------
 
 .. automodule:: torch_geometric_temporal.data.discrete.static_graph_discrete_signal
     :members:
     :undoc-members:
 
-Train Test Split
---------------
+Temporal Train Test Split
+--------------------------
 
 .. automodule:: torch_geometric_temporal.data.splitter.discrete_train_test_split
     :members:
