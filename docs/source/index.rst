@@ -8,7 +8,7 @@ PyTorch Geometric Temporal Documentation
 .. code-block:: latex
 
     >@misc{pytorch_geometric_temporal,
-           author = {Benedek, Rozemberczki and Paul, Morio},
+           author = {Benedek, Rozemberczki and Paul, Scherer},
            title = {{PyTorch Geometric Temporal}},
            year = {2020},
            publisher = {GitHub},
