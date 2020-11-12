@@ -3,22 +3,19 @@ from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import 
 
 
 def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[StaticGraphDiscreteSignal, StaticGraphDiscreteSignal]:
-    r"""
-    Summary line.
-
-    Extended description of function.
+    r""" Function to split a discrete data iterator according to a fixed ratio.
 
     Parameters
     ----------
-    arg1 : int
-        Description of arg1
-    arg2 : str
-        Description of arg2
+    data_iterator : StaticGraphDiscreteSignal
+        A data iterator to create a temporal train and test split.
+    train_ratio : float
+        Ratio of training data to be used.
 
     Returns
     -------
-    int
-        Description of return value
+    tuple
+        Train and test data iterators.
 
     """
     train_snapshots = int(train_ratio*len(data_iterator.features))
