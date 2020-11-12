@@ -8,6 +8,6 @@ def discrete_train_test_split(data_iterator, train_ratio: float=0.8):
     test_snapshots = len(data_iterator.features) - train_snapshots
 
     if type(data_iterator) == StaticGraphDiscreteSignal:
-        train_iterator = StaticGraphDiscreteSignal(None, None, [None],[None])
-        test_iterator = StaticGraphDiscreteSignal(None, None, [None],[None])
+        train_iterator = StaticGraphDiscreteSignal(data_iterator.edge_index, data_iterator.edge_weight, [None],[None])
+        test_iterator = StaticGraphDiscreteSignal(data_iterator.edge_index, data_iterator.edge_weight, [None],[None])
     return 1
