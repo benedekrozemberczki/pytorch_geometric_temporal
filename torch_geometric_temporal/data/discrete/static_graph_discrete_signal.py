@@ -6,10 +6,10 @@ class StaticGraphDiscreteSignal(object):
     r"""
 
     Args:
-        edge_index (int): .
-        edge_weight (int): .
-        features (str): .
-        targets (int): .
+        edge_index (): .
+        edge_weight (): .
+        features (): .
+        targets (): .
     """
     def __init__(self, edge_index, edge_weight, features, targets):
         self.edge_index = edge_index
