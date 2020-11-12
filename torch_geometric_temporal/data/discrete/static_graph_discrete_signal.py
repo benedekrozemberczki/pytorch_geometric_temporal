@@ -5,8 +5,12 @@ from torch_geometric.data import Data
 
 
 class StaticGraphDiscreteSignal(object):
-    r"""
-
+    r""" A data iterator object to contain a static graph with a dynamically 
+    changing discrete temporal feature set (multiple signals). The node labels
+    (target) are also temporal. The iterator returns a single discrete temporal
+    snapshot for a time period (e.g. day or week). The returned snapshot is a 
+    Pytorch Geometric Data object.
+ 
     Args:
         edge_index (): Index tensor of edges.
         edge_weight (): Edge weight tensor.
