@@ -33,5 +33,6 @@ def test_chickenpox():
 def test_discrete_train_test_split():
     loader = ChickenpoxDatasetLoader()
     dataset = loader.get_dataset()
-    assert 1 == discrete_train_test_split(dataset, 0.8)
+    train_dataset, test_dataset = discrete_train_test_split(dataset, 0.8)
+    assert 1==1
     
