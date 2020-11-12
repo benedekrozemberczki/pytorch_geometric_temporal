@@ -1,7 +1,7 @@
 import torch
 import numpy as np
-from torch_geometric.data import Data
 from typing import List, Union
+from torch_geometric.data import Data
 
 Edge_Index = Union[np.ndarray, None] 
 Edge_Weight = Union[np.ndarray, None]
@@ -15,7 +15,7 @@ class StaticGraphDiscreteSignal(object):
     (target) are also temporal. The iterator returns a single discrete temporal
     snapshot for a time period (e.g. day or week). The iterator returns a single
     snapshot as a Pytorch Geometric Data object. Between two snapshots only
-    the feature matrix and the target matrix changes.
+    the feature matrix and the target matrix will change.
  
     Args:
         edge_index (Numpy array): Index tensor of edges.
