@@ -3,17 +3,13 @@ import numpy as np
 from torch_geometric.data import Data
 
 class StaticGraphDiscreteSignal(object):
-    r"""An implementation of the integrated Gated Graph Convolution Long Short
-    Term Memory Layer. For details see this paper: `"Predictive Temporal Embedding
-    of Dynamic Graphs." <https://ieeexplore.ieee.org/document/9073186>`_
+    r"""
 
     Args:
-        conv_out_channels (int): Number of output challes for the GGCN.
-        conv_num_layers (int): Number of Gated Graph Convolutions.
-        conv_aggr (str): Aggregation scheme to use
-            (:obj:`"add"`, :obj:`"mean"`, :obj:`"max"`).
-        lstm_out_channels (int): Number of LSTM channels.
-        lstm_num_layers (int): Number of neurons in LSTM.
+        edge_index (int): .
+        edge_weight (int): .
+        features (str): .
+        targets (int): .
     """
     def __init__(self, edge_index, edge_weight, features, targets):
         self.edge_index = edge_index
