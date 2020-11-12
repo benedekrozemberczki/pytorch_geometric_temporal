@@ -4,23 +4,22 @@ from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import 
 
 def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[StaticGraphDiscreteSignal, StaticGraphDiscreteSignal]:
     r"""
-    Sampling nodes randomly proportional to the normalized pagerank score.
+    Summary line.
+
+    Extended description of function.
 
     Parameters
     ----------
-
-    shuffle : bool, default=True
-        Whether or not to shuffle the data before splitting. If shuffle=False
-        then stratify must be None.
-
-    stratify : array-like, default=None
-        If not None, data is split in a stratified fashion, using this as
-        the class labels.
+    arg1 : int
+        Description of arg1
+    arg2 : str
+        Description of arg2
 
     Returns
     -------
-    splitting : list, length=2 * len(arrays)
-        List containing train-test split of inputs.
+    int
+        Description of return value
+
     """
     train_snapshots = int(train_ratio*len(data_iterator.features))
 
