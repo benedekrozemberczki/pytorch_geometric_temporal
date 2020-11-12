@@ -3,7 +3,15 @@ from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import 
 
 
 def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[StaticGraphDiscreteSignal, StaticGraphDiscreteSignal]:
+    """
+    Sampling nodes randomly proportional to the normalized pagerank score.
 
+    Arg types:
+        * **graph** *(NetworkX or NetworKit graph)* - The graph to be sampled from.
+
+    Return types:
+        * **new_graph** *(NetworkX or NetworKit graph)* - The graph of sampled nodes.
+    """
     train_snapshots = int(train_ratio*len(data_iterator.features))
 
     if type(data_iterator) == StaticGraphDiscreteSignal:
