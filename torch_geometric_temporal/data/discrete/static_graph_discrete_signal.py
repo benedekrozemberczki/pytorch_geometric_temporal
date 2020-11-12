@@ -5,6 +5,9 @@ from typing import List, Union
 
 Edge_Index = Union[np.ndarray, None] 
 Edge_Weight = Union[np.ndarray, None]
+Features = List[Union[np.ndarray, None]]
+Targets = List[Union[np.ndarray, None]]
+
 
 class StaticGraphDiscreteSignal(object):
     r""" A data iterator object to contain a static graph with a dynamically 
