@@ -95,8 +95,8 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the following citation:
 
 ```bibtex
-@misc{rozemberczki_temporal,
-      author = {Benedek, Rozemberczki},
+@misc{pytorch_geometric_temporal,
+      author = {Benedek, Rozemberczki and Paul, Morio},
       title = {{PyTorch Geometric Temporal}},
       year = {2020},
       publisher = {GitHub},
