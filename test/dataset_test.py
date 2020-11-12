@@ -1,8 +1,8 @@
 import numpy as np
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
-
-
+from torch_geometric_temporal.data.splitter import discrete_train_test_split
+ 
 def test_static_graph_discrete_signal():
     dataset = StaticGraphDiscreteSignal(None, None, [None, None],[None, None])
     for snapshot in dataset:
@@ -28,3 +28,10 @@ def test_chickenpox():
             assert snapshot.edge_attr.shape == (102, )
             assert snapshot.x.shape == (20, 21)
             assert snapshot.y.shape == (20, )
+
+
+def test_discrete_train_test_split():
+    loader = ChickenpoxDatasetLoader()
+    dataset = loader.get_dataset()
+    assert 1 == discrete_train_test_split(dataset, 0.8)
+    
