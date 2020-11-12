@@ -21,7 +21,7 @@ Discrete Temporal Signal Iterators
 Temporal Train-Test Split
 --------------------------
 
-.. automodule:: torch_geometric_temporal.data.splitter
+.. automodule:: torch_geometric_temporal.data.splitter.discrete_splitter.discrete_train_test_split
     :members:
     :undoc-members:
 
