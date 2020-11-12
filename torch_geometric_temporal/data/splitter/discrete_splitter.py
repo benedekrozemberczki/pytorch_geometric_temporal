@@ -1,3 +1,4 @@
+from typing import Union 
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 
 
