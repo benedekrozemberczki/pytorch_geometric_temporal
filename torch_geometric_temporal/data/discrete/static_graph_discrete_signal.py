@@ -14,7 +14,8 @@ class StaticGraphDiscreteSignal(object):
     changing discrete temporal feature set (multiple signals). The node labels
     (target) are also temporal. The iterator returns a single discrete temporal
     snapshot for a time period (e.g. day or week). The iterator returns a single
-    snapshot as a Pytorch Geometric Data object.
+    snapshot as a Pytorch Geometric Data object. Between two snapshots only
+    the feature matrix and the target matrix changes.
  
     Args:
         edge_index (Numpy array): Index tensor of edges.
