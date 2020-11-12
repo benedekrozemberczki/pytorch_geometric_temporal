@@ -37,10 +37,15 @@ class ChickenpoxDatasetLoader(object):
             self.targets.append(np.array(self._dataset[str(time)]["y"]))
 
     def get_dataset(self) -> StaticGraphDiscreteSignal:
-        """Returning the Hungarian Chickenpox cases data iterator."""
+        """Returning the Hungarian Chickenpox cases data iterator.
+
+        Return types:
+            * **dataset** *(StaticGraphDiscreteSignal)* - The chickenpox dataset.
+        """
         self._get_edges()
         self._get_edge_weights()
         self._get_features()
         self._get_targets()
-        return StaticGraphDiscreteSignal(self._edges, self._edge_weights, self.features, self.targets)
+        dataset = StaticGraphDiscreteSignal(self._edges, self._edge_weights, self.features, self.targets)
+        return dataset
 
