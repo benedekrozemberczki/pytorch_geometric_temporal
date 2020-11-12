@@ -19,10 +19,11 @@ class StaticGraphDiscreteSignal(object):
     Args:
         edge_index (Numpy array): Index tensor of edges.
         edge_weight (Numpy array): Edge weight tensor.
-        features (): Node feature tensor.
-        targets (): Node label (target) tensor.
+        features (List of Numpy arrays): Node feature tensor.
+        targets (List of Numpy arrays): Node label (target) tensor.
     """
-    def __init__(self, edge_index: Edge_Index, edge_weight: Edge_Weight, features, targets):
+    def __init__(self, edge_index: Edge_Index, edge_weight: Edge_Weight,
+                 features: Features, targets: Targets):
         self.edge_index = edge_index
         self.edge_weight = edge_weight
         self.features = features
