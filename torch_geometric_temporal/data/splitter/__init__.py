@@ -1,1 +1,1 @@
-from .discrete_splitter import monkey
+from .discrete_splitter import discrete_train_test_split
