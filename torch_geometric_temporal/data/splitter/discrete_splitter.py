@@ -6,11 +6,21 @@ def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[St
     """
     Sampling nodes randomly proportional to the normalized pagerank score.
 
-    Arg types:
-        * **graph** *(NetworkX or NetworKit graph)* - The graph to be sampled from.
+    Parameters
+    ----------
 
-    Return types:
-        * **new_graph** *(NetworkX or NetworKit graph)* - The graph of sampled nodes.
+    shuffle : bool, default=True
+        Whether or not to shuffle the data before splitting. If shuffle=False
+        then stratify must be None.
+
+    stratify : array-like, default=None
+        If not None, data is split in a stratified fashion, using this as
+        the class labels.
+
+    Returns
+    -------
+    splitting : list, length=2 * len(arrays)
+        List containing train-test split of inputs.
     """
     train_snapshots = int(train_ratio*len(data_iterator.features))
 
