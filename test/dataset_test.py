@@ -34,5 +34,20 @@ def test_discrete_train_test_split():
     loader = ChickenpoxDatasetLoader()
     dataset = loader.get_dataset()
     train_dataset, test_dataset = discrete_train_test_split(dataset, 0.8)
-    assert 1==1
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert snapshot.edge_index.shape == (2, 102)
+            assert snapshot.edge_attr.shape == (102, )
+            assert snapshot.x.shape == (20, 21)
+            assert snapshot.y.shape == (20, )
+
+    for epoch in range(2):
+        for snapshot in test_dataset:
+            assert snapshot.edge_index.shape == (2, 102)
+            assert snapshot.edge_attr.shape == (102, )
+            assert snapshot.x.shape == (20, 21)
+            assert snapshot.y.shape == (20, )
+
+
     
