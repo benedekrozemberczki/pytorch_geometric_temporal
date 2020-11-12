@@ -2,14 +2,16 @@ import torch
 import numpy as np
 from torch_geometric.data import Data
 
+
+
 class StaticGraphDiscreteSignal(object):
     r"""
 
     Args:
-        edge_index (): .
-        edge_weight (): .
-        features (): .
-        targets (): .
+        edge_index (): Index tensor of edges.
+        edge_weight (): Edge weight tensor.
+        features (): Node feature tensor.
+        targets (): Node label (target) tensor.
     """
     def __init__(self, edge_index, edge_weight, features, targets):
         self.edge_index = edge_index
