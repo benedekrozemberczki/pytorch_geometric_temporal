@@ -6,7 +6,7 @@ from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import 
 
 class ChickenpoxDatasetLoader(object):
     """A dataset of county level chicken pox cases in Hungary between 2004
-    and 2014. It was collected for the development of PyTorch Geometric
+    and 2014. We made it public during the development of PyTorch Geometric
     Temporal. The underlying graph is static - vertices are counties and 
     edges are neighbourhoods. Vertex features are lagged weekly changes in 
     the chickenpox case count  (we included 21 lags). The target is 
