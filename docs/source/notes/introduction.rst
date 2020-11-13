@@ -261,16 +261,7 @@ set for this target. Finally, we evaluate the model performance by printing an a
 Benchmark datasets
 ------------------
 
-We included a number of datasets which can be used for comparing the performance of embedding and clustering algorithms. In case of node level learning these are as follows:
+We included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. In case of discrete graph neural networks these are as follows:
 
 - `European Deezer user network. <https://arxiv.org/abs/2005.07959>`_
-- `Asian LastFM user network. <https://arxiv.org/abs/2005.07959>`_
-- `Twitch user network from the UK. <https://arxiv.org/abs/1909.13021>`_
-- `Wikipedia page-page network with articles about Crocodiles. <https://arxiv.org/abs/1909.13021>`_
-- `GitHub machine learning and web developers social network. <https://arxiv.org/abs/1909.13021>`_
-- `Facebook verified page-page network. <https://arxiv.org/abs/1909.13021>`_
-
-We also added datasets for graph level embedding and graph statistical descriptors. These datasets are as follows:
-
-- `Reddit discussion and non-discussion thread graphs. <https://arxiv.org/abs/2003.04819>`_
  
