@@ -263,5 +263,5 @@ Benchmark datasets
 
 We included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. In case of discrete graph neural networks these are as follows:
 
-- `European Deezer user network. <https://arxiv.org/abs/2005.07959>`_
+- `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
  
