@@ -1,7 +1,7 @@
 Introduction by example
 =======================
 
-*Karate Club* is an unsupervised machine learning extension library for `PyTorch Geometric <https://networkx.github.io/>`_.
+*PyTorch Geometric Temporal* is an unsupervised machine learning extension library for `PyTorch Geometric <https://github.com/rusty1s/pytorch_geometric>`_.
  
 
 --------------------------------------------------------------------------------
