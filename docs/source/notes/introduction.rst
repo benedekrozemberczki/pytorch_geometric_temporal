@@ -25,12 +25,12 @@ Overview
 =======================
 --------------------------------------------------------------------------------
 
-We shortly overview the fundamental concepts and features of PyTorch Geometric through simple examples. These are the following:
+We shortly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples. These are the following:
 
 .. contents::
     :local:
 
-Standardized dataset ingestion
+Dataset Iterators
 ------------------------------
 
 Karate Club assumes that the NetworkX graph provided by the user for node embedding and community detection has the following important properties:
