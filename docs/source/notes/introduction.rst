@@ -25,7 +25,7 @@ Overview
 =======================
 --------------------------------------------------------------------------------
 
-We shortly overview the fundamental concepts and features of Karate Club through simple examples. These are the following:
+We shortly overview the fundamental concepts and features of PyTorch Geometric through simple examples. These are the following:
 
 .. contents::
     :local:
