@@ -11,7 +11,7 @@ External resources
 
 * Aynaz Taheri, Tanya Berger-Wolf: **Predictive Temporal Embedding of Dynamic Graphs** `Paper <https://ieeexplore.ieee.org/document/9073186>`_
 
-* Aynaz Taheri, Kevin Gimpel, Tanya Berger-Wolf: **Learning to Represent the Evolution of Dynamic Graphs with Recurrent Models** `Paper <https://dl.acm.org/doi/10.1145/3308560.3316581>`_, `Code <https://github.com/CompBioUIC/RepLearning>`_, 
+* Aynaz Taheri, Kevin Gimpel, Tanya Berger-Wolf: **Learning to Represent the Evolution of Dynamic Graphs with Recurrent Models** `Paper <https://dl.acm.org/doi/10.1145/3308560.3316581>`_, `Code <https://github.com/CompBioUIC/RepLearning>`_ 
 
 * Aldo Pareja, Giacomo Domeniconi, Jie Chen, Tengfei Ma, Toyotaro Suzumura, Hiroki Kanezashi, Tim Kaler, Tao B. Schardl, Charles E. Leiserson: **EvolveGCN: Evolving Graph Convolutional Networks for Dynamic Graphs** `Paper <https://arxiv.org/abs/1902.10191>`_, `Code <https://github.com/IBM/EvolveGCN>`_ 
 
