@@ -47,10 +47,10 @@ The constructor of a ``StaticGraphDiscreteSignal`` object requires the following
 
 The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
 
-- 
-- 
-- 
-- 
+- ``edge_indices`` - A **list** of ``NumPy`` arrays hold the edge indices.
+- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
+- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
+- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period. 
 
 A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned temporal snapshot has the following attributes:
 
