@@ -30,7 +30,7 @@ We shortly overview the fundamental concepts and features of PyTorch Geometric T
 .. contents::
     :local:
 
-Data Structures and Splitting
+Data Iterators, Benchmarks and Temporal Train-Test Splits
 =============================
 
 Discrete Dataset Iterators
