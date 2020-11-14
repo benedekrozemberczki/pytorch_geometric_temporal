@@ -33,18 +33,18 @@ We shortly overview the fundamental concepts and features of PyTorch Geometric T
 Dataset Iterators
 ------------------------------
 
-Karate Club assumes that the NetworkX graph provided by the user for node embedding and community detection has the following important properties:
+PyTorch Geometric Tenporal offers data iterators for discrete time datasets which contain the temporal snapshots. A temporal snapshot is a PyTorch Geometric ``Data`` object. The returned snapshot has the following attributes:
 
-- The graph is undirected.
-- Nodes are indexed with integers.
-- There are no orphaned nodes in the graph.
-- The node indexing starts with zero and the indices are consecutive.
+- ``edge_index`` -
+- ``edge_attr`` -
+- ``x`` -
+- ``y`` -
 
 Node attribute matrices can be provided as ``scipy sparse`` and ``numpy`` arrays. 
 
 The returned community membership dictionaries and embedding matrices use the same numeric, consecutive indexing.
 
-API driven design
+Dataset Splitters
 -----------------
 
 Karate Club uses the design principles of Scikit-Learn which means that the algorithms in the package share the same API. Each machine learning model
