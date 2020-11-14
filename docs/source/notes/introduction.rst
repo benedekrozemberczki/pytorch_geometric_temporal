@@ -88,10 +88,11 @@ The Hungarian Chickenpox Dataset can be loaded by the following code snippet. Th
 Train-Test Splitter
 -------------------
 
-We provide functions to create temporal splits of the discrete time iterators. These functions return data iterators which split the data using a fix ratio into train and test.
 
 Discrete Train-Test Splitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We provide functions to create temporal splits of the discrete time iterators. These functions return train and test data iterators which split the original iterator using a fix ratio. Snapshots from the earlier time periods from the training dataset and snapshots from the later periods form the test dataset. This way temporal forecasts can be evaluated in a real life like scenario.
 
 
 Applications
