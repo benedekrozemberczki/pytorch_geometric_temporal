@@ -1,4 +1,4 @@
-External resources
+External Resources
 ==================
 
 * Yaguang Li, Rose Yu, Cyrus Shahabi, Yan Liu: **Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting** `Paper <https://arxiv.org/abs/1707.01926>`_, `TensorFlow Code <https://github.com/liyaguang/DCRNN>`_, `PyTorch Code <https://github.com/chnsh/DCRNN_PyTorch>`_
