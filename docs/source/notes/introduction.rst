@@ -21,7 +21,7 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
 
 We briefly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples.
 
-Data Iterators, Benchmarks and Temporal Train-Test Splits
+Data Structures
 =============================
 
 Discrete Dataset Iterators
