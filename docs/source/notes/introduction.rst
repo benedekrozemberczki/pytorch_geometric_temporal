@@ -57,7 +57,7 @@ Static Graphs with Dynamic Signal
 
 The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
 
-- ``edge_indices`` - A **list** of ``NumPy`` arrays hold the edge indices.
+- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
 - ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
