@@ -30,7 +30,7 @@ We shortly overview the fundamental concepts and features of PyTorch Geometric T
 .. contents::
     :local:
 
-Dataset Iterators
+Discrete Dataset Iterators
 ------------------------------
 
 PyTorch Geometric Tenporal offers data iterators for discrete time datasets which contain the temporal snapshots. There are two types of discrete time data iterators:
@@ -59,7 +59,7 @@ A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returne
 - ``x`` - A PyTorch ``FloatTensor`` of vertex features (optional).
 - ``y`` - A PyTorch ``FloatTensor`` or ``LongTensor`` of vertex targets (optional).
 
-Dataset Splitters
+Dataset Splitter
 -----------------
 
 Karate Club uses the design principles of Scikit-Learn which means that the algorithms in the package share the same API. Each machine learning model
