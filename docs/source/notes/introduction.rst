@@ -35,19 +35,15 @@ Dataset Iterators
 
 PyTorch Geometric Tenporal offers data iterators for discrete time datasets which contain the temporal snapshots. There are two types of discrete time data iterators:
 
-- ```` - Which is designed for discrete spatio-temporal signals defined on a **static** graph.
-- ```` - Which is designed for discrete spatio-temporal signals defined on a **dynamic** graph.
+- ``StaticGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **static** graph.
+- ``StaticGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **dynamic** graph.
 
-A temporal snapshot is a PyTorch Geometric ``Data`` object. The returned snapshot has the following attributes:
+A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned snapshot has the following attributes:
 
 - ``edge_index`` -
 - ``edge_attr`` -
 - ``x`` -
 - ``y`` -
-
-Node attribute matrices can be provided as ``scipy sparse`` and ``numpy`` arrays. 
-
-The returned community membership dictionaries and embedding matrices use the same numeric, consecutive indexing.
 
 Dataset Splitters
 -----------------
