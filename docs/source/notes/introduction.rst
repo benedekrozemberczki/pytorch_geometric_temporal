@@ -72,7 +72,7 @@ Discrete Time Datasets
 ^^^^^^^^^^^^^^^^^^^^^^
 In case of discrete time graph neural networks these datasets are as follows:
 
-- `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
+- `Hungarian Chickenpox Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.chickenpox.ChickenpoxDatasetLoader>`_
 
 
 The Hungarian Chickenpox Dataset can be loaded by the following code snippet. The ``dataset`` returned by the public ``get_dataset`` method is a ``StaticGraphDiscreteSignal`` object. 
