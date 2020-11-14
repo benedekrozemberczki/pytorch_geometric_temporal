@@ -43,7 +43,7 @@ The constructor of a ``StaticGraphDiscreteSignal`` object requires the following
 - ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
 - ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
 - ``features`` - A **list** list of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - 
+- ``targets`` - A **list** list of ``NumPy`` arrays to hold the vertex level targets for each time period. 
 
 The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
 
