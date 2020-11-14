@@ -72,6 +72,22 @@ A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returne
 - ``x`` - A PyTorch ``FloatTensor`` of vertex features (optional).
 - ``y`` - A PyTorch ``FloatTensor`` or ``LongTensor`` of vertex targets (optional).
 
+Benchmark Datasets
+-------------------
+
+We released and included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. The related machine learning tasks are node and graph level supervised learning.
+
+Discrete Time Datasets
+^^^^^^^^^^^^^^^^^^^^^^
+In case of discrete time graph neural networks these datasets are as follows:
+
+- `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
+
+Continuous Time Datasets
+^^^^^^^^^^^^^^^^^^^^^^
+In case of continuous time graph neural networks these datasets are as follows:
+
+
 Train-Test Splitter
 -----------------
 
@@ -142,19 +158,4 @@ set for this target. Finally, we evaluate the model performance by printing an a
 Learning from a Continuous Time Signal
 --------------------------------------
 
-
-Benchmark Datasets
-==================
-
-We released and included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. The related machine learning tasks are node and graph level supervised learning.
-
-Discrete Time Datasets
-----------------------
-In case of discrete time graph neural networks these datasets are as follows:
-
-- `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
-
-Continuous Time Datasets
--------------------------
-In case of continuous time graph neural networks these datasets are as follows:
  
