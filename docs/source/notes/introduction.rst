@@ -22,7 +22,7 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
     }
 
 Overview
-=======================
+=========
 --------------------------------------------------------------------------------
 
 We shortly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples. These are the following:
@@ -30,27 +30,40 @@ We shortly overview the fundamental concepts and features of PyTorch Geometric T
 .. contents::
     :local:
 
+Data Structures and Splitting
+=============================
+
 Discrete Dataset Iterators
-------------------------------
+--------------------------
 
 PyTorch Geometric Tenporal offers data iterators for discrete time datasets which contain the temporal snapshots. There are two types of discrete time data iterators:
 
 - ``StaticGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **static** graph.
 - ``DynamicGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **dynamic** graph.
 
+
+Static Graphs with Discrete Signal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 The constructor of a ``StaticGraphDiscreteSignal`` object requires the following parameters:
 
 - ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
 - ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period. 
+- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+ 
+Static Graphs with Dynamic Signal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
 
 - ``edge_indices`` - A **list** of ``NumPy`` arrays hold the edge indices.
 - ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period. 
+- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+
+Temporal Snapshots
+^^^^^^^^^^^^^^^^^^ 
 
 A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned temporal snapshot has the following attributes:
 
@@ -62,7 +75,8 @@ A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returne
 Dataset Splitter
 -----------------
 
-
+Applications
+=============
 
 Learning from a Discrete Temporal Signal
 ----------------------------------------
@@ -123,9 +137,17 @@ set for this target. Finally, we evaluate the model performance by printing an a
 
 
 Benchmark Datasets
-------------------
+==================
 
-We included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. In case of discrete graph neural networks these are as follows:
+We released and included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. The related machine learning tasks are node and graph level supervised learning.
+
+Discrete Time Datasets
+----------------------
+In case of discrete graph neural networks these datasets are as follows:
 
 - `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
+
+Continuous Time Datasets
+-------------------------
+In case of discrete graph neural networks these datasets are as follows:
  
