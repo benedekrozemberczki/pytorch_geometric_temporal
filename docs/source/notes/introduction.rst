@@ -139,6 +139,9 @@ set for this target. Finally, we evaluate the model performance by printing an a
     print('AUC: {:.4f}'.format(auc))
     >>> AUC: 0.7127
 
+Learning from a Continuous Time Signal
+--------------------------------------
+
 
 Benchmark Datasets
 ==================
@@ -147,11 +150,11 @@ We released and included a number of datasets which can be used for comparing th
 
 Discrete Time Datasets
 ----------------------
-In case of discrete graph neural networks these datasets are as follows:
+In case of discrete time graph neural networks these datasets are as follows:
 
 - `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
 
 Continuous Time Datasets
 -------------------------
-In case of discrete graph neural networks these datasets are as follows:
+In case of continuous time graph neural networks these datasets are as follows:
  
