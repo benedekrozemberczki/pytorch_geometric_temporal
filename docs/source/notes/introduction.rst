@@ -57,7 +57,7 @@ A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returne
 - ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation. 
 - ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation.
 - ``x`` - A PyTorch ``FloatTensor`` of vertex features.
-- ``y`` - The node label matrix.
+- ``y`` - A PyTorch ``FloatTensor`` or ``LongTensor`` of vertex targets.
 
 Dataset Splitters
 -----------------
