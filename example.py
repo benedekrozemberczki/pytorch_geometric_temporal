@@ -40,7 +40,10 @@ for epoch in tqdm(range(20)):
 
 model.eval()
 loss = 0
+y, y_hat = [], []
 for t, snapshot in enumerate(test_dataset):
-    out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
-    loss = loss + torch.mean(torch.abs(out-snapshot.y)).item()  
-print(loss/(t+1))
+    y_hat.append(model(snapshot.x, snapshot.edge_index, snapshot.edge_attr))    
+    y.append(snapshot.y)  
+y = np.concat(y)
+y_hat = np.concat(y_hat)
+print(r2_score(y, y_hat))
