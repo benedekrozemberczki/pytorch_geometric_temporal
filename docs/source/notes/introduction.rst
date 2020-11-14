@@ -21,10 +21,6 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
            howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
     }
 
-Overview
-=========
---------------------------------------------------------------------------------
-
 We shortly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples. These are the following:
 
 .. contents::

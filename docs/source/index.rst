@@ -23,8 +23,6 @@ PyTorch Geometric Temporal Documentation
 
    notes/installation
    notes/introduction
-   notes/create_dataset
-   notes/examples
    notes/resources
 
 .. toctree::
