@@ -40,10 +40,10 @@ PyTorch Geometric Tenporal offers data iterators for discrete time datasets whic
 
 The constructor of a ``StaticGraphDiscreteSignal`` object requires the following parameters:
 
-- ``edge_index``
-- ``edge_index``
-- ``edge_index``
-- ``edge_index``
+- ``edge_index`` - 
+- ``edge_weight`` - 
+- ``features`` - 
+- ``targets`` - 
 
 The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
 
