@@ -40,10 +40,10 @@ PyTorch Geometric Tenporal offers data iterators for discrete time datasets whic
 
 The constructor of a ``StaticGraphDiscreteSignal`` object requires the following parameters:
 
-- 
-- 
-- 
-- 
+- ``edge_index``
+- ``edge_index``
+- ``edge_index``
+- ``edge_index``
 
 The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
 
@@ -54,8 +54,8 @@ The constructor of a ``DynamicGraphDiscreteSignal`` object requires the followin
 
 A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned temporal snapshot has the following attributes:
 
-- ``edge_index`` - A matrix of edge indices used for node feature aggregation. 
-- ``edge_attr`` - A matrix of edge features used for weighting the node feature aggregation.
+- ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation. 
+- ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation.
 - ``x`` - The node feature matrix.
 - ``y`` - The node label matrix.
 
