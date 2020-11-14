@@ -94,6 +94,18 @@ Discrete Train-Test Splitter
 
 We provide functions to create temporal splits of the discrete time iterators. These functions return train and test data iterators which split the original iterator using a fix ratio. Snapshots from the earlier time periods from the training dataset and snapshots from the later periods form the test dataset. This way temporal forecasts can be evaluated in a real life like scenario.
 
+.. code-block:: python
+
+    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.data.splitter import discrete_train_test_split
+
+    loader = ChickenpoxDatasetLoader()
+
+    dataset = loader.get_dataset()
+
+    train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.8)
+
+
 
 Applications
 =============
