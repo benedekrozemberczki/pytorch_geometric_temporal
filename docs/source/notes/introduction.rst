@@ -83,10 +83,16 @@ In case of discrete time graph neural networks these datasets are as follows:
 
 - `Hungarian Chickenpox Dataset. <https://arxiv.org/abs/2005.07959>`_
 
-Continuous Time Datasets
-^^^^^^^^^^^^^^^^^^^^^^
-In case of continuous time graph neural networks these datasets are as follows:
 
+The Hungarian Chickenpox Dataset (which is represented as a ``StaticGraphDiscreteSignal`` object) can be loaded by the following code snippet. 
+
+.. code-block:: python
+
+    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
+
+    loader = ChickenpoxDatasetLoader()
+
+    dataset = loader.get_dataset()
 
 Train-Test Splitter
 -----------------
