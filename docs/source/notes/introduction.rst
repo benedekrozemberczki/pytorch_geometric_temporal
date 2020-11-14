@@ -41,7 +41,7 @@ PyTorch Geometric Tenporal offers data iterators for discrete time datasets whic
 A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned temporal snapshot has the following attributes:
 
 - ``edge_index`` - A matrix of edge indices used for node feature aggregation. 
-- ``edge_attr`` - A matrix of edge features used for node feature aggregation.
+- ``edge_attr`` - A matrix of edge features used for weighting the node feature aggregation.
 - ``x`` - The node feature matrix.
 - ``y`` - The node label matrix.
 
