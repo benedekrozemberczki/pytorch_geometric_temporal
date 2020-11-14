@@ -38,6 +38,20 @@ PyTorch Geometric Tenporal offers data iterators for discrete time datasets whic
 - ``StaticGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **static** graph.
 - ``DynamicGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **dynamic** graph.
 
+The constructor of a ``StaticGraphDiscreteSignal`` object requires the following parameters:
+
+- 
+- 
+- 
+- 
+
+The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
+
+- 
+- 
+- 
+- 
+
 A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned temporal snapshot has the following attributes:
 
 - ``edge_index`` - A matrix of edge indices used for node feature aggregation. 
