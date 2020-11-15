@@ -12,7 +12,7 @@ class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features):
         super(RecurrentGCN, self).__init__()
         #self.recurrent_1 = DCRNN(node_features, 32, 2)
-        self.linear = torch.nn.Linear(21, 1)
+        self.linear = torch.nn.Linear(node_features, 1)
 
     def forward(self, x, edge_index, edge_weight):
         #h = self.recurrent_1(x, edge_index, edge_weight)
@@ -24,21 +24,21 @@ dataset = ChickenpoxDatasetLoader().get_dataset()
 
 train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.8)
 
-model = RecurrentGCN(node_features = 21)
+model = RecurrentGCN(node_features = 8)
 
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
 model.train()
 loss = torch.nn.MSELoss()
-for epoch in tqdm(range(500)):
+for epoch in tqdm(range(200)):
     cost = 0
     for i, snapshot in enumerate(train_dataset):
         #print(snapshot.x)
+        optimizer.zero_grad()
         out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
         cost = cost + loss(snapshot.y, out)
         #print(i)
-    cost = cost/((i+1)*20)
-    optimizer.zero_grad()
+    cost = cost/((i+1))
     cost.backward()
     optimizer.step()
 
