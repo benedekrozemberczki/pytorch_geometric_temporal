@@ -11,7 +11,7 @@ from torch_geometric_temporal.data.splitter import discrete_train_test_split
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features):
         super(RecurrentGCN, self).__init__()
-        self.recurrent_1 = DCRNN(node_features, 32, 2)
+        #self.recurrent_1 = DCRNN(node_features, 32, 2)
         self.linear = torch.nn.Linear(21, 1)
 
     def forward(self, x, edge_index, edge_weight):
@@ -26,22 +26,22 @@ train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.8
 
 model = RecurrentGCN(node_features = 21)
 
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01, weight_decay=0 )
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
 model.train()
 loss = torch.nn.MSELoss()
-for epoch in tqdm(range(200)):
+for epoch in tqdm(range(500)):
     cost = 0
-    optimizer.zero_grad()
     for i, snapshot in enumerate(train_dataset):
         #print(snapshot.x)
         out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
         cost = cost + loss(snapshot.y, out)
         #print(i)
-    cost = cost/(i+1)
+    cost = cost/((i+1)*20)
+    optimizer.zero_grad()
     cost.backward()
-    print(i,model.linear.bias) 
     optimizer.step()
+
 model.eval()
 loss = 0
 y, y_hat = [], []
@@ -53,3 +53,6 @@ y = np.concatenate(y)
 y_hat = np.concatenate(y_hat)
 print(y.shape)
 print(r2_score(y, y_hat))
+
+print(i,model.linear.bias)
+print(i,model.linear.weight)
