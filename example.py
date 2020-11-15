@@ -1,6 +1,8 @@
 from tqdm import tqdm
 import torch
+import numpy as np
 import torch.nn.functional as F
+from sklearn.metrics import r2_score
 from torch_geometric_temporal.nn.recurrent import DCRNN
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
@@ -10,12 +12,12 @@ class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features):
         super(RecurrentGCN, self).__init__()
         self.recurrent_1 = DCRNN(node_features, 32, 2)
-        self.linear = torch.nn.Linear(32, 1)
+        self.linear = torch.nn.Linear(21, 1)
 
     def forward(self, x, edge_index, edge_weight):
-        h = self.recurrent_1(x, edge_index, edge_weight)
+        #h = self.recurrent_1(x, edge_index, edge_weight)
         #h = F.relu(h)
-        h = self.linear(h)
+        h = self.linear(x)
         return h
 
 dataset = ChickenpoxDatasetLoader().get_dataset()
@@ -24,26 +26,30 @@ train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.8
 
 model = RecurrentGCN(node_features = 21)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=5e-4)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, weight_decay=0 )
 
 model.train()
-for epoch in tqdm(range(20)):
-    x = 0
+loss = torch.nn.MSELoss()
+for epoch in tqdm(range(200)):
+    cost = 0
+    optimizer.zero_grad()
     for i, snapshot in enumerate(train_dataset):
-        optimizer.zero_grad()
+        #print(snapshot.x)
         out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
-        loss = torch.mean(torch.abs(out-snapshot.y))   
-        x = x + loss.item()
-        loss.backward()
-        optimizer.step()
-    print(x/(i+1))
-
+        cost = cost + loss(snapshot.y, out)
+        #print(i)
+    cost = cost/(i+1)
+    cost.backward()
+    print(i,model.linear.bias) 
+    optimizer.step()
 model.eval()
 loss = 0
 y, y_hat = [], []
 for t, snapshot in enumerate(test_dataset):
-    y_hat.append(model(snapshot.x, snapshot.edge_index, snapshot.edge_attr))    
-    y.append(snapshot.y)  
-y = np.concat(y)
-y_hat = np.concat(y_hat)
+    pred = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+    y_hat.append(pred.detach().numpy())    
+    y.append(snapshot.y.detach().numpy())  
+y = np.concatenate(y)
+y_hat = np.concatenate(y_hat)
+print(y.shape)
 print(r2_score(y, y_hat))
