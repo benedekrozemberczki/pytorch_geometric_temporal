@@ -10,7 +10,7 @@ Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
 
 
-class StaticGraphDiscreteSignal(object):
+class DynamicGraphDiscreteSignal(object):
     r""" A data iterator object to contain a static graph with a dynamically 
     changing discrete temporal feature set (multiple signals). The node labels
     (target) are also temporal. The iterator returns a single discrete temporal
