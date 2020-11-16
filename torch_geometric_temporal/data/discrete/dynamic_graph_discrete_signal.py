@@ -19,8 +19,8 @@ class DynamicGraphDiscreteSignal(object):
     edge weights, the feature matrix and target matrices might change.
  
     Args:
-        edge_indices (List of Numpy arrays): Index tensors of edges.
-        edge_weights (List of Numpy arrays): Edge weight tensors.
+        edge_indices (List of Numpy arrays): List of edge index tensors.
+        edge_weights (List of Numpy arrays): List of edge weight tensors.
         features (List of Numpy arrays): List of node feature tensors.
         targets (List of Numpy arrays): List of node label (target) tensors.
     """
