@@ -1,16 +1,36 @@
 import numpy as np
+import networkx as nx
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
  
+def get_edge_array(n_count):
+    return np.array([edge for edge nx.gnp_random_graph(n_count, 0.1).edges()]).T
+
 def generate_dynamic_graph_discrete_signal(snapshot_count, n_count, feature_count):
-    edge_indices = [np.array([edge for nx.gnp_random_graph(n_count, 0.1)) for _ in range(snapshot_count)]
+    edge_indices = [get_edge_array(n_count) for _ in range(snapshot_count)]
     edge_weights = [np.ones(n_count) for _ in range(snapshot_count)]
     features = [np.random.uniform(0,1,(n_count, feature_count)) for _ in range(snapshot_count)]
     targets = [np.random.uniform(0,1,(n_count,)) for _ in range(snapshot_count)]
     return edge_indices, edge_weights, features, targets
 
+
+def test_dynamic_graph_discrete_signal():
+
+    snapshot_count = 250
+    n_count = 100
+    feature_count = 32
+
+    edge_indices, edge_weights, features, targets = generate_dynamic_graph_discrete_signal(250, 100, 32)
+
+    dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
+
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.x.shape == (100, 32)
+            assert snapshot.y.shape == (100, )
 
 
 def test_static_graph_discrete_signal():
