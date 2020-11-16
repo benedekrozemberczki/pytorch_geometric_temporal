@@ -1,8 +1,11 @@
 from typing import Union, Tuple
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
 
 
-def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[StaticGraphDiscreteSignal, StaticGraphDiscreteSignal]:
+Discrete_Signal = Union[StaticGraphDiscreteSignal, DynamicGraphDiscreteSignal]
+
+def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discrete_Signal, Discrete_Signal]:
     r""" Function to split a discrete data iterator according to a fixed ratio.
 
     Parameters
