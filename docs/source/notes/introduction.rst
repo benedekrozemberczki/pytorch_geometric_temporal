@@ -56,7 +56,7 @@ The constructor of a ``DynamicGraphDiscreteSignal`` object requires the followin
 Temporal Snapshots
 ^^^^^^^^^^^^^^^^^^ 
 
-A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. The returned temporal snapshot has the following attributes:
+A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
 
 - ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation (optional).
 - ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation (optional).
