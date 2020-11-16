@@ -18,6 +18,10 @@ Discrete Temporal Signal Iterators
     :members:
     :undoc-members:
 
+.. automodule:: torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal
+    :members:
+    :undoc-members:
+
 Temporal Train-Test Split
 --------------------------
 
