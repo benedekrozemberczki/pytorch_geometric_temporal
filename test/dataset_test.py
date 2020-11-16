@@ -8,27 +8,41 @@ from torch_geometric_temporal.data.splitter import discrete_train_test_split
 def get_edge_array(n_count):
     return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
 
-def generate_dynamic_graph_discrete_signal(snapshot_count, n_count, feature_count):
+def generate_signal(snapshot_count, n_count, feature_count):
     edge_indices = [get_edge_array(n_count) for _ in range(snapshot_count)]
-    edge_weights = [np.ones(n_count) for _ in range(snapshot_count)]
+    edge_weights = [np.ones(edge_indices[t].shape[1]) for t in range(snapshot_count)]
     features = [np.random.uniform(0,1,(n_count, feature_count)) for _ in range(snapshot_count)]
-    targets = [np.random.uniform(0,1,(n_count,)) for _ in range(snapshot_count)]
-    return edge_indices, edge_weights, features, targets
+    return edge_indices, edge_weights, features
 
-
-def test_dynamic_graph_discrete_signal():
+def test_dynamic_graph_discrete_signal_real():
 
     snapshot_count = 250
     n_count = 100
     feature_count = 32
 
-    edge_indices, edge_weights, features, targets = generate_dynamic_graph_discrete_signal(250, 100, 32)
+    edge_indices, edge_weights, features = generate_signal(250, 100, 32)
+
+    targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
 
     dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
 
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
+            assert snapshot.x.shape == (100, 32)
+            assert snapshot.y.shape == (100, )
+
+
+    
+    targets = [np.floor(np.random.uniform(0,10,(n_count,))).astype(int) for _ in range(snapshot_count)]
+
+    dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
+
+    for epoch in range(2):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
             assert snapshot.x.shape == (100, 32)
             assert snapshot.y.shape == (100, )
 
