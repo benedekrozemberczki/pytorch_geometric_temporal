@@ -82,7 +82,7 @@ def test_chickenpox():
             assert snapshot.y.shape == (20, )
 
 
-def test_discrete_train_test_split():
+def test_discrete_train_test_split_static():
     loader = ChickenpoxDatasetLoader()
     dataset = loader.get_dataset()
     train_dataset, test_dataset = discrete_train_test_split(dataset, 0.8)
@@ -100,6 +100,37 @@ def test_discrete_train_test_split():
             assert snapshot.edge_attr.shape == (102, )
             assert snapshot.x.shape == (20, 4)
             assert snapshot.y.shape == (20, )
+
+
+def test_discrete_train_test_split_dynamic():
+    snapshot_count = 250
+    n_count = 100
+    feature_count = 32
+
+    edge_indices, edge_weights, features = generate_signal(250, 100, 32)
+
+    targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
+
+    dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
+
+
+    train_dataset, test_dataset = discrete_train_test_split(dataset, 0.8)
+
+
+    for epoch in range(2):
+        for snapshot in test_dataset:
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
+            assert snapshot.x.shape == (100, 32)
+            assert snapshot.y.shape == (100, )
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
+            assert snapshot.x.shape == (100, 32)
+            assert snapshot.y.shape == (100, )
+
 
 
     
