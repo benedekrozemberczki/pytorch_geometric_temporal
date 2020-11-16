@@ -169,8 +169,6 @@ Let us define a model (we have 4 node features) and train the model on the train
         optimizer.step()
         optimizer.zero_grad()
 
-
-
 Learning from a Continuous Temporal Signal
 -------------------------------------------
 
