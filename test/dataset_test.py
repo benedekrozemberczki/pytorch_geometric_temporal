@@ -1,10 +1,19 @@
 import numpy as np
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
  
 def test_static_graph_discrete_signal():
     dataset = StaticGraphDiscreteSignal(None, None, [None, None],[None, None])
+    for snapshot in dataset:
+        assert snapshot.edge_index is None
+        assert snapshot.edge_attr is None
+        assert snapshot.x is None
+        assert snapshot.y is None
+
+def test_dynamic_graph_discrete_signal():
+    dataset = DynamicGraphDiscreteSignal([None, None], [None, None], [None, None],[None, None])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None

@@ -32,16 +32,16 @@ class DynamicGraphDiscreteSignal(object):
         self.targets = targets
 
     def _get_edge_index(self):
-        if self.edge_indices[t] is None:
-            return self.edge_indices[t]
+        if self.edge_indices[self.t] is None:
+            return self.edge_indices[self.t]
         else:
-            return torch.LongTensor(self.edge_indices[t])
+            return torch.LongTensor(self.edge_indices[self.t])
 
     def _get_edge_weight(self):
-        if self.edge_weights[t] is None:
-            return self.edge_weights[t]
+        if self.edge_weights[self.t] is None:
+            return self.edge_weights[self.t]
         else:
-            return torch.FloatTensor(self.edge_weights[t])
+            return torch.FloatTensor(self.edge_weights[self.t])
 
     def _get_features(self): 
         if self.features[self.t] is None:
