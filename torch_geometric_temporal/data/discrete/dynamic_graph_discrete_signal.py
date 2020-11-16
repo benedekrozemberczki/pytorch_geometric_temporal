@@ -11,16 +11,16 @@ Targets = List[Union[np.ndarray, None]]
 
 
 class DynamicGraphDiscreteSignal(object):
-    r""" A data iterator object to contain a static graph with a dynamically 
-    changing discrete temporal feature set (multiple signals). The node labels
+    r""" A data iterator object to contain a dynamic graph with a dynamically 
+    changing edge set and weights . The feature set and node labels
     (target) are also temporal. The iterator returns a single discrete temporal
-    snapshot for a time period (e.g. day or week). This iterator returns a single
-    snapshot as a Pytorch Geometric Data object. Between two temporal snapshots
-    the feature matrix and the target matrix will change.
+    snapshot for a time period (e.g. day or week). This single snapshot is a 
+    Pytorch Geometric Data object. Between two temporal snapshots the edges,
+    edge weights, the feature matrix and target matrices might change.
  
     Args:
-        edge_indices (List of Numpy arrays): Index tensor of edges.
-        edge_weights (List of Numpy arrays): Edge weight tensor.
+        edge_indices (List of Numpy arrays): Index tensors of edges.
+        edge_weights (List of Numpy arrays): Edge weight tensors.
         features (List of Numpy arrays): List of node feature tensors.
         targets (List of Numpy arrays): List of node label (target) tensors.
     """
