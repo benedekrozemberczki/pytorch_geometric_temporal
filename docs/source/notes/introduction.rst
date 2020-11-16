@@ -148,7 +148,7 @@ In the next steps we will define the **recurrent graph neural network** architec
             h = self.linear(h)
             return h
 
-Let us define a model (we have 4 node features) and train the model on the training split (first 20% of the temporal snapshots) for 20 epochs. We backpropagate when the loss from every snapshot is accumulated. We will use the **Adam optimizer** with a learning rate of **0.01**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
+Let us define a model (we have 4 node features) and train the model on the training split (first 20% of the temporal snapshots) for 200 epochs. We backpropagate when the loss from every snapshot is accumulated. We will use the **Adam optimizer** with a learning rate of **0.01**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
 
 .. code-block:: python
 
@@ -160,7 +160,7 @@ Let us define a model (we have 4 node features) and train the model on the train
 
     model.train()
 
-    for epoch in tqdm(range(20)):
+    for epoch in tqdm(range(200)):
         cost = 0
         for time, snapshot in enumerate(train_dataset):
             y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
@@ -181,9 +181,8 @@ Using the holdout we will evaluate the perormance of the trained recurrent graph
         cost = cost + torch.mean((y_hat-snapshot.y)**2)
     cost = cost / (time+1)
     cost = cost.item()
-    print('MSE: {:.4f}'.format(cost))
+    print("MSE: {:.4f}".format(cost))
+    >>> Accuracy: 0.6866
 
 Learning from a Continuous Temporal Signal
 -------------------------------------------
-
- 
