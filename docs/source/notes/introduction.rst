@@ -173,6 +173,7 @@ Let us define a model (we have 4 node features) and train the model on the train
 Using the holdout we will evaluate the perormance of the trained recurrent graph convolutional network and calculate the mean squared error across **all of the spatial units and time periods**. 
 
 .. code-block:: python
+
     model.eval()
     cost = 0
     for time, snapshot in enumerate(test_dataset):
