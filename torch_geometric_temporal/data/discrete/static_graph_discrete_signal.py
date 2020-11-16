@@ -14,9 +14,10 @@ class StaticGraphDiscreteSignal(object):
     r""" A data iterator object to contain a static graph with a dynamically 
     changing discrete temporal feature set (multiple signals). The node labels
     (target) are also temporal. The iterator returns a single discrete temporal
-    snapshot for a time period (e.g. day or week). This iterator returns a single
-    snapshot as a Pytorch Geometric Data object. Between two temporal snapshots
-    the feature matrix and the target matrix will change.
+    snapshot for a time period (e.g. day or week). This single temporal snapshot
+    is a Pytorch Geometric Data object. Between two temporal snapshots the feature
+    matrix and the target matrix might change. However, the underlying graph is
+    the same.
  
     Args:
         edge_index (Numpy array): Index tensor of edges.

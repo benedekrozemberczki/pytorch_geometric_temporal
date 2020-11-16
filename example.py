@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from sklearn.metrics import r2_score
-from torch_geometric_temporal.nn.recurrent import GConvGRU
+from torch_geometric_temporal.nn.recurrent import GConvGRU, DCRNN
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
 
@@ -11,13 +11,13 @@ from torch_geometric_temporal.data.splitter import discrete_train_test_split
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features):
         super(RecurrentGCN, self).__init__()
-        self.recurrent_1 = GConvGRU(node_features, 32, 1)
-        self.linear_1 = torch.nn.Linear(32, 1)
+        #self.recurrent_1 = DCRNN(node_features, 32, 1)
+        self.linear_1 = torch.nn.Linear(4, 1)
 
     def forward(self, x, edge_index, edge_weight):
-        h = self.recurrent_1(x, edge_index, edge_weight)
-        h = F.relu(h)
-        h = self.linear_1(h)
+        #h = self.recurrent_1(x, edge_index, edge_weight)
+        #h = F.relu(h)
+        h = self.linear_1(x)
         return h
 
 dataset = ChickenpoxDatasetLoader().get_dataset()
