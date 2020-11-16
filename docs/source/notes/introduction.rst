@@ -162,13 +162,22 @@ Let us define a model (we have 4 node features) and train the model on the train
 
     for epoch in tqdm(range(20)):
         cost = 0
-        for i, snapshot in enumerate(train_dataset):
+        for time, snapshot in enumerate(train_dataset):
             out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
             cost = cost + torch.mean((out-snapshot.y)**2)
-        cost = cost / (i+1)
+        cost = cost / (time+1)
         cost.backward()
         optimizer.step()
         optimizer.zero_grad()
+
+Using the holdout we will evaluate the perormance of the trained recurrent graph convolutional network and calculate the measn squared error across **all of the spatial units and time periods**. 
+
+.. code-block:: python
+    model.eval()
+    cost = 0
+    for time, snapshot in enumerate(test_dataset):
+        yhat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+
 
 Learning from a Continuous Temporal Signal
 -------------------------------------------
