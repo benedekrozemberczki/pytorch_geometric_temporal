@@ -4,8 +4,8 @@ from typing import List, Union
 from torch_geometric.data import Data
 
 
-Edge_Index = List[Union[np.ndarray, None]]
-Edge_Weight = List[Union[np.ndarray, None]]
+Edge_Indices = List[Union[np.ndarray, None]]
+Edge_Weights = List[Union[np.ndarray, None]]
 Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
 
@@ -19,12 +19,12 @@ class DynamicGraphDiscreteSignal(object):
     the feature matrix and the target matrix will change.
  
     Args:
-        edge_index (Numpy array): Index tensor of edges.
-        edge_weight (Numpy array): Edge weight tensor.
+        edge_indices (List of Numpy arrays): Index tensor of edges.
+        edge_weights (List of Numpy arrays): Edge weight tensor.
         features (List of Numpy arrays): List of node feature tensors.
         targets (List of Numpy arrays): List of node label (target) tensors.
     """
-    def __init__(self, edge_index: Edge_Index, edge_weight: Edge_Weight,
+    def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
                  features: Features, targets: Targets):
         self.edge_index = edge_index
         self.edge_weight = edge_weight
