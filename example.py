@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from sklearn.metrics import r2_score
-from torch_geometric_temporal.nn.recurrent import DCRNN
+from torch_geometric_temporal.nn.recurrent import GConvGRU
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
 
@@ -11,7 +11,7 @@ from torch_geometric_temporal.data.splitter import discrete_train_test_split
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features):
         super(RecurrentGCN, self).__init__()
-        self.recurrent_1 = DCRNN(node_features, 32, 1)
+        self.recurrent_1 = GConvGRU(node_features, 32, 1)
         self.linear_1 = torch.nn.Linear(32, 1)
 
     def forward(self, x, edge_index, edge_weight):
@@ -30,7 +30,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
 
-for epoch in tqdm(range(300)):
+for epoch in tqdm(range(20)):
     cost = 0
     for i, snapshot in enumerate(train_dataset):
         out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
