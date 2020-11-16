@@ -148,6 +148,28 @@ In the next steps we will define the **recurrent graph neural network** architec
             h = self.linear(h)
             return h
 
+Let us train this model on the training dataset (first 20% of the temporal snapshots) for 20 epochs. We will use the **Adam optimizer** with a learning rate of **0.01**. 
+
+.. code-block:: python
+    import tqdm
+
+    model = RecurrentGCN(node_features = 4)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+    model.train()
+
+    for epoch in tqdm(range(20)):
+        cost = 0
+        for i, snapshot in enumerate(train_dataset):
+            out = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
+            cost = cost + torch.mean((out-snapshot.y)**2)
+        cost = cost / (i+1)
+        cost.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+
 
 Learning from a Continuous Temporal Signal
 -------------------------------------------
