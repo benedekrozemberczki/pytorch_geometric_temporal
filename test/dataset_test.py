@@ -21,7 +21,7 @@ def test_dynamic_graph_discrete_signal():
         assert snapshot.y is None
 
 def test_static_graph_discrete_signal_typing():
-    dataset = StaticGraphDiscreteSignal(None, None, [np.array([1])],[np.array([2.0])])
+    dataset = StaticGraphDiscreteSignal(None, None, [np.array([1])],[np.array([2])])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
