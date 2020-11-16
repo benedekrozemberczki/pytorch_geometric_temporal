@@ -133,6 +133,8 @@ In the next step we will define the recurrent graph neural network.
 .. code-block:: python
 
     import torch
+    import torch.nn.functional as F
+    from torch_geometric_temporal.nn.recurrent import DCRNN
 
     class RecurrentGCN(torch.nn.Module):
         def __init__(self, node_features):
