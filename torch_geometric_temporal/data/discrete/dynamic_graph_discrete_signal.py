@@ -11,9 +11,9 @@ Targets = List[Union[np.ndarray, None]]
 
 
 class DynamicGraphDiscreteSignal(object):
-    r""" A data iterator object to contain a dynamic graph with a dynamically 
+    r""" A data iterator object to contain a dynamic graph with a
     changing edge set and weights . The feature set and node labels
-    (target) are also temporal. The iterator returns a single discrete temporal
+    (target) are also dynamic. The iterator returns a single discrete temporal
     snapshot for a time period (e.g. day or week). This single snapshot is a 
     Pytorch Geometric Data object. Between two temporal snapshots the edges,
     edge weights, the feature matrix and target matrices might change.
@@ -26,22 +26,22 @@ class DynamicGraphDiscreteSignal(object):
     """
     def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
                  features: Features, targets: Targets):
-        self.edge_index = edge_index
-        self.edge_weight = edge_weight
+        self.edge_indices = edge_indices
+        self.edge_weights = edge_weights
         self.features = features
         self.targets = targets
 
     def _get_edge_index(self):
-        if self.edge_index is None:
-            return self.edge_index
+        if self.edge_indices[t] is None:
+            return self.edge_indices[t]
         else:
-            return torch.LongTensor(self.edge_index)
+            return torch.LongTensor(self.edge_indices[t])
 
     def _get_edge_weight(self):
-        if self.edge_weight is None:
-            return self.edge_weight
+        if self.edge_weights[t] is None:
+            return self.edge_weights[t]
         else:
-            return torch.FloatTensor(self.edge_weight)
+            return torch.FloatTensor(self.edge_weights[t])
 
     def _get_features(self): 
         if self.features[self.t] is None:
