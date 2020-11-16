@@ -10,14 +10,14 @@ def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[Di
 
     Parameters
     ----------
-    data_iterator : StaticGraphDiscreteSignal
+    data_iterator : StaticGraphDiscreteSignal or DynamicGraphDiscreteSignal
         A data iterator to create a temporal train and test split.
     train_ratio : float
         Ratio of training data to be used.
 
     Returns
     -------
-    tuple
+    tuple : 
         Train and test data iterators.
 
     """
@@ -33,4 +33,15 @@ def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[Di
                                                   data_iterator.edge_weight,
                                                   data_iterator.features[train_snapshots:],
                                                   data_iterator.targets[train_snapshots:])
+
+    elif type(data_iterator) == DynamicGraphDiscreteSignal:
+        train_iterator = DynamicGraphDiscreteSignal(data_iterator.edge_indices[0:train_snapshots],
+                                                    data_iterator.edge_weights[0:train_snapshots],
+                                                    data_iterator.features[0:train_snapshots],
+                                                    data_iterator.targets[0:train_snapshots])
+
+        test_iterator = DynamicGraphDiscreteSignal(data_iterator.edge_indices[train_snapshots:],
+                                                   data_iterator.edge_weights[train_snapshots:],
+                                                   data_iterator.features[train_snapshots:],
+                                                   data_iterator.targets[train_snapshots:])
     return train_iterator, test_iterator
