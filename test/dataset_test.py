@@ -4,6 +4,15 @@ from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import 
 from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
  
+def generate_dynamic_graph_discrete_signal(snapshot_count, n_count, feature_count):
+    edge_indices = [np.array([edge for nx.gnp_random_graph(n_count, 0.1)) for _ in range(snapshot_count)]
+    edge_weights = [np.ones(n_count) for _ in range(snapshot_count)]
+    features = [np.random.uniform(0,1,(n_count, feature_count)) for _ in range(snapshot_count)]
+    targets = [np.random.uniform(0,1,(n_count,)) for _ in range(snapshot_count)]
+    return edge_indices, edge_weights, features, targets
+
+
+
 def test_static_graph_discrete_signal():
     dataset = StaticGraphDiscreteSignal(None, None, [None, None],[None, None])
     for snapshot in dataset:
