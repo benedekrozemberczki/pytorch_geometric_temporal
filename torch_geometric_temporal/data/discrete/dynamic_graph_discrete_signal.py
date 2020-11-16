@@ -4,8 +4,8 @@ from typing import List, Union
 from torch_geometric.data import Data
 
 
-Edge_Index = Union[np.ndarray, None] 
-Edge_Weight = Union[np.ndarray, None]
+Edge_Index = List[Union[np.ndarray, None]]
+Edge_Weight = List[Union[np.ndarray, None]]
 Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
 
