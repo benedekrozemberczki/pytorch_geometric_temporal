@@ -21,7 +21,7 @@ def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[Di
         Train and test data iterators.
 
     """
-    train_snapshots = int(train_ratio*len(data_iterator.features))
+    train_snapshots = int(train_ratio*data_iterator.snapshot_count)
 
     if type(data_iterator) == StaticGraphDiscreteSignal:
         train_iterator = StaticGraphDiscreteSignal(data_iterator.edge_index,
