@@ -6,7 +6,7 @@ from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
  
 def get_edge_array(n_count):
-    return np.array([edge for edge nx.gnp_random_graph(n_count, 0.1).edges()]).T
+    return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
 
 def generate_dynamic_graph_discrete_signal(snapshot_count, n_count, feature_count):
     edge_indices = [get_edge_array(n_count) for _ in range(snapshot_count)]
