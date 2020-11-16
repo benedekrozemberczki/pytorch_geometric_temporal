@@ -31,6 +31,10 @@ class StaticGraphDiscreteSignal(object):
         self.edge_weight = edge_weight
         self.features = features
         self.targets = targets
+        self._check_internal_consistency()
+
+    def _check_internal_consistency(self):
+        assert len(self.features) == len(self.targets), "Temporal dimension inconsistency."
 
     def _get_edge_index(self):
         if self.edge_index is None:
