@@ -177,7 +177,8 @@ Using the holdout we will evaluate the perormance of the trained recurrent graph
     cost = 0
     for time, snapshot in enumerate(test_dataset):
         y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
-
+        cost = cost + torch.mean((y_hat-snapshot.y)**2)
+    cost = cost / (time+1)
 
 Learning from a Continuous Temporal Signal
 -------------------------------------------
