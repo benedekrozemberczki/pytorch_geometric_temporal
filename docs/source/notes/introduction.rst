@@ -148,7 +148,7 @@ In the next steps we will define the **recurrent graph neural network** architec
             h = self.linear(h)
             return h
 
-Let us train this model on the training dataset (first 20% of the temporal snapshots) for 20 epochs. We will use the **Adam optimizer** with a learning rate of **0.01**. 
+Let us define a model (we have 4 node features) and train the model on the training split (first 20% of the temporal snapshots) for 20 epochs. We backpropagate when the loss from every snapshot is accumulated. We will use the **Adam optimizer** with a learning rate of **0.01**. 
 
 .. code-block:: python
     import tqdm
