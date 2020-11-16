@@ -128,7 +128,7 @@ We are using the Hungarian Chickenpox Cases dataset in this case study. We will 
 
     train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.2)
 
-In the next step we will define the recurrent graph neural network. 
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. 
 
 .. code-block:: python
 
