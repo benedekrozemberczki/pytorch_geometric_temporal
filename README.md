@@ -26,6 +26,24 @@
 
 --------------------------------------------------------------------------------
 
+**Citing**
+
+
+If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the following citation:
+
+```bibtex
+@misc{pytorch_geometric_temporal,
+      author = {Benedek, Rozemberczki and Paul, Scherer},
+      title = {{PyTorch Geometric Temporal}},
+      year = {2020},
+      publisher = {GitHub},
+      journal = {GitHub repository},
+      howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
+}
+```
+
+--------------------------------------------------------------------------------
+
 **A simple example**
 
 PyTorch Geometric Temporal makes implementing Dynamic and Temporal Graph Neural Networks quite easy -- see the accompanying [tutorial](). For example, this is all it takes to implement a recurrent graph convolutional network with two consecutive [graph convolutional GRU](https://arxiv.org/abs/1612.07659) cells and a linear layer:
@@ -88,24 +106,6 @@ For a quick start, check out the [examples](https://github.com/benedekrozembercz
 
 If you notice anything unexpected, please open an [issue](https://benedekrozemberczki/pytorch_geometric_temporal/issues). If you are missing a specific method, feel free to open a [feature request](https://github.com/rusty1s/pytorch_geometric/issues).
 
-
---------------------------------------------------------------------------------
-
-**Citing**
-
-
-If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the following citation:
-
-```bibtex
-@misc{pytorch_geometric_temporal,
-      author = {Benedek, Rozemberczki and Paul, Scherer},
-      title = {{PyTorch Geometric Temporal}},
-      year = {2020},
-      publisher = {GitHub},
-      journal = {GitHub repository},
-      howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
-}
-```
 
 --------------------------------------------------------------------------------
 
