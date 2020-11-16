@@ -30,6 +30,16 @@ class DynamicGraphDiscreteSignal(object):
         self.edge_weights = edge_weights
         self.features = features
         self.targets = targets
+        self._check_temporal_consistency()
+        self._set_snapshot_count()
+
+    def _check_temporal_consistency(self):
+        assert len(self.features) == len(self.targets), "Temporal dimension inconsistency."
+        assert len(self.edge_indices) == len(self.edge_weights), "Temporal dimension inconsistency."
+        assert len(self.features) == len(self.edge_weights), "Temporal dimension inconsistency."
+
+    def _set_snapshot_count(self):
+        self.snapshot_count = len(self.features)
 
     def _get_edge_index(self):
         if self.edge_indices[self.t] is None:
