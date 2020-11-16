@@ -92,7 +92,7 @@ Train-Test Splitter
 Discrete Train-Test Splitter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We provide functions to create temporal splits of the discrete time iterators. These functions return train and test data iterators which split the original iterator using a fix ratio. Snapshots from the earlier time periods from the training dataset and snapshots from the later periods form the test dataset. This way temporal forecasts can be evaluated in a real life like scenario.
+We provide functions to create temporal splits of the discrete time iterators. These functions return train and test data iterators which split the original iterator using a fix ratio. Snapshots from the earlier time periods from the training dataset and snapshots from the later periods form the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``discrete_train_tes_split`` takes either a ``StaticGraphDiscreteSignal`` or a ``DynamicGraphDiscreteSignal`` and returns two iterattors according to the split ratio specified by ``train_ratio``.
 
 .. code-block:: python
 
@@ -110,8 +110,26 @@ We provide functions to create temporal splits of the discrete time iterators. T
 Applications
 =============
 
+In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is on discrete time spatial data and the other one uses continuous time graphs.   
+
 Learning from a Discrete Temporal Signal
 -------------------------------------------
+
+We are using the Hungarian Chickenpox Cases dataset in this case study. We will train a regressor to predict the weekly cases reported by the counties using a recurrent graph convolutional network. First, we will load the dataset and create an appropriate spatio-temporal split.
+
+.. code-block:: python
+
+    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.data.splitter import discrete_train_test_split
+
+    loader = ChickenpoxDatasetLoader()
+
+    dataset = loader.get_dataset()
+
+    train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.2)
+
+In the next step we will define the recurrent graph neural network. 
+
 
 Learning from a Continuous Temporal Signal
 -------------------------------------------
