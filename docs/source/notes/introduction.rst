@@ -128,7 +128,7 @@ We are using the Hungarian Chickenpox Cases dataset in this case study. We will 
 
     train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.2)
 
-In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. 
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is important to note that the final non-linearity is not integrated into the recurrent graph convolutional operation. This design principle is used consistently and it was taken from PyTorch Geometric. Because of this, we defined a ``ReLU`` non-linearity between the recurrent and linear layers manually. The final linear layer is not followed by a non-linearity as we solve a regression problem with zero-mean targets.
 
 .. code-block:: python
 
