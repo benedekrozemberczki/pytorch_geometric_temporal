@@ -163,8 +163,8 @@ Let us define a model (we have 4 node features) and train the model on the train
     for epoch in tqdm(range(20)):
         cost = 0
         for time, snapshot in enumerate(train_dataset):
-            yhat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
-            cost = cost + torch.mean((yhat-snapshot.y)**2)
+            y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
+            cost = cost + torch.mean((y_hat-snapshot.y)**2)
         cost = cost / (time+1)
         cost.backward()
         optimizer.step()
@@ -176,7 +176,7 @@ Using the holdout we will evaluate the perormance of the trained recurrent graph
     model.eval()
     cost = 0
     for time, snapshot in enumerate(test_dataset):
-        yhat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+        y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
 
 
 Learning from a Continuous Temporal Signal
