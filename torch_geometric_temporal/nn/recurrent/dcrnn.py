@@ -20,7 +20,7 @@ class DConv(MessagePassing):
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
 
     Args:
-        in_channels (int): NUmber of input features.
+        in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Filter size :math:`K`.
         bias (bool, optional): If set to :obj:`False`, the layer 
@@ -91,7 +91,7 @@ class DConv(MessagePassing):
             self.in_channels, self.out_channels, self.weight.size(0))
 
 class DCRNN(torch.nn.Module):
-    """An implementation of the Diffusion Convolutional Gated Recurrent Unit.
+    r"""An implementation of the Diffusion Convolutional Gated Recurrent Unit.
     For details see: `"Diffusion Convolutional Recurrent Neural Network:
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
 
@@ -168,8 +168,7 @@ class DCRNN(torch.nn.Module):
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
                 edge_weight: torch.FloatTensor=None, H: torch.FloatTensor=None) -> torch.FloatTensor:
-        """
-        Making a forward pass. If edge weights are not present the forward pass
+        r"""Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. If the hidden state matrix is not present
         when the forward pass is called it is initialized with zeros.
 
