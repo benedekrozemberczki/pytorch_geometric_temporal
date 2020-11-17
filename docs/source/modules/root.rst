@@ -35,6 +35,6 @@ Discrete Recurrent Graph Convolutional Layers
     :members:
     :undoc-members:
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
+.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn.DCRNN
     :members:
     :undoc-members:
