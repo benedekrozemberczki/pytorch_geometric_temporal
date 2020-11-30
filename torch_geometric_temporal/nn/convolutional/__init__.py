@@ -1,1 +1,1 @@
-from .stgcn import STConv
+from .stgcn import STConv, TemporalConv
