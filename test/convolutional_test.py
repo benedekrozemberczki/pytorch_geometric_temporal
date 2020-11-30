@@ -22,7 +22,7 @@ def create_mock_target(number_of_nodes, number_of_classes):
     """
     Creating a mock target vector.
     """
-    return torch.LongTensor([random.randint(0, number_of_classes-1) for node in range(number_of_nodes)])
+    return torch.LongTensor([np.random.randint(0, number_of_classes-1) for node in range(number_of_nodes)])
 
 def create_mock_sequence(sequence_length, number_of_nodes, edge_per_node, in_channels, number_of_classes):
     """
@@ -56,3 +56,40 @@ def create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_nod
         batch_targets[b] = targets
 
     return batch, batch_targets, edge_index, edge_weight
+
+def test_temporalconv():
+    """
+    Testing the temporal block in STGCN
+    """
+    batch_size = 10
+    sequence_length = 5
+
+    number_of_nodes = 300
+    in_channels = 100
+    edge_per_node = 15
+    out_channels = 10
+    batch, batch_targets, edge_index, edge_weight = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
+
+    kernel_size = 3
+    temporal_conv = TemporalConv(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size)
+
+    H = temporal_conv(batch)
+    assert H.shape == (batch_size, sequence_length-(kernel_size-1), number_of_nodes, out_channels)    
+
+def test_stconv():
+    """
+    Testing STConv block in STGCN
+    """
+    batch_size = 10
+    sequence_length = 5
+
+    number_of_nodes = 300
+    in_channels = 100
+    edge_per_node = 15
+    out_channels = 10
+    batch, batch_targets, edge_index, edge_weight = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
+
+    kernel_size = 3
+    stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2)
+    H = stconv(batch, edge_index, edge_weight)
+    assert H.shape == (batch_size, sequence_length-2*(kernel_size-1), number_of_nodes, out_channels)
