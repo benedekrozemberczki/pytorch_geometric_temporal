@@ -1,2 +1,2 @@
 from .recurrent import *
-# from .convolutional import *
+from .convolutional import *
