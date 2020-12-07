@@ -51,7 +51,7 @@ Discrete Temporal Graph Convolutional Layers
 Auxiliary Graph Convolutional Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
+.. automodule:: torch_geometric_temporal.nn.convolutional.stgcn
     :members:
     :undoc-members:
     :exclude-members: STConv
