@@ -40,8 +40,21 @@ Discrete Recurrent Graph Convolutional Layers
     :undoc-members:
     :exclude-members: glorot, zeros, DConv
 
+Discrete Temporal Graph Convolutional Layers
+--------------
+
+.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
+    :members:
+    :undoc-members:
+    :exclude-members: glorot, zeros, DCRNN
+
 Auxiliary Graph Convolutional Layers
 --------------
+
+.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
+    :members:
+    :undoc-members:
+    :exclude-members: glorot, zeros, DCRNN
 
 .. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
