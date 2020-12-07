@@ -15,5 +15,8 @@ External Resources
 
 * Aldo Pareja, Giacomo Domeniconi, Jie Chen, Tengfei Ma, Toyotaro Suzumura, Hiroki Kanezashi, Tim Kaler, Tao B. Schardl, Charles E. Leiserson: **EvolveGCN: Evolving Graph Convolutional Networks for Dynamic Graphs** `Paper <https://arxiv.org/abs/1902.10191>`_, `Code <https://github.com/IBM/EvolveGCN>`_ 
 
+* Bing Yu, Haoteng Yin, Zhanxing Zhu: **Spatio-Temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting** `Paper <https://arxiv.org/abs/1902.10191>`_, `Code <https://github.com/IBM/EvolveGCN>`_ 
+
+
 
 
