@@ -44,7 +44,7 @@ setup(
   version = "0.0.11",
   license = "MIT",
   description = "A Temporal Extension Library for PyTorch Geometric.",
-  author = "Benedek Rozemberczki",
+  author = "Benedek Rozemberczki and Paul Scherer",
   author_email = "benedek.rozemberczki@gmail.com",
   url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal",
   download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00011.tar.gz",
