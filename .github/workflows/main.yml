@@ -32,9 +32,9 @@ jobs:
          pip install torch==${TORCH_VERSION}+${IDX} -f https://download.pytorch.org/whl/torch_stable.html
          pip install torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
          pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
-         pip install torch-sparse==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
-         pip install torch-cluster==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
-         pip install torch-spline-conv==latest+${IDX} -f https://pytorch-geometric.com/whl/torch-${TORCH_VERSION}.html
+         pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
+         pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
+         pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
          pip install torch-geometric
          pip install codecov
          pip install sphinx sphinx_rtd_theme
