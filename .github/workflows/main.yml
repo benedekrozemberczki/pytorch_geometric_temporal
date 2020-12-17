@@ -25,6 +25,8 @@ jobs:
       - run: which python
       - name: Run installation.
         run: |
+         TORCH_VERSION="1.6.0"
+         IDX="cpu"
          conda install -y scipy
          pip install codecov
          pip install torch==${TORCH_VERSION}+${IDX} torchvision==0.6.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
