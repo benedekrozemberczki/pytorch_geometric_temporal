@@ -17,6 +17,7 @@
 
 [![PyPI Version][pypi-image]][pypi-url]
 [![Docs Status][docs-image]][docs-url]
+[![Repo size][size-image]][size-url]
 [![Code Coverage][coverage-image]][coverage-url]
 [![Build Status][build-image]][build-url]
 
