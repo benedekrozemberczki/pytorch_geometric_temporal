@@ -1,5 +1,7 @@
 [pypi-image]: https://badge.fury.io/py/torch-geometric-temporal.svg
 [pypi-url]: https://pypi.python.org/pypi/torch-geometric-temporal
+[size-image]: https://img.shields.io/github/repo-size/benedekrozemberczki/pytorch_geometric_temporal.svg
+[size-url]: https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/master.zip
 [build-image]: https://github.com/benedekrozemberczki/pytorch_geometric_temporal/workflows/CI/badge.svg
 [build-url]: https://github.com/benedekrozemberczki/pytorch_geometric_temporal/actions?query=workflow%3ACI
 [docs-image]: https://readthedocs.org/projects/pytorch-geometric-temporal/badge/?version=latest
