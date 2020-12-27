@@ -188,4 +188,4 @@ $ python gconvgru_example.py
 
 **License**
 
-- [MIT License](https://github.com/benedekrozemberczki/karateclub/blob/master/LICENSE)
+- [MIT License](https://github.com/benedekrozemberczki/pytorch_geometric_temporal/blob/master/LICENSE)
