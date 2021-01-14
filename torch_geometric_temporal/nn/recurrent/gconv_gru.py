@@ -99,7 +99,7 @@ class GConvGRU(torch.nn.Module):
 
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(X.shape[0], self.out_channels)
+            H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return H
 
 
