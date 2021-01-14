@@ -117,13 +117,13 @@ class GCLSTM(torch.nn.Module):
 
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(X.shape[0], self.out_channels)
+            H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return H
 
 
     def _set_cell_state(self, X, C):
         if C is None:
-            C = torch.zeros(X.shape[0], self.out_channels)
+            C = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return C
 
 
