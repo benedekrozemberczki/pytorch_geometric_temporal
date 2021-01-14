@@ -141,7 +141,7 @@ class DCRNN(torch.nn.Module):
 
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(X.shape[0], self.out_channels)
+            H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return H
 
     def _calculate_update_gate(self, X, edge_index, edge_weight, H):
