@@ -1,5 +1,5 @@
 import torch
-from torch_geometric.nn import ChebConv
+from torch_geometric.nn import GCNConv
 
 
 class TemporalGConv(torch.nn.Module):
