@@ -6,3 +6,4 @@ from .dygrae import DyGrEncoder
 from .evolvegcnh import EvolveGCNH
 from .evolvegcno import EvolveGCNO
 from .dcrnn import DCRNN
+from .temporalgcn import TemporalGConv
