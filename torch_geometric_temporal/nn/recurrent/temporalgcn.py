@@ -75,9 +75,6 @@ class TGCN(torch.nn.Module):
         H_tilde = torch.cat([self.conv_h(X, edge_index, edge_weight), H*R],axis=1)
         H_tilde = self.linear_h(H_tilde)
         H_tilde = torch.tanh(H_tilde)
-        #H_tilde = self.conv_x_h(X, edge_index, edge_weight)
-        #H_tilde = H_tilde + self.conv_h_h(H*R, edge_index, edge_weight)
-        #H_tilde = torch.tanh(H_tilde)
         return H_tilde
 
 
