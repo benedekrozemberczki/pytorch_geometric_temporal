@@ -58,7 +58,7 @@ class TGCN(torch.nn.Module):
 
 
     def _calculate_update_gate(self, X, edge_index, edge_weight, H):
-        Z = self.conv_x_z(X, edge_index, edge_weight)
+        Z = self.conv_z(X, edge_index, edge_weight)
         Z = Z + self.conv_h_z(H, edge_index, edge_weight)
         Z = torch.sigmoid(Z)
         return Z
