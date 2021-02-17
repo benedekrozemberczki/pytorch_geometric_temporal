@@ -17,6 +17,10 @@ class TGCN(torch.nn.Module):
 
         self.in_channels = in_channels
         self.out_channels = out_channels
+        self.improved = improved
+        self.cached = cached
+        self.add_self_loops = add_self_loops
+
         self._create_parameters_and_layers()
 
 
