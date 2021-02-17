@@ -11,7 +11,8 @@ class TGCN(torch.nn.Module):
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
     """
-    def __init__(self, in_channels: int, out_channels: int):
+    def __init__(self, in_channels: int, out_channels: int, improved: bool=False,
+                 cached: bool=False, add_self_loops: bool=True):
         super(TGCN, self).__init__()
 
         self.in_channels = in_channels
