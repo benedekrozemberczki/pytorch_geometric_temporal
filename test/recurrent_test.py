@@ -98,6 +98,34 @@ def test_gconv_gru_layer():
     H = layer(X, edge_index, edge_weight, H)
 
     assert H.shape == (number_of_nodes, out_channels)
+    
+def test_tgcn_layer():
+    """
+    Testing the T-GCN Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    K = 2
+
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
+
+    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K)
+
+
+    H = layer(X, edge_index)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
 
 
 def test_dcrnn_layer():
