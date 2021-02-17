@@ -26,6 +26,9 @@ class TGCN(torch.nn.Module):
 
         self.linear_z = torch.nn.linear(in_channels=self.out_channels,
                                         out_channels=self.out_channels)
+                                        
+        self.combiner_z = torch.nn.linear(in_channels=2*self.out_channels,
+                                          out_channels=self.out_channels)
 
 
     def _create_reset_gate_parameters_and_layers(self):
