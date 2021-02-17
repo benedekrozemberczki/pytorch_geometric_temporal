@@ -2,7 +2,7 @@ import torch
 from torch_geometric.nn import GCNConv
 
 
-class TemporalGConv(torch.nn.Module):
+class TGCN(torch.nn.Module):
     r"""An implementation of the Chebyshev Graph Convolutional Gated Recurrent Unit
     Cell. For details see this paper: `"Structured Sequence Modeling with Graph
     Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
@@ -36,7 +36,7 @@ class TemporalGConv(torch.nn.Module):
     """
     def __init__(self, in_channels: int, out_channels: int, K: int,
                  normalization: str="sym", bias: bool=True):
-        super(GConvGRU, self).__init__()
+        super(TGCN, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
