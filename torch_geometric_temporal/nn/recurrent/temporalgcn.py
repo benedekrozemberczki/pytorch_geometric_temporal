@@ -10,55 +10,22 @@ class TGCN(torch.nn.Module):
     Args:
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
-        K (int): Chebyshev filter size :math:`K`.
-        normalization (str, optional): The normalization scheme for the graph
-            Laplacian (default: :obj:`"sym"`):
-
-            1. :obj:`None`: No normalization
-            :math:`\mathbf{L} = \mathbf{D} - \mathbf{A}`
-
-            2. :obj:`"sym"`: Symmetric normalization
-            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1/2} \mathbf{A}
-            \mathbf{D}^{-1/2}`
-
-            3. :obj:`"rw"`: Random-walk normalization
-            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1} \mathbf{A}`
-
-            You need to pass :obj:`lambda_max` to the :meth:`forward` method of
-            this operator in case the normalization is non-symmetric.
-            :obj:`\lambda_max` should be a :class:`torch.Tensor` of size
-            :obj:`[num_graphs]` in a mini-batch scenario and a
-            scalar/zero-dimensional tensor when operating on single graphs.
-            You can pre-compute :obj:`lambda_max` via the
-            :class:`torch_geometric.transforms.LaplacianLambdaMax` transform.
-        bias (bool, optional): If set to :obj:`False`, the layer will not learn
-            an additive bias. (default: :obj:`True`)
     """
-    def __init__(self, in_channels: int, out_channels: int, K: int,
-                 normalization: str="sym", bias: bool=True):
+    def __init__(self, in_channels: int, out_channels: int):
         super(TGCN, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.K = K
-        self.normalization = normalization
-        self.bias = bias
         self._create_parameters_and_layers()
 
 
     def _create_update_gate_parameters_and_layers(self):
 
-        self.conv_x_z = ChebConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K,
-                                 normalization=self.normalization,
-                                 bias=self.bias)
+        self.conv_z = GCNConv(in_channels=self.in_channels,
+                              out_channels=self.out_channels)
 
-        self.conv_h_z = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K,
-                                 normalization=self.normalization,
-                                 bias=self.bias)
+        self.linear_z = torch.nn.linear(in_channels=self.out_channels,
+                                        out_channels=self.out_channels)
 
 
     def _create_reset_gate_parameters_and_layers(self):
