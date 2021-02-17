@@ -1,7 +1,7 @@
 from torch_geometric_temporal.nn import *
 from torch_geometric_temporal.data import *
 
-__version__ = '0.0.6'
+__version__ = '0.0.12'
 
 __all__ = [
     'torch_geometric',
