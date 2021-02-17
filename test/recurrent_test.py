@@ -3,7 +3,7 @@ import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU, DCRNN
 from torch_geometric_temporal.nn.recurrent import GCLSTM, LRGCN, DyGrEncoder
-from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO
+from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO, TGCN
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
