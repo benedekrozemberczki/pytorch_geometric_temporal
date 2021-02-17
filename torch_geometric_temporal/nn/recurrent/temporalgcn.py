@@ -30,7 +30,10 @@ class TGCN(torch.nn.Module):
     def _create_update_gate_parameters_and_layers(self):
 
         self.conv_z = GCNConv(in_channels=self.in_channels,
-                              out_channels=self.out_channels)
+                              out_channels=self.out_channels,
+                              improved=self.improved,
+                              cached=self.cached,
+                              add_self_loops=self.add_self_loops)
                                         
         self.linear_z = torch.nn.Linear(2*self.out_channels,
                                         self.out_channels)
@@ -39,7 +42,10 @@ class TGCN(torch.nn.Module):
     def _create_reset_gate_parameters_and_layers(self):
 
         self.conv_r = GCNConv(in_channels=self.in_channels,
-                              out_channels=self.out_channels)
+                              out_channels=self.out_channels,
+                              improved=self.improved,
+                              cached=self.cached,
+                              add_self_loops=self.add_self_loops)
                                         
         self.linear_r = torch.nn.Linear(2*self.out_channels,
                                         self.out_channels)
@@ -47,7 +53,10 @@ class TGCN(torch.nn.Module):
     def _create_candidate_state_parameters_and_layers(self):
 
         self.conv_h = GCNConv(in_channels=self.in_channels,
-                              out_channels=self.out_channels)
+                              out_channels=self.out_channels,
+                              improved=self.improved,
+                              cached=self.cached,
+                              add_self_loops=self.add_self_loops)
                                         
         self.linear_h = torch.nn.Linear(2*self.out_channels,
                                         self.out_channels)
