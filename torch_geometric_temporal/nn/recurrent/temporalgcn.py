@@ -23,28 +23,18 @@ class TGCN(torch.nn.Module):
 
         self.conv_z = GCNConv(in_channels=self.in_channels,
                               out_channels=self.out_channels)
-
-        self.linear_z = torch.nn.linear(in_channels=self.in_channels,
-                                        out_channels=self.out_channels)
                                         
-        self.combiner_z = torch.nn.linear(in_channels=2*self.out_channels,
-                                          out_channels=self.out_channels)
+        self.linear_z = torch.nn.linear(in_channels=2*self.out_channels,
+                                        out_channels=self.out_channels)
 
 
     def _create_reset_gate_parameters_and_layers(self):
 
-        self.conv_x_r = ChebConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K,
-                                 normalization=self.normalization,
-                                 bias=self.bias)
-
-        self.conv_h_r = ChebConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 K=self.K,
-                                 normalization=self.normalization,
-                                 bias=self.bias)
-
+        self.conv_r = GCNConv(in_channels=self.in_channels,
+                              out_channels=self.out_channels)
+                                        
+        self.linear_r = torch.nn.linear(in_channels=2*self.out_channels,
+                                        out_channels=self.out_channels)
 
     def _create_candidate_state_parameters_and_layers(self):
 
