@@ -3,8 +3,8 @@ from torch_geometric.nn import GCNConv
 
 
 class TGCN(torch.nn.Module):
-    r"""An implementation of the Chebyshev Graph Convolutional Gated Recurrent Unit
-    Cell. For details see this paper: `"Structured Sequence Modeling with Graph
+    r"""An implementation of the Temporal Graph Convolutional Gated Recurrent Cell.
+    For details see this paper: `"Structured Sequence Modeling with Graph
     Convolutional Recurrent Networks." <https://arxiv.org/abs/1612.07659>`_
 
     Args:
