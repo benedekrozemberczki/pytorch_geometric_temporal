@@ -65,9 +65,9 @@ class TGCN(torch.nn.Module):
 
 
     def _calculate_reset_gate(self, X, edge_index, edge_weight, H):
-        R = self.conv_x_r(X, edge_index, edge_weight)
-        R = R + self.conv_h_r(H, edge_index, edge_weight)
-        R = torch.sigmoid(R) 
+        R = torch.cat([self.conv_r(X, edge_index, edge_weight), H],axis=1)
+        R = self.linear_r(R)
+        R = torch.sigmoid(R)
         return R
 
 
