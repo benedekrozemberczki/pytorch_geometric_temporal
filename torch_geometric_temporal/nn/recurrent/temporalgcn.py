@@ -24,7 +24,7 @@ class TGCN(torch.nn.Module):
         self.conv_z = GCNConv(in_channels=self.in_channels,
                               out_channels=self.out_channels)
 
-        self.linear_z = torch.nn.linear(in_channels=self.out_channels,
+        self.linear_z = torch.nn.linear(in_channels=self.in_channels,
                                         out_channels=self.out_channels)
                                         
         self.combiner_z = torch.nn.linear(in_channels=2*self.out_channels,
