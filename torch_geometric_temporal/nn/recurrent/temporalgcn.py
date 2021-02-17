@@ -10,6 +10,9 @@ class TGCN(torch.nn.Module):
     Args:
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
+        improved (bool):
+        cached (bool):
+        add_self_loops (bool):
     """
     def __init__(self, in_channels: int, out_channels: int, improved: bool=False,
                  cached: bool=False, add_self_loops: bool=True):
