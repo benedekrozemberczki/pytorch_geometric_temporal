@@ -50,17 +50,20 @@ class METRLADatasetLoader(object):
     def _get_edge_weights(self):
         self.edge_weights = np.ones(self.edges.shape[1])
 
-    def _get_features(self):
-        self.features = []
-        time_x = np.transpose(self.X, (2,0,1))
-        for time in range(len(time_x)):
-            self.features.append(time_x[time])
+    def _generate_task(self, num_timesteps_in: int=12, num_timesteps_out: int=12):
+        """Uses the node features of the graph and generates a feature/target
+        relationship of the shape
+        (num_nodes, num_node_features, num_timesteps_in) -> (num_nodes, num_timesteps_out)
+        predicting the average traffic speed using num_timesteps_in to predict the
+        traffic conditions in the next num_timesteps_out
 
-
-    def _get_targets(self):
+        Args:
+            num_timesteps_in (int): number of timesteps the sequence model sees
+            num_timesteps_out (int): number of timesteps the sequence model has to predict
+        """
         pass
 
-    def get_dataset(self) -> StaticGraphDiscreteSignal:
+    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12) -> StaticGraphDiscreteSignal:
         """Returns data iterator for METR-LA dataset as an instance of the
         static graph discrete signal class.
 
@@ -70,8 +73,7 @@ class METRLADatasetLoader(object):
         """
         self._get_edges()
         self._get_edge_weights()
-        self._get_features()
-        self._get_targets()
+        self._generate_task(num_timesteps_in, num_timesteps_out)
         dataset = StaticGraphDiscreteSignal(self.edges, self.edge_weights, self.features, self.targets)
 
         return dataset
