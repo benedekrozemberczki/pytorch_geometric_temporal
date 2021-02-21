@@ -1,6 +1,7 @@
 import os
 import zipfile
 import numpy as np
+import torch
 from six.moves import urllib
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 
@@ -37,8 +38,8 @@ class METRLADatasetLoader(object):
         stds = np.std(X, axis=(0, 2))
         X = X / stds.reshape(1, -1, 1)
         
-        self.A = A
-        self.X = X
+        self.A = torch.from_numpy(A)
+        self.X = torch.from_numpy(X)
 
     def _get_edges(self):
         pass
