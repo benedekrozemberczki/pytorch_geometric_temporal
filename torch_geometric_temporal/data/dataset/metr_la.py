@@ -2,6 +2,7 @@ import os
 import zipfile
 import numpy as np
 import torch
+from torch_geometric.utils import dense_to_sparse
 from six.moves import urllib
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 
@@ -42,13 +43,19 @@ class METRLADatasetLoader(object):
         self.X = torch.from_numpy(X)
 
     def _get_edges(self):
-        pass
+        edge_indices, values = dense_to_sparse(self.A)
+        edge_indices = edge_indices.numpy()
+        self.edges = edge_indices
 
     def _get_edge_weights(self):
-        pass
+        self.edge_weights = np.ones(self.edges.shape[1])
 
     def _get_features(self):
-        pass
+        self.features = []
+        time_x = np.transpose(self.X, (2,0,1))
+        for time in range(len(time_x)):
+            self.features.append(time_x[time])
+
 
     def _get_targets(self):
         pass
