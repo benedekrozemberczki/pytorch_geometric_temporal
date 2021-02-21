@@ -15,8 +15,9 @@ class METRLADatasetLoader(object):
     to June 2012.
     """
 
-    def __init__(self, arg):
-        super(MetrlaDatasetLoader, self).__init__()
+    def __init__(self):
+        super(METRLADatasetLoader, self).__init__()
+        self._read_web_data()
 
     def _read_web_data(self):
         url = "placeholder"
@@ -26,7 +27,7 @@ class METRLADatasetLoader(object):
             urllib.request.urlopen(url).read()
 
         if (not os.path.isfile("data/adj_mat.npy") or not os.path.isfile("data/node_values.npy")):
-            with zipfile.Zipfile("data/METR-LA.zip", "r") as zip_fh:
+            with zipfile.ZipFile("data/METR-LA.zip", "r") as zip_fh:
                 zip_fh.extractall("data/")
 
         A = np.load("data/adj_mat.npy")
@@ -60,15 +61,15 @@ class METRLADatasetLoader(object):
             num_timesteps_in (int): number of timesteps the sequence model sees
             num_timesteps_out (int): number of timesteps the sequence model has to predict
         """
-        indices = [(i, i + (num_timesteps_input + num_timesteps_output)) for i
+        indices = [(i, i + (num_timesteps_in + num_timesteps_out)) for i
                    in range(self.X.shape[2] - (
-                    num_timesteps_input + num_timesteps_output) + 1)]
+                    num_timesteps_in + num_timesteps_out) + 1)]
 
         # Generate observations
         features, target = [], []
         for i, j in indices:
-            features.append(self.X[:, :, i: i + num_timesteps_input])
-            target.append(X[:, 0, i + num_timesteps_input: j])
+            features.append((self.X[:, :, i: i + num_timesteps_in]).numpy())
+            target.append((self.X[:, 0, i + num_timesteps_in: j]).numpy())
 
         self.features = features
         self.targets = target
@@ -81,8 +82,14 @@ class METRLADatasetLoader(object):
             * **dataset** *(StaticGraphDiscrete Signal)* - The METR-LA traffic
                 forecasting dataset.
         """
-        self._get_edges()
+        self._get_edges_and_weights()
         self._generate_task(num_timesteps_in, num_timesteps_out)
         dataset = StaticGraphDiscreteSignal(self.edges, self.edge_weights, self.features, self.targets)
 
         return dataset
+
+# Manual test
+if __name__ == '__main__':
+    from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+    loader = METRLADatasetLoader()
+    dataset = loader.get_dataset()
