@@ -1,4 +1,7 @@
+import os
+import zipfile
 import numpy as np
+from six.moves import urllib
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 
 
@@ -15,7 +18,27 @@ class METRLADatasetLoader(object):
 
     def _read_web_data(self):
         url = "placeholder"
-        pass
+
+        # Check if zip file is in data folder from working directory, otherwise download
+        if (not os.path.isfile("data/METR-LA.zip")):
+            urllib.request.urlopen(url).read()
+
+        if (not os.path.isfile("data/adj_mat.npy") or not os.path.isfile("data/node_values.npy")):
+            with zipfile.Zipfile("data/METR-LA.zip", "r") as zip_fh:
+                zip_fh.extractall("data/")
+
+        A = np.load("data/adj_mat.npy")
+        X = np.load("data/node_values.npy").transpose((1,2,0))
+        X = X.astype(np.float32)
+
+        # Normalise as in DCRNN paper (via Z-Score Method)
+        means = np.mean(X, axis=(0, 2))
+        X = X - means.reshape(1, -1, 1)
+        stds = np.std(X, axis=(0, 2))
+        X = X / stds.reshape(1, -1, 1)
+        
+        self.A = A
+        self.X = X
 
     def _get_edges(self):
         pass
