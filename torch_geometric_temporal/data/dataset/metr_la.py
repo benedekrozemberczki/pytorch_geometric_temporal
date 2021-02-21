@@ -60,7 +60,18 @@ class METRLADatasetLoader(object):
             num_timesteps_in (int): number of timesteps the sequence model sees
             num_timesteps_out (int): number of timesteps the sequence model has to predict
         """
-        pass
+        indices = [(i, i + (num_timesteps_input + num_timesteps_output)) for i
+                   in range(self.X.shape[2] - (
+                    num_timesteps_input + num_timesteps_output) + 1)]
+
+        # Generate observations
+        features, target = [], []
+        for i, j in indices:
+            features.append(self.X[:, :, i: i + num_timesteps_input])
+            target.append(X[:, 0, i + num_timesteps_input: j])
+
+        self.features = features
+        self.targets = target
 
     def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12) -> StaticGraphDiscreteSignal:
         """Returns data iterator for METR-LA dataset as an instance of the
