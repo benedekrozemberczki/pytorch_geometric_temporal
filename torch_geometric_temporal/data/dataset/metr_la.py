@@ -42,13 +42,12 @@ class METRLADatasetLoader(object):
         self.A = torch.from_numpy(A)
         self.X = torch.from_numpy(X)
 
-    def _get_edges(self):
+    def _get_edges_and_weights(self):
         edge_indices, values = dense_to_sparse(self.A)
         edge_indices = edge_indices.numpy()
+        values = values.numpy()
         self.edges = edge_indices
-
-    def _get_edge_weights(self):
-        self.edge_weights = np.ones(self.edges.shape[1])
+        self.edge_weights = values
 
     def _generate_task(self, num_timesteps_in: int=12, num_timesteps_out: int=12):
         """Uses the node features of the graph and generates a feature/target
@@ -72,7 +71,6 @@ class METRLADatasetLoader(object):
                 forecasting dataset.
         """
         self._get_edges()
-        self._get_edge_weights()
         self._generate_task(num_timesteps_in, num_timesteps_out)
         dataset = StaticGraphDiscreteSignal(self.edges, self.edge_weights, self.features, self.targets)
 
