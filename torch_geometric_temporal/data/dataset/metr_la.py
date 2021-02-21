@@ -12,3 +12,35 @@ class METRLADatasetLoader(object):
 
     def __init__(self, arg):
         super(MetrlaDatasetLoader, self).__init__()
+
+    def _read_web_data(self):
+        url = "placeholder"
+        pass
+
+    def _get_edges(self):
+        pass
+
+    def _get_edge_weights(self):
+        pass
+
+    def _get_features(self):
+        pass
+
+    def _get_targets(self):
+        pass
+
+    def get_dataset(self) -> StaticGraphDiscreteSignal:
+        """Returns data iterator for METR-LA dataset as an instance of the
+        static graph discrete signal class.
+
+        Return types:
+            * **dataset** *(StaticGraphDiscrete Signal)* - The METR-LA traffic
+                forecasting dataset.
+        """
+        self._get_edges()
+        self._get_edge_weights()
+        self._get_features()
+        self._get_targets()
+        dataset = StaticGraphDiscreteSignal(self.edges, self.edge_weights, self.features, self.targets)
+
+        return dataset
