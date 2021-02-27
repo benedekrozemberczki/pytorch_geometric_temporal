@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: 3.7.9
+          python-version: 3.7.10
       - uses: s-weigand/setup-conda@v1
         with:
           activate-conda: true
