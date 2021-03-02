@@ -45,10 +45,43 @@ class PemsBayDatasetLoader(object):
         self.edge_weights = values
 
     def _generate_task(self, num_timesteps_in: int=12, num_timesteps_out: int=2):
-        pass
-        
+        """Uses the node features of the graph and generates a feature/target
+        relationship of the shape
+        (num_nodes, num_node_features, num_timesteps_in) -> (num_nodes, num_timesteps_out)
+        predicting the average traffic speed using num_timesteps_in to predict the
+        traffic conditions in the next num_timesteps_out
+
+        Args:
+            num_timesteps_in (int): number of timesteps the sequence model sees
+            num_timesteps_out (int): number of timesteps the sequence model has to predict
+        """
+        indices = [(i, i + (num_timesteps_in + num_timesteps_out)) for i
+                   in range(self.X.shape[2] - (
+                    num_timesteps_in + num_timesteps_out) + 1)]
+
+        # Generate observations
+        features, target = [], []
+        for i, j in indices:
+            features.append((self.X[:, :, i: i + num_timesteps_in]).numpy())
+            target.append((self.X[:, 0, i + num_timesteps_in: j]).numpy())
+
+        self.features = features
+        self.targets = target
+
+
     def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=2):
-        pass
+        """Returns data iterator for PEMS-BAY dataset as an instance of the
+        static graph discrete signal class.
+
+        Return types:
+            * **dataset** *(StaticGraphDiscrete Signal)* - The PEMS-BAY traffic
+                forecasting dataset.
+        """
+        self._get_edges_and_weights()
+        self._generate_task(num_timesteps_in, num_timesteps_out)
+        dataset = StaticGraphDiscreteSignal(self.edges, self.edge_weights, self.features, self.targets)
+
+        return dataset
 
 if __name__ == '__main__':
     from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
