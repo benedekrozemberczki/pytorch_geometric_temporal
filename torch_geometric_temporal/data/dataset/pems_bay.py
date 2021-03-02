@@ -44,7 +44,7 @@ class PemsBayDatasetLoader(object):
         self.edges = edge_indices
         self.edge_weights = values
 
-    def _generate_task(self, num_timesteps_in: int=12, num_timesteps_out: int=2):
+    def _generate_task(self, num_timesteps_in: int=12, num_timesteps_out: int=12):
         """Uses the node features of the graph and generates a feature/target
         relationship of the shape
         (num_nodes, num_node_features, num_timesteps_in) -> (num_nodes, num_timesteps_out)
@@ -69,7 +69,7 @@ class PemsBayDatasetLoader(object):
         self.targets = target
 
 
-    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=2):
+    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12):
         """Returns data iterator for PEMS-BAY dataset as an instance of the
         static graph discrete signal class.
 
