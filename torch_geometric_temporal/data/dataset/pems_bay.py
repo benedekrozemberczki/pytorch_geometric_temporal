@@ -14,11 +14,18 @@ class PemsBayDatasetLoader(object):
         super(PemsBayDatasetLoader, self).__init__()
         self._read_web_data()
 
+    def _download_url(self, url, save_path):
+        with urllib.request.urlopen(url) as dl_file:
+            with open(save_path, 'wb') as out_file:
+                out_file.write(dl_file.read())
+
     def _read_web_data(self):
-        url = "placeholder"
+        url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
         
         if (not os.path.isfile("data/PEMS-BAY.zip")):
-            urllib.request.urlopen(url).read()
+            if not os.path.exists("data"):
+                os.makedirs("data")
+            self._download_url(url, "data/PEMS-BAY.zip")
 
         if (not os.path.isfile("data/pems_adj_mat.npy") or not os.path.isfile("data/pems_node_values.npy")):
             with zipfile.ZipFile("data/PEMS-BAY.zip", "r") as zip_fh:
@@ -63,7 +70,7 @@ class PemsBayDatasetLoader(object):
         features, target = [], []
         for i, j in indices:
             features.append((self.X[:, :, i: i + num_timesteps_in]).numpy())
-            target.append((self.X[:, 0, i + num_timesteps_in: j]).numpy())
+            target.append((self.X[:, :, i + num_timesteps_in: j]).numpy())
 
         self.features = features
         self.targets = target
