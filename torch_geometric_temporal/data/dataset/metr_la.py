@@ -19,12 +19,19 @@ class METRLADatasetLoader(object):
         super(METRLADatasetLoader, self).__init__()
         self._read_web_data()
 
+    def _download_url(self, url, save_path):
+        with urllib.request.urlopen(url) as dl_file:
+            with open(save_path, 'wb') as out_file:
+                out_file.write(dl_file.read())
+
     def _read_web_data(self):
-        url = "placeholder"
+        url = "https://graphmining.ai/temporal_datasets/METR-LA.zip"
 
         # Check if zip file is in data folder from working directory, otherwise download
         if (not os.path.isfile("data/METR-LA.zip")):
-            urllib.request.urlopen(url).read()
+            if not os.path.exists("data"):
+                os.makedirs("data")
+            self._download_url(url, "data/METR-LA.zip")
 
         if (not os.path.isfile("data/adj_mat.npy") or not os.path.isfile("data/node_values.npy")):
             with zipfile.ZipFile("data/METR-LA.zip", "r") as zip_fh:
