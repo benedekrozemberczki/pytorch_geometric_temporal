@@ -82,7 +82,7 @@ def test_chickenpox():
             assert snapshot.y.shape == (20, )
 
 def test_metrla():
-    loader = METRLADatasetLoader()
+    loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
     for epoch in range(3):
         for snapshot in dataset:
@@ -92,7 +92,7 @@ def test_metrla():
             assert snapshot.y.shape == (207, 12)
 
 def test_metrla_task_generator():
-    loader = METRLADatasetLoader()
+    loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
     for epoch in range(3):
         for snapshot in dataset:
@@ -102,7 +102,7 @@ def test_metrla_task_generator():
             assert snapshot.y.shape == (207, 5)
 
 def test_pemsbay():
-    loader = PemsBayDatasetLoader()
+    loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
     for epoch in range(3):
         for snapshot in dataset:
@@ -112,7 +112,7 @@ def test_pemsbay():
             assert snapshot.y.shape == (325, 2, 12)
 
 def test_pemsbay_task_generator():
-    loader = PemsBayDatasetLoader()
+    loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
     for epoch in range(3):
         for snapshot in dataset:
