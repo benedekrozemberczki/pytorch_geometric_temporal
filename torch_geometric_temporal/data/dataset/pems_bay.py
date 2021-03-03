@@ -10,8 +10,9 @@ class PemsBayDatasetLoader(object):
     """A traffic forecasting dataset as described in DCRNN paper
     """
 
-    def __init__(self):
+    def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data")):
         super(PemsBayDatasetLoader, self).__init__()
+        self.raw_data_dir = raw_data_dir
         self._read_web_data()
 
     def _download_url(self, url, save_path):
@@ -22,17 +23,18 @@ class PemsBayDatasetLoader(object):
     def _read_web_data(self):
         url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
         
-        if (not os.path.isfile("data/PEMS-BAY.zip")):
-            if not os.path.exists("data"):
-                os.makedirs("data")
-            self._download_url(url, "data/PEMS-BAY.zip")
+        # Check if zip file is in data folder from working directory, otherwise download
+        if (not os.path.isfile(os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))):
+            if not os.path.exists(self.raw_data_dir):
+                os.makedirs(self.raw_data_dir)
+            self._download_url(url, os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))
 
-        if (not os.path.isfile("data/pems_adj_mat.npy") or not os.path.isfile("data/pems_node_values.npy")):
-            with zipfile.ZipFile("data/PEMS-BAY.zip", "r") as zip_fh:
-                zip_fh.extractall("data/")
+        if (not os.path.isfile(os.path.join(self.raw_data_dir, "pems_adj_mat.npy")) or not os.path.isfile(os.path.join(self.raw_data_dir, "pems_node_values.npy"))):
+            with zipfile.ZipFile(os.path.join(self.raw_data_dir, "PEMS-BAY.zip"), "r") as zip_fh:
+                zip_fh.extractall(self.raw_data_dir)
 
-        A = np.load("data/pems_adj_mat.npy")
-        X = np.load("data/pems_node_values.npy").transpose((1,2,0))
+        A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
+        X = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose((1,2,0))
         X = X.astype(np.float32)
 
         # Normalise as in DCRNN paper (via Z-Score Method)
@@ -92,5 +94,5 @@ class PemsBayDatasetLoader(object):
 
 if __name__ == '__main__':
     from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
-    loader = PemsBayDatasetLoader()
+    loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
