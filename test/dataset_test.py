@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
+from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader, METRLADatasetLoader, PemsBayDatasetLoader
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
@@ -81,6 +81,45 @@ def test_chickenpox():
             assert snapshot.x.shape == (20, 4)
             assert snapshot.y.shape == (20, )
 
+def test_metrla():
+    loader = METRLADatasetLoader(raw_data_dir="/tmp/")
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 1722)
+            assert snapshot.edge_attr.shape == (1722, )
+            assert snapshot.x.shape == (207, 2, 12)
+            assert snapshot.y.shape == (207, 12)
+
+def test_metrla_task_generator():
+    loader = METRLADatasetLoader(raw_data_dir="/tmp/")
+    dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 1722)
+            assert snapshot.edge_attr.shape == (1722, )
+            assert snapshot.x.shape == (207, 2, 6)
+            assert snapshot.y.shape == (207, 5)
+
+def test_pemsbay():
+    loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 2694)
+            assert snapshot.edge_attr.shape == (2694, )
+            assert snapshot.x.shape == (325, 2, 12)
+            assert snapshot.y.shape == (325, 2, 12)
+
+def test_pemsbay_task_generator():
+    loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
+    dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 2694)
+            assert snapshot.edge_attr.shape == (2694, )
+            assert snapshot.x.shape == (325, 2, 6)
+            assert snapshot.y.shape == (325, 2, 5)
 
 def test_discrete_train_test_split_static():
     loader = ChickenpoxDatasetLoader()
