@@ -17,7 +17,7 @@ class PedalMeDatasetLoader(object):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/discrete/chickenpox.json"
+        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/discrete/pedalme.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
 
     def _get_edges(self):
