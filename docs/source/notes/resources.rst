@@ -19,9 +19,12 @@ External Resources - Architectures
 
 * Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang, Tao Lin, Min Deng, Haifeng Li: **T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/lehaifeng/T-GCN>`_ 
 
-
 External Resources - Datasets
 =============================
+
+* Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang, Tao Lin, Min Deng, Haifeng Li: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/lehaifeng/T-GCN>`_ 
+
+
 
 
 
