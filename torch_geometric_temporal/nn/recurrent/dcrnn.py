@@ -49,9 +49,9 @@ class DConv(MessagePassing):
     def forward(self, x, edge_index, edge_weight):
         adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
         adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
-        deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)))
+        deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)).to(x.device))
         deg_out = deg_out.flatten()
-        deg_in = torch.matmul(torch.ones(size=(1, adj_mat.size(0))), adj_mat)
+        deg_in = torch.matmul(torch.ones(size=(1, adj_mat.size(0))).to(x.device), adj_mat)
         deg_in = deg_in.flatten()
 
         deg_out_inv = torch.reciprocal(deg_out)
