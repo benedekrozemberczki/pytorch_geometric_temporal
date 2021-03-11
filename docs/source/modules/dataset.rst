@@ -18,6 +18,10 @@ Datasets
 .. automodule:: torch_geometric_temporal.data.dataset.metr_la
     :members:
     :undoc-members:
+    
+.. automodule:: torch_geometric_temporal.data.dataset.pems_bay
+    :members:
+    :undoc-members:
 
 Discrete Temporal Signal Iterators
 ----------------------------------
