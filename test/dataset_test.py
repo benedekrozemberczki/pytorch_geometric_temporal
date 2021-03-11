@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader, METRLADatasetLoader, PemsBayDatasetLoader
+from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader, METRLADatasetLoader, PemsBayDatasetLoader, PedalMeDatasetLoader
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
 from torch_geometric_temporal.data.splitter import discrete_train_test_split
@@ -80,6 +80,16 @@ def test_chickenpox():
             assert snapshot.edge_attr.shape == (102, )
             assert snapshot.x.shape == (20, 4)
             assert snapshot.y.shape == (20, )
+            
+def test_pedalme():
+    loader = PedalMeDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 225)
+            assert snapshot.edge_attr.shape == (225, )
+            assert snapshot.x.shape == (15, 4)
+            assert snapshot.y.shape == (15, )
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
