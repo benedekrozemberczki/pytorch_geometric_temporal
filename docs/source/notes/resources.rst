@@ -17,14 +17,9 @@ External Resources - Architectures
 
 * Bing Yu, Haoteng Yin, Zhanxing Zhu: **Spatio-Temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting** `Paper <https://arxiv.org/abs/1709.04875>`_, `Code <https://github.com/VeritasYin/STGCN_IJCAI-18>`_ 
 
-* Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang, Tao Lin, Min Deng, Haifeng Li: **T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/lehaifeng/T-GCN>`_ 
+* Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang, Tao Lin, Min Deng, Haifeng Li: **T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/lehaifeng/T-GCN>`_
 
 External Resources - Datasets
 =============================
 
-* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Code <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 
-
-
-
-
-
+* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 
