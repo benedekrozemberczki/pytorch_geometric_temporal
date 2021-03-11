@@ -5,13 +5,12 @@ from six.moves import urllib
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 
 class PedalMeDatasetLoader(object):
-    """A dataset of county level chicken pox cases in Hungary between 2004
-    and 2014. We made it public during the development of PyTorch Geometric
-    Temporal. The underlying graph is static - vertices are counties and 
-    edges are neighbourhoods. Vertex features are lagged weekly counts of the 
-    chickenpox cases (we included 4 lags). The target is the weekly number of 
-    cases for the upcoming week (signed integers). Our dataset consist of more
-    than 500 snapshots (weeks). 
+    """A dataset of PedalMe Bicycle deliver orders in London between 2020
+    and 2021. We made it public during the development of PyTorch Geometric
+    Temporal. The underlying graph is static - vertices are localities and 
+    edges are spatial_connections. Vertex features are lagged weekly counts of the 
+    delivery demands (we included 4 lags). The target is the weekly number of 
+    deliveries the upcoming week. Our dataset consist of more than 30 snapshots (weeks). 
     """
     def __init__(self):
         self._read_web_data()
@@ -24,7 +23,7 @@ class PedalMeDatasetLoader(object):
         self._edges = np.array(self._dataset["edges"]).T
 
     def _get_edge_weights(self):
-        self._edge_weights = np.ones(self._edges.shape[1])
+        self._edge_weights = np.array(self._dataset["weights"]).T
 
     def _get_features(self):
         self.features = []
@@ -40,7 +39,7 @@ class PedalMeDatasetLoader(object):
         """Returning the PedalMe London demand data iterator.
 
         Return types:
-            * **dataset** *(StaticGraphDiscreteSignal)* - The chickenpox dataset.
+            * **dataset** *(StaticGraphDiscreteSignal)* - The PedalMe dataset.
         """
         self._get_edges()
         self._get_edge_weights()
