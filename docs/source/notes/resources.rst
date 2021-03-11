@@ -1,5 +1,5 @@
-External Resources
-==================
+External Resources - Architectures
+==================================
 
 * Yaguang Li, Rose Yu, Cyrus Shahabi, Yan Liu: **Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting** `Paper <https://arxiv.org/abs/1707.01926>`_, `TensorFlow Code <https://github.com/liyaguang/DCRNN>`_, `PyTorch Code <https://github.com/chnsh/DCRNN_PyTorch>`_
 
@@ -17,6 +17,8 @@ External Resources
 
 * Bing Yu, Haoteng Yin, Zhanxing Zhu: **Spatio-Temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting** `Paper <https://arxiv.org/abs/1709.04875>`_, `Code <https://github.com/VeritasYin/STGCN_IJCAI-18>`_ 
 
+External Resources - Datasets
+=============================
 
 
 
