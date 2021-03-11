@@ -4,7 +4,7 @@ import numpy as np
 from six.moves import urllib
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 
-class ChickenpoxDatasetLoader(object):
+class PedalMeDatasetLoader(object):
     """A dataset of county level chicken pox cases in Hungary between 2004
     and 2014. We made it public during the development of PyTorch Geometric
     Temporal. The underlying graph is static - vertices are counties and 
@@ -37,7 +37,7 @@ class ChickenpoxDatasetLoader(object):
             self.targets.append(np.array(self._dataset[str(time)]["y"]))
 
     def get_dataset(self) -> StaticGraphDiscreteSignal:
-        """Returning the Hungarian Chickenpox cases data iterator.
+        """Returning the PedalMe London demand data iterator.
 
         Return types:
             * **dataset** *(StaticGraphDiscreteSignal)* - The chickenpox dataset.
