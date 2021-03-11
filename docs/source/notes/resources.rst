@@ -22,7 +22,7 @@ External Resources - Architectures
 External Resources - Datasets
 =============================
 
-* Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang, Tao Lin, Min Deng, Haifeng Li: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/lehaifeng/T-GCN>`_ 
+* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 
 
 
 
