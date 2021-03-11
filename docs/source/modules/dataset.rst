@@ -10,6 +10,10 @@ Datasets
 .. automodule:: torch_geometric_temporal.data.dataset.chickenpox
     :members:
     :undoc-members:
+    
+.. automodule:: torch_geometric_temporal.data.dataset.pedalme
+    :members:
+    :undoc-members:
 
 Discrete Temporal Signal Iterators
 ----------------------------------
