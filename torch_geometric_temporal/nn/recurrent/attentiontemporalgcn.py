@@ -3,7 +3,7 @@ from temporalgcn import TGCN
 from torch.nn import MultiheadAttention
 from torch_geometric.nn import GCNConv
 
-class TGCN(torch.nn.Module):
+class A3TGCN(torch.nn.Module):
     r"""An implementation of the Temporal Graph Convolutional Gated Recurrent Cell.
     For details see this paper: `"T-GCN: A Temporal Graph ConvolutionalNetwork for
     Traffic Prediction." <https://arxiv.org/abs/1811.05320>`_
@@ -31,8 +31,6 @@ class TGCN(torch.nn.Module):
                               improved = self.improved,
                               cached = self.cached,
                               add_self_loops = self.add_self_loops)
-        
-        self.attention_head = 
 
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
@@ -43,7 +41,7 @@ class TGCN(torch.nn.Module):
         when the forward pass is called it is initialized with zeros.
 
         Arg types:
-            * **X** *(PyTorch Float Tensor)* - Node features.
+            * **X** *(PyTorch Float Tensor)* - Node features for T time periods.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
             * **edge_weight** *(PyTorch Long Tensor, optional)* - Edge weight vector.
             * **H** *(PyTorch Float Tensor, optional)* - Hidden state matrix for all nodes.
@@ -51,9 +49,5 @@ class TGCN(torch.nn.Module):
         Return types:
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
         """
-        H = self._set_hidden_state(X, H)
-        Z = self._calculate_update_gate(X, edge_index, edge_weight, H)
-        R = self._calculate_reset_gate(X, edge_index, edge_weight, H)
-        H_tilde = self._calculate_candidate_state(X, edge_index, edge_weight, H, R)
-        H = self._calculate_hidden_state(Z, H, H_tilde)
+        H_accum = 0
         return H
