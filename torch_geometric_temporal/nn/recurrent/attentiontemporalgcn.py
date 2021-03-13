@@ -17,7 +17,7 @@ class A3TGCN(torch.nn.Module):
     """
     def __init__(self, in_channels: int, out_channels: int, improved: bool=False,
                  cached: bool=False, add_self_loops: bool=True):
-        super(TGCN, self).__init__()
+        super(A3TGCN, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
