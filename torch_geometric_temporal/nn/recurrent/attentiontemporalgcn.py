@@ -59,5 +59,5 @@ class A3TGCN(torch.nn.Module):
         H_accum = 0
         probs = torch.nn.Softmax(self.attention)
         for period in range(self.periods):
-            H_accum = H_accum + probs[p]*self.base_tgcn(X[:, :, period], edge_index, edge_weight H)
+            H_accum = H_accum + probs[p]*self.base_tgcn(X[:, :, period], edge_index, edge_weight, H)
         return H_accum
