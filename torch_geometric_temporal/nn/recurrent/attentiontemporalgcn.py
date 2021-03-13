@@ -27,7 +27,6 @@ class A3TGCN(torch.nn.Module):
         self.cached = cached
         self.add_self_loops = add_self_loops
         
-        
         self.base_tgcn = TGCN(in_channels = self.in_channels,
                               out_channels = self.out_channels,
                               improved = self.improved,
