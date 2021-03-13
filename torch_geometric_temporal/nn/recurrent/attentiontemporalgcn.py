@@ -11,6 +11,7 @@ class A3TGCN(torch.nn.Module):
     Args:
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
+        periods (int): Number of time periods.
         improved (bool): Stronger self loops. Default is True.
         cached (bool): Caching the message weights. Default is False.
         add_self_loops (bool): Adding self-loops for smoothing. Default is True.
