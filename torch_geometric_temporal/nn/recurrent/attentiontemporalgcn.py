@@ -15,12 +15,13 @@ class A3TGCN(torch.nn.Module):
         cached (bool): Caching the message weights. Default is False.
         add_self_loops (bool): Adding self-loops for smoothing. Default is True.
     """
-    def __init__(self, in_channels: int, out_channels: int, improved: bool=False,
-                 cached: bool=False, add_self_loops: bool=True):
+    def __init__(self, in_channels: int, out_channels: int, periods: int,
+                 improved: bool=False, cached: bool=False, add_self_loops: bool=True):
         super(A3TGCN, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
+        self.periods = periods
         self.improved = improved
         self.cached = cached
         self.add_self_loops = add_self_loops
