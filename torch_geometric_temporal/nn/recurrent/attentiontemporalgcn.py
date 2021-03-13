@@ -1,5 +1,5 @@
 import torch
-from temporalgcn import TGCN
+from .temporalgcn import TGCN
 from torch_geometric.nn import GCNConv
 
 class A3TGCN(torch.nn.Module):
