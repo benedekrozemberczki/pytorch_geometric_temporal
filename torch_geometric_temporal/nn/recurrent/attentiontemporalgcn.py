@@ -1,5 +1,6 @@
 import torch
 from temporalgcn import TGCN
+from torch.nn import MultiheadAttention
 from torch_geometric.nn import GCNConv
 
 class TGCN(torch.nn.Module):
@@ -23,6 +24,15 @@ class TGCN(torch.nn.Module):
         self.improved = improved
         self.cached = cached
         self.add_self_loops = add_self_loops
+        
+        
+        self.base_tgcn = TGCN(in_channels = self.in_channels,
+                              out_channels = self.out_channels,
+                              improved = self.improved,
+                              cached = self.cached,
+                              add_self_loops = self.add_self_loops)
+        
+        self.attention_head = 
 
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
