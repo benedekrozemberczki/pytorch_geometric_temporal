@@ -13,6 +13,15 @@ def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
     X = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     return X, edge_index
+    
+def create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, periods):
+    """
+    Creating a mock stacked feature matrix and edge index.
+    """
+    graph = nx.watts_strogatz_graph(number_of_nodes, edge_per_node, 0.5)
+    edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
+    X = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels, periods)))
+    return X, edge_index
 
 
 def create_mock_states(number_of_nodes, out_channels):
