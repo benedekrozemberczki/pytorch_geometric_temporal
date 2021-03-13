@@ -3,7 +3,7 @@ import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU, DCRNN
 from torch_geometric_temporal.nn.recurrent import GCLSTM, LRGCN, DyGrEncoder
-from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO, TGCN
+from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO, TGCN, A3TGCN
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -122,6 +122,33 @@ def test_tgcn_layer():
 
     layer = TGCN(in_channels=in_channels, out_channels=out_channels)
 
+
+    H = layer(X, edge_index)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+    
+def test_a3tgcn_layer():
+    """
+    Testing the A3TGCN Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    periods = 7
+    
+    X, edge_index = create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, periods)
+    edge_weight = create_mock_edge_weight(edge_index)
+
+    layer = A3TGCN(in_channels=in_channels, out_channels=out_channels, periods=periods)
 
     H = layer(X, edge_index)
 
