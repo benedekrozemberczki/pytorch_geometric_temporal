@@ -18,10 +18,16 @@ class Spatial_Attention_layer(nn.Module):
 
 
     def forward(self, x):
-        '''
-        :param x: (batch_size, N, F_in, T)
-        :return: (B,N,N)
-        '''
+        """
+        Making a forward pass of the spatial attention layer.
+        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
+        T_in is the length of input sequence in time. 
+        Arg types:
+            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+
+        Return types:
+            * output (PyTorch Float Tensor)* - Spatial attention score matrices, with shape (B, N_nodes, N_nodes).
+        """
 
         lhs = torch.matmul(torch.matmul(x, self.W1), self.W2)  # (b,N,F,T)(T)->(b,N,F)(F,T)->(b,N,T)
 
@@ -56,11 +62,17 @@ class cheb_conv_withSAt(nn.Module):
         self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.DEVICE)) for _ in range(K)])
 
     def forward(self, x, spatial_attention):
-        '''
-        Chebyshev graph convolution operation
-        :param x: (batch_size, N, F_in, T)
-        :return: (batch_size, N, F_out, T)
-        '''
+        """
+        Making a forward pass of Chebyshev graph convolution operation with the spatial attention layer.
+        B is the batch size. N_nodes is the number of nodes in the graph. 
+        F_in is the dimension of input features. F_out is the dimension of output features.
+        T_in is the length of input sequence in time. 
+        Arg types:
+            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+
+        Return types:
+            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out, T_in).
+        """
 
         batch_size, num_of_vertices, in_channels, num_of_timesteps = x.shape
 
@@ -76,11 +88,11 @@ class cheb_conv_withSAt(nn.Module):
 
                 T_k = self.cheb_polynomials[k]  # (N,N)
 
-                T_k_with_at = T_k.mul(spatial_attention)   # (N,N)*(N,N) = (N,N) 多行和为1, 按着列进行归一化
+                T_k_with_at = T_k.mul(spatial_attention)   # (N,N)*(N,N) = (N,N). row sums are usually 1, column normalization
 
                 theta_k = self.Theta[k]  # (in_channel, out_channel)
 
-                rhs = T_k_with_at.permute(0, 2, 1).matmul(graph_signal)  # (N, N)(b, N, F_in) = (b, N, F_in) 因为是左乘，所以多行和为1变为多列和为1，即一行之和为1，进行左乘
+                rhs = T_k_with_at.permute(0, 2, 1).matmul(graph_signal)  # (N, N)(b, N, F_in) = (b, N, F_in). left multiplication to make row sums 1
 
                 output = output + rhs.matmul(theta_k)  # (b, N, F_in)(F_in, F_out) = (b, N, F_out)
 
@@ -99,10 +111,16 @@ class Temporal_Attention_layer(nn.Module):
         self.Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps).to(DEVICE))
 
     def forward(self, x):
-        '''
-        :param x: (batch_size, N, F_in, T)
-        :return: (B, T, T)
-        '''
+        """
+        Making a forward pass of the temporal attention layer.
+        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
+        T_in is the length of input sequence in time. 
+        Arg types:
+            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+
+        Return types:
+            * output (PyTorch Float Tensor)* - Temporal attention score matrices, with shape (B, T_in, T_in).
+        """
         _, num_of_vertices, num_of_features, num_of_timesteps = x.shape
 
         lhs = torch.matmul(torch.matmul(x.permute(0, 3, 2, 1), self.U1), self.U2)
@@ -141,12 +159,17 @@ class cheb_conv(nn.Module):
         self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.DEVICE)) for _ in range(K)])
 
     def forward(self, x):
-        '''
-        Chebyshev graph convolution operation
-        :param x: (batch_size, N, F_in, T)
-        :return: (batch_size, N, F_out, T)
-        '''
+        """
+        Making a forward pass of the Chebyshev graph convolution operation.
+        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
+        F_out is the dimension of output features.
+        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
+        Arg types:
+            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
+        Return types:
+            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out, T_out).
+        """
         batch_size, num_of_vertices, in_channels, num_of_timesteps = x.shape
 
         outputs = []
@@ -184,10 +207,17 @@ class ASTGCN_block(nn.Module):
         self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension
 
     def forward(self, x):
-        '''
-        :param x: (batch_size, N, F_in, T)
-        :return: (batch_size, N, nb_time_filter, T)
-        '''
+        """
+        Making a forward pass. This is one ASTGCN block.
+        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
+        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
+        nb_time_filter is the number of time filters used.
+        Arg types:
+            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+
+        Return types:
+            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
+        """
         batch_size, num_of_vertices, num_of_features, num_of_timesteps = x.shape
 
         # TAt
@@ -241,10 +271,16 @@ class ASTGCN_submodule(nn.Module):
         self.to(DEVICE)
 
     def forward(self, x):
-        '''
-        :param x: (B, N_nodes, F_in, T_in)
-        :return: (B, N_nodes, T_out)
-        '''
+        """
+        Making a forward pass. This submodule takes a likst of ASTGCN blocks and use a final convolution to serve as a multi-component fusion.
+        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
+        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
+        Arg types:
+            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+
+        Return types:
+            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
+        """
         for block in self.BlockList:
             x = block(x)
 
@@ -255,19 +291,22 @@ class ASTGCN_submodule(nn.Module):
 
 
 def ASTGCN(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, adj_mx, num_for_predict, len_input, num_of_vertices):
-    '''
-    :param DEVICE:
-    :param nb_block:
-    :param in_channels:
-    :param K:
-    :param nb_chev_filter:
-    :param nb_time_filter:
-    :param time_strides:
-    :param cheb_polynomials:
-    :param nb_predict_step:
-    :param len_input
-    :return:
-    '''
+    r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Cell.
+    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+    Args:
+        DEVICE: The device used.
+        nb_block (int): Number of ASTGCN blocks in the model.
+        in_channels (int): Number of input features.
+        K (int): Order of Chebyshev polynomials. Degree is K-1.
+        nb_chev_filters (int): Number of Chebyshev filters.
+        nb_time_filters (int): Number of time filters.
+        time_strides (int): Time strides during temporal convolution.
+        adj_mx: Adjacency matrix (an NumPy array).
+        num_for_predict (int): Number of predictions to make in the future.
+        len_input (int): Length of the input sequence.
+        num_of_vertices (int): Number of vertices in the graph.
+    """
     L_tilde = scaled_Laplacian(adj_mx)
     cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(DEVICE) for i in cheb_polynomial(L_tilde, K)]
     model = ASTGCN_submodule(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_for_predict, len_input, num_of_vertices)
