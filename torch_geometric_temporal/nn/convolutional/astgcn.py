@@ -255,19 +255,22 @@ class ASTGCN_submodule(nn.Module):
 
 
 def ASTGCN(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, adj_mx, num_for_predict, len_input, num_of_vertices):
-    '''
-    :param DEVICE:
-    :param nb_block:
-    :param in_channels:
-    :param K:
-    :param nb_chev_filter:
-    :param nb_time_filter:
-    :param time_strides:
-    :param cheb_polynomials:
-    :param nb_predict_step:
-    :param len_input
-    :return:
-    '''
+    r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Cell.
+    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+    Args:
+        DEVICE: The device used.
+        nb_block (int): Number of ASTGCN blocks in the model.
+        in_channels (int): Number of input features.
+        K (int): Degree of Chebyshev polynomials plus 1. Degree is K-1.
+        nb_chev_filters (int): Number of Chebyshev filters.
+        nb_time_filters (int): Number of time filters.
+        time_strides (int): Time strides during temporal convolution.
+        adj_mx: Adjacency matrix (an NumPy array).
+        num_for_predict (int): Number of predictions to make in the future.
+        len_input (int): Length of the input sequence.
+        num_of_vertices (int): Number of vertices in the graph.
+    """
     L_tilde = scaled_Laplacian(adj_mx)
     cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(DEVICE) for i in cheb_polynomial(L_tilde, K)]
     model = ASTGCN_submodule(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_for_predict, len_input, num_of_vertices)
