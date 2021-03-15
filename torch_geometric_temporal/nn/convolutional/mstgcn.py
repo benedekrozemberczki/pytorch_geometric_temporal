@@ -157,7 +157,6 @@ def MSTGCN(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, tim
         adj_mx: Adjacency matrix (an NumPy array).
         num_for_predict (int): Number of predictions to make in the future.
         len_input (int): Length of the input sequence.
-        num_of_vertices (int): Number of vertices in the graph.
     """
     L_tilde = scaled_Laplacian(adj_mx)
     cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(DEVICE) for i in cheb_polynomial(L_tilde, K)]
