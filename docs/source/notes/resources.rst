@@ -21,7 +21,7 @@ External Resources - Architectures
 
 * Jiawei Zhu, Yujiao Song, Ling Zhao, Haifeng Li: **A3T-GCN: Attention Temporal Graph Convolutional Network for Traffic Forecasting** `Paper <https://arxiv.org/abs/2006.11583>`_, `Code <https://github.com/lehaifeng/T-GCN/tree/master/A3T-GCN>`_
 
-* Jiawei Zhu, Yujiao Song, Ling Zhao, Haifeng Li: **A3T-GCN: Attention Temporal Graph Convolutional Network for Traffic Forecasting** `Paper <https://arxiv.org/abs/2006.11583>`_, `Code <https://github.com/lehaifeng/T-GCN/tree/master/A3T-GCN>`_
+* Jiawei Zhu, Yujiao Song, Ling Zhao, Haifeng Li: **Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow Forecasting** `Paper <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_, `Code <https://github.com/lehaifeng/T-GCN/tree/master/A3T-GCN>`_
 
 External Resources - Datasets
 =============================
