@@ -30,7 +30,7 @@ def create_mock_sequence(sequence_length, number_of_nodes, edge_per_node, in_cha
     Creating mock sequence data
     
     Note that this is a static graph discrete signal type sequence
-    The target is the "next" iterm in the sequence
+    The target is the "next" item in the sequence
     """
 
     input_sequence = torch.zeros(sequence_length, number_of_nodes, in_channels)
