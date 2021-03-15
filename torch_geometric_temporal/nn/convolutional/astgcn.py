@@ -62,11 +62,6 @@ class cheb_conv_withSAt(nn.Module):
         self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.DEVICE)) for _ in range(K)])
 
     def forward(self, x, spatial_attention):
-        '''
-        Chebyshev graph convolution operation
-        :param x: (batch_size, N, F_in, T)
-        :return: (batch_size, N, F_out, T)
-        '''
         """
         Making a forward pass of Chebyshev graph convolution operation with the spatial attention layer.
         B is the batch size. N_nodes is the number of nodes in the graph. 
