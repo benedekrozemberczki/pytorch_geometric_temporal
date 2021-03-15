@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.sparse.linalg import eigs
 
-# borrowed from https://github.com/guoshnBJTU/ASTGCN-r-pytorch/blob/master/lib/utils.py
 def scaled_Laplacian(W):
     '''
     compute \tilde{L}
@@ -23,7 +22,7 @@ def scaled_Laplacian(W):
 
     return (2 * L) / lambda_max - np.identity(W.shape[0])
 
-# borrowed from https://github.com/guoshnBJTU/ASTGCN-r-pytorch/blob/master/lib/utils.py
+
 def cheb_polynomial(L_tilde, K):
     '''
     compute a list of chebyshev polynomials from T_0 to T_{K-1}
