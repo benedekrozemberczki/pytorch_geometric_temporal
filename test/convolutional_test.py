@@ -1,7 +1,8 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN
+from torch_geometric.utils import to_scipy_sparse_matrix
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -93,3 +94,48 @@ def test_stconv():
     stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2)
     H = stconv(batch, edge_index, edge_weight)
     assert H.shape == (batch_size, sequence_length-2*(kernel_size-1), number_of_nodes, out_channels)
+
+def test_astgcn():
+    """
+    Testing ASTGCN block
+    """
+    node_count = 307
+    num_classes = 10
+    edge_per_node = 15
+
+
+    num_of_vertices = node_count # 307
+    num_for_predict = 12
+    len_input = 12
+    nb_time_strides = 1
+
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    node_features = 1
+    nb_block = 2
+    K = 3
+    nb_chev_filter = 64
+    nb_time_filter = 64
+    batch_size = 32
+
+    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+    adj_mx = to_scipy_sparse_matrix(edge_index)
+    model = ASTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, adj_mx.toarray(),num_for_predict, len_input, node_count)
+
+    T = len_input
+    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
+    target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
+    for b in range(batch_size):
+        for t in range(T):
+            x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+            x_seq[b,:,:,t] = x
+            target = create_mock_target(node_count, num_classes)
+            target_seq[b,:,t] = target
+    shuffle = True
+    train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+    criterion = torch.nn.MSELoss().to(DEVICE)
+    for batch_data in train_loader:
+        encoder_inputs, labels = batch_data
+        outputs = model(encoder_inputs)
+    assert outputs.shape == (batch_size, node_count, num_for_predict)
