@@ -2,7 +2,6 @@ import torch
 import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN
-from torch_geometric.utils import to_scipy_sparse_matrix
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -118,8 +117,7 @@ def test_astgcn():
     batch_size = 32
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    adj_mx = to_scipy_sparse_matrix(edge_index)
-    model = ASTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, adj_mx.toarray(),num_for_predict, len_input, node_count)
+    model = ASTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, edge_index,num_for_predict, len_input, node_count)
 
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)

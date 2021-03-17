@@ -2,7 +2,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric_temporal.utils import scaled_Laplacian, cheb_polynomial
+import numpy as np
+from scipy.sparse.linalg import eigs
+from torch_geometric.utils import to_scipy_sparse_matrix
 
 class Spatial_Attention_layer(nn.Module):
     '''
@@ -47,18 +49,30 @@ class cheb_conv_withSAt(nn.Module):
     K-order chebyshev graph convolution
     '''
 
-    def __init__(self, K, cheb_polynomials, in_channels, out_channels):
+    def __init__(self, K, edge_index, in_channels, out_channels, DEVICE):
         '''
         :param K: int
+        :param edge_index: array of edge indices
         :param in_channles: int, num of channels in the input sequence
         :param out_channels: int, num of channels in the output sequence
+        :param DEVICE: device
         '''
         super(cheb_conv_withSAt, self).__init__()
         self.K = K
-        self.cheb_polynomials = cheb_polynomials
+        # now calculate Chebyshev polynomials
+        W = to_scipy_sparse_matrix(edge_index)
+        assert W.shape[0] == W.shape[1]
+        D = np.diag(np.sum(W, axis=1))
+        L = np.array(D - W.toarray())
+        lambda_max = eigs(L, k=1, which='LR')[0].real
+        L_tilde = (2 * L) / lambda_max - np.identity(W.shape[0])
+        cheb_polynomials = [np.identity(L_tilde.shape[0]), L_tilde.copy()]
+        for i in range(2, K):
+            cheb_polynomials.append(2 * L_tilde * cheb_polynomials[i - 1] - cheb_polynomials[i - 2])
+        self.cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(DEVICE) for i in cheb_polynomials]
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.DEVICE = cheb_polynomials[0].device
+        self.DEVICE = DEVICE
         self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.DEVICE)) for _ in range(K)])
 
     def forward(self, x, spatial_attention):
@@ -140,11 +154,11 @@ class Temporal_Attention_layer(nn.Module):
 
 class ASTGCN_block(nn.Module):
 
-    def __init__(self, DEVICE, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_of_vertices, num_of_timesteps):
+    def __init__(self, DEVICE, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, num_of_vertices, num_of_timesteps):
         super(ASTGCN_block, self).__init__()
         self.TAt = Temporal_Attention_layer(DEVICE, in_channels, num_of_vertices, num_of_timesteps)
         self.SAt = Spatial_Attention_layer(DEVICE, in_channels, num_of_vertices, num_of_timesteps)
-        self.cheb_conv_SAt = cheb_conv_withSAt(K, cheb_polynomials, in_channels, nb_chev_filter)
+        self.cheb_conv_SAt = cheb_conv_withSAt(K, edge_index, in_channels, nb_chev_filter, DEVICE)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension
@@ -187,25 +201,31 @@ class ASTGCN_block(nn.Module):
         return x_residual
 
 
-class ASTGCN_submodule(nn.Module):
+class ASTGCN(nn.Module):
+    r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Cell.
+    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+    Args:
+        DEVICE: The device used.
+        nb_block (int): Number of ASTGCN blocks in the model.
+        in_channels (int): Number of input features.
+        K (int): Order of Chebyshev polynomials. Degree is K-1.
+        nb_chev_filters (int): Number of Chebyshev filters.
+        nb_time_filters (int): Number of time filters.
+        time_strides (int): Time strides during temporal convolution.
+        edge_index (array): edge indices.
+        num_for_predict (int): Number of predictions to make in the future.
+        len_input (int): Length of the input sequence.
+        num_of_vertices (int): Number of vertices in the graph.
+    """
 
-    def __init__(self, DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_for_predict, len_input, num_of_vertices):
-        '''
-        :param nb_block:
-        :param in_channels:
-        :param K:
-        :param nb_chev_filter:
-        :param nb_time_filter:
-        :param time_strides:
-        :param cheb_polynomials:
-        :param nb_predict_step:
-        '''
+    def __init__(self, DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, num_for_predict, len_input, num_of_vertices):
 
-        super(ASTGCN_submodule, self).__init__()
+        super(ASTGCN, self).__init__()
 
-        self.BlockList = nn.ModuleList([ASTGCN_block(DEVICE, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_of_vertices, len_input)])
+        self.BlockList = nn.ModuleList([ASTGCN_block(DEVICE, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, num_of_vertices, len_input)])
 
-        self.BlockList.extend([ASTGCN_block(DEVICE, nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, cheb_polynomials, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
+        self.BlockList.extend([ASTGCN_block(DEVICE, nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, edge_index, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
@@ -215,7 +235,7 @@ class ASTGCN_submodule(nn.Module):
 
     def forward(self, x):
         """
-        Making a forward pass. This submodule takes a likst of ASTGCN blocks and use a final convolution to serve as a multi-component fusion.
+        Making a forward pass. This module takes a likst of ASTGCN blocks and use a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         Arg types:
@@ -231,33 +251,3 @@ class ASTGCN_submodule(nn.Module):
         # (b,N,F,T)->(b,T,N,F)-conv<1,F>->(b,c_out*T,N,1)->(b,c_out*T,N)->(b,N,T)
 
         return output
-
-
-def ASTGCN(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, adj_mx, num_for_predict, len_input, num_of_vertices):
-    r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Cell.
-    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
-    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
-    Args:
-        DEVICE: The device used.
-        nb_block (int): Number of ASTGCN blocks in the model.
-        in_channels (int): Number of input features.
-        K (int): Order of Chebyshev polynomials. Degree is K-1.
-        nb_chev_filters (int): Number of Chebyshev filters.
-        nb_time_filters (int): Number of time filters.
-        time_strides (int): Time strides during temporal convolution.
-        adj_mx: Adjacency matrix (an NumPy array).
-        num_for_predict (int): Number of predictions to make in the future.
-        len_input (int): Length of the input sequence.
-        num_of_vertices (int): Number of vertices in the graph.
-    """
-    L_tilde = scaled_Laplacian(adj_mx)
-    cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(DEVICE) for i in cheb_polynomial(L_tilde, K)]
-    model = ASTGCN_submodule(DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_for_predict, len_input, num_of_vertices)
-
-    for p in model.parameters():
-        if p.dim() > 1:
-            nn.init.xavier_uniform_(p)
-        else:
-            nn.init.uniform_(p)
-
-    return model
