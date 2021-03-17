@@ -204,6 +204,7 @@ class ASTGCN(nn.Module):
     r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Cell.
     For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+
     Args:
         DEVICE: The device used.
         nb_block (int): Number of ASTGCN blocks in the model.
