@@ -1,4 +1,3 @@
-# modified from https://github.com/guoshnBJTU/ASTGCN-r-pytorch/blob/master/model/MSTGCN_r.py
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -11,13 +10,13 @@ class cheb_conv4D(nn.Module):
     K-order chebyshev graph convolution, with batch and time dimension
     '''
 
-    def __init__(self, K, edge_index, in_channels, out_channels, DEVICE):
+    def __init__(self, K, edge_index, in_channels, out_channels, device):
         '''
         :param K: int
         :param edge_index: array of edge indices
         :param in_channles: int, num of channels in the input sequence
         :param out_channels: int, num of channels in the output sequence
-        :param DEVICE: device
+        :param device: device
         '''
         super(cheb_conv4D, self).__init__()
         self.K = K
@@ -31,11 +30,11 @@ class cheb_conv4D(nn.Module):
         cheb_polynomials = [np.identity(L_tilde.shape[0]), L_tilde.copy()]
         for i in range(2, K):
             cheb_polynomials.append(2 * L_tilde * cheb_polynomials[i - 1] - cheb_polynomials[i - 2])
-        self.cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(DEVICE) for i in cheb_polynomials]
+        self.cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(device) for i in cheb_polynomials]
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.DEVICE = DEVICE
-        self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.DEVICE)) for _ in range(K)])
+        self.device = device
+        self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.device)) for _ in range(K)])
 
     def forward(self, x):
         """
@@ -58,7 +57,7 @@ class cheb_conv4D(nn.Module):
 
             graph_signal = x[:, :, :, time_step]  # (b, N, F_in)
 
-            output = torch.zeros(batch_size, num_of_vertices, self.out_channels).to(self.DEVICE)  # (b, N, F_out)
+            output = torch.zeros(batch_size, num_of_vertices, self.out_channels).to(self.device)  # (b, N, F_out)
 
             for k in range(self.K):
 
@@ -77,9 +76,9 @@ class cheb_conv4D(nn.Module):
 
 class MSTGCN_block(nn.Module):
 
-    def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, DEVICE):
+    def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, device):
         super(MSTGCN_block, self).__init__()
-        self.cheb_conv = cheb_conv4D(K, edge_index, in_channels, nb_chev_filter, DEVICE)
+        self.cheb_conv = cheb_conv4D(K, edge_index, in_channels, nb_chev_filter, device)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)
@@ -115,7 +114,7 @@ class MSTGCN(nn.Module):
     For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
     Args:
-        DEVICE: The device used.
+        device: The device used.
         nb_block (int): Number of ASTGCN blocks in the model.
         in_channels (int): Number of input features.
         K (int): Order of Chebyshev polynomials. Degree is K-1.
@@ -127,19 +126,19 @@ class MSTGCN(nn.Module):
         edge_index (array): edge indices.
     """
 
-    def __init__(self, DEVICE, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, edge_index):
+    def __init__(self, device, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, edge_index):
 
         super(MSTGCN, self).__init__()
 
-        self.BlockList = nn.ModuleList([MSTGCN_block(in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, DEVICE)])
+        self.BlockList = nn.ModuleList([MSTGCN_block(in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, device)])
 
-        self.BlockList.extend([MSTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, edge_index, DEVICE) for _ in range(nb_block-1)])
+        self.BlockList.extend([MSTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, edge_index, device) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
-        self.DEVICE = DEVICE
+        self.device = device
 
-        self.to(DEVICE)
+        self.to(device)
 
     def forward(self, x):
         """
