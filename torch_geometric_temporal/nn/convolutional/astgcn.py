@@ -138,63 +138,6 @@ class Temporal_Attention_layer(nn.Module):
 
         return E_normalized
 
-
-class cheb_conv(nn.Module):
-    '''
-    K-order chebyshev graph convolution
-    '''
-
-    def __init__(self, K, cheb_polynomials, in_channels, out_channels):
-        '''
-        :param K: int
-        :param in_channles: int, num of channels in the input sequence
-        :param out_channels: int, num of channels in the output sequence
-        '''
-        super(cheb_conv, self).__init__()
-        self.K = K
-        self.cheb_polynomials = cheb_polynomials
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.DEVICE = cheb_polynomials[0].device
-        self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.DEVICE)) for _ in range(K)])
-
-    def forward(self, x):
-        """
-        Making a forward pass of the Chebyshev graph convolution operation.
-        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
-        F_out is the dimension of output features.
-        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
-        Arg types:
-            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-
-        Return types:
-            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out, T_out).
-        """
-        batch_size, num_of_vertices, in_channels, num_of_timesteps = x.shape
-
-        outputs = []
-
-        for time_step in range(num_of_timesteps):
-
-            graph_signal = x[:, :, :, time_step]  # (b, N, F_in)
-
-            output = torch.zeros(batch_size, num_of_vertices, self.out_channels).to(self.DEVICE)  # (b, N, F_out)
-
-            for k in range(self.K):
-
-                T_k = self.cheb_polynomials[k]  # (N,N)
-
-                theta_k = self.Theta[k]  # (in_channel, out_channel)
-
-                rhs = graph_signal.permute(0, 2, 1).matmul(T_k).permute(0, 2, 1)
-
-                output = output + rhs.matmul(theta_k)
-
-            outputs.append(output.unsqueeze(-1))
-
-        return F.relu(torch.cat(outputs, dim=-1))
-
-
 class ASTGCN_block(nn.Module):
 
     def __init__(self, DEVICE, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, cheb_polynomials, num_of_vertices, num_of_timesteps):

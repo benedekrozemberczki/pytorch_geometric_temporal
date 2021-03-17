@@ -4,7 +4,7 @@ import numpy as np
 import networkx as nx
 import torch.nn.functional as F
 from torch_geometric_temporal.nn.convolutional import MSTGCN
-from torch_geometric.utils import to_scipy_sparse_matrix
+from torch import nn
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -30,7 +30,7 @@ def create_mock_target(number_of_nodes, number_of_classes):
 node_count = 307
 num_classes = 10
 edge_per_node = 15
-epochs = 200
+epochs = 3
 learning_rate = 0.01
 weight_decay = 5e-4
 
@@ -48,9 +48,12 @@ nb_time_filter = 64
 batch_size = 32
 
 x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-adj_mx = to_scipy_sparse_matrix(edge_index)
-model = MSTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, adj_mx.toarray(),num_for_predict, len_input)
-
+model = MSTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input, edge_index)
+for p in model.parameters():
+    if p.dim() > 1:
+        nn.init.xavier_uniform_(p)
+    else:
+        nn.init.uniform_(p)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
 model.train()

@@ -163,9 +163,7 @@ def test_mstgcn():
     batch_size = 32
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    adj_mx = to_scipy_sparse_matrix(edge_index)
-    model = MSTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, adj_mx.toarray(),num_for_predict, len_input)
-
+    model = MSTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input, edge_index)
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
     target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
