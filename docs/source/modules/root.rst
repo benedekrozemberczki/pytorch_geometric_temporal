@@ -64,7 +64,7 @@ Discrete Temporal Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.convolutional.mstgcn
     :members:
     :undoc-members:
-    :exclude-members: MSTGCN_submodule, MSTGCN_block
+    :exclude-members: MSTGCN_submodule, MSTGCN_block, cheb_conv4D
 
 Auxiliary Graph Convolutional Layers
 --------------
