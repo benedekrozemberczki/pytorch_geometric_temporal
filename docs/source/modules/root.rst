@@ -8,10 +8,8 @@ Discrete Recurrent Graph Convolutional Layers
 --------------
 
 
-.. autosummary:: torch_geometric_temporal.nn.recurrent.gconv_gru
+.. autosummary:: torch_geometric_temporal.nn.recurrent.gconv_gru.GConvGRU
    :nosignatures:
-   :members:
-   :undoc-members:
 
 .. automodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
     :members:
