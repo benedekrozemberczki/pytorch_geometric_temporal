@@ -238,6 +238,7 @@ class ASTGCN(nn.Module):
         Making a forward pass. This module takes a likst of ASTGCN blocks and use a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
+        
         Arg types:
             * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
