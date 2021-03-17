@@ -113,6 +113,7 @@ class MSTGCN(nn.Module):
     r"""An implementation of the Multi-Component Spatial-Temporal Graph Convolution Networks, a degraded version of ASTGCN.
     For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+    
     Args:
         device: The device used.
         nb_block (int): Number of ASTGCN blocks in the model.
@@ -141,10 +142,11 @@ class MSTGCN(nn.Module):
         self.to(device)
 
     def forward(self, x):
-        """
+        r"""
         Making a forward pass. This module takes a likst of MSTGCN blocks and use a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
+        
         Arg types:
             * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
