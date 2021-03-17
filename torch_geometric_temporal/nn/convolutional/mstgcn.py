@@ -124,7 +124,7 @@ class MSTGCN(nn.Module):
         time_strides (int): Time strides during temporal convolution.
         num_for_predict (int): Number of predictions to make in the future.
         len_input (int): Length of the input sequence.
-        edge_index (array): edge indices.
+        edge_index (array): Edge indices.
     """
 
     def __init__(self, device, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, edge_index):

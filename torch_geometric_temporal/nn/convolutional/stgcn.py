@@ -58,7 +58,7 @@ class STConv(nn.Module):
         in_channels (int): Number of input features.
         hidden_channels (int): Number of hidden units output by graph convolution block
         out_channels (int): Number of output features.
-        kernel_size = 
+        kernel_size (int): Size of the kernel considered. 
         K (int): Chebyshev filter size :math:`K`.
         normalization (str, optional): The normalization scheme for the graph
             Laplacian (default: :obj:`"sym"`):
