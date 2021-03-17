@@ -1,8 +1,7 @@
-# modified from https://github.com/guoshnBJTU/ASTGCN-r-pytorch/blob/master/model/ASTGCN_r.py
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 from scipy.sparse.linalg import eigs
 from torch_geometric.utils import to_scipy_sparse_matrix
 
