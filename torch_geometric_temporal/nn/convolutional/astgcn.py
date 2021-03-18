@@ -9,13 +9,13 @@ class Spatial_Attention_layer(nn.Module):
     '''
     compute spatial attention scores
     '''
-    def __init__(self, device, in_channels, num_of_vertices, num_of_timesteps):
+    def __init__(self, in_channels, num_of_vertices, num_of_timesteps):
         super(Spatial_Attention_layer, self).__init__()
-        self.W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps).to(device))
-        self.W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps).to(device))
-        self.W3 = nn.Parameter(torch.FloatTensor(in_channels).to(device))
-        self.bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices).to(device))
-        self.Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices).to(device))
+        self.W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))
+        self.W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
+        self.W3 = nn.Parameter(torch.FloatTensor(in_channels))
+        self.bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices))
+        self.Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices))
 
 
     def forward(self, x):
@@ -45,13 +45,13 @@ class Spatial_Attention_layer(nn.Module):
 
 
 class Temporal_Attention_layer(nn.Module):
-    def __init__(self, device, in_channels, num_of_vertices, num_of_timesteps):
+    def __init__(self, in_channels, num_of_vertices, num_of_timesteps):
         super(Temporal_Attention_layer, self).__init__()
-        self.U1 = nn.Parameter(torch.FloatTensor(num_of_vertices).to(device))
-        self.U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices).to(device))
-        self.U3 = nn.Parameter(torch.FloatTensor(in_channels).to(device))
-        self.be = nn.Parameter(torch.FloatTensor(1, num_of_timesteps, num_of_timesteps).to(device))
-        self.Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps).to(device))
+        self.U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
+        self.U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices))
+        self.U3 = nn.Parameter(torch.FloatTensor(in_channels))
+        self.be = nn.Parameter(torch.FloatTensor(1, num_of_timesteps, num_of_timesteps))
+        self.Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))
 
     def forward(self, x):
         """
@@ -83,10 +83,10 @@ class Temporal_Attention_layer(nn.Module):
 
 class ASTGCN_block(nn.Module):
 
-    def __init__(self, device, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, num_of_timesteps):
+    def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, num_of_timesteps):
         super(ASTGCN_block, self).__init__()
-        self.TAt = Temporal_Attention_layer(device, in_channels, num_of_vertices, num_of_timesteps)
-        self.SAt = Spatial_Attention_layer(device, in_channels, num_of_vertices, num_of_timesteps)
+        self.TAt = Temporal_Attention_layer(in_channels, num_of_vertices, num_of_timesteps)
+        self.SAt = Spatial_Attention_layer(in_channels, num_of_vertices, num_of_timesteps)
         self.cheb_conv_SAt = ChebConvAtt(in_channels, nb_chev_filter, K)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
@@ -99,10 +99,11 @@ class ASTGCN_block(nn.Module):
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         nb_time_filter is the number of time filters used.
         Arg types:
-            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
-            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
+            * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
         """
         batch_size, num_of_vertices, num_of_features, num_of_timesteps = x.shape
 
@@ -150,7 +151,6 @@ class ASTGCN(nn.Module):
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
 
     Args:
-        device: The device used.
         nb_block (int): Number of ASTGCN blocks in the model.
         in_channels (int): Number of input features.
         K (int): Order of Chebyshev polynomials. Degree is K-1.
@@ -163,19 +163,15 @@ class ASTGCN(nn.Module):
         num_of_vertices (int): Number of vertices in the graph.
     """
 
-    def __init__(self, device, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, num_of_vertices):
+    def __init__(self, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, num_of_vertices):
 
         super(ASTGCN, self).__init__()
 
-        self.BlockList = nn.ModuleList([ASTGCN_block(device, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, len_input)])
+        self.blocklist = nn.ModuleList([ASTGCN_block(in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, len_input)])
 
-        self.BlockList.extend([ASTGCN_block(device, nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
+        self.blocklist.extend([ASTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
-
-        self.device = device
-
-        self.to(device)
 
     def forward(self, x, edge_index):
         """
@@ -185,11 +181,12 @@ class ASTGCN(nn.Module):
         
         Arg types:
             * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
             * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
         """
-        for block in self.BlockList:
+        for block in self.blocklist:
             x = block(x, edge_index)
 
         output = self.final_conv(x.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)

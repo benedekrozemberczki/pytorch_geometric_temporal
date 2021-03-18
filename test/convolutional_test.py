@@ -117,7 +117,7 @@ def test_astgcn():
     batch_size = 32
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = ASTGCN(device, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count)
+    model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count).to(device)
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
     target_seq = torch.zeros([batch_size,node_count,T]).to(device)
