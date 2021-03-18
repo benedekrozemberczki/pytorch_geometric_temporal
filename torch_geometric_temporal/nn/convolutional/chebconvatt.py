@@ -143,6 +143,7 @@ class ChebConvAtt(MessagePassing):
         else:
             d1, d2 = norm.shape
             return norm.view(d1,d2, 1) * x_j
+
     def __repr__(self):
         return '{}({}, {}, K={}, normalization={})'.format(
             self.__class__.__name__, self.in_channels, self.out_channels,
