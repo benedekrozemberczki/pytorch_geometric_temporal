@@ -3,7 +3,7 @@ import random
 import numpy as np
 import networkx as nx
 from torch import nn
-from torch_geometric_temporal.nn.convolutional import ASTGCN
+from torch_geometric_temporal.nn import ASTGCN
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
