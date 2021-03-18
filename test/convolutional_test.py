@@ -1,7 +1,9 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt
+from torch_geometric.transforms import LaplacianLambdaMax
+from torch_geometric.data import Data
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -271,3 +273,48 @@ def test_mstgcn_change_edge_index():
         encoder_inputs, labels = batch_data
         outputs = model(encoder_inputs, edge_index_seq)
     assert outputs.shape == (batch_size, node_count, num_for_predict)
+
+def test_chebconvatt():
+    """
+    Testing ChebCOnvAtt block
+    """
+    node_count = 307
+    num_classes = 10
+    edge_per_node = 15
+
+
+    len_input = 12
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    node_features = 2
+    K = 3
+    nb_chev_filter = 64
+    batch_size = 32
+
+    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+    model = ChebConvAtt(node_features, nb_chev_filter, K)
+    spatial_attention = torch.rand(batch_size,node_count,node_count)
+    spatial_attention = torch.nn.functional.softmax(spatial_attention, dim=1)
+    model.train()
+    T = len_input
+    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
+    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
+    for b in range(batch_size):
+        for t in range(T):
+            x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+            x_seq[b,:,:,t] = x
+            target = create_mock_target(node_count, num_classes)
+            target_seq[b,:,t] = target
+    shuffle = True
+    train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+    for batch_data in train_loader:
+        encoder_inputs, labels = batch_data
+        data = Data(edge_index=edge_index, edge_attr=None, num_nodes=node_count)
+        lambda_max = LaplacianLambdaMax()(data).lambda_max
+        outputs = []
+        for time_step in range(T):
+            outputs.append(torch.unsqueeze(model(encoder_inputs[:,:,:,time_step], edge_index, spatial_attention, lambda_max = lambda_max), -1))
+        spatial_gcn = torch.nn.functional.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T) # (b,N,F,T)
+    assert spatial_gcn.shape == (batch_size, node_count, nb_chev_filter, T) 
