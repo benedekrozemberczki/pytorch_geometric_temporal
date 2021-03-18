@@ -47,7 +47,7 @@ nb_time_filter = 64
 batch_size = 32
 
 x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-model = ASTGCN(device, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count)
+model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count)
 for p in model.parameters():
     if p.dim() > 1:
         nn.init.xavier_uniform_(p)
