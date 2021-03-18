@@ -116,17 +116,16 @@ class ChebConvAtt(MessagePassing):
                                          lambda_max, dtype=x.dtype,
                                          batch=batch)
         row, col = edge_index
-        Att_norm = norm * spatial_attention[:,row,col]
-        TAx_0 = torch.matmul(spatial_attention,x)
+        TAx_0 = torch.matmul(spatial_attention.permute(0,2,1),x)
         out = torch.matmul(TAx_0, self.weight[0])
 
         # propagate_type: (x: Tensor, norm: Tensor)
         if self.weight.size(0) > 1:
-            TAx_1 = self.propagate(edge_index, x=x, norm=Att_norm, size=None)
+            TAx_1 = self.propagate(edge_index, x=TAx_0, norm=norm, size=None)
             out = out + torch.matmul(TAx_1, self.weight[1])
 
         for k in range(2, self.weight.size(0)):
-            TAx_2 = self.propagate(edge_index, x=TAx_1, norm=Att_norm, size=None)
+            TAx_2 = self.propagate(edge_index, x=TAx_1, norm=norm, size=None)
             TAx_2 = 2. * TAx_2 - TAx_0
             out = out + torch.matmul(TAx_2, self.weight[k])
             TAx_0, TAx_1 = TAx_1, TAx_2
@@ -137,8 +136,7 @@ class ChebConvAtt(MessagePassing):
         return out
 
     def message(self, x_j, norm):
-        d1, d2 = norm.shape
-        return norm.view(d1,d2, 1) * x_j
+        return norm.view(-1, 1) * x_j
 
     def __repr__(self):
         return '{}({}, {}, K={}, normalization={})'.format(
