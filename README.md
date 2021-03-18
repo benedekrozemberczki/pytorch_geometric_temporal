@@ -36,7 +36,7 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
 
 ```bibtex
 @misc{pytorch_geometric_temporal,
-      author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Nicolas, Collignon},
+      author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Oliver, Kiss and Nicolas, Collignon},
       title = {{PyTorch Geometric Temporal}},
       year = {2020},
       publisher = {GitHub},
