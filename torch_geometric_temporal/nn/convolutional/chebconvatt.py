@@ -115,8 +115,8 @@ class ChebConvAtt(MessagePassing):
                                          edge_weight, self.normalization,
                                          lambda_max, dtype=x.dtype,
                                          batch=batch)
-        row, col = edge_index
-        TAx_0 = torch.matmul(spatial_attention.permute(0,2,1),x)
+
+        TAx_0 = torch.matmul(spatial_attention.permute(0,2,1),x) # needs transpose here so that 
         out = torch.matmul(TAx_0, self.weight[0])
 
         # propagate_type: (x: Tensor, norm: Tensor)
