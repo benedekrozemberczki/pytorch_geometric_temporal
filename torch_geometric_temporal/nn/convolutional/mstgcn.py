@@ -14,6 +14,7 @@ class MSTGCN_block(nn.Module):
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)
+        self.nb_time_filter = nb_time_filter
 
     def forward(self, x, edge_index, num_nodes):
         """
@@ -33,12 +34,18 @@ class MSTGCN_block(nn.Module):
         batch_size, num_of_vertices, in_channels, num_of_timesteps = x.shape
         data = Data(edge_index=edge_index, edge_attr=None, num_nodes=num_nodes)
         lambda_max = LaplacianLambdaMax()(data).lambda_max
+        '''
         outputs = []
         for time_step in range(num_of_timesteps):
             outputs.append(torch.unsqueeze(self.cheb_conv(x=x[:,:,:,time_step], edge_index=edge_index,
                 batch = batch_size, lambda_max=lambda_max), -1))
-
         spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T)
+        '''
+        tmp = x.permute(2,0,1,3).reshape(num_of_vertices, in_channels, num_of_timesteps*batch_size) # (N_nodes, F_in, B*T_in)
+        tmp = tmp.permute(2,0,1) # (B*T_in, N_nodes, F_in)
+        output = F.relu(self.cheb_conv(x=tmp, edge_index=edge_index,
+                batch = batch_size*num_of_timesteps, lambda_max=lambda_max))
+        spatial_gcn = output.permute(1,2,0).reshape(num_of_vertices,self.nb_time_filter,batch_size,num_of_timesteps).permute(2,0,1,3) # (B,N_nodes,F_out,T_in)
 
         # convolution along the time axis
         time_conv_output = self.time_conv(spatial_gcn.permute(0, 2, 1, 3))  # (b,F,N,T)
