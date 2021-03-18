@@ -1,9 +1,162 @@
 import torch
-import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-from scipy.sparse.linalg import eigs
-from torch_geometric.utils import to_scipy_sparse_matrix
+from torch_geometric.transforms import LaplacianLambdaMax
+from torch_geometric.data import Data
+from typing import Optional
+from torch_geometric.typing import OptTensor
+
+from torch.nn import Parameter
+from torch_geometric.nn.conv import MessagePassing
+from torch_geometric.utils import remove_self_loops, add_self_loops
+from torch_geometric.utils import get_laplacian
+import math
+
+def glorot(tensor):
+    if tensor is not None:
+        stdv = math.sqrt(6.0 / (tensor.size(-2) + tensor.size(-1)))
+        tensor.data.uniform_(-stdv, stdv)
+
+
+def zeros(tensor):
+    if tensor is not None:
+        tensor.data.fill_(0)
+
+class ChebConv_SpatialAtt(MessagePassing):
+    r"""The chebyshev spectral graph convolutional operator with attention from the
+    `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_ paper
+    .. math::
+        \mathbf{X}^{\prime} = \sum_{k=1}^{K} \mathbf{Z}^{(k)} \cdot
+        \mathbf{\Theta}^{(k)}
+    where :math:`\mathbf{Z}^{(k)}` is computed recursively by
+    .. math::
+        \mathbf{Z}^{(1)} &= \mathbf{X}
+        \mathbf{Z}^{(2)} &= \mathbf{\hat{L}} \cdot \mathbf{X}
+        \mathbf{Z}^{(k)} &= 2 \cdot \mathbf{\hat{L}} \cdot
+        \mathbf{Z}^{(k-1)} - \mathbf{Z}^{(k-2)}
+    and :math:`\mathbf{\hat{L}}` denotes the scaled and normalized Laplacian
+    :math:`\frac{2\mathbf{L}}{\lambda_{\max}} - \mathbf{I}`.
+    Args:
+        in_channels (int): Size of each input sample.
+        out_channels (int): Size of each output sample.
+        K (int): Chebyshev filter size :math:`K`.
+        normalization (str, optional): The normalization scheme for the graph
+            Laplacian (default: :obj:`"sym"`):
+            1. :obj:`None`: No normalization
+            :math:`\mathbf{L} = \mathbf{D} - \mathbf{A}`
+            2. :obj:`"sym"`: Symmetric normalization
+            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1/2} \mathbf{A}
+            \mathbf{D}^{-1/2}`
+            3. :obj:`"rw"`: Random-walk normalization
+            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1} \mathbf{A}`
+            You need to pass :obj:`lambda_max` to the :meth:`forward` method of
+            this operator in case the normalization is non-symmetric.
+            :obj:`\lambda_max` should be a :class:`torch.Tensor` of size
+            :obj:`[num_graphs]` in a mini-batch scenario and a
+            scalar/zero-dimensional tensor when operating on single graphs.
+            You can pre-compute :obj:`lambda_max` via the
+            :class:`torch_geometric.transforms.LaplacianLambdaMax` transform.
+        bias (bool, optional): If set to :obj:`False`, the layer will not learn
+            an additive bias. (default: :obj:`True`)
+        **kwargs (optional): Additional arguments of
+            :class:`torch_geometric.nn.conv.MessagePassing`.
+    """
+    def __init__(self, in_channels, out_channels, K, normalization=None,
+                 bias=True, **kwargs):
+        kwargs.setdefault('aggr', 'add')
+        super(ChebConv_SpatialAtt, self).__init__(**kwargs)
+
+        assert K > 0
+        assert normalization in [None, 'sym', 'rw'], 'Invalid normalization'
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.normalization = normalization
+        self.weight = Parameter(torch.Tensor(K, in_channels, out_channels))
+
+        if bias:
+            self.bias = Parameter(torch.Tensor(out_channels))
+        else:
+            self.register_parameter('bias', None)
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        glorot(self.weight)
+        zeros(self.bias)
+
+    def __norm__(self, edge_index, num_nodes: Optional[int],
+                 edge_weight: OptTensor, normalization: Optional[str],
+                 lambda_max, dtype: Optional[int] = None,
+                 batch: OptTensor = None):
+
+        edge_index, edge_weight = remove_self_loops(edge_index, edge_weight)
+
+        edge_index, edge_weight = get_laplacian(edge_index, edge_weight,
+                                                normalization, dtype,
+                                                num_nodes)
+
+        if batch is not None and lambda_max.numel() > 1:
+            lambda_max = lambda_max[batch[edge_index[0]]]
+
+        edge_weight = (2.0 * edge_weight) / lambda_max
+        edge_weight.masked_fill_(edge_weight == float('inf'), 0)
+
+        edge_index, edge_weight = add_self_loops(edge_index, edge_weight,
+                                                 fill_value=-1.,
+                                                 num_nodes=num_nodes)
+        assert edge_weight is not None
+
+        return edge_index, edge_weight
+
+    def forward(self, x, edge_index, spatial_attention, edge_weight: OptTensor = None,
+                batch: OptTensor = None, lambda_max: OptTensor = None):
+        """"""
+        if self.normalization != 'sym' and lambda_max is None:
+            raise ValueError('You need to pass `lambda_max` to `forward() in`'
+                             'case the normalization is non-symmetric.')
+
+        if lambda_max is None:
+            lambda_max = torch.tensor(2.0, dtype=x.dtype, device=x.device)
+        if not isinstance(lambda_max, torch.Tensor):
+            lambda_max = torch.tensor(lambda_max, dtype=x.dtype,
+                                      device=x.device)
+        assert lambda_max is not None
+
+        edge_index, norm = self.__norm__(edge_index, x.size(self.node_dim),
+                                         edge_weight, self.normalization,
+                                         lambda_max, dtype=x.dtype,
+                                         batch=batch)
+        row, col = edge_index
+        Att_norm = norm * spatial_attention[:,row,col]
+        TAx_0 = torch.matmul(spatial_attention,x)
+        out = torch.matmul(TAx_0, self.weight[0])
+
+        # propagate_type: (x: Tensor, norm: Tensor)
+        if self.weight.size(0) > 1:
+            TAx_1 = self.propagate(edge_index, x=x, norm=Att_norm, size=None)
+            out = out + torch.matmul(TAx_1, self.weight[1])
+
+        for k in range(2, self.weight.size(0)):
+            TAx_2 = self.propagate(edge_index, x=TAx_1, norm=Att_norm, size=None)
+            TAx_2 = 2. * TAx_2 - TAx_0
+            out = out + torch.matmul(TAx_2, self.weight[k])
+            TAx_0, TAx_1 = TAx_1, TAx_2
+
+        if self.bias is not None:
+            out += self.bias
+
+        return out
+
+    def message(self, x_j, norm):
+        d1, d2 = norm.shape
+        return norm.view(d1,d2, 1) * x_j
+
+    def __repr__(self):
+        return '{}({}, {}, K={}, normalization={})'.format(
+            self.__class__.__name__, self.in_channels, self.out_channels,
+            self.weight.size(0), self.normalization)
 
 class Spatial_Attention_layer(nn.Module):
     '''
@@ -42,76 +195,6 @@ class Spatial_Attention_layer(nn.Module):
 
         return S_normalized
 
-
-class cheb_conv_withSAt(nn.Module):
-    '''
-    K-order chebyshev graph convolution
-    '''
-
-    def __init__(self, K, edge_index, in_channels, out_channels, device):
-        '''
-        :param K: int
-        :param edge_index: array of edge indices
-        :param in_channles: int, num of channels in the input sequence
-        :param out_channels: int, num of channels in the output sequence
-        :param device: device
-        '''
-        super(cheb_conv_withSAt, self).__init__()
-        self.K = K
-        # now calculate Chebyshev polynomials
-        W = to_scipy_sparse_matrix(edge_index)
-        assert W.shape[0] == W.shape[1]
-        D = np.diag(np.sum(W, axis=1))
-        L = np.array(D - W.toarray())
-        lambda_max = eigs(L, k=1, which='LR')[0].real
-        L_tilde = (2 * L) / lambda_max - np.identity(W.shape[0])
-        cheb_polynomials = [np.identity(L_tilde.shape[0]), L_tilde.copy()]
-        for i in range(2, K):
-            cheb_polynomials.append(2 * L_tilde * cheb_polynomials[i - 1] - cheb_polynomials[i - 2])
-        self.cheb_polynomials = [torch.from_numpy(i).type(torch.FloatTensor).to(device) for i in cheb_polynomials]
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.device = device
-        self.Theta = nn.ParameterList([nn.Parameter(torch.FloatTensor(in_channels, out_channels).to(self.device)) for _ in range(K)])
-
-    def forward(self, x, spatial_attention):
-        """
-        Making a forward pass of Chebyshev graph convolution operation with the spatial attention layer.
-        B is the batch size. N_nodes is the number of nodes in the graph. 
-        F_in is the dimension of input features. F_out is the dimension of output features.
-        T_in is the length of input sequence in time. 
-        Arg types:
-            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-
-        Return types:
-            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out, T_in).
-        """
-
-        batch_size, num_of_vertices, in_channels, num_of_timesteps = x.shape
-
-        outputs = []
-
-        for time_step in range(num_of_timesteps):
-
-            graph_signal = x[:, :, :, time_step]  # (b, N, F_in)
-
-            output = torch.zeros(batch_size, num_of_vertices, self.out_channels).to(self.device)  # (b, N, F_out)
-
-            for k in range(self.K):
-
-                T_k = self.cheb_polynomials[k]  # (N,N)
-
-                T_k_with_at = T_k.mul(spatial_attention)   # (N,N)*(N,N) = (N,N). row sums are usually 1, column normalization
-
-                theta_k = self.Theta[k]  # (in_channel, out_channel)
-
-                rhs = T_k_with_at.permute(0, 2, 1).matmul(graph_signal)  # (N, N)(b, N, F_in) = (b, N, F_in). left multiplication to make row sums 1
-
-                output = output + rhs.matmul(theta_k)  # (b, N, F_in)(F_in, F_out) = (b, N, F_out)
-
-            outputs.append(output.unsqueeze(-1))  # (b, N, F_out, 1)
-
-        return F.relu(torch.cat(outputs, dim=-1))  # (b, N, F_out, T)
 
 
 class Temporal_Attention_layer(nn.Module):
@@ -153,16 +236,16 @@ class Temporal_Attention_layer(nn.Module):
 
 class ASTGCN_block(nn.Module):
 
-    def __init__(self, device, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, num_of_vertices, num_of_timesteps):
+    def __init__(self, device, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, num_of_timesteps):
         super(ASTGCN_block, self).__init__()
         self.TAt = Temporal_Attention_layer(device, in_channels, num_of_vertices, num_of_timesteps)
         self.SAt = Spatial_Attention_layer(device, in_channels, num_of_vertices, num_of_timesteps)
-        self.cheb_conv_SAt = cheb_conv_withSAt(K, edge_index, in_channels, nb_chev_filter, device)
+        self.cheb_conv_SAt = ChebConv_SpatialAtt(in_channels, nb_chev_filter, K)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension
 
-    def forward(self, x):
+    def forward(self, x, edge_index):
         """
         Making a forward pass. This is one ASTGCN block.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
@@ -185,9 +268,23 @@ class ASTGCN_block(nn.Module):
         spatial_At = self.SAt(x_TAt)
 
         # cheb gcn
-        spatial_gcn = self.cheb_conv_SAt(x, spatial_At)  # (b,N,F,T)
-        # spatial_gcn = self.cheb_conv(x)
-
+        if not isinstance(edge_index, list):
+            data = Data(edge_index=edge_index, edge_attr=None, num_nodes=num_of_vertices)
+            lambda_max = LaplacianLambdaMax()(data).lambda_max
+            outputs = []
+            for time_step in range(num_of_timesteps):
+                outputs.append(torch.unsqueeze(self.cheb_conv_SAt(x[:,:,:,time_step], edge_index, spatial_At, lambda_max = lambda_max), -1))
+    
+            spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T) # (b,N,F,T)        
+        else: # edge_index changes over time
+            outputs = []
+            for time_step in range(num_of_timesteps):
+                data = Data(edge_index=edge_index[time_step], edge_attr=None, num_nodes=num_of_vertices)
+                lambda_max = LaplacianLambdaMax()(data).lambda_max
+                outputs.append(torch.unsqueeze(self.cheb_conv_SAt(x=x[:,:,:,time_step], edge_index=edge_index[time_step],
+                    spatial_attention=spatial_At,lambda_max=lambda_max), -1))
+            spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T)
+            
         # convolution along the time axis
         time_conv_output = self.time_conv(spatial_gcn.permute(0, 2, 1, 3))  # (b,N,F,T)->(b,F,N,T) use kernel size (1,3)->(b,F,N,T)
 
@@ -219,13 +316,13 @@ class ASTGCN(nn.Module):
         num_of_vertices (int): Number of vertices in the graph.
     """
 
-    def __init__(self, device, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, num_for_predict, len_input, num_of_vertices):
+    def __init__(self, device, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, num_of_vertices):
 
         super(ASTGCN, self).__init__()
 
-        self.BlockList = nn.ModuleList([ASTGCN_block(device, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, edge_index, num_of_vertices, len_input)])
+        self.BlockList = nn.ModuleList([ASTGCN_block(device, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, len_input)])
 
-        self.BlockList.extend([ASTGCN_block(device, nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, edge_index, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
+        self.BlockList.extend([ASTGCN_block(device, nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
@@ -233,7 +330,7 @@ class ASTGCN(nn.Module):
 
         self.to(device)
 
-    def forward(self, x):
+    def forward(self, x, edge_index):
         """
         Making a forward pass. This module takes a likst of ASTGCN blocks and use a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
@@ -246,7 +343,7 @@ class ASTGCN(nn.Module):
             * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
         """
         for block in self.BlockList:
-            x = block(x)
+            x = block(x, edge_index)
 
         output = self.final_conv(x.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
         # (b,N,F,T)->(b,T,N,F)-conv<1,F>->(b,c_out*T,N,1)->(b,c_out*T,N)->(b,N,T)
