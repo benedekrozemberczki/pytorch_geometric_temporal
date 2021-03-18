@@ -37,7 +37,7 @@ class MSTGCN_block(nn.Module):
             tmp = x.permute(2,0,1,3).reshape(num_of_vertices, in_channels, num_of_timesteps*batch_size) # (N_nodes, F_in, B*T_in)
             tmp = tmp.permute(2,0,1) # (B*T_in, N_nodes, F_in)
             output = F.relu(self.cheb_conv(x=tmp, edge_index=edge_index,
-                    batch = batch_size*num_of_timesteps, lambda_max=lambda_max))
+                    lambda_max=lambda_max))
             spatial_gcn = output.permute(1,2,0).reshape(num_of_vertices,self.nb_time_filter,batch_size,num_of_timesteps).permute(2,0,1,3) # (B,N_nodes,F_out,T_in)
         else: # edge_index changes over time
             outputs = []
@@ -45,7 +45,7 @@ class MSTGCN_block(nn.Module):
                 data = Data(edge_index=edge_index[time_step], edge_attr=None, num_nodes=num_of_vertices)
                 lambda_max = LaplacianLambdaMax()(data).lambda_max
                 outputs.append(torch.unsqueeze(self.cheb_conv(x=x[:,:,:,time_step], edge_index=edge_index[time_step],
-                    batch = batch_size, lambda_max=lambda_max), -1))
+                    lambda_max=lambda_max), -1))
             spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T)
 
         # convolution along the time axis

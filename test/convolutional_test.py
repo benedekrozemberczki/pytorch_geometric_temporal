@@ -153,7 +153,7 @@ def test_mstgcn():
     nb_time_strides = 1
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    node_features = 1
+    node_features = 2
     nb_block = 2
     K = 3
     nb_chev_filter = 64
@@ -196,7 +196,7 @@ def test_mstgcn_change_edge_index():
     nb_time_strides = 1
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    node_features = 1
+    node_features = 2
     nb_block = 2
     K = 3
     nb_chev_filter = 64
