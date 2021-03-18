@@ -161,7 +161,7 @@ def test_mstgcn():
     batch_size = 32
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = MSTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input, edge_index)
+    model = MSTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input)
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
     target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
@@ -178,5 +178,5 @@ def test_mstgcn():
     criterion = torch.nn.MSELoss().to(DEVICE)
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs)
+        outputs = model(encoder_inputs, edge_index)
     assert outputs.shape == (batch_size, node_count, num_for_predict)
