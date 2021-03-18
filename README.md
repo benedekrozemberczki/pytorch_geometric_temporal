@@ -36,7 +36,7 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
 
 ```bibtex
 @misc{pytorch_geometric_temporal,
-      author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Nicolas, Collignon},
+      author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Oliver, Kiss and Nicolas, Collignon},
       title = {{PyTorch Geometric Temporal}},
       year = {2020},
       publisher = {GitHub},
@@ -112,6 +112,8 @@ In detail, the following temporal graph neural networks were implemented.
 * **[MSTGCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.mstgcn.MSTGCN)** from Guo *et al.*: [Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow Forecasting](https://ojs.aaai.org/index.php/AAAI/article/view/3881) (AAAI 2019)
 
 **Auxiliary Graph Convolutions**
+
+* **[MSTGCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.chebconvatt.ChebConvAtt)** from Guo *et al.*: [Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow Forecasting](https://ojs.aaai.org/index.php/AAAI/article/view/3881) (AAAI 2019)
 
 * **[TemporalConv](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.stgcn.TemporalConv)** from Yu *et al.*: [Spatio-Temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting](https://arxiv.org/abs/1709.04875) (IJCAI 2018)
 
