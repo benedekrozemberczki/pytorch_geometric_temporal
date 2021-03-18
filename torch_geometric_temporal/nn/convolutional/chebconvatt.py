@@ -123,12 +123,13 @@ class ChebConvAtt(MessagePassing):
         out = torch.matmul(TAx_0, self.weight[0])
         # L_tilde = torch.sparse_coo_tensor(edge_index,norm,(num_nodes,num_nodes)).to_dense()
         # propagate_type: (x: Tensor, norm: Tensor)
+        edge_index_transpose = edge_index[[1,0]] # transpose according to the paper
         if self.weight.size(0) > 1:
-            TAx_1 = self.propagate(edge_index, x=TAx_0, norm=Att_norm, size=None)
+            TAx_1 = self.propagate(edge_index_transpose, x=TAx_0, norm=Att_norm, size=None)
             out = out + torch.matmul(TAx_1, self.weight[1])
 
         for k in range(2, self.weight.size(0)):
-            TAx_2 = self.propagate(edge_index, x=TAx_1, norm=norm, size=None)
+            TAx_2 = self.propagate(edge_index_transpose, x=TAx_1, norm=norm, size=None)
             TAx_2 = 2. * TAx_2 - TAx_0
             out = out + torch.matmul(TAx_2, self.weight[k])
             TAx_0, TAx_1 = TAx_1, TAx_2
