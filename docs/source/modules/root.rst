@@ -7,10 +7,6 @@ PyTorch Geometric Temporal
 Discrete Recurrent Graph Convolutional Layers
 --------------
 
-
-.. autosummary:: torch_geometric_temporal.nn.recurrent.gconv_gru.GConvGRU
-   :nosignatures:
-
 .. automodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
     :members:
     :undoc-members:
