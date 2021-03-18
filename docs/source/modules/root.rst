@@ -79,9 +79,7 @@ Auxiliary Graph Convolutional Layers
     :undoc-members:
     :exclude-members: glorot, zeros, DCRNN
 
-
 .. automodule:: torch_geometric_temporal.nn.convolutional.chebconvatt
     :members:
     :undoc-members:
     :exclude-members: glorot, zeros
-    
