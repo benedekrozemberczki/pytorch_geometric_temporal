@@ -178,5 +178,51 @@ def test_mstgcn():
     criterion = torch.nn.MSELoss().to(DEVICE)
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs, edge_index, node_count)
+        outputs = model(encoder_inputs, edge_index)
+    assert outputs.shape == (batch_size, node_count, num_for_predict)
+
+def test_mstgcn_change_edge_index():
+    """
+    Testing MSTGCN block with changing edge index over time
+    """
+    node_count = 307
+    num_classes = 10
+    edge_per_node = 15
+
+
+    num_of_vertices = node_count # 307
+    num_for_predict = 12
+    len_input = 12
+    nb_time_strides = 1
+
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    node_features = 1
+    nb_block = 2
+    K = 3
+    nb_chev_filter = 64
+    nb_time_filter = 64
+    batch_size = 32
+
+    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+    model = MSTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input)
+    T = len_input
+    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
+    target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
+    edge_index_seq = []
+    for b in range(batch_size):
+        for t in range(T):
+            x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
+            x_seq[b,:,:,t] = x
+            if b == 0:
+                edge_index_seq.append(edge_index)
+            target = create_mock_target(node_count, num_classes)
+            target_seq[b,:,t] = target
+    shuffle = True
+    train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
+
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+    criterion = torch.nn.MSELoss().to(DEVICE)
+    for batch_data in train_loader:
+        encoder_inputs, labels = batch_data
+        outputs = model(encoder_inputs, edge_index_seq)
     assert outputs.shape == (batch_size, node_count, num_for_predict)
