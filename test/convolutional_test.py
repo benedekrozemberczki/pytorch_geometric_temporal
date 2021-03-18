@@ -178,5 +178,5 @@ def test_mstgcn():
     criterion = torch.nn.MSELoss().to(DEVICE)
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs, edge_index)
+        outputs = model(encoder_inputs, edge_index, node_count)
     assert outputs.shape == (batch_size, node_count, num_for_predict)

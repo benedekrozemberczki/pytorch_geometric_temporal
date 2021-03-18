@@ -75,7 +75,7 @@ for epoch in range(epochs):
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
         optimizer.zero_grad()
-        outputs = model(encoder_inputs, edge_index)
+        outputs = model(encoder_inputs, edge_index, node_count)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
