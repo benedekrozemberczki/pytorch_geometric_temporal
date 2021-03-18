@@ -108,7 +108,7 @@ def test_astgcn():
     len_input = 12
     nb_time_strides = 1
 
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     node_features = 1
     nb_block = 2
     K = 3
@@ -117,11 +117,11 @@ def test_astgcn():
     batch_size = 32
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = ASTGCN(DEVICE, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, edge_index,num_for_predict, len_input, node_count)
+    model = ASTGCN(device, nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, edge_index,num_for_predict, len_input, node_count)
 
     T = len_input
-    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
-    target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
+    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
+    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
     for b in range(batch_size):
         for t in range(T):
             x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
@@ -132,7 +132,7 @@ def test_astgcn():
     train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(DEVICE)
+    criterion = torch.nn.MSELoss().to(device)
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
         outputs = model(encoder_inputs)
@@ -152,7 +152,7 @@ def test_mstgcn():
     len_input = 12
     nb_time_strides = 1
 
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     node_features = 1
     nb_block = 2
     K = 3
@@ -163,8 +163,8 @@ def test_mstgcn():
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
     model = MSTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input)
     T = len_input
-    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
-    target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
+    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
+    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
     for b in range(batch_size):
         for t in range(T):
             x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
@@ -175,7 +175,7 @@ def test_mstgcn():
     train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(DEVICE)
+    criterion = torch.nn.MSELoss().to(device)
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
         outputs = model(encoder_inputs, edge_index)
@@ -195,7 +195,7 @@ def test_mstgcn_change_edge_index():
     len_input = 12
     nb_time_strides = 1
 
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     node_features = 1
     nb_block = 2
     K = 3
@@ -206,8 +206,8 @@ def test_mstgcn_change_edge_index():
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
     model = MSTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input)
     T = len_input
-    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
-    target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
+    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
+    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
     edge_index_seq = []
     for b in range(batch_size):
         for t in range(T):
@@ -221,7 +221,7 @@ def test_mstgcn_change_edge_index():
     train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(DEVICE)
+    criterion = torch.nn.MSELoss().to(device)
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
         outputs = model(encoder_inputs, edge_index_seq)

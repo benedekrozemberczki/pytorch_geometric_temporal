@@ -39,7 +39,7 @@ num_for_predict = 12
 len_input = 12
 nb_time_strides = 1
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 node_features = 1
 nb_block = 2
 K = 3
@@ -58,8 +58,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=
 
 model.train()
 T = len_input
-x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(DEVICE)
-target_seq = torch.zeros([batch_size,node_count,T]).to(DEVICE)
+x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
+target_seq = torch.zeros([batch_size,node_count,T]).to(device)
 for b in range(batch_size):
     for t in range(T):
         x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
@@ -70,7 +70,7 @@ shuffle = True
 train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
 
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-criterion = torch.nn.MSELoss().to(DEVICE)
+criterion = torch.nn.MSELoss().to(device)
 for epoch in range(epochs):
     for batch_data in train_loader:
         encoder_inputs, labels = batch_data
