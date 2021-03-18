@@ -24,10 +24,10 @@ class Spatial_Attention_layer(nn.Module):
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. 
         Arg types:
-            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
         Return types:
-            * output (PyTorch Float Tensor)* - Spatial attention score matrices, with shape (B, N_nodes, N_nodes).
+            * output (PyTorch Float Tensor) - Spatial attention score matrices, with shape (B, N_nodes, N_nodes).
         """
 
         lhs = torch.matmul(torch.matmul(x, self.W1), self.W2)  # (b,N,F,T)(T)->(b,N,F)(F,T)->(b,N,T)
@@ -59,10 +59,10 @@ class Temporal_Attention_layer(nn.Module):
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. 
         Arg types:
-            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
         Return types:
-            * output (PyTorch Float Tensor)* - Temporal attention score matrices, with shape (B, T_in, T_in).
+            * output (PyTorch Float Tensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
         """
         _, num_of_vertices, num_of_features, num_of_timesteps = x.shape
 
@@ -180,7 +180,7 @@ class ASTGCN(nn.Module):
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         
         Arg types:
-            * x (PyTorch Float Tensor)* - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
             * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
