@@ -36,7 +36,7 @@ class MSTGCN_block(nn.Module):
         outputs = []
         for time_step in range(num_of_timesteps):
             outputs.append(torch.unsqueeze(self.cheb_conv(x=x[:,:,:,time_step], edge_index=edge_index,
-                batch = None, lambda_max=lambda_max), -1))
+                batch = batch_size, lambda_max=lambda_max), -1))
 
         spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T)
 
