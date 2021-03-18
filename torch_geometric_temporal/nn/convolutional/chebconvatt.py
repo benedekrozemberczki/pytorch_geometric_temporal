@@ -117,9 +117,10 @@ class ChebConvAtt(MessagePassing):
                                          batch=batch)
         row, col = edge_index
         Att_norm = norm * spatial_attention[:,row,col]
-        TAx_0 = torch.matmul((torch.eye(x.size(self.node_dim))*spatial_attention).permute(0,2,1),x)
+        num_nodes = x.size(self.node_dim)
+        TAx_0 = torch.matmul((torch.eye(num_nodes)*spatial_attention).permute(0,2,1),x)
         out = torch.matmul(TAx_0, self.weight[0])
-
+        # L_tilde = torch.sparse_coo_tensor(edge_index,norm,(num_nodes,num_nodes)).to_dense()
         # propagate_type: (x: Tensor, norm: Tensor)
         if self.weight.size(0) > 1:
             TAx_1 = self.propagate(edge_index, x=TAx_0, norm=Att_norm, size=None)
