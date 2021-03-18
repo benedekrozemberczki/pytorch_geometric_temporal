@@ -2,7 +2,6 @@ import torch
 import random
 import numpy as np
 import networkx as nx
-from torch import nn
 from torch_geometric_temporal.nn import ASTGCN
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
@@ -48,11 +47,6 @@ batch_size = 32
 
 x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
 model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count)
-for p in model.parameters():
-    if p.dim() > 1:
-        nn.init.xavier_uniform_(p)
-    else:
-        nn.init.uniform_(p)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
 model.train()

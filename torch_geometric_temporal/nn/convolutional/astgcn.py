@@ -16,6 +16,14 @@ class Spatial_Attention_layer(nn.Module):
         self.W3 = nn.Parameter(torch.FloatTensor(in_channels))
         self.bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices))
         self.Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices))
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
 
     def forward(self, x):
@@ -52,6 +60,14 @@ class Temporal_Attention_layer(nn.Module):
         self.U3 = nn.Parameter(torch.FloatTensor(in_channels))
         self.be = nn.Parameter(torch.FloatTensor(1, num_of_timesteps, num_of_timesteps))
         self.Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, x):
         """
@@ -91,6 +107,14 @@ class ASTGCN_block(nn.Module):
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, x, edge_index):
         """
@@ -172,6 +196,15 @@ class ASTGCN(nn.Module):
         self.blocklist.extend([ASTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, x, edge_index):
         """

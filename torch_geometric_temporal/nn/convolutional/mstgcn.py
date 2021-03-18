@@ -15,6 +15,14 @@ class MSTGCN_block(nn.Module):
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)
         self.nb_time_filter = nb_time_filter
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, x, edge_index):
         """
@@ -93,6 +101,15 @@ class MSTGCN(nn.Module):
         self.blocklist.extend([MSTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, x, edge_index):
         r"""
