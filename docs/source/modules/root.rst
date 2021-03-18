@@ -63,7 +63,7 @@ Discrete Temporal Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.convolutional.chebconvatt
     :members:
     :undoc-members:
-    :exclude-members:
+    :exclude-members: glorot, zeros
     
 .. automodule:: torch_geometric_temporal.nn.convolutional.astgcn
     :members:

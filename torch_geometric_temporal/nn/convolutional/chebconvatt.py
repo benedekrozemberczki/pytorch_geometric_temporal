@@ -22,16 +22,7 @@ class ChebConvAtt(MessagePassing):
     r"""The chebyshev spectral graph convolutional operator with attention from the
     `"Attention Based Spatial-Temporal Graph Convolutional 
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_ paper
-    .. math::
-        \mathbf{X}^{\prime} = \sum_{k=1}^{K} \mathbf{Z}^{(k)} \cdot
-        \mathbf{\Theta}^{(k)}
-    where :math:`\mathbf{Z}^{(k)}` is computed recursively by
-    .. math::
-        \mathbf{Z}^{(1)} &= \mathbf{X}
-        \mathbf{Z}^{(2)} &= \mathbf{\hat{L}} \cdot \mathbf{X}
-        \mathbf{Z}^{(k)} &= 2 \cdot \mathbf{\hat{L}} \cdot
-        \mathbf{Z}^{(k-1)} - \mathbf{Z}^{(k-2)}
-    and :math:`\mathbf{\hat{L}}` denotes the scaled and normalized Laplacian
+    :math:`\mathbf{\hat{L}}` denotes the scaled and normalized Laplacian
     :math:`\frac{2\mathbf{L}}{\lambda_{\max}} - \mathbf{I}`.
     Args:
         in_channels (int): Size of each input sample.
