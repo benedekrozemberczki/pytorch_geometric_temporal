@@ -24,7 +24,7 @@ class MSTGCN_block(nn.Module):
         nb_time_filter is the number of time filters used.
         Arg types:
             * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-            * edge_index (Tensor): Edge indices.
+            * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
             * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
@@ -102,7 +102,7 @@ class MSTGCN(nn.Module):
         
         Arg types:
             * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-            * edge_index (Tensor): Edge indices.
+            * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
             * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
