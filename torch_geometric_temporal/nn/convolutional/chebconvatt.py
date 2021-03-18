@@ -20,10 +20,11 @@ def zeros(tensor):
 
 class ChebConvAtt(MessagePassing):
     r"""The chebyshev spectral graph convolutional operator with attention from the
-    `"Attention Based Spatial-Temporal Graph Convolutional 
+    `Attention Based Spatial-Temporal Graph Convolutional 
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_ paper
     :math:`\mathbf{\hat{L}}` denotes the scaled and normalized Laplacian
     :math:`\frac{2\mathbf{L}}{\lambda_{\max}} - \mathbf{I}`.
+    
     Args:
         in_channels (int): Size of each input sample.
         out_channels (int): Size of each output sample.
