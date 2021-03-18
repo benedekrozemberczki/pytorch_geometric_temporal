@@ -100,7 +100,23 @@ class ChebConvAtt(MessagePassing):
 
     def forward(self, x, edge_index, spatial_attention, edge_weight: OptTensor = None,
                 batch: OptTensor = None, lambda_max: OptTensor = None):
-        """"""
+        """
+        Making a forward pass of the ChebConvAtt layer.
+        B is the batch size. N_nodes is the number of nodes in the graph. 
+        F_in is the dimension of input features (in_channels). 
+        F_out is the dimension of input features (out_channels). 
+        
+        Arg types:
+            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in).
+            * edge_index (Tensor array) - Edge indices.
+            * spatial_attention (PyTorch Float Tensor) - Spatial attention weights, with shape (B, N_nodes, N_nodes).
+            * edge_weight (PyTorch Float Tensor, optional) - Edge weights corresponding to edge indices.
+            * batch (PyTorch Tensor, optional) - Batch labels for each edge.
+            * lambda_max (optional, but mandatory if normalization is None) - Largest eigenvalue of Laplacian.
+
+        Return types:
+            * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out).
+        """
         if self.normalization != 'sym' and lambda_max is None:
             raise ValueError('You need to pass `lambda_max` to `forward() in`'
                              'case the normalization is non-symmetric.')
