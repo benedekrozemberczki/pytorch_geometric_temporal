@@ -93,7 +93,7 @@ class graph_constructor(nn.Module):
         nnodes (int) : number of nodes in the graph.
         k (int) : the number of largest values to consider in constructing the neighbourhood of a node (pick the "nearest" k nodes).
         dim (int) : dimension of the node embedding.
-        alpha (float, optional) : tanh alpha for generating adjacency matrix to control the saturation rate, default 3.
+        alpha (float, optional) : tanh alpha for generating adjacency matrix, alpha controls the saturation rate, default 3.
         static_feat (Pytorch Float Tensor, optional) : static feature, default None.
     """
     def __init__(self, nnodes, k, dim, alpha=3, static_feat=None):
