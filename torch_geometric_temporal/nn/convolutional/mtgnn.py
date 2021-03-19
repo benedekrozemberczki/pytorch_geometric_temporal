@@ -2,6 +2,32 @@ from .mtgnn_layers import *
 
 
 class MTGNN(nn.Module):
+    r"""An implementation of the Multivariate Time Series Forecasting Graph Neural Networks.
+    For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." <https://arxiv.org/pdf/2005.11650.pdf>`_
+
+    Args:
+        gcn_true (bool) : whether to add graph convolution layer.
+        buildA_true (bool) : whether to construct adaptive adjacency matrix.
+        gcn_depth (int) : graph convolution depth.
+        num_nodes (int) : number of nodes in the graph.
+        dropout (float, optional) : droupout rate, default 0.3.
+        static_feat (Pytorch Float Tensor, optional) : static feature, default None.
+        predefined_A (Pytorch Float Tensor, optional) : predefined adjacency matrix, default None.
+        subgraph_size (int, optional) : size of subgraph, default 20.
+        node_dim (int, optional) : dimension of nodes, default 40.
+        dilation_exponential (int, optional) : dilation exponential, default 1.
+        conv_channels (int, optional) : convolution channels, default 32.
+        residual_channels (int, optional) : residual channels, default 32.
+        skip_channels (int, optional) : skip channels, default 64.
+        end_channels (int, optional): end channels, default 128.
+        seq_length (int, optional) : length of input sequence, default 12.
+        in_dim (int, optional) : input dimension, default 2.
+        out_dim (int, optional) : output dimension, default 12.
+        layers (int, optional) : number of layers, default 3.
+        propalpha (float, optional) : prop alpha, default 0.05.
+        tanhalpha (float, optional) : tanh alpha for generating adjacency matrix, default 3.
+        layer_norm_affline (bool, optional) : whether to do elementwise affine in Layer Normalization, default True.
+    """
     def __init__(self, gcn_true, buildA_true, gcn_depth, num_nodes, device, predefined_A=None, static_feat=None, dropout=0.3, subgraph_size=20, node_dim=40, dilation_exponential=1, conv_channels=32, residual_channels=32, skip_channels=64, end_channels=128, seq_length=12, in_dim=2, out_dim=12, layers=3, propalpha=0.05, tanhalpha=3, layer_norm_affline=True):
         super(MTGNN, self).__init__()
         self.gcn_true = gcn_true
