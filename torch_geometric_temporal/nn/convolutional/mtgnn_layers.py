@@ -14,14 +14,6 @@ class nconv(nn.Module):
         x = torch.einsum('ncwl,vw->ncvl',(x,A))
         return x.contiguous()
 
-class dy_nconv(nn.Module):
-    def __init__(self):
-        super(dy_nconv,self).__init__()
-
-    def forward(self,x, A):
-        x = torch.einsum('ncvl,nvwl->ncwl',(x,A))
-        return x.contiguous()
-
 class linear(nn.Module):
     def __init__(self,c_in,c_out,bias=True):
         super(linear,self).__init__()
@@ -31,28 +23,17 @@ class linear(nn.Module):
         return self.mlp(x)
 
 
-class prop(nn.Module):
-    def __init__(self,c_in,c_out,gdep,dropout,alpha):
-        super(prop, self).__init__()
-        self.nconv = nconv()
-        self.mlp = linear(c_in,c_out)
-        self.gdep = gdep
-        self.dropout = dropout
-        self.alpha = alpha
-
-    def forward(self,x,adj):
-        adj = adj + torch.eye(adj.size(0)).to(x.device)
-        d = adj.sum(1)
-        h = x
-        dv = d
-        a = adj / dv.view(-1, 1)
-        for i in range(self.gdep):
-            h = self.alpha*x + (1-self.alpha)*self.nconv(h,a)
-        ho = self.mlp(h)
-        return ho
-
-
 class mixprop(nn.Module):
+    r"""An implementation of the dynatic mix-hop propagation layer.
+    For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." <https://arxiv.org/pdf/2005.11650.pdf>`_
+
+    Args:
+        c_in (int) : number of input channels.
+        c_out (int) : number of output channels.
+        gdep (int) : depth of graph convolution.
+        dropout (float) : dropout rate.
+        alpha (float) : ratio of retaining the root nodes's original states, a value between 0 and 1.
+    """
     def __init__(self,c_in,c_out,gdep,dropout,alpha):
         super(mixprop, self).__init__()
         self.nconv = nconv()
@@ -63,7 +44,17 @@ class mixprop(nn.Module):
 
 
     def forward(self,x,adj):
-        adj = adj + torch.eye(adj.size(0)).to(x.device)
+        """
+        Making a forward pass of mix-hop propagation.
+        
+        Arg types:
+            * x (Tensor): input feature matrix.
+            * adj (PyTorch Float Tensor) - adjacency matrix.
+
+        Return types:
+            * ho (PyTorch Float Tensor) - hidden representation for all nodes.
+        """
+        adj = adj + torch.eye(adj.size(0)).to(x.device) # add self-loops
         d = adj.sum(1)
         h = x
         out = [h]
@@ -74,61 +65,6 @@ class mixprop(nn.Module):
         ho = torch.cat(out,dim=1)
         ho = self.mlp(ho)
         return ho
-
-class dy_mixprop(nn.Module):
-    def __init__(self,c_in,c_out,gdep,dropout,alpha):
-        super(dy_mixprop, self).__init__()
-        self.nconv = dy_nconv()
-        self.mlp1 = linear((gdep+1)*c_in,c_out)
-        self.mlp2 = linear((gdep+1)*c_in,c_out)
-
-        self.gdep = gdep
-        self.dropout = dropout
-        self.alpha = alpha
-        self.lin1 = linear(c_in,c_in)
-        self.lin2 = linear(c_in,c_in)
-
-
-    def forward(self,x):
-        #adj = adj + torch.eye(adj.size(0)).to(x.device)
-        #d = adj.sum(1)
-        x1 = torch.tanh(self.lin1(x))
-        x2 = torch.tanh(self.lin2(x))
-        adj = self.nconv(x1.transpose(2,1),x2)
-        adj0 = torch.softmax(adj, dim=2)
-        adj1 = torch.softmax(adj.transpose(2,1), dim=2)
-
-        h = x
-        out = [h]
-        for i in range(self.gdep):
-            h = self.alpha*x + (1-self.alpha)*self.nconv(h,adj0)
-            out.append(h)
-        ho = torch.cat(out,dim=1)
-        ho1 = self.mlp1(ho)
-
-
-        h = x
-        out = [h]
-        for i in range(self.gdep):
-            h = self.alpha * x + (1 - self.alpha) * self.nconv(h, adj1)
-            out.append(h)
-        ho = torch.cat(out, dim=1)
-        ho2 = self.mlp2(ho)
-
-        return ho1+ho2
-
-
-
-class dilated_1D(nn.Module):
-    def __init__(self, cin, cout, dilation_factor=2):
-        super(dilated_1D, self).__init__()
-        self.tconv = nn.ModuleList()
-        self.kernel_set = [2,3,6,7]
-        self.tconv = nn.Conv2d(cin,cout,(1,7),dilation=(1,dilation_factor))
-
-    def forward(self,input):
-        x = self.tconv(input)
-        return x
 
 class dilated_inception(nn.Module):
     def __init__(self, cin, cout, dilation_factor=2):
@@ -150,6 +86,16 @@ class dilated_inception(nn.Module):
 
 
 class graph_constructor(nn.Module):
+    r"""An implementation of the graph learning layer to construct an adjacency matrix.
+    For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." <https://arxiv.org/pdf/2005.11650.pdf>`_
+
+    Args:
+        nnodes (int) : number of nodes in the graph.
+        k (int) : the number of largest values to consider in constructing the neighbourhood of a node (pick the "nearest" k nodes).
+        dim (int) : dimension of the node embedding.
+        alpha (float, optional) : tanh alpha for generating adjacency matrix to control the saturation rate, default 3.
+        static_feat (Pytorch Float Tensor, optional) : static feature, default None.
+    """
     def __init__(self, nnodes, k, dim, alpha=3, static_feat=None):
         super(graph_constructor, self).__init__()
         self.nnodes = nnodes
@@ -169,6 +115,15 @@ class graph_constructor(nn.Module):
         self.static_feat = static_feat
 
     def forward(self, idx):
+        """
+        Making a forward pass to construct an adjacency matrix from node embeddings.
+        
+        Arg types:
+            * idx (Tensor, optional): input indices, a permutation of the number of nodes, default None (no permutation).
+
+        Return types:
+            * adj (PyTorch Float Tensor) - adjacency matrix constructed from node embeddings.
+        """
         if self.static_feat is None:
             nodevec1 = self.emb1(idx)
             nodevec2 = self.emb2(idx)

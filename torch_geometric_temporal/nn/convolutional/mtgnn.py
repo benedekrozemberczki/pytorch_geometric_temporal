@@ -24,8 +24,8 @@ class MTGNN(nn.Module):
         in_dim (int, optional) : input dimension, default 2.
         out_dim (int, optional) : output dimension, default 12.
         layers (int, optional) : number of layers, default 3.
-        propalpha (float, optional) : prop alpha, default 0.05.
-        tanhalpha (float, optional) : tanh alpha for generating adjacency matrix, default 3.
+        propalpha (float, optional) : prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1, default 0.05.
+        tanhalpha (float, optional) : tanh alpha for generating adjacency matrix to control the saturation rate, default 3.
         layer_norm_affline (bool, optional) : whether to do elementwise affine in Layer Normalization, default True.
     """
     def __init__(self, gcn_true, buildA_true, gcn_depth, num_nodes, predefined_A=None, static_feat=None, dropout=0.3, subgraph_size=20, node_dim=40, dilation_exponential=1, conv_channels=32, residual_channels=32, skip_channels=64, end_channels=128, seq_length=12, in_dim=2, out_dim=12, layers=3, propalpha=0.05, tanhalpha=3, layer_norm_affline=True):
