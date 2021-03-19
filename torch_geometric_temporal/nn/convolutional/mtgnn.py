@@ -113,6 +113,18 @@ class MTGNN(nn.Module):
 
 
     def forward(self, input, idx=None):
+        """
+        Making a forward pass of MTGNN.
+        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
+        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
+        nb_time_filter is the number of time filters used.
+        Arg types:
+            * input (PyTorch Float Tensor) - input sequence, with shape (batch size, input dimension, number of nodes, input sequence length).
+            * idx (Tensor, optional): input indices, a permutation of the number of nodes, default None (no permutation).
+
+        Return types:
+            * x (PyTorch Float Tensor) - output sequence for prediction, with shape (batch size, input sequence length, number of nodes, 1).
+        """
         seq_len = input.size(3)
         assert seq_len==self.seq_length, 'input sequence length not equal to preset sequence length'
 
