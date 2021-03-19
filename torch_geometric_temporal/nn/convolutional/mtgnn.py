@@ -28,7 +28,7 @@ class MTGNN(nn.Module):
         tanhalpha (float, optional) : tanh alpha for generating adjacency matrix, default 3.
         layer_norm_affline (bool, optional) : whether to do elementwise affine in Layer Normalization, default True.
     """
-    def __init__(self, gcn_true, buildA_true, gcn_depth, num_nodes, device, predefined_A=None, static_feat=None, dropout=0.3, subgraph_size=20, node_dim=40, dilation_exponential=1, conv_channels=32, residual_channels=32, skip_channels=64, end_channels=128, seq_length=12, in_dim=2, out_dim=12, layers=3, propalpha=0.05, tanhalpha=3, layer_norm_affline=True):
+    def __init__(self, gcn_true, buildA_true, gcn_depth, num_nodes, predefined_A=None, static_feat=None, dropout=0.3, subgraph_size=20, node_dim=40, dilation_exponential=1, conv_channels=32, residual_channels=32, skip_channels=64, end_channels=128, seq_length=12, in_dim=2, out_dim=12, layers=3, propalpha=0.05, tanhalpha=3, layer_norm_affline=True):
         super(MTGNN, self).__init__()
         self.gcn_true = gcn_true
         self.buildA_true = buildA_true
@@ -45,7 +45,7 @@ class MTGNN(nn.Module):
         self.start_conv = nn.Conv2d(in_channels=in_dim,
                                     out_channels=residual_channels,
                                     kernel_size=(1, 1))
-        self.gc = graph_constructor(num_nodes, subgraph_size, node_dim, device, alpha=tanhalpha, static_feat=static_feat)
+        self.gc = graph_constructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=static_feat)
 
         self.seq_length = seq_length
         kernel_size = 7
@@ -109,15 +109,13 @@ class MTGNN(nn.Module):
             self.skipE = nn.Conv2d(in_channels=residual_channels, out_channels=skip_channels, kernel_size=(1, 1), bias=True)
 
 
-        self.idx = torch.arange(self.num_nodes).to(device)
+        self.idx = torch.arange(self.num_nodes)
 
 
     def forward(self, input, idx=None):
         """
         Making a forward pass of MTGNN.
-        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
-        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
-        nb_time_filter is the number of time filters used.
+        
         Arg types:
             * input (PyTorch Float Tensor) - input sequence, with shape (batch size, input dimension, number of nodes, input sequence length).
             * idx (Tensor, optional): input indices, a permutation of the number of nodes, default None (no permutation).
@@ -136,7 +134,7 @@ class MTGNN(nn.Module):
         if self.gcn_true:
             if self.buildA_true:
                 if idx is None:
-                    adp = self.gc(self.idx)
+                    adp = self.gc(self.idx.to(input.device))
                 else:
                     adp = self.gc(idx)
             else:

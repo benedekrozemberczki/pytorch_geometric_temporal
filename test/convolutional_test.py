@@ -143,7 +143,7 @@ def test_mtgnn():
             x_all[i,j] = x
     # define model and optimizer
     model = MTGNN(gcn_true, buildA_true, gcn_depth, num_nodes,
-                device, predefined_A=predefined_A,
+                predefined_A=predefined_A,
                 dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim,
                 dilation_exponential=dilation_exponential,

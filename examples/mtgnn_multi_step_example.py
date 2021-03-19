@@ -125,7 +125,7 @@ data = DataLoaderM(x_all,y_all,batch_size)
 scaler = StandardScaler(mean=x_all[..., 0].mean(), std=x_all[..., 0].std())
 # define model and optimizer
 model = MTGNN(gcn_true, buildA_true, gcn_depth, num_nodes,
-              device, predefined_A=predefined_A,
+              predefined_A=predefined_A,
               dropout=dropout, subgraph_size=subgraph_size,
               node_dim=node_dim,
               dilation_exponential=dilation_exponential,
