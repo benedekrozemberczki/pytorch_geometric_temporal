@@ -88,3 +88,8 @@ Auxiliary Graph Convolutional Layers
     :members:
     :undoc-members:
     :exclude-members: glorot, zeros
+
+.. automodule:: torch_geometric_temporal.nn.convolutional.mtgnn_layers
+    :members:
+    :undoc-members:
+    :exclude-members: nconv, linear, dilated_inception, LayerNorm
