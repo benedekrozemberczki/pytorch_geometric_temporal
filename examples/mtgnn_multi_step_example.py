@@ -116,7 +116,7 @@ predefined_A = torch.tensor(mock_adj.toarray()).to(device)
 total_size = 100
 num_batch = int(total_size // batch_size)
 x_all = torch.zeros(total_size,seq_in_len,num_nodes,in_dim)
-y_all = torch.clip(torch.rand(total_size,seq_out_len,num_nodes,in_dim) * 100 - 20,0,80)
+y_all = torch.clamp(torch.rand(total_size,seq_out_len,num_nodes,in_dim) * 100 - 20,0,80)
 for i in range(total_size):
     for j in range(seq_in_len):
         x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
