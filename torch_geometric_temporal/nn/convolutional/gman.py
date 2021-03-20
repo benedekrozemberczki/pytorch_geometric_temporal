@@ -253,16 +253,14 @@ class STAttBlock(nn.Module):
 
 
 class transformAttention(nn.Module):
-    '''
-    transform attention mechanism
-    X:        [batch_size, num_his, num_vertex, D]
-    STE_his:  [batch_size, num_his, num_vertex, D]
-    STE_pred: [batch_size, num_pred, num_vertex, D]
-    K:        number of attention heads
-    d:        dimension of each attention outputs
-    return:   [batch_size, num_pred, num_vertex, D]
-    '''
+    r"""An implementation of the tranform attention mechanism.
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
+    Args:
+        K (int) : number of attention heads.
+        d (int) : dimension of each attention head outputs.
+        bn_decay: batch normalization momentum.
+    """
     def __init__(self, K, d, bn_decay):
         super(transformAttention, self).__init__()
         D = K * d
@@ -278,6 +276,17 @@ class transformAttention(nn.Module):
                      bn_decay=bn_decay)
 
     def forward(self, X, STE_his, STE_pred):
+        """
+        Making a forward pass of the transform attention layer.
+        
+        Arg types:
+            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_his, num_nodes, K*d).
+            * STE_his (Pytorch Float Tensor) - spatial-temporal embedding for history, with shape (batch_size, num_his, num_nodes, K*d).
+            * STE_pred (Pytorch Float Tensor) - spatial-temporal embedding for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
+
+        Return types:
+            * X (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
+        """
         batch_size = X.shape[0]
         # [batch_size, num_step, num_vertex, K * d]
         query = self.FC_q(STE_pred)

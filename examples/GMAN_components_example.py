@@ -19,7 +19,7 @@ d = 8
 D = K * d
 bn_decay = 0.1
 num_his = 12
-num_pred = 12
+num_pred = 10
 num_nodes = 50
 num_sample = 100
 batch_size = 32
@@ -44,5 +44,5 @@ X = STAttBlock_layer(X, STE_his)
 print(X.shape) # (batch_size, num_his, num_nodes,D)
 # transAtt
 X = transformAttention_layer(X, STE_his, STE_pred)
-print(X.shape) # (batch_size, num_his, num_nodes,D)
+print(X.shape) # (batch_size, num_pred, num_nodes,D)
         

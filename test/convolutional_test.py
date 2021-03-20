@@ -108,7 +108,7 @@ def test_gman():
     # generate data
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     num_his = 12
-    num_pred = 12
+    num_pred = 10
     num_nodes = 50
     num_sample = 100
     batch_size = 32
@@ -147,7 +147,7 @@ def test_gman():
     assert X.shape ==  (batch_size, num_his, num_nodes,D)
     # transAtt
     X = transformAttention_layer(X, STE_his, STE_pred)
-    assert X.shape ==  (batch_size, num_his, num_nodes,D)
+    assert X.shape ==  (batch_size, num_pred, num_nodes,D)
 
 def test_mtgnn():
     """
@@ -167,7 +167,7 @@ def test_mtgnn():
     end_channels = 128
     in_dim = 2
     seq_in_len = 12
-    seq_out_len = 12
+    seq_out_len = 10
     layers = 3
     batch_size = 16
     propalpha = 0.05
