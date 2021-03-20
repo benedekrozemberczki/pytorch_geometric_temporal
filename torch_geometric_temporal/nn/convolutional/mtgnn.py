@@ -118,7 +118,7 @@ class MTGNN(nn.Module):
         
         Arg types:
             * input (PyTorch Float Tensor) - input sequence, with shape (batch size, input dimension, number of nodes, input sequence length).
-            * idx (Tensor, optional): input indices, a permutation of the number of nodes, default None (no permutation).
+            * idx (Tensor, optional) - input indices, a permutation of the number of nodes, default None (no permutation).
 
         Return types:
             * x (PyTorch Float Tensor) - output sequence for prediction, with shape (batch size, input sequence length, number of nodes, 1).
