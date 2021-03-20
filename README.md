@@ -127,17 +127,17 @@ In detail, the following temporal graph neural networks were implemented.
 
 * **[STEmbedding](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.STEmbedding)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
 
-* **[transformAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.transformAttention)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
+* **[TransformAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.TransformAttention)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
 
-* **[spatialAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.spatialAttention)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
+* **[SpatialAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.SpatialAttention)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
 
-* **[temporalAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.temporalAttention)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
+* **[TemporalAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.TemporalAttention)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
 
-* **[gatedFusion](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.gatedFusion)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
+* **[GatedFusion](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.gman.GatedFusion)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
 
-* **[mixprop](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.mtgnn_layers.mixprop)** from Wu *et al.*: [Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks](https://arxiv.org/pdf/2005.11650.pdf) (KDD 2020)
+* **[MixProp](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.mtgnn_layers.MixProp)** from Wu *et al.*: [Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks](https://arxiv.org/pdf/2005.11650.pdf) (KDD 2020)
 
-* **[graph_constructor](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.mtgnn_layers.graph_constructor)** from Wu *et al.*: [Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks](https://arxiv.org/pdf/2005.11650.pdf) (KDD 2020)
+* **[GraphConstructor](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.convolutional.mtgnn_layers.GraphConstructor)** from Wu *et al.*: [Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks](https://arxiv.org/pdf/2005.11650.pdf) (KDD 2020)
 
 --------------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from torch_geometric.utils import to_scipy_sparse_matrix
 import networkx as nx
-from torch_geometric_temporal.nn import mixprop, graph_constructor
+from torch_geometric_temporal.nn import MixProp, GraphConstructor
     
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -44,10 +44,10 @@ for i in range(total_size):
 start_conv = torch.nn.Conv2d(in_channels=in_dim,
                        out_channels=residual_channels,
                        kernel_size=(1, 1)).to(device)
-gc = graph_constructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=None).to(device)
+gc = GraphConstructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=None).to(device)
 adp = gc(torch.arange(num_nodes))
 x_tmp = start_conv(x_all[:batch_size].transpose(1,3))
-model = mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
-mixprop_output = model(x_tmp,adp)
+model = MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
+MixProp_output = model(x_tmp,adp)
 
 

@@ -23,7 +23,7 @@ class linear(nn.Module):
         return self.mlp(x)
 
 
-class mixprop(nn.Module):
+class MixProp(nn.Module):
     r"""An implementation of the dynatic mix-hop propagation layer.
     For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." <https://arxiv.org/pdf/2005.11650.pdf>`_
 
@@ -35,7 +35,7 @@ class mixprop(nn.Module):
         alpha (float) : ratio of retaining the root nodes's original states, a value between 0 and 1.
     """
     def __init__(self,c_in,c_out,gdep,dropout,alpha):
-        super(mixprop, self).__init__()
+        super(MixProp, self).__init__()
         self.nconv = nconv()
         self.mlp = linear((gdep+1)*c_in,c_out)
         self.gdep = gdep
@@ -85,7 +85,7 @@ class dilated_inception(nn.Module):
         return x
 
 
-class graph_constructor(nn.Module):
+class GraphConstructor(nn.Module):
     r"""An implementation of the graph learning layer to construct an adjacency matrix.
     For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." <https://arxiv.org/pdf/2005.11650.pdf>`_
 
@@ -97,7 +97,7 @@ class graph_constructor(nn.Module):
         static_feat (Pytorch Float Tensor, optional) : static feature, default None.
     """
     def __init__(self, nnodes, k, dim, alpha=3, static_feat=None):
-        super(graph_constructor, self).__init__()
+        super(GraphConstructor, self).__init__()
         self.nnodes = nnodes
         if static_feat is not None:
             xd = static_feat.shape[1]

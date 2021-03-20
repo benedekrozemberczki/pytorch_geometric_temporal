@@ -104,7 +104,7 @@ class STEmbedding(nn.Module):
         return SE + TE
 
 
-class spatialAttention(nn.Module):
+class SpatialAttention(nn.Module):
     r"""An implementation of the spatial attention mechanism.
     For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
@@ -114,7 +114,7 @@ class spatialAttention(nn.Module):
         bn_decay (float): batch normalization momentum.
     """
     def __init__(self, K, d, bn_decay):
-        super(spatialAttention, self).__init__()
+        super(SpatialAttention, self).__init__()
         D = K * d
         self.d = d
         self.K = K
@@ -160,7 +160,7 @@ class spatialAttention(nn.Module):
         return X
 
 
-class temporalAttention(nn.Module):
+class TemporalAttention(nn.Module):
     r"""An implementation of the temporal attention mechanism.
     For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
@@ -171,7 +171,7 @@ class temporalAttention(nn.Module):
         mask (bool, optional): whether to mask attention score.
     """
     def __init__(self, K, d, bn_decay, mask=True):
-        super(temporalAttention, self).__init__()
+        super(TemporalAttention, self).__init__()
         D = K * d
         self.d = d
         self.K = K
@@ -237,7 +237,7 @@ class temporalAttention(nn.Module):
         return X
 
 
-class gatedFusion(nn.Module):
+class GatedFusion(nn.Module):
     r"""An implementation of the gated fusion mechanism.
     For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
@@ -246,7 +246,7 @@ class gatedFusion(nn.Module):
         bn_decay (float): batch normalization momentum.
     """
     def __init__(self, D, bn_decay):
-        super(gatedFusion, self).__init__()
+        super(GatedFusion, self).__init__()
         self.FC_xs = FC(input_dims=D, units=D, activations=None,
                         bn_decay=bn_decay, use_bias=False)
         self.FC_xt = FC(input_dims=D, units=D, activations=None,
@@ -286,9 +286,9 @@ class STAttBlock(nn.Module):
     """
     def __init__(self, K, d, bn_decay, mask=False):
         super(STAttBlock, self).__init__()
-        self.spatialAttention = spatialAttention(K, d, bn_decay)
-        self.temporalAttention = temporalAttention(K, d, bn_decay, mask=mask)
-        self.gatedFusion = gatedFusion(K * d, bn_decay)
+        self.SpatialAttention = SpatialAttention(K, d, bn_decay)
+        self.TemporalAttention = TemporalAttention(K, d, bn_decay, mask=mask)
+        self.GatedFusion = GatedFusion(K * d, bn_decay)
 
     def forward(self, X, STE):
         """
@@ -301,14 +301,14 @@ class STAttBlock(nn.Module):
         Return types:
             * output (PyTorch Float Tensor) - attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
-        HS = self.spatialAttention(X, STE)
-        HT = self.temporalAttention(X, STE)
-        H = self.gatedFusion(HS, HT)
+        HS = self.SpatialAttention(X, STE)
+        HT = self.TemporalAttention(X, STE)
+        H = self.GatedFusion(HS, HT)
         del HS, HT
         return torch.add(X, H)
 
 
-class transformAttention(nn.Module):
+class TransformAttention(nn.Module):
     r"""An implementation of the tranform attention mechanism.
     For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
@@ -318,7 +318,7 @@ class transformAttention(nn.Module):
         bn_decay (float): batch normalization momentum.
     """
     def __init__(self, K, d, bn_decay):
-        super(transformAttention, self).__init__()
+        super(TransformAttention, self).__init__()
         D = K * d
         self.K = K
         self.d = d
@@ -393,7 +393,7 @@ class GMAN(nn.Module):
         self.STEmbedding = STEmbedding(D, bn_decay)
         self.STAttBlock_1 = nn.ModuleList([STAttBlock(K, d, bn_decay) for _ in range(L)])
         self.STAttBlock_2 = nn.ModuleList([STAttBlock(K, d, bn_decay) for _ in range(L)])
-        self.transformAttention = transformAttention(K, d, bn_decay)
+        self.TransformAttention = TransformAttention(K, d, bn_decay)
         self.FC_1 = FC(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
                        bn_decay=bn_decay)
         self.FC_2 = FC(input_dims=[D, D], units=[D, 1], activations=[F.relu, None],
@@ -421,7 +421,7 @@ class GMAN(nn.Module):
         for net in self.STAttBlock_1:
             X = net(X, STE_his)
         # transAtt
-        X = self.transformAttention(X, STE_his, STE_pred)
+        X = self.TransformAttention(X, STE_his, STE_pred)
         # decoder
         for net in self.STAttBlock_2:
             X = net(X, STE_pred)

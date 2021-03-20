@@ -45,7 +45,7 @@ class MTGNN(nn.Module):
         self.start_conv = nn.Conv2d(in_channels=in_dim,
                                     out_channels=residual_channels,
                                     kernel_size=(1, 1))
-        self.gc = graph_constructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=static_feat)
+        self.gc = GraphConstructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=static_feat)
 
         self.seq_length = seq_length
         kernel_size = 7
@@ -81,8 +81,8 @@ class MTGNN(nn.Module):
                                                     kernel_size=(1, self.receptive_field-rf_size_j+1)))
 
                 if self.gcn_true:
-                    self.gconv1.append(mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
-                    self.gconv2.append(mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
+                    self.gconv1.append(MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
+                    self.gconv2.append(MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
 
                 if self.seq_length>self.receptive_field:
                     self.norm.append(LayerNorm((residual_channels, num_nodes, self.seq_length - rf_size_j + 1),elementwise_affine=layer_norm_affline))
