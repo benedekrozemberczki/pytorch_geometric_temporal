@@ -74,7 +74,7 @@ Discrete Temporal Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.convolutional.gman
     :members:
     :undoc-members:
-    :exclude-members: conv2d_, FC, STEmbedding, spatialAttention, temporalAttention, gatedFusion, STAttBlock
+    :exclude-members: conv2d_, FC, STEmbedding, spatialAttention, temporalAttention, gatedFusion, STAttBlock, transformAttention
 
 Auxiliary Graph Convolutional Layers
 --------------
