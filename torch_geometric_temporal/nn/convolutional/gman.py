@@ -307,20 +307,19 @@ class transformAttention(nn.Module):
 
 
 class GMAN(nn.Module):
-    '''
-    GMAN
-        X：       [batch_size, num_his, num_vertx]
-        TE：      [batch_size, num_his + num_pred, 2] (time-of-day, day-of-week)
-        SE：      [num_vertex, K * d]
-        num_his： number of history steps
-        num_pred：number of prediction steps
-        T：       one day is divided into T steps
-        L：       number of STAtt blocks in the encoder/decoder
-        K：       number of attention heads
-        d：       dimension of each attention head outputs
-        return：  [batch_size, num_pred, num_vertex]
-    '''
+    r"""An implementation of GMAN.
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
+    Args:
+        SE (Pytorch Float Tensor) ： spatial embedding, with shape (numbed of nodes, K * d).
+        num_his (int) ： number of history steps.
+        num_pred (int) ：number of prediction steps.
+        T (int)：       one day is divided into T steps.
+        L (int)：       number of STAtt blocks in the encoder/decoder.
+        K (int)：       number of attention heads.
+        d (int)：       dimension of each attention head outputs.
+        bn_decay:       batch normalization momentem.
+    """
     def __init__(self, SE, L,K,d,num_his, bn_decay):
         super(GMAN, self).__init__()
         D = K * d
@@ -336,7 +335,16 @@ class GMAN(nn.Module):
                        bn_decay=bn_decay)
 
     def forward(self, X, TE):
+        """
+        Making a forward pass of GMAN.
+        
+        Arg types:
+            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_hist, num of nodes).
+            * TE (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2) (time-of-day, day-of-week).
 
+        Return types:
+            * output (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num of nodes).
+        """
         # input
         X = torch.unsqueeze(X, -1)
         X = self.FC_1(X)
