@@ -102,4 +102,4 @@ Auxiliary Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.convolutional.gman
     :members:
     :undoc-members:
-    :exclude-members: conv2d_, FC, spatialAttention, temporalAttention, gatedFusion, GMAN
+    :exclude-members: conv2d_, FC, GMAN

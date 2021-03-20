@@ -4,4 +4,4 @@ from .mstgcn import MSTGCN
 from .chebconvatt import ChebConvAtt
 from .mtgnn import MTGNN
 from .mtgnn_layers import mixprop, graph_constructor
-from .gman import GMAN, STAttBlock, STEmbedding, transformAttention
+from .gman import GMAN, STAttBlock, STEmbedding, transformAttention, spatialAttention, temporalAttention, gatedFusion
