@@ -318,7 +318,7 @@ class GMAN(nn.Module):
         L (int) : number of STAtt blocks in the encoder/decoder.
         K (int) : number of attention heads.
         d (int) : dimension of each attention head outputs.
-        bn_decay:       batch normalization momentem.
+        bn_decay: batch normalization momentum.
     """
     def __init__(self, SE, L,K,d,num_his, bn_decay):
         super(GMAN, self).__init__()
