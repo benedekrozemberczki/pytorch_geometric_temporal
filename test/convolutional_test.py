@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN, graph_constructor, mixprop
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
@@ -96,6 +96,42 @@ def test_stconv():
     stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2)
     H = stconv(batch, edge_index, edge_weight)
     assert H.shape == (batch_size, sequence_length-2*(kernel_size-1), number_of_nodes, out_channels)
+def test_mtgnn_layers():
+    """
+    Testing MTGNN layers
+    """
+    dropout = 0.3
+    subgraph_size = 20
+    gcn_depth = 2
+    num_nodes = 207
+    node_dim = 40
+    conv_channels = 32
+    residual_channels = 32
+    skip_channels = 64
+    in_dim = 2
+    seq_in_len = 12
+    batch_size = 16
+    propalpha = 0.05
+    tanhalpha = 3
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    total_size = batch_size
+    x_all = torch.zeros(total_size,seq_in_len,num_nodes,in_dim)
+    for i in range(total_size):
+        for j in range(seq_in_len):
+            x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
+            x_all[i,j] = x
+    # define model and optimizer
+    start_conv = torch.nn.Conv2d(in_channels=in_dim,
+                        out_channels=residual_channels,
+                        kernel_size=(1, 1)).to(device)
+    gc = graph_constructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=None).to(device)
+    adp = gc(torch.arange(num_nodes))
+    assert adp.shape == (num_nodes, num_nodes)
+    x_tmp = start_conv(x_all[:batch_size].transpose(1,3))
+    model = mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
+    mixprop_output = model(x_tmp,adp)
+    assert mixprop_output.shape == (batch_size, residual_channels, num_nodes, seq_in_len)
 
 def test_mtgnn():
     """
@@ -136,7 +172,6 @@ def test_mtgnn():
     mock_adj = to_scipy_sparse_matrix(edge_index)
     predefined_A = torch.tensor(mock_adj.toarray()).to(device)
     x_all = torch.zeros(batch_size,seq_in_len,num_nodes,in_dim)
-    y_all = torch.clamp(torch.rand(batch_size,seq_out_len,num_nodes,in_dim) * 100 - 20,0,80)
     for i in range(batch_size):
         for j in range(seq_in_len):
             x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
@@ -153,8 +188,6 @@ def test_mtgnn():
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
     trainx = torch.Tensor(x_all).to(device)
     trainx= trainx.transpose(1, 3)
-    trainy = torch.Tensor(y_all).to(device)
-    trainy = trainy.transpose(1, 3)
     perm = np.random.permutation(range(num_nodes))
     num_sub = int(num_nodes/num_split) # number of nodes in each sudgraph
     for j in range(num_split):
@@ -164,7 +197,6 @@ def test_mtgnn():
             id = perm[j * num_sub:]
         id = torch.tensor(id).to(device) # a permutation of node id
         tx = trainx[:, :, id, :]
-        ty = trainy[:, :, id, :]
         output = model(tx, idx=id)
         output = output.transpose(1,3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)

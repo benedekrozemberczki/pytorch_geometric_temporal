@@ -48,11 +48,11 @@ class mixprop(nn.Module):
         Making a forward pass of mix-hop propagation.
         
         Arg types:
-            * x (Tensor): input feature matrix.
-            * adj (PyTorch Float Tensor) - adjacency matrix.
+            * x (Pytorch Float Tensor): input feature Tensor, with shape (batch_size, c_in, num_nodes, seq_len).
+            * adj (PyTorch Float Tensor) - adjacency matrix, with shape (num_nodes, num_nodes).
 
         Return types:
-            * ho (PyTorch Float Tensor) - hidden representation for all nodes.
+            * ho (PyTorch Float Tensor) - hidden representation for all nodes, with shape (batch_size, c_out, num_nodes, seq_len).
         """
         adj = adj + torch.eye(adj.size(0)).to(x.device) # add self-loops
         d = adj.sum(1)
