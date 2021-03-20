@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN
 from torch_geometric_temporal.nn.convolutional import GMAN, STAttBlock, STEmbedding, transformAttention, graph_constructor, mixprop
+from torch_geometric_temporal.nn.convolutional import spatialAttention, temporalAttention, gatedFusion
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
@@ -132,6 +133,9 @@ def test_gman():
     D = K * d
     bn_decay = 0.1
     # layers
+    spatialAttention_layer = spatialAttention(K, d, bn_decay).to(device)
+    temporalAttention_layer = temporalAttention(K, d, bn_decay, mask=False).to(device)
+    gatedFusion_layer = gatedFusion(D, bn_decay).to(device)
     STEmbedding_layer = STEmbedding(D, bn_decay).to(device)
     STAttBlock_layer = STAttBlock(K, d, bn_decay).to(device)
     transformAttention_layer = transformAttention(K, d, bn_decay).to(device)
@@ -142,6 +146,16 @@ def test_gman():
     STE_pred = STE[:, num_his:]
     assert STE.shape == (batch_size, num_his+num_pred, num_nodes,D)
     X = torch.rand(batch_size,num_his,num_nodes,D).to(device)
+    # diffent components of STAtt
+    # spatial attention
+    HS = spatialAttention_layer(X, STE_his)
+    assert HS.shape == (batch_size, num_his, num_nodes,D)
+    # temporal attention
+    HT = temporalAttention_layer(X, STE_his)
+    assert HT.shape == (batch_size, num_his, num_nodes,D)
+    # gated fustion
+    H = gatedFusion_layer(HS, HT)
+    assert H.shape == (batch_size, num_his, num_nodes,D)
     # STAtt
     X = STAttBlock_layer(X, STE_his)
     assert X.shape ==  (batch_size, num_his, num_nodes,D)

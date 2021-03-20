@@ -1,9 +1,7 @@
-import torch.nn as nn
 import torch
-import math
 import networkx as nx
 import numpy as np
-from torch_geometric_temporal.nn import STEmbedding, STAttBlock, transformAttention
+from torch_geometric_temporal.nn import STEmbedding, STAttBlock, transformAttention, spatialAttention, temporalAttention, gatedFusion
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -29,6 +27,9 @@ for i in range(num_his+num_pred):
     x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
     trainTE[:,i,:] = x
 # layers
+spatialAttention_layer = spatialAttention(K, d, bn_decay).to(device)
+temporalAttention_layer = temporalAttention(K, d, bn_decay, mask=False).to(device)
+gatedFusion_layer = gatedFusion(D, bn_decay).to(device)
 STEmbedding_layer = STEmbedding(D, bn_decay).to(device)
 STAttBlock_layer = STAttBlock(K, d, bn_decay).to(device)
 transformAttention_layer = transformAttention(K, d, bn_decay).to(device)
@@ -39,6 +40,16 @@ STE_his = STE[:, :num_his]
 STE_pred = STE[:, num_his:]
 print(STE.shape) # (batch_size, num_his+num_pred, num_nodes,D)
 X = torch.rand(batch_size,num_his,num_nodes,D).to(device)
+# diffent components of STAtt
+# spatial attention
+HS = spatialAttention_layer(X, STE_his)
+print(HS.shape) # (batch_size, num_his, num_nodes,D)
+# temporal attention
+HT = temporalAttention_layer(X, STE_his)
+print(HT.shape) # (batch_size, num_his, num_nodes,D)
+# gated fustion
+H = gatedFusion_layer(HS, HT)
+print(H.shape) # (batch_size, num_his, num_nodes,D)
 # STAtt
 X = STAttBlock_layer(X, STE_his)
 print(X.shape) # (batch_size, num_his, num_nodes,D)
