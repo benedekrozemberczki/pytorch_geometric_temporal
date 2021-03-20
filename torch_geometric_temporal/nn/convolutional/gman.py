@@ -58,15 +58,13 @@ class FC(nn.Module):
 
 
 class STEmbedding(nn.Module):
-    '''
-    spatio-temporal embedding
-    SE:     [num_vertex, D]
-    TE:     [batch_size, num_his + num_pred, 2] (dayofweek, timeofday)
-    T:      num of time steps in one day
-    D:      output dims
-    retrun: [batch_size, num_his + num_pred, num_vertex, D]
-    '''
+    r"""An implementation of the spatial-temporal embedding block.
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
 
+    Args:
+        D (int) : dimension of output.
+        bn_decay (float): batch normalization momentum.
+    """
     def __init__(self, D, bn_decay):
         super(STEmbedding, self).__init__()
         self.FC_se = FC(
@@ -78,6 +76,17 @@ class STEmbedding(nn.Module):
             bn_decay=bn_decay)  # input_dims = time step per day + days per week=288+7=295
 
     def forward(self, SE, TE, T=288):
+        """
+        Making a forward pass of the spatial-temporal embedding.
+        
+        Arg types:
+            * SE (PyTorch Float Tensor) - spatial embedding, with shape (num_nodes, D).
+            * TE (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2).(dayofweek, timeofday)
+            * T (int, optional) - num of time steps in one day, default 288.
+        
+        Return types:
+            * output (PyTorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_his + num_pred, num_vertex, D).
+        """
         # spatial embedding
         SE = SE.unsqueeze(0).unsqueeze(0)
         SE = self.FC_se(SE)
@@ -238,6 +247,15 @@ class gatedFusion(nn.Module):
 
 
 class STAttBlock(nn.Module):
+    r"""An implementation of the spatial-temporal attention block, with spatial attention and temporal attention followed by gated fusion.
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+
+    Args:
+        K (int) : number of attention heads.
+        d (int) : dimension of each attention head outputs.
+        bn_decay (float): batch normalization momentum.
+        mask (bool, optional): whether to mask attention score in temporal attention.
+    """
     def __init__(self, K, d, bn_decay, mask=False):
         super(STAttBlock, self).__init__()
         self.spatialAttention = spatialAttention(K, d, bn_decay)
@@ -245,6 +263,16 @@ class STAttBlock(nn.Module):
         self.gatedFusion = gatedFusion(K * d, bn_decay)
 
     def forward(self, X, STE):
+        """
+        Making a forward pass of the spatial-temporal attention block.
+        
+        Arg types:
+            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num, num_nodes, K*d), where num can be num_his or num_pred.
+            * STE (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num, num_nodes, K*d).
+        
+        Return types:
+            * output (PyTorch Float Tensor) - attention scores, with shape (batch_size, num, num_nodes, K*d).
+        """
         HS = self.spatialAttention(X, STE)
         HT = self.temporalAttention(X, STE)
         H = self.gatedFusion(HS, HT)
@@ -259,7 +287,7 @@ class transformAttention(nn.Module):
     Args:
         K (int) : number of attention heads.
         d (int) : dimension of each attention head outputs.
-        bn_decay: batch normalization momentum.
+        bn_decay (float): batch normalization momentum.
     """
     def __init__(self, K, d, bn_decay):
         super(transformAttention, self).__init__()
@@ -327,7 +355,7 @@ class GMAN(nn.Module):
         L (int) : number of STAtt blocks in the encoder/decoder.
         K (int) : number of attention heads.
         d (int) : dimension of each attention head outputs.
-        bn_decay: batch normalization momentum.
+        bn_decay (float): batch normalization momentum.
     """
     def __init__(self, SE, L,K,d,num_his, bn_decay):
         super(GMAN, self).__init__()
