@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN
-from torch_geometric_temporal.nn.convolutional import GMAN, graph_constructor, mixprop
+from torch_geometric_temporal.nn.convolutional import GMAN, STAttBlock, STEmbedding, transformAttention, graph_constructor, mixprop
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
@@ -102,12 +102,11 @@ def test_gman():
     """
     Testing GMAN
     """
-    time_slot = 5
-    T = 24 * 60 // time_slot  # Number of time steps in one day
     L = 1
     K = 8
     d = 8
     # generate data
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     num_his = 12
     num_pred = 12
     num_nodes = 50
@@ -120,58 +119,35 @@ def test_gman():
         x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
         trainTE[:,i,:] = x
     # build model
-    model = GMAN(SE, L, K, d, num_his, bn_decay=0.1)
+    model = GMAN(SE, L, K, d, num_his, bn_decay=0.1).to(device)
 
-    # start training
-    num_train, _, num_vertex = trainX.shape
-    # shuffle
-    permutation = torch.randperm(num_train)
-    trainX = trainX[permutation]
-    trainTE = trainTE[permutation]
     start_idx = 0
     end_idx = batch_size
-    X = trainX[start_idx: end_idx]
-    TE = trainTE[start_idx: end_idx]
+    X = trainX[start_idx: end_idx].to(device)
+    TE = trainTE[start_idx: end_idx].to(device)
     pred = model(X, TE)
-
     assert pred.shape == (batch_size, num_pred, num_nodes)
-
-def test_mtgnn_layers():
-    """
-    Testing MTGNN layers
-    """
-    dropout = 0.3
-    subgraph_size = 20
-    gcn_depth = 2
-    num_nodes = 207
-    node_dim = 40
-    conv_channels = 32
-    residual_channels = 32
-    skip_channels = 64
-    in_dim = 2
-    seq_in_len = 12
-    batch_size = 16
-    propalpha = 0.05
-    tanhalpha = 3
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    total_size = batch_size
-    x_all = torch.zeros(total_size,seq_in_len,num_nodes,in_dim)
-    for i in range(total_size):
-        for j in range(seq_in_len):
-            x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
-            x_all[i,j] = x
-    # define model and optimizer
-    start_conv = torch.nn.Conv2d(in_channels=in_dim,
-                        out_channels=residual_channels,
-                        kernel_size=(1, 1)).to(device)
-    gc = graph_constructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=None).to(device)
-    adp = gc(torch.arange(num_nodes))
-    assert adp.shape == (num_nodes, num_nodes)
-    x_tmp = start_conv(x_all[:batch_size].transpose(1,3))
-    model = mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
-    mixprop_output = model(x_tmp,adp)
-    assert mixprop_output.shape == (batch_size, residual_channels, num_nodes, seq_in_len)
+    
+    # GMAN components
+    D = K * d
+    bn_decay = 0.1
+    # layers
+    STEmbedding_layer = STEmbedding(D, bn_decay).to(device)
+    STAttBlock_layer = STAttBlock(K, d, bn_decay).to(device)
+    transformAttention_layer = transformAttention(K, d, bn_decay).to(device)
+    TE = trainTE[:batch_size].to(device)
+    # STE
+    STE = STEmbedding_layer(SE, TE)
+    STE_his = STE[:, :num_his]
+    STE_pred = STE[:, num_his:]
+    assert STE.shape == (batch_size, num_his+num_pred, num_nodes,D)
+    X = torch.rand(batch_size,num_his,num_nodes,D).to(device)
+    # STAtt
+    X = STAttBlock_layer(X, STE_his)
+    assert X.shape ==  (batch_size, num_his, num_nodes,D)
+    # transAtt
+    X = transformAttention_layer(X, STE_his, STE_pred)
+    assert X.shape ==  (batch_size, num_his, num_nodes,D)
 
 def test_mtgnn():
     """
@@ -179,7 +155,6 @@ def test_mtgnn():
     """
     gcn_true = True
     buildA_true = True
-    cl = True
     dropout = 0.3
     subgraph_size = 20
     gcn_depth = 2
@@ -195,13 +170,6 @@ def test_mtgnn():
     seq_out_len = 12
     layers = 3
     batch_size = 16
-    learning_rate = 0.001
-    weight_decay = 0.00001
-    clip = 5
-    step_size1 = 2500
-    step_size2 = 100
-    epochs = 3
-    seed = 101
     propalpha = 0.05
     tanhalpha = 3
     num_split = 1
@@ -240,23 +208,32 @@ def test_mtgnn():
         output = model(tx, idx=id)
         output = output.transpose(1,3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
+    # test MTGNN layers
+    gc = graph_constructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=None).to(device)
+    adp = gc(torch.arange(num_nodes))
+    assert adp.shape == (num_nodes, num_nodes)
+    start_conv = torch.nn.Conv2d(in_channels=in_dim,
+                        out_channels=residual_channels,
+                        kernel_size=(1, 1)).to(device)
+    x_tmp = start_conv(x_all[:batch_size].transpose(1,3))
+    model = mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha).to(device)
+    mixprop_output = model(x_tmp,adp)
+    assert mixprop_output.shape == (batch_size, residual_channels, num_nodes, seq_in_len)
 
 def test_astgcn():
     """
-    Testing ASTGCN block
+    Testing ASTGCN block with changing edge index over time or not
     """
     node_count = 307
     num_classes = 10
     edge_per_node = 15
 
-
-    num_of_vertices = node_count # 307
     num_for_predict = 12
     len_input = 12
     nb_time_strides = 1
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    node_features = 1
+    node_features = 2
     nb_block = 2
     K = 3
     nb_chev_filter = 64
@@ -268,121 +245,34 @@ def test_astgcn():
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
     target_seq = torch.zeros([batch_size,node_count,T]).to(device)
+    edge_index_seq = []
     for b in range(batch_size):
         for t in range(T):
             x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
             x_seq[b,:,:,t] = x
+            if b == 0:
+                edge_index_seq.append(edge_index)
             target = create_mock_target(node_count, num_classes)
             target_seq[b,:,t] = target
     shuffle = True
     train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(device)
     for batch_data in train_loader:
-        encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs, edge_index)
-    assert outputs.shape == (batch_size, node_count, num_for_predict)
+        encoder_inputs, _ = batch_data
+        outputs1 = model(encoder_inputs, edge_index_seq)
+        outputs2 = model(encoder_inputs, edge_index_seq[0])
+    assert outputs1.shape == (batch_size, node_count, num_for_predict)
+    assert outputs2.shape == (batch_size, node_count, num_for_predict)
 
 def test_mstgcn():
     """
-    Testing MSTGCN block
+    Testing MSTGCN block with changing edge index over time or not
     """
     node_count = 307
     num_classes = 10
     edge_per_node = 15
 
-
-    num_of_vertices = node_count # 307
-    num_for_predict = 12
-    len_input = 12
-    nb_time_strides = 1
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    node_features = 2
-    nb_block = 2
-    K = 3
-    nb_chev_filter = 64
-    nb_time_filter = 64
-    batch_size = 32
-
-    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = MSTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input)
-    T = len_input
-    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
-    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
-    for b in range(batch_size):
-        for t in range(T):
-            x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-            x_seq[b,:,:,t] = x
-            target = create_mock_target(node_count, num_classes)
-            target_seq[b,:,t] = target
-    shuffle = True
-    train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(device)
-    for batch_data in train_loader:
-        encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs, edge_index)
-    assert outputs.shape == (batch_size, node_count, num_for_predict)
-
-def test_astgcn_change_edge_index():
-    """
-    Testing ASTGCN block with changing edge index over time
-    """
-    node_count = 307
-    num_classes = 10
-    edge_per_node = 15
-
-
-    num_of_vertices = node_count # 307
-    num_for_predict = 12
-    len_input = 12
-    nb_time_strides = 1
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    node_features = 2
-    nb_block = 2
-    K = 3
-    nb_chev_filter = 64
-    nb_time_filter = 64
-    batch_size = 32
-
-    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count).to(device)
-    T = len_input
-    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
-    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
-    edge_index_seq = []
-    for b in range(batch_size):
-        for t in range(T):
-            x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-            x_seq[b,:,:,t] = x
-            if b == 0:
-                edge_index_seq.append(edge_index)
-            target = create_mock_target(node_count, num_classes)
-            target_seq[b,:,t] = target
-    shuffle = True
-    train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(device)
-    for batch_data in train_loader:
-        encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs, edge_index_seq)
-    assert outputs.shape == (batch_size, node_count, num_for_predict)
-
-def test_mstgcn_change_edge_index():
-    """
-    Testing MSTGCN block with changing edge index over time
-    """
-    node_count = 307
-    num_classes = 10
-    edge_per_node = 15
-
-
-    num_of_vertices = node_count # 307
     num_for_predict = 12
     len_input = 12
     nb_time_strides = 1
@@ -413,11 +303,12 @@ def test_mstgcn_change_edge_index():
     train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    criterion = torch.nn.MSELoss().to(device)
     for batch_data in train_loader:
-        encoder_inputs, labels = batch_data
-        outputs = model(encoder_inputs, edge_index_seq)
-    assert outputs.shape == (batch_size, node_count, num_for_predict)
+        encoder_inputs, _ = batch_data
+        outputs1 = model(encoder_inputs, edge_index_seq)
+        outputs2 = model(encoder_inputs, edge_index_seq[0])
+    assert outputs1.shape == (batch_size, node_count, num_for_predict)
+    assert outputs2.shape == (batch_size, node_count, num_for_predict)
 
 def test_chebconvatt():
     """
