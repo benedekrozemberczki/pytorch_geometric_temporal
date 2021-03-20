@@ -1,7 +1,8 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN, graph_constructor, mixprop
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN
+from torch_geometric_temporal.nn.convolutional import GMAN, graph_constructor, mixprop
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
@@ -96,6 +97,45 @@ def test_stconv():
     stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2)
     H = stconv(batch, edge_index, edge_weight)
     assert H.shape == (batch_size, sequence_length-2*(kernel_size-1), number_of_nodes, out_channels)
+
+def test_gman():
+    """
+    Testing GMAN
+    """
+    time_slot = 5
+    T = 24 * 60 // time_slot  # Number of time steps in one day
+    L = 1
+    K = 8
+    d = 8
+    # generate data
+    num_his = 12
+    num_pred = 12
+    num_nodes = 50
+    num_sample = 100
+    batch_size = 32
+    trainX = torch.rand(num_sample,num_his, num_nodes)
+    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
+    trainTE = torch.zeros((num_sample, num_his + num_pred, 2))
+    for i in range(num_his+num_pred):
+        x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
+        trainTE[:,i,:] = x
+    # build model
+    model = GMAN(SE, L, K, d, num_his, bn_decay=0.1)
+
+    # start training
+    num_train, _, num_vertex = trainX.shape
+    # shuffle
+    permutation = torch.randperm(num_train)
+    trainX = trainX[permutation]
+    trainTE = trainTE[permutation]
+    start_idx = 0
+    end_idx = batch_size
+    X = trainX[start_idx: end_idx]
+    TE = trainTE[start_idx: end_idx]
+    pred = model(X, TE)
+
+    assert pred.shape == (batch_size, num_pred, num_nodes)
+
 def test_mtgnn_layers():
     """
     Testing MTGNN layers
