@@ -312,12 +312,12 @@ class GMAN(nn.Module):
 
     Args:
         SE (Pytorch Float Tensor) ： spatial embedding, with shape (numbed of nodes, K * d).
-        num_his (int) ： number of history steps.
-        num_pred (int) ：number of prediction steps.
-        T (int)：       one day is divided into T steps.
-        L (int)：       number of STAtt blocks in the encoder/decoder.
-        K (int)：       number of attention heads.
-        d (int)：       dimension of each attention head outputs.
+        num_his (int): number of history steps.
+        num_pred (int): number of prediction steps.
+        T (int) : one day is divided into T steps.
+        L (int) : number of STAtt blocks in the encoder/decoder.
+        K (int) : number of attention heads.
+        d (int) : dimension of each attention head outputs.
         bn_decay:       batch normalization momentem.
     """
     def __init__(self, SE, L,K,d,num_his, bn_decay):
