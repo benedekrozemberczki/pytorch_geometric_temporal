@@ -2,8 +2,7 @@ import torch
 import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN
-from torch_geometric_temporal.nn.convolutional import GMAN, STAttBlock, STEmbedding, TransformAttention, GraphConstructor, MixProp
-from torch_geometric_temporal.nn.convolutional import SpatialAttention, TemporalAttention, GatedFusion
+from torch_geometric_temporal.nn.convolutional import GMAN, STAttBlock, STEmbedding, GraphConstructor, MixProp
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
@@ -133,12 +132,8 @@ def test_gman():
     D = K * d
     bn_decay = 0.1
     # layers
-    SpatialAttention_layer = SpatialAttention(K, d, bn_decay).to(device)
-    TemporalAttention_layer = TemporalAttention(K, d, bn_decay, mask=False).to(device)
-    GatedFusion_layer = GatedFusion(D, bn_decay).to(device)
     STEmbedding_layer = STEmbedding(D, bn_decay).to(device)
     STAttBlock_layer = STAttBlock(K, d, bn_decay).to(device)
-    TransformAttention_layer = TransformAttention(K, d, bn_decay).to(device)
     TE = trainTE[:batch_size].to(device)
     # STE
     STE = STEmbedding_layer(SE, TE)
@@ -146,22 +141,9 @@ def test_gman():
     STE_pred = STE[:, num_his:]
     assert STE.shape == (batch_size, num_his+num_pred, num_nodes,D)
     X = torch.rand(batch_size,num_his,num_nodes,D).to(device)
-    # diffent components of STAtt
-    # spatial attention
-    HS = SpatialAttention_layer(X, STE_his)
-    assert HS.shape == (batch_size, num_his, num_nodes,D)
-    # temporal attention
-    HT = TemporalAttention_layer(X, STE_his)
-    assert HT.shape == (batch_size, num_his, num_nodes,D)
-    # gated fustion
-    H = GatedFusion_layer(HS, HT)
-    assert H.shape == (batch_size, num_his, num_nodes,D)
     # STAtt
     X = STAttBlock_layer(X, STE_his)
     assert X.shape ==  (batch_size, num_his, num_nodes,D)
-    # transAtt
-    X = TransformAttention_layer(X, STE_his, STE_pred)
-    assert X.shape ==  (batch_size, num_pred, num_nodes,D)
 
 def test_mtgnn():
     """
