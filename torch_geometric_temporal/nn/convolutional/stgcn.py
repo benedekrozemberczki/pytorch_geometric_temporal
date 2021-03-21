@@ -25,12 +25,12 @@ class TemporalConv(nn.Module):
     def forward(self, X: torch.FloatTensor):
         """Forward pass through temporal convolution block.
         
-        Arg Types:
-            * **X** (torch.FloatTensor): Input data of shape 
+        Arg types:
+            * **X** (torch.FloatTensor) -  Input data of shape 
                 (batch_size, input_time_steps, num_nodes, in_channels).
 
-        Returns Types:
-            * **H** (torch.FloatTensor): Output data of shape 
+        Return types:
+            * **H** (torch.FloatTensor) - Output data of shape 
                 (batch_size, in_channels, num_nodes, input_time_steps).
         """
         X = X.permute(0, 3, 2, 1)
@@ -114,14 +114,14 @@ class STConv(nn.Module):
         r"""Forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. 
 
-        Args:
-            * **X** (PyTorch Float Tensor): Sequence of node features of shape 
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Sequence of node features of shape 
                     (batch_size, input_time_steps, num_nodes, in_channels).
-            * **edge_index** (PyTorch Long Tensor): Graph edge indices.
-            * **edge_weight** (PyTorch Long Tensor, optional): Edge weight vector.
+            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional)- Edge weight vector.
         
-        Returns:
-            * **T** (PyTorch Float Tensor): Sequence of node features.
+        Return types:
+            * **T** (PyTorch Float Tensor) - Sequence of node features.
         """
         T = self._temporal_conv1(X)
 
