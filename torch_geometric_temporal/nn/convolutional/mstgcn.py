@@ -92,7 +92,9 @@ class MSTGCN(nn.Module):
         
     """
 
-    def __init__(self, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input):
+    def __init__(self, nb_block: int, in_channels: int, K: int,
+                 nb_chev_filter: int, nb_time_filter: int, time_strides: int,
+                 num_for_predict: int, len_input: int):
 
         super(MSTGCN, self).__init__()
 
@@ -112,8 +114,7 @@ class MSTGCN(nn.Module):
                 nn.init.uniform_(p)
 
     def forward(self, x, edge_index):
-        r"""
-        Making a forward pass. This module takes a likst of MSTGCN blocks and use a final convolution to serve as a multi-component fusion.
+        r""" Making a forward pass. This module takes a likst of MSTGCN blocks and use a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         

@@ -215,15 +215,6 @@ $ python setup.py test
 ```
 --------------------------------------------------------------------------------
 
-**Running examples**
-
-```
-$ cd examples
-$ python gconvgru_example.py
-```
-
---------------------------------------------------------------------------------
-
 **License**
 
 - [MIT License](https://github.com/benedekrozemberczki/pytorch_geometric_temporal/blob/master/LICENSE)

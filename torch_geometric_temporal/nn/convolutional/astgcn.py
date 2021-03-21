@@ -1,18 +1,16 @@
+import math
+from typing import Optional
+
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric.data import Data
-
-from typing import Optional
-from torch_geometric.typing import OptTensor
-
-import torch
 from torch.nn import Parameter
+import torch.nn.functional as F
+
+from torch_geometric.data import Data
+from torch_geometric.typing import OptTensor
 from torch_geometric.nn.conv import MessagePassing
-from torch_geometric.utils import remove_self_loops, add_self_loops
-from torch_geometric.utils import get_laplacian
-import math
+from torch_geometric.transforms import LaplacianLambdaMax
+from torch_geometric.utils import remove_self_loops, add_self_loops, get_laplacian
 
 def glorot(tensor):
     if tensor is not None:
@@ -24,7 +22,7 @@ def zeros(tensor):
     if tensor is not None:
         tensor.data.fill_(0)
 
-class ChebConvAtt(MessagePassing):
+class ChebConvAttention(MessagePassing):
     r"""The chebyshev spectral graph convolutional operator with attention from the
     `Attention Based Spatial-Temporal Graph Convolutional 
     Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_ paper
@@ -56,10 +54,10 @@ class ChebConvAtt(MessagePassing):
         **kwargs (optional): Additional arguments of
             :class:`torch_geometric.nn.conv.MessagePassing`.
     """
-    def __init__(self, in_channels, out_channels, K, normalization=None,
+    def __init__(self, in_channels: int, out_channels: int, K: int, normalization=None,
                  bias=True, **kwargs):
         kwargs.setdefault('aggr', 'add')
-        super(ChebConvAtt, self).__init__(**kwargs)
+        super(ChebConvAttention, self).__init__(**kwargs)
 
         assert K > 0
         assert normalization in [None, 'sym', 'rw'], 'Invalid normalization'
@@ -173,12 +171,12 @@ class ChebConvAtt(MessagePassing):
             self.__class__.__name__, self.in_channels, self.out_channels,
             self.weight.size(0), self.normalization)
 
-class SpatialAttentionLayer(nn.Module):
+class SpatialAttention(nn.Module):
     """
     Spatial Attention Computation Layer.
     """
     def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
-        super(SpatialAttentionLayer, self).__init__()
+        super(SpatialAttention, self).__init__()
         
         self.W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))
         self.W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
@@ -224,9 +222,9 @@ class SpatialAttentionLayer(nn.Module):
 
 
 
-class Temporal_Attention_layer(nn.Module):
+class TemporalAttention(nn.Module):
     def __init__(self, in_channels, num_of_vertices, num_of_timesteps):
-        super(Temporal_Attention_layer, self).__init__()
+        super(TemporalAttention, self).__init__()
         self.U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
         self.U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices))
         self.U3 = nn.Parameter(torch.FloatTensor(in_channels))
@@ -273,9 +271,9 @@ class ASTGCNBlock(nn.Module):
 
     def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, num_of_timesteps):
         super(ASTGCNBlock, self).__init__()
-        self.TAt = Temporal_Attention_layer(in_channels, num_of_vertices, num_of_timesteps)
-        self.SAt = SpatialAttentionLayer(in_channels, num_of_vertices, num_of_timesteps)
-        self.cheb_conv_SAt = ChebConvAtt(in_channels, nb_chev_filter, K)
+        self.TAt = TemporalAttention(in_channels, num_of_vertices, num_of_timesteps)
+        self.SAt = SpatialAttention(in_channels, num_of_vertices, num_of_timesteps)
+        self.cheb_conv_SAt = ChebConvAttention(in_channels, nb_chev_filter, K)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension

@@ -59,12 +59,12 @@ Discrete Temporal Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.convolutional.astgcn
     :members:
     :undoc-members:
-    :exclude-members:  Spatial_Attention_layer, ASTGCN_block, Temporal_Attention_layer
+    :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention
     
 .. automodule:: torch_geometric_temporal.nn.convolutional.mstgcn
     :members:
     :undoc-members:
-    :exclude-members: MSTGCN_submodule, MSTGCN_block
+    :exclude-members: MSTGCNSubmodule, MSTGCNBlock
 
 .. automodule:: torch_geometric_temporal.nn.convolutional.mtgnn
     :members:
@@ -88,13 +88,3 @@ Auxiliary Graph Convolutional Layers
     :members:
     :undoc-members:
     :exclude-members: glorot, zeros, DCRNN
-
-.. automodule:: torch_geometric_temporal.nn.convolutional.chebconvatt
-    :members:
-    :undoc-members:
-    :exclude-members: glorot, zeros
-
-.. automodule:: torch_geometric_temporal.nn.convolutional.gman
-    :members:
-    :undoc-members:
-    :exclude-members: conv2d_, FC, GMAN, SpatialAttention, TemporalAttention, GatedFusion, TransformAttention

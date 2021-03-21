@@ -235,7 +235,7 @@ def test_astgcn():
 
 def test_mstgcn():
     """
-    Testing MSTGCN block with changing edge index over time or not
+    Testing MSTGCN block with changing edge index over time.
     """
     node_count = 307
     num_classes = 10
@@ -254,11 +254,14 @@ def test_mstgcn():
     batch_size = 32
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = MSTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides,num_for_predict, len_input)
+    
+    model = MSTGCN(nb_block, node_features, K, nb_chev_filter,
+                  nb_time_filter, nb_time_strides,num_for_predict, len_input)
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
     target_seq = torch.zeros([batch_size,node_count,T]).to(device)
     edge_index_seq = []
+    
     for b in range(batch_size):
         for t in range(T):
             x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
@@ -267,14 +270,16 @@ def test_mstgcn():
                 edge_index_seq.append(edge_index)
             target = create_mock_target(node_count, num_classes)
             target_seq[b,:,t] = target
+            
     shuffle = True
     train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
-
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+    
     for batch_data in train_loader:
         encoder_inputs, _ = batch_data
         outputs1 = model(encoder_inputs, edge_index_seq)
         outputs2 = model(encoder_inputs, edge_index_seq[0])
+        
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
 
