@@ -170,13 +170,13 @@ class DCRNN(torch.nn.Module):
         defaults to an unweighted graph. If the hidden state matrix is not present
         when the forward pass is called it is initialized with zeros.
 
-        Args:
+        Arg types:
             * **X** (PyTorch Float Tensor): Node features.
             * **edge_index** (PyTorch Long Tensor): Graph edge indices.
             * **edge_weight** (PyTorch Long Tensor, optional): Edge weight vector.
             * **H** (PyTorch Float Tensor, optional): Hidden state matrix for all nodes.
 
-        Returns:
+        Return types:
             H (PyTorch Float Tensor): Hidden state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)
