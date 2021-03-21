@@ -101,10 +101,10 @@ class Temporal_Attention_layer(nn.Module):
 
         return E_normalized
 
-class ASTGCN_block(nn.Module):
+class ASTGCNBlock(nn.Module):
 
     def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, num_of_timesteps):
-        super(ASTGCN_block, self).__init__()
+        super(ASTGCNBlock, self).__init__()
         self.TAt = Temporal_Attention_layer(in_channels, num_of_vertices, num_of_timesteps)
         self.SAt = SpatialAttentionLayer(in_channels, num_of_vertices, num_of_timesteps)
         self.cheb_conv_SAt = ChebConvAtt(in_channels, nb_chev_filter, K)
@@ -192,13 +192,15 @@ class ASTGCN(nn.Module):
     """
 
     def __init__(self, nb_block, in_channels, K, nb_chev_filter,
-                 nb_time_filter, time_strides, num_for_predict, len_input, num_of_vertices):
+                 nb_time_filter, time_strides, num_for_predict,
+                 len_input, num_of_vertices):
 
         super(ASTGCN, self).__init__()
 
-        self.blocklist = nn.ModuleList([ASTGCN_block(in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, len_input)])
+        self.blocklist = nn.ModuleList([ASTGCNBlock(in_channels, K, nb_chev_filter,
+                                        nb_time_filter, time_strides, num_of_vertices, len_input)])
 
-        self.blocklist.extend([ASTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
+        self.blocklist.extend([ASTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input/time_strides) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
