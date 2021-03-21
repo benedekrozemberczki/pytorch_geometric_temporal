@@ -4,7 +4,7 @@ import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, GMAN
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -95,98 +95,6 @@ def test_stconv():
     stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2)
     H = stconv(batch, edge_index, edge_weight)
     assert H.shape == (batch_size, sequence_length-2*(kernel_size-1), number_of_nodes, out_channels)
-
-def test_gman():
-    """
-    Testing GMAN
-    """
-    L = 1
-    K = 8
-    d = 8
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    num_his = 12
-    num_pred = 10
-    num_nodes = 50
-    num_sample = 100
-    batch_size = 32
-    trainX = torch.rand(num_sample,num_his, num_nodes)
-    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
-    trainTE = torch.zeros((num_sample, num_his + num_pred, 2))
-    
-    for i in range(num_his+num_pred):
-        x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
-        trainTE[:,i,:] = x
-        
-    model = GMAN(SE, L, K, d, num_his, bn_decay=0.1).to(device)
-
-    start_idx = 0
-    end_idx = batch_size
-    X = trainX[start_idx: end_idx].to(device)
-    TE = trainTE[start_idx: end_idx].to(device)
-    pred = model(X, TE)
-    assert pred.shape == (batch_size, num_pred, num_nodes)
-
-def test_mtgnn():
-    """
-    Testing MTGNN block
-    """
-    gcn_true = True
-    buildA_true = True
-    dropout = 0.3
-    subgraph_size = 20
-    gcn_depth = 2
-    num_nodes = 207
-    node_dim = 40
-    dilation_exponential = 1
-    conv_channels = 32
-    residual_channels = 32
-    skip_channels = 64
-    end_channels = 128
-    in_dim = 2
-    seq_in_len = 12
-    seq_out_len = 10
-    layers = 3
-    batch_size = 16
-    propalpha = 0.05
-    tanhalpha = 3
-    num_split = 1
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch.set_num_threads(3)
-    x, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
-    mock_adj = to_scipy_sparse_matrix(edge_index)
-    predefined_A = torch.tensor(mock_adj.toarray()).to(device)
-    x_all = torch.zeros(batch_size,seq_in_len,num_nodes,in_dim)
-    for i in range(batch_size):
-        for j in range(seq_in_len):
-            x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
-            x_all[i,j] = x
-    # define model and optimizer
-    model = MTGNN(gcn_true, buildA_true, gcn_depth, num_nodes,
-                predefined_A=predefined_A,
-                dropout=dropout, subgraph_size=subgraph_size,
-                node_dim=node_dim,
-                dilation_exponential=dilation_exponential,
-                conv_channels=conv_channels, residual_channels=residual_channels,
-                skip_channels=skip_channels, end_channels= end_channels,
-                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
-                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
-    trainx = torch.Tensor(x_all).to(device)
-    trainx= trainx.transpose(1, 3)
-    perm = np.random.permutation(range(num_nodes))
-    num_sub = int(num_nodes/num_split) # number of nodes in each sudgraph
-    for j in range(num_split):
-        if j != num_split-1:
-            id = perm[j * num_sub:(j + 1) * num_sub]
-        else:
-            id = perm[j * num_sub:]
-        id = torch.tensor(id).to(device) # a permutation of node id
-        tx = trainx[:, :, id, :]
-        output = model(tx, idx=id)
-        output = output.transpose(1,3)
-        assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
-
 
 def test_astgcn():
     """
