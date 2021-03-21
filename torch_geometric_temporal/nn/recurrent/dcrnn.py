@@ -55,7 +55,7 @@ class DConv(MessagePassing):
             * **edge_weight** (PyTorch Long Tensor, optional) - Edge weight vector.
 
         Return types:
-            out (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+            * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """
         adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
         adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
@@ -68,30 +68,29 @@ class DConv(MessagePassing):
         deg_in_inv = torch.reciprocal(deg_in)
         row, col = edge_index
         norm_out = deg_out_inv[row]
-        norm_in = deg_in_inv[row] # row for W^T
+        norm_in = deg_in_inv[row]
 
         Tx_0 = x
         Tx_1 = x
-        out = torch.matmul(Tx_0, (self.weight[0])[0]) + torch.matmul(Tx_0, (self.weight[1])[0]) 
+        H = torch.matmul(Tx_0, (self.weight[0])[0]) + torch.matmul(Tx_0, (self.weight[1])[0]) 
 
-        # propagate_type
         if self.weight.size(1) > 1:
             Tx_1_o = self.propagate(edge_index, x=x, norm=norm_out, size=None)
             Tx_1_i = self.propagate(edge_index, x=x, norm=norm_in, size=None)
-            out = out + torch.matmul(Tx_1_o, (self.weight[0])[1]) + torch.matmul(Tx_1_i, (self.weight[1])[1])
+            H = H + torch.matmul(Tx_1_o, (self.weight[0])[1]) + torch.matmul(Tx_1_i, (self.weight[1])[1])
 
         for k in range(2, self.weight.size(1)):
             Tx_2_o = self.propagate(edge_index, x=Tx_1_o, norm=norm_out, size=None)
             Tx_2_o = 2. * Tx_2_o - Tx_0
             Tx_2_i = self.propagate(edge_index, x=Tx_1_i, norm=norm_in, size=None) 
             Tx_2_i = 2. * Tx_2_i - Tx_0
-            out = out + torch.matmul(Tx_2_o, (self.weight[0])[k]) + torch.matmul(Tx_2_i, (self.weight[1])[k])
+            H = H + torch.matmul(Tx_2_o, (self.weight[0])[k]) + torch.matmul(Tx_2_i, (self.weight[1])[k])
             Tx_0, Tx_1_o, Tx_1_i = Tx_1, Tx_2_o, Tx_2_i
 
         if self.bias is not None:
-            out += self.bias
+            H += self.bias
 
-        return out
+        return H
 
     def message(self, x_j, norm):
         return norm.view(-1, 1) * x_j
