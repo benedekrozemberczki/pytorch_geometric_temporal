@@ -117,12 +117,12 @@ class STConv(nn.Module):
         defaults to an unweighted graph. 
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - Sequence of node features of shape (batch_size, input_time_steps, num_nodes, in_channels).
-            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
-            * **edge_weight** (PyTorch Long Tensor, optional)- Edge weight vector.
+            * **X** (torch.FloatTensor) - Sequence of node features of shape (Batch size X Input time steps X Num nodes X In channels).
+            * **edge_index** (torch.LongTensor) - Graph edge indices.
+            * **edge_weight** (torch.LongTensor, optional)- Edge weight vector.
         
         Return types:
-            * **T** (PyTorch Float Tensor) - Sequence of node features.
+            * **T** (torch.FloatTensor) - Sequence of node features.
         """
         T = self._temporal_conv1(X)
 

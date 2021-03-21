@@ -3,15 +3,6 @@ import torch
 from torch_geometric.utils import to_dense_adj
 from torch_geometric.nn.conv import MessagePassing
 
-def glorot(tensor):
-    if tensor is not None:
-        stdv = math.sqrt(6.0 / (tensor.size(-2) + tensor.size(-1)))
-        tensor.data.uniform_(-stdv, stdv)
-
-def zeros(tensor):
-    if tensor is not None:
-        tensor.data.fill_(0)
-
 class DConv(MessagePassing):
     r"""An implementation of the Diffusion Convolution Layer. 
     For details see: `"Diffusion Convolutional Recurrent Neural Network:
@@ -41,8 +32,8 @@ class DConv(MessagePassing):
         self.__reset_parameters()
 
     def __reset_parameters(self):
-        glorot(self.weight)
-        zeros(self.bias)
+        torch.nn.init.xavier_uniform_(self.weight)
+        torch.nn.init.zeros_(self.bias)
 
     def message(self, x_j, norm):
         return norm.view(-1, 1) * x_j
@@ -66,9 +57,9 @@ class DConv(MessagePassing):
         """
         adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
         adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
-        deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)).to(x.device))
+        deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)).to(X.device))
         deg_out = deg_out.flatten()
-        deg_in = torch.matmul(torch.ones(size=(1, adj_mat.size(0))).to(x.device), adj_mat)
+        deg_in = torch.matmul(torch.ones(size=(1, adj_mat.size(0))).to(X.device), adj_mat)
         deg_in = deg_in.flatten()
 
         deg_out_inv = torch.reciprocal(deg_out)
@@ -77,13 +68,13 @@ class DConv(MessagePassing):
         norm_out = deg_out_inv[row]
         norm_in = deg_in_inv[row]
 
-        Tx_0 = x
-        Tx_1 = x
+        Tx_0 = X
+        Tx_1 = X
         H = torch.matmul(Tx_0, (self.weight[0])[0]) + torch.matmul(Tx_0, (self.weight[1])[0]) 
 
         if self.weight.size(1) > 1:
-            Tx_1_o = self.propagate(edge_index, x=x, norm=norm_out, size=None)
-            Tx_1_i = self.propagate(edge_index, x=x, norm=norm_in, size=None)
+            Tx_1_o = self.propagate(edge_index, x=X, norm=norm_out, size=None)
+            Tx_1_i = self.propagate(edge_index, x=X, norm=norm_in, size=None)
             H = H + torch.matmul(Tx_1_o, (self.weight[0])[1]) + torch.matmul(Tx_1_i, (self.weight[1])[1])
 
         for k in range(2, self.weight.size(1)):
