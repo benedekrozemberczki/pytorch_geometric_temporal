@@ -22,7 +22,7 @@ class DConv(MessagePassing):
         out_channels (int): Number of output features.
         K (int): Filter size :math:`K`.
         bias (bool, optional): If set to :obj:`False`, the layer 
-            will not learn an additive bias (default :obj:`True`)
+            will not learn an additive bias (default :obj:`True`).
 
     """
 
