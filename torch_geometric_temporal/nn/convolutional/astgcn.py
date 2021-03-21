@@ -12,15 +12,6 @@ from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.utils import remove_self_loops, add_self_loops, get_laplacian
 
-def glorot(tensor):
-    if tensor is not None:
-        stdv = math.sqrt(6.0 / (tensor.size(-2) + tensor.size(-1)))
-        tensor.data.uniform_(-stdv, stdv)
-
-
-def zeros(tensor):
-    if tensor is not None:
-        tensor.data.fill_(0)
 
 class ChebConvAttention(MessagePassing):
     r"""The chebyshev spectral graph convolutional operator with attention from the
@@ -72,11 +63,11 @@ class ChebConvAttention(MessagePassing):
         else:
             self.register_parameter('bias', None)
 
-        self.reset_parameters()
+        self._reset_parameters()
 
-    def reset_parameters(self):
-        glorot(self.weight)
-        zeros(self.bias)
+    def _reset_parameters(self):
+        nn.init.xavier_uniform_(self.weight)
+        nn.init.uniform(self.bias)
 
     def __norm__(self, edge_index, num_nodes: Optional[int],
                  edge_weight: OptTensor, normalization: Optional[str],

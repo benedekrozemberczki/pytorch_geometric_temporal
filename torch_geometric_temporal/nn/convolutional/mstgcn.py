@@ -6,10 +6,10 @@ from torch_geometric.data import Data
 from torch_geometric.nn import ChebConv
 from torch_geometric.transforms import LaplacianLambdaMax
 
-class MSTGCN_block(nn.Module):
+class MSTGCNBlock(nn.Module):
 
     def __init__(self, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int, time_strides: int):
-        super(MSTGCN_block, self).__init__()
+        super(MSTGCNBlock, self).__init__()
         self.cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
@@ -98,15 +98,15 @@ class MSTGCN(nn.Module):
 
         super(MSTGCN, self).__init__()
 
-        self.blocklist = nn.ModuleList([MSTGCN_block(in_channels, K, nb_chev_filter, nb_time_filter, time_strides)])
+        self.blocklist = nn.ModuleList([MSTGCNBlock(in_channels, K, nb_chev_filter, nb_time_filter, time_strides)])
 
-        self.blocklist.extend([MSTGCN_block(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1) for _ in range(nb_block-1)])
+        self.blocklist.extend([MSTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1) for _ in range(nb_block-1)])
 
         self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
-        self.reset_parameters()
+        self._reset_parameters()
 
-    def reset_parameters(self):
+    def _reset_parameters(self):
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
