@@ -178,7 +178,7 @@ class SpatialAttentionLayer(nn.Module):
     Spatial Attention Computation Layer.
     """
     def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
-        super(Spatial_Attention_layer, self).__init__()
+        super(SpatialAttentionLayer, self).__init__()
         
         self.W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))
         self.W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
