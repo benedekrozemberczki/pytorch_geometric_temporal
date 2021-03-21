@@ -30,14 +30,14 @@ class A3TGCN(torch.nn.Module):
 
     def _setup_layers(self):
     
-        self.base_tgcn = TGCN(in_channels = self.in_channels,
+        self._base_tgcn = TGCN(in_channels = self.in_channels,
                               out_channels = self.out_channels,
                               improved = self.improved,
                               cached = self.cached,
                               add_self_loops = self.add_self_loops)
                               
-        self.attention = torch.empty(self.periods)
-        torch.nn.init.uniform_(self.attention)
+        self._attention = torch.empty(self.periods)
+        torch.nn.init.uniform_(self._attention)
 
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
@@ -48,8 +48,8 @@ class A3TGCN(torch.nn.Module):
         when the forward pass is called it is initialized with zeros.
 
         Args:
-            * **X** *(PyTorch Float Tensor)* - Node features for T time periods.
-            * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
+            * **X** *(PyTorch Float Tensor)*: Node features for T time periods.
+            * **edge_index** *(PyTorch Long Tensor)*: Graph edge indices.
             * **edge_weight** *(PyTorch Long Tensor, optional)* - Edge weight vector.
             * **H** *(PyTorch Float Tensor, optional)* - Hidden state matrix for all nodes.
 
@@ -57,7 +57,7 @@ class A3TGCN(torch.nn.Module):
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
         """
         H_accum = 0
-        probs = torch.nn.functional.softmax(self.attention, dim=0)
+        probs = torch.nn.functional.softmax(self._attention, dim=0)
         for period in range(self.periods):
-            H_accum = H_accum + probs[period]*self.base_tgcn(X[:, :, period], edge_index, edge_weight, H)
+            H_accum = H_accum + probs[period]*self._base_tgcn(X[:, :, period], edge_index, edge_weight, H)
         return H_accum
