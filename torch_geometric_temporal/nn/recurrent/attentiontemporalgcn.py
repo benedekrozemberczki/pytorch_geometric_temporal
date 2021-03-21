@@ -47,13 +47,13 @@ class A3TGCN(torch.nn.Module):
         defaults to an unweighted graph. If the hidden state matrix is not present
         when the forward pass is called it is initialized with zeros.
 
-        Arg types:
+        Args:
             * **X** *(PyTorch Float Tensor)* - Node features for T time periods.
             * **edge_index** *(PyTorch Long Tensor)* - Graph edge indices.
             * **edge_weight** *(PyTorch Long Tensor, optional)* - Edge weight vector.
             * **H** *(PyTorch Float Tensor, optional)* - Hidden state matrix for all nodes.
 
-        Return types:
+        Returns:
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
         """
         H_accum = 0

@@ -97,7 +97,6 @@ class STConv(nn.Module):
         self.normalization = normalization
         self.bias = bias
 
-        # Create blocks
         self._temporal_conv1 = TemporalConv(in_channels=in_channels, 
                                             out_channels=hidden_channels, 
                                             kernel_size=kernel_size)
