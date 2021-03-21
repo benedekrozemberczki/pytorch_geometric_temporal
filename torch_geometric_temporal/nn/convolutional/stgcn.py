@@ -110,7 +110,9 @@ class STConv(nn.Module):
                                         
         self._batch_norm = nn.BatchNorm2d(num_nodes)
         
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
+                edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
+                
         r"""Forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. 
 
