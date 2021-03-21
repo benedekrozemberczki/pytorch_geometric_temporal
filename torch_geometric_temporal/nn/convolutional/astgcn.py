@@ -6,9 +6,9 @@ from torch_geometric.data import Data
 from .chebconvatt import ChebConvAtt
 
 class SpatialAttentionLayer(nn.Module):
-    '''
-    Compute spatial attention scores
-    '''
+    """
+    Spatial Attention Computation Layer.
+    """
     def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
         super(Spatial_Attention_layer, self).__init__()
         
@@ -207,6 +207,9 @@ class ASTGCN(nn.Module):
         self._reset_parameters()
 
     def _reset_parameters(self):
+        """
+        Resetting the parameters.
+        """
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)

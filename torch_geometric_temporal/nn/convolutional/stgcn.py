@@ -27,7 +27,7 @@ class TemporalConv(nn.Module):
         self.conv2 = nn.Conv2d(in_channels, out_channels, (1, kernel_size))
         self.conv3 = nn.Conv2d(in_channels, out_channels, (1, kernel_size))
 
-    def forward(self, X):
+    def forward(self, X: torch.LongTensor):
         """Forward pass through temporal convolution block
         
         Args:
@@ -101,14 +101,17 @@ class STConv(nn.Module):
         self.temporal_conv1 = TemporalConv(in_channels=in_channels, 
                                         out_channels=hidden_channels, 
                                         kernel_size=kernel_size)
+                                        
         self.graph_conv = ChebConv(in_channels=hidden_channels,
                                 out_channels=hidden_channels,
                                 K=K,
                                 normalization=normalization,
                                 bias=bias)
+                                
         self.temporal_conv2 = TemporalConv(in_channels=hidden_channels, 
                                         out_channels=out_channels, 
                                         kernel_size=kernel_size)
+                                        
         self.batch_norm = nn.BatchNorm2d(num_nodes)
         
     def forward(self, X, edge_index, edge_weight):
@@ -122,7 +125,7 @@ class STConv(nn.Module):
             edge_weight (PyTorch Long Tensor, optional): Edge weight vector.
         
         Return Types:
-            Out (PyTorch Float Tensor): (Sequence) of node features
+            t3 (PyTorch Float Tensor): (Sequence) of node features
         """
         t1 = self.temporal_conv1(X)
         # Need to apply the same graph convolution to every one snapshot in sequence
