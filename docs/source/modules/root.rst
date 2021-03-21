@@ -87,4 +87,4 @@ Auxiliary Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
     :undoc-members:
-    :exclude-members: glorot, zeros, DCRNN
+    :exclude-members: glorot, zeros, DCRNN, message, reset_parameters
