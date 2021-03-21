@@ -44,7 +44,19 @@ class DConv(MessagePassing):
         glorot(self.weight)
         zeros(self.bias)
 
-    def forward(self, x, edge_index, edge_weight):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
+                edge_weight: torch.FloatTensor) -> torch.FloatTensor:
+        r"""Making a forward pass. If edge weights are not present the forward pass
+        defaults to an unweighted graph.
+
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Node features.
+            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional) - Edge weight vector.
+
+        Return types:
+            out (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+        """
         adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
         adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
         deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)).to(x.device))
@@ -171,13 +183,13 @@ class DCRNN(torch.nn.Module):
         when the forward pass is called it is initialized with zeros.
 
         Arg types:
-            * **X** (PyTorch Float Tensor): Node features.
-            * **edge_index** (PyTorch Long Tensor): Graph edge indices.
-            * **edge_weight** (PyTorch Long Tensor, optional): Edge weight vector.
-            * **H** (PyTorch Float Tensor, optional): Hidden state matrix for all nodes.
+            * **X** (PyTorch Float Tensor) - Node features.
+            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional) - Edge weight vector.
+            * **H** (PyTorch Float Tensor, optional) - Hidden state matrix for all nodes.
 
         Return types:
-            H (PyTorch Float Tensor): Hidden state matrix for all nodes.
+            H (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)
         Z = self._calculate_update_gate(X, edge_index, edge_weight, H)
