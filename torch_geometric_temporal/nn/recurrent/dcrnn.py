@@ -38,9 +38,9 @@ class DConv(MessagePassing):
         else:
             self.register_parameter('bias', None)
 
-        self.reset_parameters()
+        self.__reset_parameters()
 
-    def reset_parameters(self):
+    def __reset_parameters(self):
         glorot(self.weight)
         zeros(self.bias)
 
@@ -91,13 +91,6 @@ class DConv(MessagePassing):
             H += self.bias
 
         return H
-
-    def message(self, x_j, norm):
-        return norm.view(-1, 1) * x_j
-
-    def __repr__(self):
-        return '{}({}, {}, K={})'.format(self.__class__.__name__,
-            self.in_channels, self.out_channels, self.weight.size(0))
 
 class DCRNN(torch.nn.Module):
     r"""An implementation of the Diffusion Convolutional Gated Recurrent Unit.
