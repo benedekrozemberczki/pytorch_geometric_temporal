@@ -188,7 +188,7 @@ class DCRNN(torch.nn.Module):
             * **H** (PyTorch Float Tensor, optional) - Hidden state matrix for all nodes.
 
         Return types:
-            H (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+            * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)
         Z = self._calculate_update_gate(X, edge_index, edge_weight, H)
