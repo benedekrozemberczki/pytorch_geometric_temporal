@@ -187,7 +187,8 @@ class ASTGCN(nn.Module):
         num_of_vertices (int): Number of vertices in the graph.
     """
 
-    def __init__(self, nb_block, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_for_predict, len_input, num_of_vertices):
+    def __init__(self, nb_block, in_channels, K, nb_chev_filter,
+                 nb_time_filter, time_strides, num_for_predict, len_input, num_of_vertices):
 
         super(ASTGCN, self).__init__()
 
@@ -206,23 +207,21 @@ class ASTGCN(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, x, edge_index):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor) -> torch.FloatTensor:
         """
-        Making a forward pass. This module takes a likst of ASTGCN blocks and use a final convolution to serve as a multi-component fusion.
+        Making a forward pass. This module takes a lilst of ASTGCN blocks and uses a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         
         Arg types:
-            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-            * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
+            * X (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * edge_index (PyTorch Long Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
             * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
         """
         for block in self.blocklist:
-            x = block(x, edge_index)
+            X = block(X, edge_index)
 
-        output = self.final_conv(x.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
-        # (b,N,F,T)->(b,T,N,F)-conv<1,F>->(b,c_out*T,N,1)->(b,c_out*T,N)->(b,N,T)
-
+        output = self.final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
         return output
