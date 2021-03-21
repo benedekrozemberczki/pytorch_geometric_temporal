@@ -3,7 +3,6 @@ import torch
 from torch_geometric.utils import to_dense_adj
 from torch_geometric.nn.conv import MessagePassing
 
-
 def glorot(tensor):
     if tensor is not None:
         stdv = math.sqrt(6.0 / (tensor.size(-2) + tensor.size(-1)))
@@ -13,7 +12,6 @@ def zeros(tensor):
     if tensor is not None:
         tensor.data.fill_(0)
 
-# Diffusion Convolution Layer
 class DConv(MessagePassing):
     r"""An implementation of the Diffusion Convolution Layer. 
     For details see: `"Diffusion Convolutional Recurrent Neural Network:
@@ -173,12 +171,12 @@ class DCRNN(torch.nn.Module):
         when the forward pass is called it is initialized with zeros.
 
         Args:
-            X (PyTorch Float Tensor): Node features.
-            edge_index (PyTorch Long Tensor): Graph edge indices.
-            edge_weight (PyTorch Long Tensor, optional): Edge weight vector.
-            H (PyTorch Float Tensor, optional): Hidden state matrix for all nodes.
+            * **X** (PyTorch Float Tensor): Node features.
+            * **edge_index** (PyTorch Long Tensor): Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional): Edge weight vector.
+            * **H** (PyTorch Float Tensor, optional): Hidden state matrix for all nodes.
 
-        Return types:
+        Returns:
             H (PyTorch Float Tensor): Hidden state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)

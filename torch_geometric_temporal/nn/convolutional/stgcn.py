@@ -123,7 +123,7 @@ class STConv(nn.Module):
             * **edge_index** (PyTorch Long Tensor): Graph edge indices.
             * **edge_weight** (PyTorch Long Tensor, optional): Edge weight vector.
         
-        Return Types:
+        Returns:
             * **T** (PyTorch Float Tensor): Sequence of node features.
         """
         T = self._temporal_conv1(X)
