@@ -22,7 +22,7 @@ class TemporalConv(nn.Module):
         self.conv_2 = nn.Conv2d(in_channels, out_channels, (1, kernel_size))
         self.conv_3 = nn.Conv2d(in_channels, out_channels, (1, kernel_size))
 
-    def forward(self, X: torch.FloatTensor):
+    def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """Forward pass through temporal convolution block.
         
         Arg types:
