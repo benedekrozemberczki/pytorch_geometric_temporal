@@ -1,16 +1,16 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
+
+from torch_geometric.data import Data
 from torch_geometric.nn import ChebConv
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric.data import Data
 
 class MSTGCN_block(nn.Module):
 
-    def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides):
+    def __init__(self, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int, time_strides: int):
         super(MSTGCN_block, self).__init__()
-        self.cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None) # do not normalize Laplacian
+        self.cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)

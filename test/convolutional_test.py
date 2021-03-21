@@ -1,11 +1,10 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, ChebConvAtt, MTGNN
-from torch_geometric_temporal.nn.convolutional import GMAN, STAttBlock, STEmbedding, GraphConstructor, MixProp
-from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
+from torch_geometric.transforms import LaplacianLambdaMax
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, GMAN
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -35,7 +34,6 @@ def create_mock_sequence(sequence_length, number_of_nodes, edge_per_node, in_cha
     Note that this is a static graph discrete signal type sequence
     The target is the "next" item in the sequence
     """
-
     input_sequence = torch.zeros(sequence_length, number_of_nodes, in_channels)
     
     X, edge_index = create_mock_data(number_of_nodes=number_of_nodes, edge_per_node=edge_per_node, in_channels=in_channels)
@@ -105,7 +103,7 @@ def test_gman():
     L = 1
     K = 8
     d = 8
-    # generate data
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     num_his = 12
     num_pred = 10
@@ -115,10 +113,11 @@ def test_gman():
     trainX = torch.rand(num_sample,num_his, num_nodes)
     SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
     trainTE = torch.zeros((num_sample, num_his + num_pred, 2))
+    
     for i in range(num_his+num_pred):
         x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
         trainTE[:,i,:] = x
-    # build model
+        
     model = GMAN(SE, L, K, d, num_his, bn_decay=0.1).to(device)
 
     start_idx = 0
@@ -127,23 +126,6 @@ def test_gman():
     TE = trainTE[start_idx: end_idx].to(device)
     pred = model(X, TE)
     assert pred.shape == (batch_size, num_pred, num_nodes)
-    
-    # GMAN components
-    D = K * d
-    bn_decay = 0.1
-    # layers
-    STEmbedding_layer = STEmbedding(D, bn_decay).to(device)
-    STAttBlock_layer = STAttBlock(K, d, bn_decay).to(device)
-    TE = trainTE[:batch_size].to(device)
-    # STE
-    STE = STEmbedding_layer(SE, TE)
-    STE_his = STE[:, :num_his]
-    STE_pred = STE[:, num_his:]
-    assert STE.shape == (batch_size, num_his+num_pred, num_nodes,D)
-    X = torch.rand(batch_size,num_his,num_nodes,D).to(device)
-    # STAtt
-    X = STAttBlock_layer(X, STE_his)
-    assert X.shape ==  (batch_size, num_his, num_nodes,D)
 
 def test_mtgnn():
     """
@@ -204,17 +186,7 @@ def test_mtgnn():
         output = model(tx, idx=id)
         output = output.transpose(1,3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
-    # test MTGNN layers
-    gc = GraphConstructor(num_nodes, subgraph_size, node_dim, alpha=tanhalpha, static_feat=None).to(device)
-    adp = gc(torch.arange(num_nodes))
-    assert adp.shape == (num_nodes, num_nodes)
-    start_conv = torch.nn.Conv2d(in_channels=in_dim,
-                        out_channels=residual_channels,
-                        kernel_size=(1, 1)).to(device)
-    x_tmp = start_conv(x_all[:batch_size].transpose(1,3))
-    model = MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha).to(device)
-    MixProp_output = model(x_tmp,adp)
-    assert MixProp_output.shape == (batch_size, residual_channels, num_nodes, seq_in_len)
+
 
 def test_astgcn():
     """
@@ -306,47 +278,3 @@ def test_mstgcn():
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
 
-def test_chebconvatt():
-    """
-    Testing ChebCOnvAtt block
-    """
-    node_count = 307
-    num_classes = 10
-    edge_per_node = 15
-
-
-    len_input = 12
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    node_features = 2
-    K = 3
-    nb_chev_filter = 64
-    batch_size = 32
-
-    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = ChebConvAtt(node_features, nb_chev_filter, K)
-    spatial_attention = torch.rand(batch_size,node_count,node_count)
-    spatial_attention = torch.nn.functional.softmax(spatial_attention, dim=1)
-    model.train()
-    T = len_input
-    x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
-    target_seq = torch.zeros([batch_size,node_count,T]).to(device)
-    for b in range(batch_size):
-        for t in range(T):
-            x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-            x_seq[b,:,:,t] = x
-            target = create_mock_target(node_count, num_classes)
-            target_seq[b,:,t] = target
-    shuffle = True
-    train_dataset = torch.utils.data.TensorDataset(x_seq, target_seq)
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    for batch_data in train_loader:
-        encoder_inputs, labels = batch_data
-        data = Data(edge_index=edge_index, edge_attr=None, num_nodes=node_count)
-        lambda_max = LaplacianLambdaMax()(data).lambda_max
-        outputs = []
-        for time_step in range(T):
-            outputs.append(torch.unsqueeze(model(encoder_inputs[:,:,:,time_step], edge_index, spatial_attention, lambda_max = lambda_max), -1))
-        spatial_gcn = torch.nn.functional.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T) # (b,N,F,T)
-    assert spatial_gcn.shape == (batch_size, node_count, nb_chev_filter, T) 

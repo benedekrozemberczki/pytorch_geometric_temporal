@@ -179,7 +179,3 @@ def test_discrete_train_test_split_dynamic():
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
             assert snapshot.x.shape == (100, 32)
             assert snapshot.y.shape == (100, )
-
-
-
-    
