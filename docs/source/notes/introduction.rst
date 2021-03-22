@@ -74,6 +74,7 @@ In case of discrete time graph neural networks these datasets are as follows:
 
 - `Hungarian Chickenpox Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.chickenpox.ChickenpoxDatasetLoader>`_
 - `PedalMe London Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pedalme.PedalMeDatasetLoader>`_
+- `Wikipedia Vital Math Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.wikimath.WikiMathsDatasetLoader>`_
 - `Pems Bay Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pems_bay.PemsBayDatasetLoader>`_
 - `Metr LA Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.metr_la.METRLADatasetLoader>`_
 
