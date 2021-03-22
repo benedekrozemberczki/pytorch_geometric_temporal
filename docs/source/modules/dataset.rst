@@ -15,6 +15,10 @@ Datasets
     :members:
     :undoc-members:
     
+.. automodule:: torch_geometric_temporal.data.dataset.wikimath
+    :members:
+    :undoc-members:
+    
 .. automodule:: torch_geometric_temporal.data.dataset.metr_la
     :members:
     :undoc-members:
