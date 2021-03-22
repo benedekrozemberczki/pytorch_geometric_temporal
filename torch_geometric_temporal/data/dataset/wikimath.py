@@ -26,24 +26,25 @@ class WikiMathsDatasetLoader(object):
     def _get_edge_weights(self):
         self._edge_weights = np.array(self._dataset["weights"]).T
 
-    def _get_features(self):
-        self.features = np.ones(len(self.targets))
-
-    def _get_targets(self):
+    def _get_targets_and_features(self):
         self.targets = []
         for time in range(self._dataset["time_periods"]):
             self.targets.append(np.array(self._dataset[str(time)]["y"]))
+        stacked_target = np.stack(self.targets)
+        standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / np.std(stacked_target, axis=0)
+        self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(self.targets)-self.lags)]
+        self.targets = self.targets[self.lags:]
 
-    def get_dataset(self) -> StaticGraphDiscreteSignal:
+    def get_dataset(self, lags: int=8) -> StaticGraphDiscreteSignal:
         """Returning the Wikipedia Vital Mathematics data iterator.
 
         Return types:
             * **dataset** *(StaticGraphDiscreteSignal)* - The Wiki Maths dataset.
         """
+        self.lags = lags
         self._get_edges()
         self._get_edge_weights()
-        self._get_targets()
-        self._get_features()
+        self._get_targets_and_features()
         dataset = StaticGraphDiscreteSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
 
