@@ -39,6 +39,8 @@ class WikiMathsDatasetLoader(object):
     def get_dataset(self, lags: int=8) -> StaticGraphDiscreteSignal:
         """Returning the Wikipedia Vital Mathematics data iterator.
 
+        Args types:
+            * **lags** *(int)* - The number of time lags.        
         Return types:
             * **dataset** *(StaticGraphDiscreteSignal)* - The Wiki Maths dataset.
         """
