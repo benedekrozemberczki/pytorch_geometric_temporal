@@ -5,7 +5,7 @@ from .dynamic_graph_temporal_signal import DynamicGraphTemporalSignal
 
 Discrete_Signal = Union[StaticGraphTemporalSignal, DynamicGraphTemporalSignal]
 
-def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discrete_Signal, Discrete_Signal]:
+def temporal_signal_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discrete_Signal, Discrete_Signal]:
     r""" Function to split a data iterator according to a fixed ratio.
 
     Parameters

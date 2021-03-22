@@ -17,7 +17,7 @@ class WikiMathsDatasetLoader(object):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/discrete/wikivital_mathematics.json"
+        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/wikivital_mathematics.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
 
     def _get_edges(self):
