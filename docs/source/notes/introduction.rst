@@ -70,7 +70,7 @@ We released and included a number of datasets which can be used for comparing th
 
 Integrated Datasets
 ^^^^^^^^^^^^^^^^^^^^^^
-In case of discrete time graph neural networks these datasets are as follows:
+In order to benchmark  graph neural networks these datasets are as follows:
 
 - `Hungarian Chickenpox Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.chickenpox.ChickenpoxDatasetLoader>`_
 - `PedalMe London Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pedalme.PedalMeDatasetLoader>`_
@@ -93,28 +93,25 @@ Train-Test Splitter
 -------------------
 
 
-Discrete Train-Test Splitter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-We provide functions to create temporal splits of the discrete time iterators. These functions return train and test data iterators which split the original iterator using a fix ratio. Snapshots from the earlier time periods from the training dataset and snapshots from the later periods form the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``discrete_train_tes_split`` takes either a ``StaticGraphDiscreteSignal`` or a ``DynamicGraphDiscreteSignal`` and returns two iterattors according to the split ratio specified by ``train_ratio``.
+We provide functions to create temporal splits of the data iterators. These functions return train and test data iterators which split the original iterator using a fix train-test ratio. Snapshots from the earlier time periods contribute to the the training dataset and snapshots from the later periods contribute to the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``split_temporal_signal`` takes either a ``StaticGraphTemporalSignal`` or a ``DynamicGraphTemporalSignal`` object and returns two iterattors according to the split ratio specified by ``train_ratio``.
 
 .. code-block:: python
 
-    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
-    from torch_geometric_temporal.data.splitter import discrete_train_test_split
+    from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.signal import split_temporal_signal
 
     loader = ChickenpoxDatasetLoader()
 
     dataset = loader.get_dataset()
 
-    train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.8)
+    train_dataset, test_dataset = split_temporal_signal(dataset, train_ratio=0.8)
 
 
 
 Applications
 =============
 
-In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is on discrete time spatial data and the other one uses continuous time graphs.   
+In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is about epidmeiological forecasting the other on is about predicting web traffic.
 
 Epidemiological Forecasting
 -------------------------------------------
