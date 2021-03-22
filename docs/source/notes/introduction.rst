@@ -33,7 +33,7 @@ PyTorch Geometric Tenporal offers data iterators for constant time difference sp
 - ``DynamicGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **dynamic** graph.
 
 
-Static Graphs with Discrete Signal
+Static Graph with Temporal Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The constructor of a ``StaticGraphTemporalSignal`` object requires the following parameters:
@@ -43,7 +43,7 @@ The constructor of a ``StaticGraphTemporalSignal`` object requires the following
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
  
-Static Graphs with Dynamic Signal
+Dynamic Graph with Temporal Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The constructor of a ``DynamicGraphTemporalSignal`` object requires the following parameters:
@@ -56,7 +56,7 @@ The constructor of a ``DynamicGraphTemporalSignal`` object requires the followin
 Temporal Snapshots
 ^^^^^^^^^^^^^^^^^^ 
 
-A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
+A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
 
 - ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation (optional).
 - ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation (optional).
