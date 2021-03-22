@@ -95,8 +95,8 @@ The Hungarian Chickenpox Dataset can be loaded by the following code snippet. Th
 
     dataset = loader.get_dataset()
 
-Train-Test Splitter
--------------------
+Smatiotemporal Signal Splitting
+-------------------------------
 
 
 We provide functions to create temporal splits of the data iterators. These functions return train and test data iterators which split the original iterator using a fix train-test ratio. Snapshots from the earlier time periods contribute to the the training dataset and snapshots from the later periods contribute to the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``split_temporal_signal`` takes either a ``StaticGraphTemporalSignal`` or a ``DynamicGraphTemporalSignal`` object and returns two iterattors according to the split ratio specified by ``train_ratio``.
