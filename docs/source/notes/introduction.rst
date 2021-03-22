@@ -116,7 +116,7 @@ Applications
 
 In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is on discrete time spatial data and the other one uses continuous time graphs.   
 
-Learning from a Discrete Temporal Signal
+Epidemiological Forecasting
 -------------------------------------------
 
 We are using the Hungarian Chickenpox Cases dataset in this case study. We will train a regressor to predict the weekly cases reported by the counties using a recurrent graph convolutional network. First, we will load the dataset and create an appropriate spatio-temporal split.
