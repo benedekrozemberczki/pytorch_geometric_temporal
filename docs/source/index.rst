@@ -27,8 +27,9 @@ PyTorch Geometric Temporal Documentation
 
 .. toctree::
    :glob:
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Package Reference
 
    modules/root
+   modules/signal
    modules/dataset
