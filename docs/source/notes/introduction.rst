@@ -24,13 +24,13 @@ We briefly overview the fundamental concepts and features of PyTorch Geometric T
 Data Structures
 =============================
 
-Discrete Dataset Iterators
+Temporal Signal Iterators
 --------------------------
 
-PyTorch Geometric Tenporal offers data iterators for discrete time datasets which contain the temporal snapshots. There are two types of discrete time data iterators:
+PyTorch Geometric Tenporal offers data iterators for constant time difference spatio-temporal datasets which contain the temporal snapshots. There are two types of constant time difference data iterators:
 
-- ``StaticGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **static** graph.
-- ``DynamicGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **dynamic** graph.
+- ``StaticGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **static** graph.
+- ``DynamicGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **dynamic** graph.
 
 
 Static Graphs with Discrete Signal
@@ -123,14 +123,14 @@ We are using the Hungarian Chickenpox Cases dataset in this case study. We will 
 
 .. code-block:: python
 
-    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
-    from torch_geometric_temporal.data.splitter import discrete_train_test_split
+    from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.signal import temporal_signal_split
 
     loader = ChickenpoxDatasetLoader()
 
     dataset = loader.get_dataset()
 
-    train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.2)
+    train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.2)
 
 In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is important to note that the final non-linearity is not integrated into the recurrent graph convolutional operation. This design principle is used consistently and it was taken from PyTorch Geometric. Because of this, we defined a ``ReLU`` non-linearity between the recurrent and linear layers manually. The final linear layer is not followed by a non-linearity as we solve a regression problem with zero-mean targets.
 
@@ -187,6 +187,3 @@ Using the holdout we will evaluate the performance of the trained recurrent grap
     cost = cost.item()
     print("MSE: {:.4f}".format(cost))
     >>> Accuracy: 0.6866
-
-Learning from a Continuous Temporal Signal
--------------------------------------------
