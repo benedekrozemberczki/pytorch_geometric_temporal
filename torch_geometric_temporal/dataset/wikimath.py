@@ -2,7 +2,7 @@ import io
 import json
 import numpy as np
 from six.moves import urllib
-from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+from ..signal import StaticGraphTemporalSignal
 
 class WikiMathsDatasetLoader(object):
     """A dataset of vital mathematics articles from Wikipedia. We made it 
@@ -36,18 +36,18 @@ class WikiMathsDatasetLoader(object):
         self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(targets)-self.lags)]
         self.targets = [standardized_target[i+self.lags,:].T for i in range(len(targets)-self.lags)]
 
-    def get_dataset(self, lags: int=8) -> StaticGraphDiscreteSignal:
+    def get_dataset(self, lags: int=8) -> StaticGraphTemporalSignal:
         """Returning the Wikipedia Vital Mathematics data iterator.
 
         Args types:
             * **lags** *(int)* - The number of time lags.        
         Return types:
-            * **dataset** *(StaticGraphDiscreteSignal)* - The Wiki Maths dataset.
+            * **dataset** *(StaticGraphTemporalSignal)* - The Wiki Maths dataset.
         """
         self.lags = lags
         self._get_edges()
         self._get_edge_weights()
         self._get_targets_and_features()
-        dataset = StaticGraphDiscreteSignal(self._edges, self._edge_weights, self.features, self.targets)
+        dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
 
