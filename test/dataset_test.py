@@ -94,6 +94,16 @@ def test_pedalme():
             assert snapshot.edge_attr.shape == (225, )
             assert snapshot.x.shape == (15, 4)
             assert snapshot.y.shape == (15, )
+            
+def test_wiki():
+    loader = WikiMathsDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            snapshot.edge_index.shape == (2, 27079)
+            snapshot.edge_attr.shape == (27079, )
+            snapshot.x.shape == (1068, 8)
+            snapshot.y.shape == (1068, )
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
