@@ -1,5 +1,5 @@
 from torch_geometric_temporal.nn import *
-from torch_geometric_temporal.data import *
+from torch_geometric_temporal.dataset import *
 
 __version__ = '0.0.14'
 

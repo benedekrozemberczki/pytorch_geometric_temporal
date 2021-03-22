@@ -1,9 +1,9 @@
 import numpy as np
 import networkx as nx
 
+from torch_geometric_temporal.data.splitter import discrete_train_test_split
 from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
 from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
-from torch_geometric_temporal.data.splitter import discrete_train_test_split
 
 from torch_geometric_temporal.data.dataset import METRLADatasetLoader, PemsBayDatasetLoader
 from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader
