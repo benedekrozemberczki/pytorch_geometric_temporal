@@ -27,13 +27,14 @@ class WikiMathsDatasetLoader(object):
         self._edge_weights = np.array(self._dataset["weights"]).T
 
     def _get_targets_and_features(self):
-        self.targets = []
+
+        targets = []
         for time in range(self._dataset["time_periods"]):
-            self.targets.append(np.array(self._dataset[str(time)]["y"]))
+            targets.append(np.array(self._dataset[str(time)]["y"]))
         stacked_target = np.stack(self.targets)
         standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / np.std(stacked_target, axis=0)
         self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(self.targets)-self.lags)]
-        self.targets = self.targets[self.lags:]
+        self.targets = [standardized_target[i+self.lags,:].T for i in range(len(self.targets)-self.lags)]
 
     def get_dataset(self, lags: int=8) -> StaticGraphDiscreteSignal:
         """Returning the Wikipedia Vital Mathematics data iterator.
