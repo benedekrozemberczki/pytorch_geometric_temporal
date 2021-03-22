@@ -2,7 +2,7 @@ import io
 import json
 import numpy as np
 from six.moves import urllib
-from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+from ..signal import StaticGraphTemporalSignal
 
 class ChickenpoxDatasetLoader(object):
     """A dataset of county level chicken pox cases in Hungary between 2004
@@ -17,7 +17,7 @@ class ChickenpoxDatasetLoader(object):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/discrete/chickenpox.json"
+        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/chickenpox.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
 
     def _get_edges(self):
@@ -36,16 +36,16 @@ class ChickenpoxDatasetLoader(object):
         for time in range(self._dataset["time_periods"]):
             self.targets.append(np.array(self._dataset[str(time)]["y"]))
 
-    def get_dataset(self) -> StaticGraphDiscreteSignal:
+    def get_dataset(self) -> StaticGraphTemporalSignal:
         """Returning the Hungarian Chickenpox cases data iterator.
 
         Return types:
-            * **dataset** *(StaticGraphDiscreteSignal)* - The chickenpox dataset.
+            * **dataset** *(StaticGraphTemporalSignal)* - The chickenpox dataset.
         """
         self._get_edges()
         self._get_edge_weights()
         self._get_features()
         self._get_targets()
-        dataset = StaticGraphDiscreteSignal(self._edges, self._edge_weights, self.features, self.targets)
+        dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
 

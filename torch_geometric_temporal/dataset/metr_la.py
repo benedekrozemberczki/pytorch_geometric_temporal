@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch_geometric.utils import dense_to_sparse
 from six.moves import urllib
-from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+from ..signal import StaticGraphTemporalSignal
 
 
 class METRLADatasetLoader(object):
@@ -83,22 +83,22 @@ class METRLADatasetLoader(object):
         self.features = features
         self.targets = target
 
-    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12) -> StaticGraphDiscreteSignal:
+    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12) -> StaticGraphTemporalSignal:
         """Returns data iterator for METR-LA dataset as an instance of the
-        static graph discrete signal class.
+        static graph temporal signal class.
 
         Return types:
-            * **dataset** *(StaticGraphDiscrete Signal)* - The METR-LA traffic
+            * **dataset** *(StaticGraphTemporalSignal)* - The METR-LA traffic
                 forecasting dataset.
         """
         self._get_edges_and_weights()
         self._generate_task(num_timesteps_in, num_timesteps_out)
-        dataset = StaticGraphDiscreteSignal(self.edges, self.edge_weights, self.features, self.targets)
+        dataset = StaticGraphTemporalSignal(self.edges, self.edge_weights, self.features, self.targets)
 
         return dataset
 
 
 if __name__ == '__main__':
-    from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
+    from ..signal import StaticGraphTemporalSignal
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
