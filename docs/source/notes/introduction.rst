@@ -114,7 +114,7 @@ Applications
 In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is about epidmeiological forecasting the other on is about predicting web traffic.
 
 Epidemiological Forecasting
--------------------------------------------
+---------------------------
 
 We are using the Hungarian Chickenpox Cases dataset in this case study. We will train a regressor to predict the weekly cases reported by the counties using a recurrent graph convolutional network. First, we will load the dataset and create an appropriate spatio-temporal split.
 
@@ -183,4 +183,7 @@ Using the holdout we will evaluate the performance of the trained recurrent grap
     cost = cost / (time+1)
     cost = cost.item()
     print("MSE: {:.4f}".format(cost))
-    >>> Accuracy: 0.6866
+    >>> MSE: 0.6866
+    
+Web Traffic Prediction
+----------------------
