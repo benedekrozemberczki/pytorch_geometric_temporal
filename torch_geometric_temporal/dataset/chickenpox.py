@@ -40,7 +40,7 @@ class ChickenpoxDatasetLoader(object):
         """Returning the Hungarian Chickenpox cases data iterator.
 
         Return types:
-            * **dataset** *(StaticGraphTemporalSignal)* - The chickenpox dataset.
+            * **dataset** *(StaticGraphTemporalSignal)* - The Chickenpox Hungary dataset.
         """
         self._get_edges()
         self._get_edge_weights()
