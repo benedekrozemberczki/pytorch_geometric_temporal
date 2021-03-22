@@ -78,7 +78,7 @@ class PemsBayDatasetLoader(object):
         self.targets = target
 
 
-    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12):
+    def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12)  -> StaticGraphTemporalSignal:
         """Returns data iterator for PEMS-BAY dataset as an instance of the
         static graph temporal signal class.
 
@@ -89,7 +89,6 @@ class PemsBayDatasetLoader(object):
         self._get_edges_and_weights()
         self._generate_task(num_timesteps_in, num_timesteps_out)
         dataset = StaticGraphTemporalSignal(self.edges, self.edge_weights, self.features, self.targets)
-
         return dataset
 
 if __name__ == '__main__':
