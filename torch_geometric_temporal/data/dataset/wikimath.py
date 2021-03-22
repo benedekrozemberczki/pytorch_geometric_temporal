@@ -31,10 +31,10 @@ class WikiMathsDatasetLoader(object):
         targets = []
         for time in range(self._dataset["time_periods"]):
             targets.append(np.array(self._dataset[str(time)]["y"]))
-        stacked_target = np.stack(self.targets)
+        stacked_target = np.stack(targets)
         standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / np.std(stacked_target, axis=0)
-        self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(self.targets)-self.lags)]
-        self.targets = [standardized_target[i+self.lags,:].T for i in range(len(self.targets)-self.lags)]
+        self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(targets)-self.lags)]
+        self.targets = [standardized_target[i+self.lags,:].T for i in range(len(targets)-self.lags)]
 
     def get_dataset(self, lags: int=8) -> StaticGraphDiscreteSignal:
         """Returning the Wikipedia Vital Mathematics data iterator.
