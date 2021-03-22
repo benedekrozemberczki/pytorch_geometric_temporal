@@ -36,7 +36,7 @@ PyTorch Geometric Tenporal offers data iterators for constant time difference sp
 Static Graphs with Discrete Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``StaticGraphDiscreteSignal`` object requires the following parameters:
+The constructor of a ``StaticGraphTemporalSignal`` object requires the following parameters:
 
 - ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
 - ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
@@ -46,7 +46,7 @@ The constructor of a ``StaticGraphDiscreteSignal`` object requires the following
 Static Graphs with Dynamic Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
+The constructor of a ``DynamicGraphTemporalSignal`` object requires the following parameters:
 
 - ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
 - ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
