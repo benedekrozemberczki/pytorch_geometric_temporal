@@ -1,12 +1,12 @@
 from typing import Union, Tuple
-from ..signal import StaticGraphTemporalSignal
-from ..signal import DynamicGraphTemporalSignal
+from .static_graph_temporal_signal import StaticGraphTemporalSignal
+from .dynamic_graph_temporal_signal import DynamicGraphTemporalSignal
 
 
 Discrete_Signal = Union[StaticGraphTemporalSignal, DynamicGraphTemporalSignal]
 
 def discrete_train_test_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discrete_Signal, Discrete_Signal]:
-    r""" Function to split a discrete data iterator according to a fixed ratio.
+    r""" Function to split a data iterator according to a fixed ratio.
 
     Parameters
     ----------
