@@ -27,22 +27,3 @@ Datasets
     :members:
     :undoc-members:
 
-Discrete Temporal Signal Iterators
-----------------------------------
-
-.. automodule:: torch_geometric_temporal.signal.static_graph_temporal_signal
-    :members:
-    :undoc-members:
-
-.. automodule:: torch_geometric_temporal.signal.static_graph_dynamic_signal
-    :members:
-    :undoc-members:
-
-Temporal Train-Test Split
---------------------------
-
-.. automodule:: torch_geometric_temporal.signal.temporal_signal_split
-    :members:
-    :undoc-members:
-
-
