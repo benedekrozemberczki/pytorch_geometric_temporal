@@ -113,7 +113,7 @@ class MSTGCN(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, x, edge_index):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor):
         r""" Making a forward pass. This module takes a likst of MSTGCN blocks and use a final convolution to serve as a multi-component fusion.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
@@ -126,7 +126,7 @@ class MSTGCN(nn.Module):
             * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
         """
         for block in self.blocklist:
-            x = block(x, edge_index)
+            X = block(X, edge_index)
 
         output = self.final_conv(x.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
 
