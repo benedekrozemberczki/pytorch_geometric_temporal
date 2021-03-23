@@ -1,5 +1,5 @@
 import math
-from typing import Optional
+from typing import Optional, List, Union
 
 import torch
 import torch.nn as nn
@@ -289,7 +289,7 @@ class ASTGCNBlock(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor):
+    def forward(self, X: torch.FloatTensor, edge_index: Union[torch.LongTensor,List[torch.LongTensor]]) -> torch.FloatTensor:
         """
         Making a forward pass. This is one ASTGCN block.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
@@ -322,7 +322,7 @@ class ASTGCNBlock(nn.Module):
             for t in range(num_of_timesteps):
                 data = Data(edge_index=edge_index[t], edge_attr=None, num_nodes=num_of_vertices)
                 lambda_max = LaplacianLambdaMax()(data).lambda_max
-                X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index[t], X_tilde, lambda_max), -1))
+                X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index[t], X_tilde, lambda_max=lambda_max), -1))
             X_hat = F.relu(torch.cat(X_hat, dim=-1))
 
         X_hat = self._time_convolution(X_hat.permute(0, 2, 1, 3))

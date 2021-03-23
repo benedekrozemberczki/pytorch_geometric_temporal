@@ -73,7 +73,7 @@ class MSTGCNBlock(nn.Module):
             X_tilde = []
             for t in range(num_of_timesteps):
                 lambda_max = LaplacianLambdaMax()(Data(edge_index=edge_index[t], edge_attr=None, num_nodes=num_of_vertices)).lambda_max
-                X_tilde.append(torch.unsqueeze(self._cheb_conv(x=X[:,:,:,t], edge_index=edge_index[t], lambda_max=lambda_max), -1))
+                X_tilde.append(torch.unsqueeze(self._cheb_conv(X[:,:,:,t], edge_index[t], lambda_max=lambda_max), -1))
             X_tilde = F.relu(torch.cat(X_tilde, dim=-1))
 
         X_tilde = self._time_conv(X_tilde.permute(0, 2, 1, 3))
