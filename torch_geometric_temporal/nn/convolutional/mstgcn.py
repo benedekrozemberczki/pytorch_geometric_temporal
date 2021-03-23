@@ -96,10 +96,8 @@ class MSTGCN(nn.Module):
         num_for_predict (int): Number of predictions to make in the future.
         len_input (int): Length of the input sequence.
     """
-    def __init__(self, nb_block: int, in_channels: int, K: int,
-                 nb_chev_filter: int, nb_time_filter: int, time_strides: int,
-                 num_for_predict: int, len_input: int):
-
+    def __init__(self, nb_block: int, in_channels: int, K: int, nb_chev_filter: int,
+                 nb_time_filter: int, time_strides: int, num_for_predict: int, len_input: int):
         super(MSTGCN, self).__init__()
 
         self._blocklist = nn.ModuleList([MSTGCNBlock(in_channels, K, nb_chev_filter, nb_time_filter, time_strides)])
