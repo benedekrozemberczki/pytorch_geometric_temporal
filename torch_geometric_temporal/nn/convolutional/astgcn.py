@@ -216,11 +216,11 @@ class SpatialAttention(nn.Module):
 class TemporalAttention(nn.Module):
     def __init__(self, in_channels, num_of_vertices, num_of_timesteps):
         super(TemporalAttention, self).__init__()
-        self.U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
-        self.U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices))
-        self.U3 = nn.Parameter(torch.FloatTensor(in_channels))
-        self.be = nn.Parameter(torch.FloatTensor(1, num_of_timesteps, num_of_timesteps))
-        self.Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))
+        self._U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
+        self._U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices))
+        self._U3 = nn.Parameter(torch.FloatTensor(in_channels))
+        self._be = nn.Parameter(torch.FloatTensor(1, num_of_timesteps, num_of_timesteps))
+        self._Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -230,29 +230,23 @@ class TemporalAttention(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, x):
+    def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the temporal attention layer.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
-        T_in is the length of input sequence in time. 
+        T_in is the length of input sequence in time.
+       
         Arg types:
-            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * X (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
         Return types:
-            * output (PyTorch Float Tensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
+            * E (PyTorch FloatTensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
         """
-        _, num_of_vertices, num_of_features, num_of_timesteps = x.shape
-
-        lhs = torch.matmul(torch.matmul(x.permute(0, 3, 2, 1), self.U1), self.U2)
-
-        rhs = torch.matmul(self.U3, x)
-
-        product = torch.matmul(lhs, rhs)
-
-        E = torch.matmul(self.Ve, torch.sigmoid(product + self.be))
-
+        _, num_of_vertices, num_of_features, num_of_timesteps = X.shape
+        LHS = torch.matmul(torch.matmul(X.permute(0, 3, 2, 1), self._U1), self._U2)
+        RHS = torch.matmul(self._U3, X)
+        E = torch.matmul(self._Ve, torch.sigmoid(torch.matmul(LHS, RHS) + self._be))
         E = F.softmax(E, dim=1)
-
         return E
 
 class ASTGCNBlock(nn.Module):
