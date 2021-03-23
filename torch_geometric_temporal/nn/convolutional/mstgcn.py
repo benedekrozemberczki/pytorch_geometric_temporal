@@ -7,7 +7,19 @@ from torch_geometric.nn import ChebConv
 from torch_geometric.transforms import LaplacianLambdaMax
 
 class MSTGCNBlock(nn.Module):
-
+    r"""An implementation of the Multi-Component Spatial-Temporal Graph Convolution Networks, a degraded version of ASTGCN.
+    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+    
+    Args:
+        
+        nb_block (int): Number of ASTGCN blocks in the model.
+        in_channels (int): Number of input features.
+        K (int): Order of Chebyshev polynomials. Degree is K-1.
+        nb_chev_filters (int): Number of Chebyshev filters.
+        nb_time_filters (int): Number of time filters.
+        time_strides (int): Time strides during temporal convolution.
+    """
     def __init__(self, in_channels: int, K: int, nb_chev_filter: int,
                  nb_time_filter: int, time_strides: int):
         super(MSTGCNBlock, self).__init__()
@@ -78,13 +90,12 @@ class MSTGCN(nn.Module):
         nb_block (int): Number of ASTGCN blocks in the model.
         in_channels (int): Number of input features.
         K (int): Order of Chebyshev polynomials. Degree is K-1.
-        nb_chev_filters (int): Number of Chebyshev filters.
-        nb_time_filters (int): Number of time filters.
+        nb_chev_filter (int): Number of Chebyshev filters.
+        nb_time_filter (int): Number of time filters.
         time_strides (int): Time strides during temporal convolution.
         num_for_predict (int): Number of predictions to make in the future.
         len_input (int): Length of the input sequence.
     """
-
     def __init__(self, nb_block: int, in_channels: int, K: int,
                  nb_chev_filter: int, nb_time_filter: int, time_strides: int,
                  num_for_predict: int, len_input: int):
