@@ -130,9 +130,7 @@ class ChebConvAttention(MessagePassing):
         num_nodes = x.size(self.node_dim)
         TAx_0 = torch.matmul((torch.eye(num_nodes)*spatial_attention).permute(0,2,1),x)
         out = torch.matmul(TAx_0, self.weight[0])
-        # L_tilde = torch.sparse_coo_tensor(edge_index,norm,(num_nodes,num_nodes)).to_dense()
-        # propagate_type: (x: Tensor, norm: Tensor)
-        edge_index_transpose = edge_index[[1,0]] # transpose according to the paper
+        edge_index_transpose = edge_index[[1,0]]
         if self.weight.size(0) > 1:
             TAx_1 = self.propagate(edge_index_transpose, x=TAx_0, norm=Att_norm, size=None)
             out = out + torch.matmul(TAx_1, self.weight[1])
@@ -240,10 +238,10 @@ class TemporalAttention(nn.Module):
         Making a forward pass of the temporal attention layer.
        
         Arg types:
-            * X (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * **X** (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
         Return types:
-            * E (PyTorch FloatTensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
+            * **E** (PyTorch FloatTensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
         """
         _, num_of_vertices, num_of_features, num_of_timesteps = X.shape
         LHS = torch.matmul(torch.matmul(X.permute(0, 3, 2, 1), self._U1), self._U2)
@@ -288,16 +286,14 @@ class ASTGCNBlock(nn.Module):
 
     def forward(self, X: torch.FloatTensor, edge_index: Union[torch.LongTensor,List[torch.LongTensor]]) -> torch.FloatTensor:
         """
-        Making a forward pass. This is one ASTGCN block.
-        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
-        T_in is the length of input sequence in time. T_out is the length of output sequence in time.
-        nb_time_filter is the number of time filters used.
+        Making a forward pass with the ASTGCN block.
+ 
         Arg types:
-            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-            * edge_index (LongTensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
+            * **X** (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * **edge_index** (LongTensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
-            * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
+            * **X** (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
         """
         batch_size, num_of_vertices, num_of_features, num_of_timesteps = X.shape
 
