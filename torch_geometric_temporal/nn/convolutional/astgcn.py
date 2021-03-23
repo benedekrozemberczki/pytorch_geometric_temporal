@@ -244,15 +244,12 @@ class TemporalAttention(nn.Module):
         _, num_of_vertices, num_of_features, num_of_timesteps = x.shape
 
         lhs = torch.matmul(torch.matmul(x.permute(0, 3, 2, 1), self.U1), self.U2)
-        # x:(B, N, F_in, T) -> (B, T, F_in, N)
-        # (B, T, F_in, N)(N) -> (B,T,F_in)
-        # (B,T,F_in)(F_in,N)->(B,T,N)
 
-        rhs = torch.matmul(self.U3, x)  # (F)(B,N,F,T)->(B, N, T)
+        rhs = torch.matmul(self.U3, x)
 
-        product = torch.matmul(lhs, rhs)  # (B,T,N)(B,N,T)->(B,T,T)
+        product = torch.matmul(lhs, rhs)
 
-        E = torch.matmul(self.Ve, torch.sigmoid(product + self.be))  # (B, T, T)
+        E = torch.matmul(self.Ve, torch.sigmoid(product + self.be))
 
         E_normalized = F.softmax(E, dim=1)
 
