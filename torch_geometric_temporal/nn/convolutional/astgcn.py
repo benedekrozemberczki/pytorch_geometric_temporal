@@ -259,12 +259,25 @@ class TemporalAttention(nn.Module):
         return E_normalized
 
 class ASTGCNBlock(nn.Module):
+    r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Block.
+    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
 
-    def __init__(self, in_channels, K, nb_chev_filter, nb_time_filter, time_strides, num_of_vertices, num_of_timesteps):
+    Args:
+        in_channels (int): Number of input features.
+        K (int): Order of Chebyshev polynomials. Degree is K-1.
+        nb_chev_filter (int): Number of Chebyshev filters.
+        nb_time_filter (int): Number of time filters.
+        time_strides (int): Time strides during temporal convolution.
+        num_of_vertices (int): Number of vertices in the graph.
+        num_of_timesteps (int): Number of time lags.
+    """
+    def __init__(self, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int,
+                 time_strides: int, num_of_vertices: int, num_of_timesteps: int):
         super(ASTGCNBlock, self).__init__()
-        self.TAt = TemporalAttention(in_channels, num_of_vertices, num_of_timesteps)
-        self.SAt = SpatialAttention(in_channels, num_of_vertices, num_of_timesteps)
-        self.cheb_conv_SAt = ChebConvAttention(in_channels, nb_chev_filter, K)
+        self._temporal_attention = TemporalAttention(in_channels, num_of_vertices, num_of_timesteps)
+        self._spatial_attention = SpatialAttention(in_channels, num_of_vertices, num_of_timesteps)
+        self._chebconv_attention = ChebConvAttention(in_channels, nb_chev_filter, K)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension
@@ -347,7 +360,6 @@ class ASTGCN(nn.Module):
         len_input (int): Length of the input sequence.
         num_of_vertices (int): Number of vertices in the graph.
     """
-
     def __init__(self, nb_block: int, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int,
                  time_strides: int, num_for_predict: int, len_input: int, num_of_vertices: int):
 
