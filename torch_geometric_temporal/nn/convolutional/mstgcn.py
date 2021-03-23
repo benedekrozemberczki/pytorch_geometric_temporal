@@ -75,21 +75,13 @@ class MSTGCN(nn.Module):
     Args:
         
         nb_block (int): Number of ASTGCN blocks in the model.
-        
         in_channels (int): Number of input features.
-        
         K (int): Order of Chebyshev polynomials. Degree is K-1.
-        
         nb_chev_filters (int): Number of Chebyshev filters.
-        
         nb_time_filters (int): Number of time filters.
-        
         time_strides (int): Time strides during temporal convolution.
-        
         num_for_predict (int): Number of predictions to make in the future.
-        
         len_input (int): Length of the input sequence.
-        
     """
 
     def __init__(self, nb_block: int, in_channels: int, K: int,
@@ -98,11 +90,11 @@ class MSTGCN(nn.Module):
 
         super(MSTGCN, self).__init__()
 
-        self.blocklist = nn.ModuleList([MSTGCNBlock(in_channels, K, nb_chev_filter, nb_time_filter, time_strides)])
+        self._blocklist = nn.ModuleList([MSTGCNBlock(in_channels, K, nb_chev_filter, nb_time_filter, time_strides)])
 
-        self.blocklist.extend([MSTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1) for _ in range(nb_block-1)])
+        self._blocklist.extend([MSTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1) for _ in range(nb_block-1)])
 
-        self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
+        self._final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
         self._reset_parameters()
 
@@ -125,8 +117,8 @@ class MSTGCN(nn.Module):
         Return types:
             * X (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
         """
-        for block in self.blocklist:
+        for block in self._blocklist:
             X = block(X, edge_index)
 
-        X = self.final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
+        X = self._final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
         return X
