@@ -127,7 +127,7 @@ class MSTGCN(nn.Module):
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         
         Arg types:
-            * x (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * X (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
             * edge_index (PyTorch LongTensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
