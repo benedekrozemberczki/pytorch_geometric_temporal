@@ -7,13 +7,12 @@ from torch_geometric.nn import ChebConv
 from torch_geometric.transforms import LaplacianLambdaMax
 
 class MSTGCNBlock(nn.Module):
-    r"""An implementation of the Multi-Component Spatial-Temporal Graph Convolution Networks, a degraded version of ASTGCN.
-    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
-    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+    r"""An implementation of the Multi-Component Spatial-Temporal Graph
+    Convolution block from this paper: `"Attention Based Spatial-Temporal
+    Graph Convolutional Networks for Traffic Flow Forecasting." 
+    <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
     
     Args:
-        
-        nb_block (int): Number of ASTGCN blocks in the model.
         in_channels (int): Number of input features.
         K (int): Order of Chebyshev polynomials. Degree is K-1.
         nb_chev_filters (int): Number of Chebyshev filters.
@@ -23,21 +22,21 @@ class MSTGCNBlock(nn.Module):
     def __init__(self, in_channels: int, K: int, nb_chev_filter: int,
                  nb_time_filter: int, time_strides: int):
         super(MSTGCNBlock, self).__init__()
-        self.cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None)
-        self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
-        self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
-        self.ln = nn.LayerNorm(nb_time_filter)
-        self.nb_time_filter = nb_time_filter
-        self.reset_parameters()
+        self._cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None)
+        self._time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
+        self._residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
+        self._layer_norm = nn.LayerNorm(nb_time_filter)
+        self._nb_time_filter = nb_time_filter
+        self._reset_parameters()
 
-    def reset_parameters(self):
+    def _reset_parameters(self):
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, x, edge_index):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor):
         """
         Making a forward pass. This is one MSTGCN block.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
@@ -75,7 +74,7 @@ class MSTGCNBlock(nn.Module):
         # residual shortcut
         x_residual = self.residual_conv(x.permute(0, 2, 1, 3))  # (b,F,N,T)
 
-        x_residual = self.ln(F.relu(x_residual + time_conv_output).permute(0, 3, 2, 1)).permute(0, 2, 3, 1)  # (b,N,F,T)
+        x_residual = self.layer_norm(F.relu(x_residual + time_conv_output).permute(0, 3, 2, 1)).permute(0, 2, 3, 1)  # (b,N,F,T)
 
         return x_residual
 
