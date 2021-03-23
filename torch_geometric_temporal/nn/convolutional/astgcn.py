@@ -221,9 +221,9 @@ class TemporalAttention(nn.Module):
         self.U3 = nn.Parameter(torch.FloatTensor(in_channels))
         self.be = nn.Parameter(torch.FloatTensor(1, num_of_timesteps, num_of_timesteps))
         self.Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))
-        self.reset_parameters()
+        self._reset_parameters()
 
-    def reset_parameters(self):
+    def _reset_parameters(self):
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
@@ -251,9 +251,9 @@ class TemporalAttention(nn.Module):
 
         E = torch.matmul(self.Ve, torch.sigmoid(product + self.be))
 
-        E_normalized = F.softmax(E, dim=1)
+        E = F.softmax(E, dim=1)
 
-        return E_normalized
+        return E
 
 class ASTGCNBlock(nn.Module):
     r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Block.
