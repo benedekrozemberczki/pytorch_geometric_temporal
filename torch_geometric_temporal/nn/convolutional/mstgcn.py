@@ -128,7 +128,7 @@ class MSTGCN(nn.Module):
         for block in self.blocklist:
             X = block(X, edge_index)
 
-        output = self.final_conv(x.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
+        X = self.final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
 
-        return output
+        return X
 
