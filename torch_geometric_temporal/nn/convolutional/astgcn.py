@@ -374,11 +374,7 @@ class ASTGCN(nn.Module):
 
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor) -> torch.FloatTensor:
         """
-        Making a forward pass. This module takes a lilst of ASTGCN blocks
-        and uses a final convolution to serve as a multi-component fusion.
-        'B' is the batch size. 'N_nodes' is the number of nodes in the graph.
-        'F_in' is the dimension of input features. 'T_in' is the length of input 
-        sequence in time. 'T_out' is the length of output sequence in time.
+        Making a forward pass.
         
         Arg types:
             * **X** (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
@@ -390,5 +386,7 @@ class ASTGCN(nn.Module):
         for block in self._blocklist:
             X = block(X, edge_index)
 
-        X = self.final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
+        X = self.final_conv(X.permute(0, 3, 1, 2))
+        X = X[:, :, :, -1]
+        X = X.permute(0, 2, 1)
         return X
