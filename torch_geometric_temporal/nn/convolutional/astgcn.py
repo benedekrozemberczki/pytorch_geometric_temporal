@@ -276,20 +276,20 @@ class ASTGCNBlock(nn.Module):
         self._temporal_attention = TemporalAttention(in_channels, num_of_vertices, num_of_timesteps)
         self._spatial_attention = SpatialAttention(in_channels, num_of_vertices, num_of_timesteps)
         self._chebconv_attention = ChebConvAttention(in_channels, nb_chev_filter, K)
-        self._time_convolutiom = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
+        self._time_convolution = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self._residual_convolution = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self._layer_norm = nn.LayerNorm(nb_time_filter)
         
         self._reset_parameters()
 
-    def reset_parameters(self):
+    def _reset_parameters(self):
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, x, edge_index):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor):
         """
         Making a forward pass. This is one ASTGCN block.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
@@ -297,49 +297,39 @@ class ASTGCNBlock(nn.Module):
         nb_time_filter is the number of time filters used.
         Arg types:
             * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-            * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
+            * edge_index (LongTensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
             * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
         """
-        batch_size, num_of_vertices, num_of_features, num_of_timesteps = x.shape
+        batch_size, num_of_vertices, num_of_features, num_of_timesteps = X.shape
 
-        # TAt
-        temporal_At = self._temporal_attention(x)  # (b, T, T)
+        X_tilde = self._temporal_attention(X)
+        X_tilde = torch.matmul(X.reshape(batch_size, -1, num_of_timesteps), X_tilde)
+        X_tilde = X_tilde.reshape(batch_size, num_of_vertices, num_of_features, num_of_timesteps)
+        X_tilde = self._spatial_attention(X_tilde)
 
-        x_TAt = torch.matmul(x.reshape(batch_size, -1, num_of_timesteps), temporal_At).reshape(batch_size, num_of_vertices, num_of_features, num_of_timesteps)
-
-        # SAt
-        spatial_At = self._spatial_attention(x_TAt)
-
-        # cheb gcn
         if not isinstance(edge_index, list):
             data = Data(edge_index=edge_index, edge_attr=None, num_nodes=num_of_vertices)
             lambda_max = LaplacianLambdaMax()(data).lambda_max
-            outputs = []
-            for time_step in range(num_of_timesteps):
-                outputs.append(torch.unsqueeze(self._chebconv_attention(x[:,:,:,time_step], edge_index, spatial_At, lambda_max = lambda_max), -1))
+            X_hat = []
+            for t in range(num_of_timesteps):
+                X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index, X_tilde, lambda_max=lambda_max), -1))
     
-            spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T) # (b,N,F,T)        
-        else: # edge_index changes over time
-            outputs = []
-            for time_step in range(num_of_timesteps):
-                data = Data(edge_index=edge_index[time_step], edge_attr=None, num_nodes=num_of_vertices)
+            X_hat = F.relu(torch.cat(X_hat, dim=-1))       
+        else:
+            X_hat = []
+            for t in range(num_of_timesteps):
+                data = Data(edge_index=edge_index[t], edge_attr=None, num_nodes=num_of_vertices)
                 lambda_max = LaplacianLambdaMax()(data).lambda_max
-                outputs.append(torch.unsqueeze(self._chebconv_attention(x=x[:,:,:,time_step], edge_index=edge_index[time_step],
-                    spatial_attention=spatial_At,lambda_max=lambda_max), -1))
-            spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T)
-            
-        # convolution along the time axis
-        time_conv_output = self.time_conv(spatial_gcn.permute(0, 2, 1, 3))  # (b,N,F,T)->(b,F,N,T) use kernel size (1,3)->(b,F,N,T)
+                X_hat.append(torch.unsqueeze(self._chebconv_attention(x=x[:,:,:,t], edge_index=edge_index[t], patial_attention=X_tilde,lambda_max=lambda_max), -1))
+            X_hat = F.relu(torch.cat(X_hat, dim=-1))
 
-        # residual shortcut
-        x_residual = self.residual_conv(x.permute(0, 2, 1, 3))  # (b,N,F,T)->(b,F,N,T) use kernel size (1,1)->(b,F,N,T)
-
-        x_residual = self.ln(F.relu(x_residual + time_conv_output).permute(0, 3, 2, 1)).permute(0, 2, 3, 1)
-        # (b,F,N,T)->(b,T,N,F) -ln-> (b,T,N,F)->(b,N,F,T)
-
-        return x_residual
+        X_hat = self._time_convolution(X_hat.permute(0, 2, 1, 3))
+        X = self._residual_convolution(X.permute(0, 2, 1, 3))
+        X = self._layer_norm(F.relu(X + X_hat).permute(0, 3, 2, 1))
+        X = X.permute(0, 2, 3, 1)
+        return X
 
 
 class ASTGCN(nn.Module):
@@ -397,7 +387,7 @@ class ASTGCN(nn.Module):
         for block in self._blocklist:
             X = block(X, edge_index)
 
-        X = self.final_conv(X.permute(0, 3, 1, 2))
+        X = self._final_conv(X.permute(0, 3, 1, 2))
         X = X[:, :, :, -1]
         X = X.permute(0, 2, 1)
         return X
