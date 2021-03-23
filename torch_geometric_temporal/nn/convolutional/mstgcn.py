@@ -36,9 +36,9 @@ class MSTGCNBlock(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor) -> torch.FloatTensor:
         """
-        Making a forward pass. This is one MSTGCN block.
+        Making a forward pass with a single MSTGCN block.
         B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         nb_time_filter is the number of time filters used.
