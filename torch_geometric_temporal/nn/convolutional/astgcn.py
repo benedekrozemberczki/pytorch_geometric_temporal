@@ -348,18 +348,17 @@ class ASTGCN(nn.Module):
         num_of_vertices (int): Number of vertices in the graph.
     """
 
-    def __init__(self, nb_block, in_channels, K, nb_chev_filter,
-                 nb_time_filter, time_strides, num_for_predict,
-                 len_input, num_of_vertices):
+    def __init__(self, nb_block: int, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int,
+                 time_strides: int, num_for_predict: int, len_input: int, num_of_vertices: int):
 
         super(ASTGCN, self).__init__()
 
-        self.blocklist = nn.ModuleList([ASTGCNBlock(in_channels, K, nb_chev_filter,
+        self._blocklist = nn.ModuleList([ASTGCNBlock(in_channels, K, nb_chev_filter,
                                         nb_time_filter, time_strides, num_of_vertices, len_input)])
 
-        self.blocklist.extend([ASTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
+        self._blocklist.extend([ASTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
 
-        self.final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
+        self._final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 
         self._reset_parameters()
 
@@ -382,14 +381,14 @@ class ASTGCN(nn.Module):
         sequence in time. 'T_out' is the length of output sequence in time.
         
         Arg types:
-            * X (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
-            * edge_index (PyTorch Long Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
+            * X (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * edge_index (PyTorch LongTensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
-            * output (PyTorch Float Tensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
+            * X (PyTorch FloatTensor)* - Hidden state tensor for all nodes, with shape (B, N_nodes, T_out).
         """
-        for block in self.blocklist:
+        for block in self._blocklist:
             X = block(X, edge_index)
 
-        output = self.final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
-        return output
+        X = self.final_conv(X.permute(0, 3, 1, 2))[:, :, :, -1].permute(0, 2, 1)
+        return X
