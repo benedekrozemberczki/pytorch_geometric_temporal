@@ -275,13 +275,15 @@ class ASTGCNBlock(nn.Module):
     def __init__(self, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int,
                  time_strides: int, num_of_vertices: int, num_of_timesteps: int):
         super(ASTGCNBlock, self).__init__()
+        
         self._temporal_attention = TemporalAttention(in_channels, num_of_vertices, num_of_timesteps)
         self._spatial_attention = SpatialAttention(in_channels, num_of_vertices, num_of_timesteps)
         self._chebconv_attention = ChebConvAttention(in_channels, nb_chev_filter, K)
-        self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
-        self.residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
-        self.ln = nn.LayerNorm(nb_time_filter)  #need to put channel to the last dimension
-        self.reset_parameters()
+        self._time_convolutiom = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
+        self._residual_convolution = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
+        self._layer_norm = nn.LayerNorm(nb_time_filter)
+        
+        self._reset_parameters()
 
     def reset_parameters(self):
         for p in self.parameters():
@@ -306,12 +308,12 @@ class ASTGCNBlock(nn.Module):
         batch_size, num_of_vertices, num_of_features, num_of_timesteps = x.shape
 
         # TAt
-        temporal_At = self.TAt(x)  # (b, T, T)
+        temporal_At = self._temporal_attention(x)  # (b, T, T)
 
         x_TAt = torch.matmul(x.reshape(batch_size, -1, num_of_timesteps), temporal_At).reshape(batch_size, num_of_vertices, num_of_features, num_of_timesteps)
 
         # SAt
-        spatial_At = self.SAt(x_TAt)
+        spatial_At = self._spatial_attention(x_TAt)
 
         # cheb gcn
         if not isinstance(edge_index, list):
@@ -319,7 +321,7 @@ class ASTGCNBlock(nn.Module):
             lambda_max = LaplacianLambdaMax()(data).lambda_max
             outputs = []
             for time_step in range(num_of_timesteps):
-                outputs.append(torch.unsqueeze(self.cheb_conv_SAt(x[:,:,:,time_step], edge_index, spatial_At, lambda_max = lambda_max), -1))
+                outputs.append(torch.unsqueeze(self._chebconv_attention(x[:,:,:,time_step], edge_index, spatial_At, lambda_max = lambda_max), -1))
     
             spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T) # (b,N,F,T)        
         else: # edge_index changes over time
@@ -327,7 +329,7 @@ class ASTGCNBlock(nn.Module):
             for time_step in range(num_of_timesteps):
                 data = Data(edge_index=edge_index[time_step], edge_attr=None, num_nodes=num_of_vertices)
                 lambda_max = LaplacianLambdaMax()(data).lambda_max
-                outputs.append(torch.unsqueeze(self.cheb_conv_SAt(x=x[:,:,:,time_step], edge_index=edge_index[time_step],
+                outputs.append(torch.unsqueeze(self._chebconv_attention(x=x[:,:,:,time_step], edge_index=edge_index[time_step],
                     spatial_attention=spatial_At,lambda_max=lambda_max), -1))
             spatial_gcn = F.relu(torch.cat(outputs, dim=-1)) # (b,N,F,T)
             
