@@ -214,6 +214,15 @@ class SpatialAttention(nn.Module):
 
 
 class TemporalAttention(nn.Module):
+    r"""An implementation of the Temporal Attention Module.
+    For details see this paper: `"Attention Based Spatial-Temporal Graph Convolutional 
+    Networks for Traffic Flow Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+
+    Args:
+        in_channels (int): Number of input features.
+        num_of_vertices (int): Number of vertices in the graph.
+        num_of_timesteps (int): Number of time lags.
+    """
     def __init__(self, in_channels, num_of_vertices, num_of_timesteps):
         super(TemporalAttention, self).__init__()
         self._U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
