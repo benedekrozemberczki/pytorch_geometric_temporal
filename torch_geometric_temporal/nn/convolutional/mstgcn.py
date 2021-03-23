@@ -22,11 +22,18 @@ class MSTGCNBlock(nn.Module):
     def __init__(self, in_channels: int, K: int, nb_chev_filter: int,
                  nb_time_filter: int, time_strides: int):
         super(MSTGCNBlock, self).__init__()
+        
         self._cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None)
-        self._time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
-        self._residual_conv = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
+        
+        self._time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter,
+                                    kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
+                                    
+        self._residual_conv = nn.Conv2d(in_channels, nb_time_filter,
+                                        kernel_size=(1, 1), stride=(1, time_strides))
+                                        
         self._layer_norm = nn.LayerNorm(nb_time_filter)
         self._nb_time_filter = nb_time_filter
+        
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -43,22 +50,26 @@ class MSTGCNBlock(nn.Module):
         T_in is the length of input sequence in time. T_out is the length of output sequence in time.
         nb_time_filter is the number of time filters used.
         Arg types:
-            * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * X (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
             * edge_index (Tensor): Edge indices, can be an array of a list of Tensor arrays, depending on whether edges change over time.
 
         Return types:
-            * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
+            * X (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, nb_time_filter, T_out).
         """
-        # cheb gcn
-        batch_size, num_of_vertices, in_channels, num_of_timesteps = x.shape
+
+        batch_size, num_of_vertices, in_channels, num_of_timesteps = X.shape
+        
         if not isinstance(edge_index, list):
-            data = Data(edge_index=edge_index, edge_attr=None, num_nodes=num_of_vertices)
-            lambda_max = LaplacianLambdaMax()(data).lambda_max
-            tmp = x.permute(2,0,1,3).reshape(num_of_vertices, in_channels, num_of_timesteps*batch_size) # (N_nodes, F_in, B*T_in)
-            tmp = tmp.permute(2,0,1) # (B*T_in, N_nodes, F_in)
-            output = F.relu(self.cheb_conv(x=tmp, edge_index=edge_index,
-                    lambda_max=lambda_max))
-            spatial_gcn = output.permute(1,2,0).reshape(num_of_vertices,self.nb_time_filter,batch_size,num_of_timesteps).permute(2,0,1,3) # (B,N_nodes,F_out,T_in)
+
+            lambda_max = LaplacianLambdaMax()(Data(edge_index = edge_index, edge_attr=None, num_nodes=num_of_vertices)).lambda_max
+            
+            X_tilde = X.permute(2, 0, 1, 3).reshape(num_of_vertices, in_channels, num_of_timesteps*batch_size)
+            X_tilde = X_tilde.permute(2, 0, 1)
+            X_tilde = F.relu(self.cheb_conv(x=X_tilde, edge_index=edge_index, lambda_max=lambda_max))
+            X_tilde = X_tilde.permute(1, 2, 0)
+            X_tilde = X_tilde.reshape(num_of_vertices, self._nb_time_filter, batch_size,num_of_timesteps)
+            X_tilde = X_tilde.permute(2, 0, 1, 3)
+            
         else: # edge_index changes over time
             outputs = []
             for time_step in range(num_of_timesteps):
