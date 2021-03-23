@@ -8,7 +8,8 @@ from torch_geometric.transforms import LaplacianLambdaMax
 
 class MSTGCNBlock(nn.Module):
 
-    def __init__(self, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int, time_strides: int):
+    def __init__(self, in_channels: int, K: int, nb_chev_filter: int,
+                 nb_time_filter: int, time_strides: int):
         super(MSTGCNBlock, self).__init__()
         self.cheb_conv = ChebConv(in_channels, nb_chev_filter, K, normalization=None)
         self.time_conv = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
@@ -99,6 +100,9 @@ class MSTGCN(nn.Module):
         self._reset_parameters()
 
     def _reset_parameters(self):
+        """
+        Resetting the model parameters.
+        """
         for p in self.parameters():
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
