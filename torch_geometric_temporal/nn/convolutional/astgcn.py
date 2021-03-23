@@ -163,19 +163,24 @@ class ChebConvAttention(MessagePassing):
             self.weight.size(0), self.normalization)
 
 class SpatialAttention(nn.Module):
-    """
-    Spatial Attention Computation Layer.
+    r"""An implementation of the Spatial Attention Module. For details see this paper: 
+    `"Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow 
+    Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
+
+    Args:
+        in_channels (int): Number of input features.
+        num_of_vertices (int): Number of vertices in the graph.
+        num_of_timesteps (int): Number of time lags.
     """
     def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
         super(SpatialAttention, self).__init__()
         
-        self.W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))
-        self.W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
-        self.W3 = nn.Parameter(torch.FloatTensor(in_channels))
+        self._W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))
+        self._W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
+        self._W3 = nn.Parameter(torch.FloatTensor(in_channels))
+        self._bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices))
         
-        self.bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices))
-        
-        self.Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices))
+        self._Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices))
         
         self._reset_parameters()
 
@@ -187,29 +192,22 @@ class SpatialAttention(nn.Module):
                 nn.init.uniform_(p)
 
 
-    def forward(self, X):
+    def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the spatial attention layer.
-        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
-        T_in is the length of input sequence in time. 
+        
         Arg types:
-            * X (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
+            * **X** (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
 
         Return types:
-            * output (PyTorch Float Tensor) - Spatial attention score matrices, with shape (B, N_nodes, N_nodes).
+            * **S** (PyTorch FloatTensor) - Spatial attention score matrices, with shape (B, N_nodes, N_nodes).
         """
 
-        LHS = torch.matmul(torch.matmul(X, self.W1), self.W2)  # (b,N,F,T)(T)->(b,N,F)(F,T)->(b,N,T)
-
-        RHS = torch.matmul(self.W3, X).transpose(-1, -2)  # (F)(b,N,F,T)->(b,N,T)->(b,T,N)
-
-        L_R_product = torch.matmul(LHS, RHS)  # (b,N,T)(b,T,N) -> (B, N, N)
-
-        S = torch.matmul(self.Vs, torch.sigmoid(L_R_product + self.bs))  # (N,N)(B, N, N)->(B,N,N)
-
-        S_normalized = F.softmax(S, dim=1)
-
-        return S_normalized
+        LHS = torch.matmul(torch.matmul(X, self._W1), self._W2)
+        RHS = torch.matmul(self._W3, X).transpose(-1, -2)
+        S = torch.matmul(self._Vs, torch.sigmoid(torch.matmul(LHS, RHS) + self._bs))
+        S = F.softmax(S, dim=1)
+        return S
 
 
 
@@ -223,7 +221,7 @@ class TemporalAttention(nn.Module):
         num_of_vertices (int): Number of vertices in the graph.
         num_of_timesteps (int): Number of time lags.
     """
-    def __init__(self, in_channels, num_of_vertices, num_of_timesteps):
+    def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
         super(TemporalAttention, self).__init__()
         
         self._U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
@@ -243,8 +241,6 @@ class TemporalAttention(nn.Module):
     def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the temporal attention layer.
-        B is the batch size. N_nodes is the number of nodes in the graph. F_in is the dimension of input features. 
-        T_in is the length of input sequence in time.
        
         Arg types:
             * X (PyTorch FloatTensor) - Node features for T time periods, with shape (B, N_nodes, F_in, T_in).
