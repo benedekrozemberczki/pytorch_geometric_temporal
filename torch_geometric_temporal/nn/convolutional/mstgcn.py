@@ -32,7 +32,7 @@ class MSTGCNBlock(nn.Module):
                                         kernel_size=(1, 1), stride=(1, time_strides))
                                         
         self._layer_norm = nn.LayerNorm(nb_time_filter)
-        self._nb_time_filter = nb_time_filter
+        self.nb_time_filter = nb_time_filter
         
         self._reset_parameters()
 
@@ -66,7 +66,7 @@ class MSTGCNBlock(nn.Module):
             X_tilde = X_tilde.permute(2, 0, 1)
             X_tilde = F.relu(self._cheb_conv(x=X_tilde, edge_index=edge_index, lambda_max=lambda_max))
             X_tilde = X_tilde.permute(1, 2, 0)
-            X_tilde = X_tilde.reshape(num_of_vertices, self._nb_time_filter, batch_size,num_of_timesteps)
+            X_tilde = X_tilde.reshape(num_of_vertices, self.nb_time_filter, batch_size,num_of_timesteps)
             X_tilde = X_tilde.permute(2, 0, 1, 3)
             
         else:
