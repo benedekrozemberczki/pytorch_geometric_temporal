@@ -93,13 +93,11 @@ class ChebConvAttention(MessagePassing):
 
         return edge_index, edge_weight
 
-    def forward(self, x, edge_index, spatial_attention, edge_weight: OptTensor = None,
-                batch: OptTensor = None, lambda_max: OptTensor = None):
+    def forward(self, x: torch.FloatTensor, edge_index: torch.LongTensor,
+                spatial_attention: torch.FloatTensor, edge_weight: OptTensor = None,
+                batch: OptTensor = None, lambda_max: OptTensor = None) -> torch.FloatTensor:
         """
-        Making a forward pass of the ChebConvAtt layer.
-        B is the batch size. N_nodes is the number of nodes in the graph. 
-        F_in is the dimension of input features (in_channels). 
-        F_out is the dimension of input features (out_channels). 
+        Making a forward pass of the ChebConv Attention layer.
         
         Arg types:
             * x (PyTorch Float Tensor) - Node features for T time periods, with shape (B, N_nodes, F_in).
@@ -110,7 +108,7 @@ class ChebConvAttention(MessagePassing):
             * lambda_max (optional, but mandatory if normalization is None) - Largest eigenvalue of Laplacian.
 
         Return types:
-            * output (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out).
+            * out (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out).
         """
         if self.normalization != 'sym' and lambda_max is None:
             raise ValueError('You need to pass `lambda_max` to `forward() in`'
@@ -162,6 +160,7 @@ class ChebConvAttention(MessagePassing):
             self.__class__.__name__, self.in_channels, self.out_channels,
             self.weight.size(0), self.normalization)
 
+
 class SpatialAttention(nn.Module):
     r"""An implementation of the Spatial Attention Module. For details see this paper: 
     `"Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow 
@@ -179,9 +178,7 @@ class SpatialAttention(nn.Module):
         self._W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
         self._W3 = nn.Parameter(torch.FloatTensor(in_channels))
         self._bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices))
-        
         self._Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices))
-        
         self._reset_parameters()
 
     def _reset_parameters(self):
