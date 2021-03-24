@@ -75,6 +75,8 @@ In order to benchmark  graph neural networks we released the following datasets:
 - `Hungarian Chickenpox Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.chickenpox.ChickenpoxDatasetLoader>`_
 - `PedalMe London Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pedalme.PedalMeDatasetLoader>`_
 - `Wikipedia Vital Math Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.wikimath.WikiMathsDatasetLoader>`_
+- `Windmill Output Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.windmill.WindmillOutputDatasetLoader>`_
+
 
 Integrated Datasets
 ^^^^^^^^^^^^^^^^^^^^^^
