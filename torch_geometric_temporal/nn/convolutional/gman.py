@@ -12,9 +12,9 @@ class conv2d_(nn.Module):
         super(conv2d_, self).__init__()
         self.activation = activation
         if padding == 'SAME':
-            self.padding_size = math.ceil(kernel_size)
+            self._padding_size = math.ceil(kernel_size)
         else:
-            self.padding_size = [0, 0]
+            self._padding_size = [0, 0]
         self._conv = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
                                padding=0, bias=use_bias)
         self._batch_norm = nn.BatchNorm2d(output_dims, momentum=bn_decay)
@@ -25,8 +25,8 @@ class conv2d_(nn.Module):
 
     def forward(self, x: torch.FloatTensor) -> torch.FloatTensor:
         x = x.permute(0, 3, 2, 1)
-        x = F.pad(x, ([self.padding_size[1], self.padding_size[1],
-                       self.padding_size[0], self.padding_size[0]]))
+        x = F.pad(x, ([self._padding_size[1], self._padding_size[1],
+                       self._padding_size[0], self._padding_size[0]]))
         x = self._conv(x)
         x = self._batch_norm(x)
         if self.activation is not None:
@@ -119,8 +119,8 @@ class SpatialAttention(nn.Module):
     def __init__(self, K: int, d: int, bn_decay: float):
         super(SpatialAttention, self).__init__()
         D = K * d
-        self.d = d
-        self.K = K
+        self._d = d
+        self._K = K
         self._FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
                         bn_decay=bn_decay)
         self._FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
@@ -148,12 +148,12 @@ class SpatialAttention(nn.Module):
         key = self._FC_k(X)
         value = self._FC_v(X)
         # [K * batch_size, num_step, num_nodes, d]
-        query = torch.cat(torch.split(query, self.K, dim=-1), dim=0)
-        key = torch.cat(torch.split(key, self.K, dim=-1), dim=0)
-        value = torch.cat(torch.split(value, self.K, dim=-1), dim=0)
+        query = torch.cat(torch.split(query, self._K, dim=-1), dim=0)
+        key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
+        value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
         # [K * batch_size, num_step, num_nodes, num_nodes]
         attention = torch.matmul(query, key.transpose(2, 3))
-        attention /= (self.d ** 0.5)
+        attention /= (self._d ** 0.5)
         attention = F.softmax(attention, dim=-1)
         # [batch_size, num_step, num_nodes, D]
         X = torch.matmul(attention, value)
@@ -178,9 +178,9 @@ class TemporalAttention(nn.Module):
     def __init__(self, K: int, d: int, bn_decay: float, mask: bool = True):
         super(TemporalAttention, self).__init__()
         D = K * d
-        self.d = d
-        self.K = K
-        self.mask = mask
+        self._d = d
+        self._K = K
+        self._mask = mask
         self._FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
                         bn_decay=bn_decay)
         self._FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
@@ -208,9 +208,9 @@ class TemporalAttention(nn.Module):
         key = self._FC_k(X)
         value = self._FC_v(X)
         # [K * batch_size, num_step, num_nodes, d]
-        query = torch.cat(torch.split(query, self.K, dim=-1), dim=0)
-        key = torch.cat(torch.split(key, self.K, dim=-1), dim=0)
-        value = torch.cat(torch.split(value, self.K, dim=-1), dim=0)
+        query = torch.cat(torch.split(query, self._K, dim=-1), dim=0)
+        key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
+        value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
         # query: [K * batch_size, num_nodes, num_step, d]
         # key:   [K * batch_size, num_nodes, d, num_step]
         # value: [K * batch_size, num_nodes, num_step, d]
@@ -219,16 +219,16 @@ class TemporalAttention(nn.Module):
         value = value.permute(0, 2, 1, 3)
         # [K * batch_size, num_nodes, num_step, num_step]
         attention = torch.matmul(query, key)
-        attention /= (self.d ** 0.5)
+        attention /= (self._d ** 0.5)
         # mask attention score
-        if self.mask:
+        if self._mask:
             batch_size = X.shape[0]
             num_step = X.shape[1]
             num_nodes = X.shape[2]
             mask = torch.ones(num_step, num_step)
             mask = torch.tril(mask)
             mask = torch.unsqueeze(torch.unsqueeze(mask, dim=0), dim=0)
-            mask = mask.repeat(self.K * batch_size, num_nodes, 1, 1)
+            mask = mask.repeat(self._K * batch_size, num_nodes, 1, 1)
             mask = mask.to(torch.bool)
             attention = torch.where(mask, attention, -2 ** 15 + 1)
         # softmax
@@ -330,8 +330,8 @@ class TransformAttention(nn.Module):
     def __init__(self, K: int, d: int, bn_decay: float):
         super(TransformAttention, self).__init__()
         D = K * d
-        self.K = K
-        self.d = d
+        self._K = K
+        self._d = d
         self._FC_q = FC(input_dims=D, units=D, activations=F.relu,
                         bn_decay=bn_decay)
         self._FC_k = FC(input_dims=D, units=D, activations=F.relu,
@@ -359,9 +359,9 @@ class TransformAttention(nn.Module):
         key = self._FC_k(STE_his)
         value = self._FC_v(X)
         # [K * batch_size, num_step, num_nodes, d]
-        query = torch.cat(torch.split(query, self.K, dim=-1), dim=0)
-        key = torch.cat(torch.split(key, self.K, dim=-1), dim=0)
-        value = torch.cat(torch.split(value, self.K, dim=-1), dim=0)
+        query = torch.cat(torch.split(query, self._K, dim=-1), dim=0)
+        key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
+        value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
         # query: [K * batch_size, num_nodes, num_pred, d]
         # key:   [K * batch_size, num_nodes, d, num_his]
         # value: [K * batch_size, num_nodes, num_his, d]
@@ -370,7 +370,7 @@ class TransformAttention(nn.Module):
         value = value.permute(0, 2, 1, 3)
         # [K * batch_size, num_nodes, num_pred, num_his]
         attention = torch.matmul(query, key)
-        attention /= (self.d ** 0.5)
+        attention /= (self._d ** 0.5)
         attention = F.softmax(attention, dim=-1)
         # [batch_size, num_pred, num_nodes, D]
         X = torch.matmul(attention, value)
@@ -398,7 +398,7 @@ class GMAN(nn.Module):
     def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float):
         super(GMAN, self).__init__()
         D = K * d
-        self.num_his = num_his
+        self._num_his = num_his
         self._st_embedding = STEmbedding(D, bn_decay)
         self._st_att_block1 = nn.ModuleList(
             [STAttBlock(K, d, bn_decay) for _ in range(L)])
@@ -427,8 +427,8 @@ class GMAN(nn.Module):
         X = self._FC_1(X)
         # STE
         STE = self._st_embedding(SE, TE)
-        STE_his = STE[:, :self.num_his]
-        STE_pred = STE[:, self.num_his:]
+        STE_his = STE[:, :self._num_his]
+        STE_pred = STE[:, self._num_his:]
         # encoder
         for net in self._st_att_block1:
             X = net(X, STE_his)
