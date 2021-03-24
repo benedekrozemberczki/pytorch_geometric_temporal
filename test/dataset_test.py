@@ -5,7 +5,7 @@ from torch_geometric_temporal.signal import temporal_signal_split
 from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 
-from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader
+from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader
 
  
@@ -104,6 +104,16 @@ def test_wiki():
             snapshot.edge_attr.shape == (27079, )
             snapshot.x.shape == (1068, 8)
             snapshot.y.shape == (1068, )
+            
+def test_windmill():
+    loader = WindmillOutputDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            snapshot.edge_index.shape == (2, 27079)
+            snapshot.edge_attr.shape == (27079, )
+            snapshot.x.shape == (1068, 8)
+            snapshot.y.shape == (1068, )
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
@@ -177,9 +187,7 @@ def test_discrete_train_test_split_dynamic():
 
     dataset = DynamicGraphTemporalSignal(edge_indices, edge_weights, features, targets)
 
-
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
-
 
     for epoch in range(2):
         for snapshot in test_dataset:
