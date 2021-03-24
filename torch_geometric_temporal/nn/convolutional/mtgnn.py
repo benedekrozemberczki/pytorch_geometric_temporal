@@ -380,12 +380,12 @@ class MTGNN(nn.Module):
 
         self._idx = torch.arange(self._num_nodes)
 
-    def forward(self, input: torch.FloatTensor, predefined_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, static_feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+    def forward(self, X_in: torch.FloatTensor, predefined_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, static_feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN.
 
         Arg types:
-            * input (PyTorch Float Tensor) - Input sequence, 
+            * X_in (PyTorch Float Tensor) - Input sequence, 
             with shape (batch size, input dimension, number of nodes, input sequence length).
             * predefined_A (Pytorch Float Tensor, optional) - Predefined adjacency matrix, default None.
             * idx (Pytorch Long Tensor, optional) - Input indices, a permutation of the number of nodes, default None (no permutation).
@@ -395,26 +395,26 @@ class MTGNN(nn.Module):
             * x (PyTorch Float Tensor) - Output sequence for prediction, 
             with shape (batch size, input sequence length, number of nodes, 1).
         """
-        seq_len = input.size(3)
+        seq_len = X_in.size(3)
         assert seq_len == self._seq_length, 'input sequence length not equal to preset sequence length'
 
         if self._seq_length < self._receptive_field:
-            input = nn.functional.pad(
-                input, (self._receptive_field-self._seq_length, 0, 0, 0))
+            X_in = nn.functional.pad(
+                X_in, (self._receptive_field-self._seq_length, 0, 0, 0))
 
         if self._gcn_true:
             if self._build_adj_true:
                 if idx is None:
-                    adp = self._graph_constructor(self._idx.to(input.device),
+                    adp = self._graph_constructor(self._idx.to(X_in.device),
                                   static_feat=static_feat)
                 else:
                     adp = self._graph_constructor(idx, static_feat=static_feat)
             else:
                 adp = predefined_A
 
-        X = self._start_conv(input)
+        X = self._start_conv(X_in)
         skip = self._skip_conv_0(
-            F.dropout(input, self._dropout, training=self.training))
+            F.dropout(X_in, self._dropout, training=self.training))
         for i in range(self._layers):
             residual = X
             filter = self._filter_convs[i](X)
