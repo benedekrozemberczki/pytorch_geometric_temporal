@@ -23,7 +23,7 @@ External Resources - Architectures
 
 * Shengnan Guo, Youfang Lin, Ning Feng, Chao Song, Huaiyu Wan: **Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow Forecasting** `Paper <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_, `Code <https://github.com/guoshnBJTU/ASTGCN-r-pytorch>`_
 
-* Chuanpan Zheng, Xiaoliang Fan, Cheng Wang, Jianzhong Qi: **GMAN: A Graph Multi-Attention Network for Traffic Prediction** `Paper <https://arxiv.org/pdf/1911.08415.pdf>`_, `Code <https://github.com/guoshnBJTU/ASTGCN-r-pytorch>`_
+* Chuanpan Zheng, Xiaoliang Fan, Cheng Wang, Jianzhong Qi: **GMAN: A Graph Multi-Attention Network for Traffic Prediction** `Paper <https://arxiv.org/pdf/1911.08415.pdf>`_, `Code <https://github.com/zhengchuanpan/GMAN>`_
 
 External Resources - Datasets
 =============================
