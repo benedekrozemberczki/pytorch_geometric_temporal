@@ -4,7 +4,7 @@ import numpy as np
 from six.moves import urllib
 from ..signal import StaticGraphTemporalSignal
 
-class WindmillOutputDatasetLoader(object):
+class WikiMathsDatasetLoader(object):
     """A dataset of vital mathematics articles from Wikipedia. We made it 
     public during the development of PyTorch Geometric Temporal. The 
     underlying graph is static - vertices are Wikipedia pages and edges are 
@@ -17,7 +17,7 @@ class WindmillOutputDatasetLoader(object):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/windmill_output.json"
+        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/wikivital_mathematics.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
 
     def _get_edges(self):
