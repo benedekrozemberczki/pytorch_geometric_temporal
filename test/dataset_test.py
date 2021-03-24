@@ -98,16 +98,6 @@ def test_pedalme():
 def test_wiki():
     loader = WikiMathsDatasetLoader()
     dataset = loader.get_dataset()
-    for epoch in range(2):
-        for snapshot in dataset:
-            snapshot.edge_index.shape == (2, 97032)
-            snapshot.edge_attr.shape == (97032, )
-            snapshot.x.shape == (312, 8)
-            snapshot.y.shape == (312, )
-            
-def test_windmill():
-    loader = WindmillOutputDatasetLoader()
-    dataset = loader.get_dataset()
     print(dataset)
     for epoch in range(1):
         for snapshot in dataset:
@@ -115,6 +105,16 @@ def test_windmill():
             snapshot.edge_attr.shape == (27079, )
             snapshot.x.shape == (1068, 8)
             snapshot.y.shape == (1068, )
+            
+def test_windmill():
+    loader = WindmillOutputDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(2):
+        for snapshot in dataset:
+            snapshot.edge_index.shape == (2, 97032)
+            snapshot.edge_attr.shape == (97032, )
+            snapshot.x.shape == (312, 8)
+            snapshot.y.shape == (312, )
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
