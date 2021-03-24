@@ -22,11 +22,7 @@ class WindmillOutputDatasetLoader(object):
         self._edge_weights = np.array(self._dataset["weights"]).T
 
     def _get_targets_and_features(self):
-
-        targets = []
-        for time in range(self._dataset["time_periods"]):
-            targets.append(np.array(self._dataset[str(time)]))
-        stacked_target = np.stack(targets)
+        stacked_target = np.stack(self._dataset["block"])
         standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / np.std(stacked_target, axis=0)
         self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(targets)-self.lags)]
         self.targets = [standardized_target[i+self.lags,:].T for i in range(len(targets)-self.lags)]
