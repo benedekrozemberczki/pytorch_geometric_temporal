@@ -157,7 +157,7 @@ class GraphConstructor(nn.Module):
         xd (int, optional): Static feature dimension, default None.
     """
 
-    def __init__(self, nnodes: int, k: int, dim: int, alpha: float=3, xd: int=None):
+    def __init__(self, nnodes: int, k: int, dim: int, alpha: float=3, xd: Optional[int]=None):
         super(GraphConstructor, self).__init__()
         if xd is not None:
             self._static_feature_dim = xd
