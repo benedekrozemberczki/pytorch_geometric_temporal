@@ -201,7 +201,7 @@ class TemporalAttention(nn.Module):
         Return types:
             * **X** (PyTorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
-        batch_size_ = X.shape[0]
+        batch_size = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
         # [batch_size, num_step, num_nodes, K * d]
         query = self._FC_q(X)
@@ -237,7 +237,7 @@ class TemporalAttention(nn.Module):
         X = torch.matmul(attention, value)
         X = X.permute(0, 2, 1, 3)
         # orginal K, change to batch_size
-        X = torch.cat(torch.split(X, batch_size_, dim=0), dim=-1)
+        X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
         X = self._FC(X)
         del query, key, value, attention
         return X
