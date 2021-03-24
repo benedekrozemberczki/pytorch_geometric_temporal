@@ -8,7 +8,7 @@ PyTorch Geometric Temporal is an temporal graph neural network extension library
 .. code-block:: latex
 
     >@misc{pytorch_geometric_temporal,
-           author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Oliver, Kiss and Nicolas, Collignon},
+           author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Maria, Astefanoaei and Oliver, Kiss and Nicolas, Collignon},
            title = {{PyTorch Geometric Temporal}},
            year = {2020},
            publisher = {GitHub},
