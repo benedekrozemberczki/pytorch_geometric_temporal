@@ -4,7 +4,7 @@ import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN
 from torch_geometric_temporal.nn.convolutional import GMAN, SpatioTemporalAttention, SpatioTemporalEmbedding
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
@@ -191,6 +191,64 @@ def test_mstgcn():
         
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
+
+def test_mtgnn():
+    """
+    Testing MTGNN block
+    """
+    gcn_true = True
+    buildA_true = True
+    dropout = 0.3
+    subgraph_size = 20
+    gcn_depth = 2
+    num_nodes = 207
+    node_dim = 40
+    dilation_exponential = 1
+    conv_channels = 32
+    residual_channels = 32
+    skip_channels = 64
+    end_channels = 128
+    in_dim = 2
+    seq_in_len = 12
+    seq_out_len = 10
+    layers = 3
+    batch_size = 16
+    propalpha = 0.05
+    tanhalpha = 3
+    num_split = 1
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.set_num_threads(3)
+    x, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
+    mock_adj = to_scipy_sparse_matrix(edge_index)
+    predefined_A = torch.tensor(mock_adj.toarray()).to(device)
+    x_all = torch.zeros(batch_size,seq_in_len,num_nodes,in_dim)
+    for i in range(batch_size):
+        for j in range(seq_in_len):
+            x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
+            x_all[i,j] = x
+    model = MTGNN(gcn_true, buildA_true, gcn_depth, num_nodes,
+                dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim,
+                dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels= end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
+    trainx = torch.Tensor(x_all).to(device)
+    trainx= trainx.transpose(1, 3)
+    perm = np.random.permutation(range(num_nodes))
+    num_sub = int(num_nodes/num_split)
+    for j in range(num_split):
+        if j != num_split-1:
+            id = perm[j * num_sub:(j + 1) * num_sub]
+        else:
+            id = perm[j * num_sub:]
+        id = torch.tensor(id).to(device)
+        tx = trainx[:, :, id, :]
+        output = model(tx, predefined_A, idx=id)
+        output = output.transpose(1,3)
+        assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
 
 def test_gman():
     """
