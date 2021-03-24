@@ -457,22 +457,15 @@ class GMAN(nn.Module):
         Return types:
             * **X** (PyTorch Float Tensor) - Output sequence for prediction, with shape (batch_size, num_pred, num of nodes).
         """
-        # input
         X = torch.unsqueeze(X, -1)
         X = self._fully_connected_1(X)
-        # STE
         STE = self._st_embedding(SE, TE, self._steps_per_day)
         STE_his = STE[:, :self._num_his]
         STE_pred = STE[:, self._num_his:]
-        # encoder
         for net in self._st_att_block1:
             X = net(X, STE_his)
-        # transAtt
         X = self._transform_attention(X, STE_his, STE_pred)
-        # decoder
         for net in self._st_att_block2:
             X = net(X, STE_pred)
-        # output
-        X = self._fully_connected_2(X)
-        del STE, STE_his, STE_pred
-        return torch.squeeze(X, 3)
+        X = torch.squeeze(self._fully_connected_2(X), 3)
+        return X

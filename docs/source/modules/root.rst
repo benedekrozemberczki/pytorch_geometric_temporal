@@ -4,7 +4,7 @@ PyTorch Geometric Temporal
 .. contents:: Contents
     :local:
 
-Discrete Recurrent Graph Convolutional Layers
+Recurrent Graph Convolutional Layers
 --------------
 
 .. automodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
@@ -48,7 +48,7 @@ Discrete Recurrent Graph Convolutional Layers
     :undoc-members:
     :exclude-members: DConv
 
-Discrete Temporal Graph Convolutional Layers
+Temporal Graph Convolutional Layers
 --------------
 
 .. automodule:: torch_geometric_temporal.nn.convolutional.stgcn
@@ -74,7 +74,7 @@ Discrete Temporal Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.convolutional.gman
     :members:
     :undoc-members:
-    :exclude-members: conv2d_, FC, STEmbedding, SpatialAttention, TemporalAttention, GatedFusion, STAttBlock, TransformAttention
+    :exclude-members: Conv2D, FullyConnected, SpatioTemporalEmbedding, SpatialAttention, TemporalAttention, GatedFusion, SpatioTemporalAttentionBlock, TransformAttention
 
 Auxiliary Graph Convolutional Layers
 --------------
