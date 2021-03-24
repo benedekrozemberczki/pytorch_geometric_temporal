@@ -17,18 +17,18 @@ class Conv(nn.Module):
     def __init__(self):
         super(Conv, self).__init__()
 
-    def forward(self, X: torch.FloatTensor, A: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(self, X: torch.FloatTensor, adj: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the convolution layer.
 
         Arg types:
             * **X** (Pytorch Float Tensor) - Input tensor, with shape (batch_size, c_in, num_nodes, seq_len).
-            * **A** (Pytorch Float Tensor) - Adjacancy matrix, with shape (num_nodes, num_nodes).
+            * **adj** (Pytorch Float Tensor) - Adjacancy matrix, with shape (num_nodes, num_nodes).
 
         Return types:
             * **X** (PyTorch Float Tensor) - Output tensor, with shape (batch_size, c_in, num_nodes, seq_len).
         """
-        X = torch.einsum('ncwl,vw->ncvl', (X, A))
+        X = torch.einsum('ncwl,vw->ncvl', (X, adj))
         return X.contiguous()
 
 
