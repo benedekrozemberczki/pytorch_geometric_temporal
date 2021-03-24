@@ -25,7 +25,7 @@ class WindmillOutputDatasetLoader(object):
 
         targets = []
         for time in range(self._dataset["time_periods"]):
-            targets.append(np.array(self._dataset[str(time)]]))
+            targets.append(np.array(self._dataset[str(time)]))
         stacked_target = np.stack(targets)
         standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / np.std(stacked_target, axis=0)
         self.features = [standardized_target[i:i+self.lags,:].T for i in range(len(targets)-self.lags)]
