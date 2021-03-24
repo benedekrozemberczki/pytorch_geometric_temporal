@@ -5,6 +5,7 @@ from torch_geometric.data import Data
 from torch_geometric.utils import to_scipy_sparse_matrix
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN
+from torch_geometric_temporal.nn.convolutional import GMAN, STAttBlock, STEmbedding
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -190,4 +191,50 @@ def test_mstgcn():
         
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
+
+def test_gman():
+    """
+    Testing GMAN
+    """
+    L = 1
+    K = 8
+    d = 8
+    # generate data
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    num_his = 12
+    num_pred = 10
+    num_nodes = 50
+    num_sample = 100
+    batch_size = 32
+    trainX = torch.rand(num_sample,num_his, num_nodes)
+    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
+    trainTE = torch.zeros((num_sample, num_his + num_pred, 2))
+    for i in range(num_his+num_pred):
+        x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
+        trainTE[:,i,:] = x
+    # build model
+    model = GMAN(L, K, d, num_his, bn_decay=0.1).to(device)
+
+    start_idx = 0
+    end_idx = batch_size
+    X = trainX[start_idx: end_idx].to(device)
+    TE = trainTE[start_idx: end_idx].to(device)
+    pred = model(X, SE, TE)
+    assert pred.shape == (batch_size, num_pred, num_nodes)
+    
+    # GMAN components
+    D = K * d
+    bn_decay = 0.1
+    # layers
+    STEmbedding_layer = STEmbedding(D, bn_decay).to(device)
+    STAttBlock_layer = STAttBlock(K, d, bn_decay).to(device)
+    TE = trainTE[:batch_size].to(device)
+    # STE
+    STE = STEmbedding_layer(SE, TE)
+    STE_his = STE[:, :num_his]
+    assert STE.shape == (batch_size, num_his+num_pred, num_nodes,D)
+    X = torch.rand(batch_size,num_his,num_nodes,D).to(device)
+    # STAtt
+    X = STAttBlock_layer(X, STE_his)
+    assert X.shape ==  (batch_size, num_his, num_nodes,D)
 
