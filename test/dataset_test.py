@@ -108,7 +108,8 @@ def test_wiki():
 def test_windmill():
     loader = WindmillOutputDatasetLoader()
     dataset = loader.get_dataset()
-    for epoch in range(2):
+    print(dataset)
+    for epoch in range(1):
         for snapshot in dataset:
             snapshot.edge_index.shape == (2, 27079)
             snapshot.edge_attr.shape == (27079, )
