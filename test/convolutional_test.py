@@ -218,8 +218,7 @@ def test_mtgnn():
     num_split = 1
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch.set_num_threads(3)
-    x, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
+    _, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
     mock_adj = to_scipy_sparse_matrix(edge_index)
     predefined_A = torch.tensor(mock_adj.toarray()).to(device)
     x_all = torch.zeros(batch_size,seq_in_len,num_nodes,in_dim)
