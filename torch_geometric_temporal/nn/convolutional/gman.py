@@ -1,42 +1,82 @@
+import math
+from typing import Union, Callable, Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
-from typing import Union, Callable
 
 
-class conv2d_(nn.Module):
-    def __init__(self, input_dims: int, output_dims: int, kernel_size: int, stride: tuple = (1, 1),
-                 padding: str = 'SAME', use_bias: bool = True, activation: Callable[[torch.FloatTensor], torch.FloatTensor] = F.relu,
-                 bn_decay=None):
-        super(conv2d_, self).__init__()
-        self.activation = activation
+class Conv2D(nn.Module):
+    r"""An implementation of the 2D-convolution block.
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
+
+    Args:
+        input_dims (int): Dimension of input.
+        output_dims (int): Dimension of output.
+        kernel_size (tuple or list): Size of the convolution kernel.
+        stride (tuple or list, optional): Convolution strides, default (1,1).
+        padding (str, optional): Whether to use the same padding size as kernel size, default 'SAME', otherwise padding size is [0,0].
+        use_bias (bool, optional): Whether to use bias, default is True.
+        activation (Callable, optional): Activation function, default is torch.nn.functional.relu.
+        bn_decay (float, optional): Batch normalization momentum, default is None.
+    """
+
+    def __init__(self, input_dims: int, output_dims: int, kernel_size: Union[tuple, list], 
+                stride: Union[tuple, list]=(1, 1), padding: str='SAME', use_bias: bool=True, 
+                activation: Callable[[torch.FloatTensor], torch.FloatTensor]=F.relu,
+                bn_decay: Optional[float]=None):
+        super(Conv2D, self).__init__()
+        self._activation = activation
         if padding == 'SAME':
             self._padding_size = math.ceil(kernel_size)
         else:
             self._padding_size = [0, 0]
-        self._conv = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
+        self._conv2d = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
                                padding=0, bias=use_bias)
         self._batch_norm = nn.BatchNorm2d(output_dims, momentum=bn_decay)
-        torch.nn.init.xavier_uniform_(self._conv.weight)
+        torch.nn.init.xavier_uniform_(self._conv2d.weight)
 
         if use_bias:
-            torch.nn.init.zeros_(self._conv.bias)
+            torch.nn.init.zeros_(self._conv2d.bias)
 
-    def forward(self, x: torch.FloatTensor) -> torch.FloatTensor:
-        x = x.permute(0, 3, 2, 1)
-        x = F.pad(x, ([self._padding_size[1], self._padding_size[1],
+    def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
+        """
+        Making a forward pass of the 2D-convolution block.
+
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Input tensor, with shape (batch_size, num_his, num_nodes, input_dims).
+
+        Return types:
+            * **X** (PyTorch Float Tensor) - Output tensor, with shape (batch_size, num_his, num_nodes, output_dims).
+        """
+        X = X.permute(0, 3, 2, 1)
+        X = F.pad(X, ([self._padding_size[1], self._padding_size[1],
                        self._padding_size[0], self._padding_size[0]]))
-        x = self._conv(x)
-        x = self._batch_norm(x)
-        if self.activation is not None:
-            x = F.relu_(x)
-        return x.permute(0, 3, 2, 1)
+        X = self._conv2d(X)
+        X = self._batch_norm(X)
+        if self._activation is not None:
+            X = F.relu_(X)
+        return X.permute(0, 3, 2, 1)
 
 
-class FC(nn.Module):
-    def __init__(self, input_dims: int, units: Union[int, tuple], activations: Union[Callable[[torch.FloatTensor], torch.FloatTensor], list], bn_decay: float, use_bias: bool = True):
-        super(FC, self).__init__()
+class FullyConnected(nn.Module):
+    r"""An implementation of the fully-connected layer.
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
+
+    Args:
+        input_dims (int, list or tuple): Dimension(s) of input.
+        units (int, list or tuple): Dimension(s) of outputs in each 2D convolution block.
+        activations (Callable or list): Activation function(s).
+        bn_decay (float, optional): Batch normalization momentum, default is None.
+        use_bias (bool, optional): Whether to use bias, default is True.
+    """
+
+    def __init__(self, input_dims: Union[int, list, tuple], units: Union[int, list, tuple], 
+                activations: Union[Callable[[torch.FloatTensor], torch.FloatTensor], list],
+                bn_decay: float, use_bias: bool=True):
+        super(FullyConnected, self).__init__()
         if isinstance(units, int):
             units = [units]
             input_dims = [input_dims]
@@ -46,53 +86,62 @@ class FC(nn.Module):
             input_dims = list(input_dims)
             activations = list(activations)
         assert type(units) == list
-        self._convs = nn.ModuleList([conv2d_(
+        self._conv2ds = nn.ModuleList([Conv2D(
             input_dims=input_dim, output_dims=num_unit, kernel_size=[1, 1], stride=[1, 1],
             padding='VALID', use_bias=use_bias, activation=activation,
             bn_decay=bn_decay) for input_dim, num_unit, activation in
             zip(input_dims, units, activations)])
 
-    def forward(self, x: torch.FloatTensor) -> torch.FloatTensor:
-        for conv in self._convs:
-            x = conv(x)
-        return x
+    def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
+        """
+        Making a forward pass of the fully-connected layer.
+
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Input tensor, with shape (batch_size, num_his, num_nodes, 1).
+
+        Return types:
+            * **X** (PyTorch Float Tensor) - Output tensor, with shape (batch_size, num_his, num_nodes, units[-1]).
+        """
+        for conv in self._conv2ds:
+            X = conv(X)
+        return X
 
 
-class STEmbedding(nn.Module):
+class SpatioTemporalEmbedding(nn.Module):
     r"""An implementation of the spatial-temporal embedding block.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        D (int) : dimension of output.
-        bn_decay (float): batch normalization momentum.
+        D (int) : Dimension of output.
+        bn_decay (float): Batch normalization momentum.
+        steps_per_day (int): Steps to take for a day.
     """
 
-    def __init__(self, D: int, bn_decay: float):
-        super(STEmbedding, self).__init__()
-        self._FC_se = FC(
+    def __init__(self, D: int, bn_decay: float, steps_per_day: int):
+        super(SpatioTemporalEmbedding, self).__init__()
+        self._fully_connected_se = FullyConnected(
             input_dims=[D, D], units=[D, D], activations=[F.relu, None],
             bn_decay=bn_decay)
 
-        self._FC_te = FC(
-            input_dims=[295, D], units=[D, D], activations=[F.relu, None],
-            bn_decay=bn_decay)  # input_dims = time step per day + days per week=288+7=295
+        self._fully_connected_te = FullyConnected(
+            input_dims=[steps_per_day+7, D], units=[D, D], activations=[F.relu, None],
+            bn_decay=bn_decay)
 
-    def forward(self, SE: torch.FloatTensor, TE: torch.FloatTensor, T: int = 288) -> torch.FloatTensor:
+    def forward(self, SE: torch.FloatTensor, TE: torch.FloatTensor, T: int) -> torch.FloatTensor:
         """
         Making a forward pass of the spatial-temporal embedding.
 
         Arg types:
-            * **SE** (PyTorch Float Tensor) - spatial embedding, with shape (num_nodes, D).
-            * **TE** (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2).(dayofweek, timeofday)
-            * **T** (int, optional) - num of time steps in one day, default 288.
+            * **SE** (PyTorch Float Tensor) - Spatial embedding, with shape (num_nodes, D).
+            * **TE** (Pytorch Float Tensor) - Temporal embedding, with shape (batch_size, num_his + num_pred, 2).(dayofweek, timeofday)
+            * **T** (int) - Number of time steps in one day.
 
         Return types:
-            * output (PyTorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_his + num_pred, num_nodes, D).
+            * **output** (PyTorch Float Tensor) - Spatial-temporal embedding, with shape (batch_size, num_his + num_pred, num_nodes, D).
         """
-        # spatial embedding
         SE = SE.unsqueeze(0).unsqueeze(0)
-        SE = self._FC_se(SE)
-        # temporal embedding
+        SE = self._fully_connected_se(SE)
         dayofweek = torch.empty(TE.shape[0], TE.shape[1], 7)
         timeofday = torch.empty(TE.shape[0], TE.shape[1], T)
         for i in range(TE.shape[0]):
@@ -101,19 +150,20 @@ class STEmbedding(nn.Module):
             timeofday[j] = F.one_hot(TE[..., 1][j].to(torch.int64) % 288, T)
         TE = torch.cat((dayofweek, timeofday), dim=-1)
         TE = TE.unsqueeze(dim=2)
-        TE = self._FC_te(TE)
+        TE = self._fully_connected_te(TE)
         del dayofweek, timeofday
         return SE + TE
 
 
 class SpatialAttention(nn.Module):
     r"""An implementation of the spatial attention mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        K (int) : number of attention heads.
-        d (int) : dimension of each attention head outputs.
-        bn_decay (float): batch normalization momentum.
+        K (int) : Number of attention heads.
+        d (int) : Dimension of each attention head outputs.
+        bn_decay (float): Batch normalization momentum.
     """
 
     def __init__(self, K: int, d: int, bn_decay: float):
@@ -121,106 +171,95 @@ class SpatialAttention(nn.Module):
         D = K * d
         self._d = d
         self._K = K
-        self._FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC_v = FC(input_dims=2 * D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC = FC(input_dims=D, units=D, activations=F.relu,
-                      bn_decay=bn_decay)
+        self._fully_connected_q = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected_k = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected_v = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected = FullyConnected(input_dims=D, units=D, activations=F.relu,
+                                               bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the spatial attention mechanism.
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
-            * **STE** (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Input sequence, with shape (batch_size, num_step, num_nodes, K*d).
+            * **STE** (Pytorch Float Tensor) - Spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
 
         Return types:
-            * **X** (PyTorch Float Tensor) - spatial attention scores, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Spatial attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
         batch_size = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
-        # [batch_size, num_step, num_nodes, K * d]
-        query = self._FC_q(X)
-        key = self._FC_k(X)
-        value = self._FC_v(X)
-        # [K * batch_size, num_step, num_nodes, d]
+        query = self._fully_connected_q(X)
+        key = self._fully_connected_k(X)
+        value = self._fully_connected_v(X)
         query = torch.cat(torch.split(query, self._K, dim=-1), dim=0)
         key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
         value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
-        # [K * batch_size, num_step, num_nodes, num_nodes]
         attention = torch.matmul(query, key.transpose(2, 3))
         attention /= (self._d ** 0.5)
         attention = F.softmax(attention, dim=-1)
-        # [batch_size, num_step, num_nodes, D]
         X = torch.matmul(attention, value)
-        # orginal K, change to batch_size
         X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
-        X = self._FC(X)
+        X = self._fully_connected(X)
         del query, key, value, attention
         return X
 
 
 class TemporalAttention(nn.Module):
     r"""An implementation of the temporal attention mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        K (int) : number of attention heads.
-        d (int) : dimension of each attention head outputs.
-        bn_decay (float): batch normalization momentum.
-        mask (bool, optional): whether to mask attention score.
+        K (int) : Number of attention heads.
+        d (int) : Dimension of each attention head outputs.
+        bn_decay (float): Batch normalization momentum.
+        mask (bool, optional): Whether to mask attention score.
     """
 
-    def __init__(self, K: int, d: int, bn_decay: float, mask: bool = True):
+    def __init__(self, K: int, d: int, bn_decay: float, mask: bool=True):
         super(TemporalAttention, self).__init__()
         D = K * d
         self._d = d
         self._K = K
         self._mask = mask
-        self._FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC_v = FC(input_dims=2 * D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC = FC(input_dims=D, units=D, activations=F.relu,
-                      bn_decay=bn_decay)
+        self._fully_connected_q = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected_k = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected_v = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected = FullyConnected(input_dims=D, units=D, activations=F.relu,
+                                               bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the temporal attention mechanism.
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
-            * **STE** (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Input sequence, with shape (batch_size, num_step, num_nodes, K*d).
+            * **STE** (Pytorch Float Tensor) - Spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
 
         Return types:
-            * **X** (PyTorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Temporal attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
         batch_size = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
-        # [batch_size, num_step, num_nodes, K * d]
-        query = self._FC_q(X)
-        key = self._FC_k(X)
-        value = self._FC_v(X)
-        # [K * batch_size, num_step, num_nodes, d]
+        query = self._fully_connected_q(X)
+        key = self._fully_connected_k(X)
+        value = self._fully_connected_v(X)
         query = torch.cat(torch.split(query, self._K, dim=-1), dim=0)
         key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
         value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
-        # query: [K * batch_size, num_nodes, num_step, d]
-        # key:   [K * batch_size, num_nodes, d, num_step]
-        # value: [K * batch_size, num_nodes, num_step, d]
         query = query.permute(0, 2, 1, 3)
         key = key.permute(0, 2, 3, 1)
         value = value.permute(0, 2, 1, 3)
-        # [K * batch_size, num_nodes, num_step, num_step]
         attention = torch.matmul(query, key)
         attention /= (self._d ** 0.5)
-        # mask attention score
         if self._mask:
             batch_size = X.shape[0]
             num_step = X.shape[1]
@@ -231,21 +270,19 @@ class TemporalAttention(nn.Module):
             mask = mask.repeat(self._K * batch_size, num_nodes, 1, 1)
             mask = mask.to(torch.bool)
             attention = torch.where(mask, attention, -2 ** 15 + 1)
-        # softmax
         attention = F.softmax(attention, dim=-1)
-        # [batch_size, num_step, num_nodes, D]
         X = torch.matmul(attention, value)
         X = X.permute(0, 2, 1, 3)
-        # orginal K, change to batch_size
         X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
-        X = self._FC(X)
+        X = self._fully_connected(X)
         del query, key, value, attention
         return X
 
 
 class GatedFusion(nn.Module):
     r"""An implementation of the gated fusion mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
         D (int) : dimension of output.
@@ -254,46 +291,47 @@ class GatedFusion(nn.Module):
 
     def __init__(self, D: int, bn_decay: float):
         super(GatedFusion, self).__init__()
-        self._FC_xs = FC(input_dims=D, units=D, activations=None,
-                         bn_decay=bn_decay, use_bias=False)
-        self._FC_xt = FC(input_dims=D, units=D, activations=None,
-                         bn_decay=bn_decay, use_bias=True)
-        self._FC_h = FC(input_dims=[D, D], units=[D, D], activations=[F.relu, None],
-                        bn_decay=bn_decay)
+        self._fully_connected_xs = FullyConnected(input_dims=D, units=D, activations=None,
+                                                  bn_decay=bn_decay, use_bias=False)
+        self._fully_connected_xt = FullyConnected(input_dims=D, units=D, activations=None,
+                                                  bn_decay=bn_decay, use_bias=True)
+        self._fully_connected_h = FullyConnected(input_dims=[D, D], units=[D, D], activations=[F.relu, None],
+                                                 bn_decay=bn_decay)
 
     def forward(self, HS: torch.FloatTensor, HT: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the gated fusion mechanism.
 
         Arg types:
-            * **HS** (PyTorch Float Tensor) - spatial attention scores, with shape (batch_size, num_step, num_nodes, D), where num_step can be num_his or num_pred.
-            * **HT** (Pytorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
+            * **HS** (PyTorch Float Tensor) - Spatial attention scores, with shape (batch_size, num_step, num_nodes, D).
+            * **HT** (Pytorch Float Tensor) - Temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
 
         Return types:
-            * **H** (PyTorch Float Tensor) - spatial-temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
+            * **H** (PyTorch Float Tensor) - Spatial-temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
         """
-        XS = self._FC_xs(HS)
-        XT = self._FC_xt(HT)
+        XS = self._fully_connected_xs(HS)
+        XT = self._fully_connected_xt(HT)
         z = torch.sigmoid(torch.add(XS, XT))
         H = torch.add(torch.mul(z, HS), torch.mul(1 - z, HT))
-        H = self._FC_h(H)
+        H = self._fully_connected_h(H)
         del XS, XT, z
         return H
 
 
-class STAttBlock(nn.Module):
-    r"""An implementation of the spatial-temporal attention block, with spatial attention and temporal attention followed by gated fusion.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+class SpatioTemporalAttention(nn.Module):
+    r"""An implementation of the spatial-temporal attention block, with spatial attention and temporal attention 
+    followed by gated fusion. For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        K (int) : number of attention heads.
-        d (int) : dimension of each attention head outputs.
-        bn_decay (float): batch normalization momentum.
-        mask (bool, optional): whether to mask attention score in temporal attention.
+        K (int) : Number of attention heads.
+        d (int) : Dimension of each attention head outputs.
+        bn_decay (float): Batch normalization momentum.
+        mask (bool, optional): Whether to mask attention score in temporal attention.
     """
 
-    def __init__(self, K: int, d: int, bn_decay: float, mask: bool = False):
-        super(STAttBlock, self).__init__()
+    def __init__(self, K: int, d: int, bn_decay: float, mask: bool=False):
+        super(SpatioTemporalAttention, self).__init__()
         self._spatial_attention = SpatialAttention(K, d, bn_decay)
         self._temporal_attention = TemporalAttention(K, d, bn_decay, mask=mask)
         self._gated_fusion = GatedFusion(K * d, bn_decay)
@@ -303,11 +341,11 @@ class STAttBlock(nn.Module):
         Making a forward pass of the spatial-temporal attention block.
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
-            * **STE** (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Input sequence, with shape (batch_size, num_step, num_nodes, K*d).
+            * **STE** (Pytorch Float Tensor) - Spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
 
         Return types:
-            * **X** (PyTorch Float Tensor) - attention scores, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
         HS = self._spatial_attention(X, STE)
         HT = self._temporal_attention(X, STE)
@@ -319,12 +357,13 @@ class STAttBlock(nn.Module):
 
 class TransformAttention(nn.Module):
     r"""An implementation of the tranform attention mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        K (int) : number of attention heads.
-        d (int) : dimension of each attention head outputs.
-        bn_decay (float): batch normalization momentum.
+        K (int) : Number of attention heads.
+        d (int) : Dimension of each attention head outputs.
+        bn_decay (float): Batch normalization momentum.
     """
 
     def __init__(self, K: int, d: int, bn_decay: float):
@@ -332,101 +371,97 @@ class TransformAttention(nn.Module):
         D = K * d
         self._K = K
         self._d = d
-        self._FC_q = FC(input_dims=D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC_k = FC(input_dims=D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC_v = FC(input_dims=D, units=D, activations=F.relu,
-                        bn_decay=bn_decay)
-        self._FC = FC(input_dims=D, units=D, activations=F.relu,
-                      bn_decay=bn_decay)
+        self._fully_connected_q = FullyConnected(input_dims=D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected_k = FullyConnected(input_dims=D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected_v = FullyConnected(input_dims=D, units=D, activations=F.relu,
+                                                 bn_decay=bn_decay)
+        self._fully_connected = FullyConnected(input_dims=D, units=D, activations=F.relu,
+                                               bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE_his: torch.FloatTensor, STE_pred: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of the transform attention layer.
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_his, num_nodes, K*d).
-            * **STE_his** (Pytorch Float Tensor) - spatial-temporal embedding for history, with shape (batch_size, num_his, num_nodes, K*d).
-            * **STE_pred** (Pytorch Float Tensor) - spatial-temporal embedding for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Input sequence, with shape (batch_size, num_his, num_nodes, K*d).
+            * **STE_his** (Pytorch Float Tensor) - Spatial-temporal embedding for history, 
+            with shape (batch_size, num_his, num_nodes, K*d).
+            * **STE_pred** (Pytorch Float Tensor) - Spatial-temporal embedding for prediction, 
+            with shape (batch_size, num_pred, num_nodes, K*d).
 
         Return types:
-            * **X** (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - Output sequence for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
         """
         batch_size = X.shape[0]
-        # [batch_size, num_step, num_nodes, K * d]
-        query = self._FC_q(STE_pred)
-        key = self._FC_k(STE_his)
-        value = self._FC_v(X)
-        # [K * batch_size, num_step, num_nodes, d]
+        query = self._fully_connected_q(STE_pred)
+        key = self._fully_connected_k(STE_his)
+        value = self._fully_connected_v(X)
         query = torch.cat(torch.split(query, self._K, dim=-1), dim=0)
         key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
         value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
-        # query: [K * batch_size, num_nodes, num_pred, d]
-        # key:   [K * batch_size, num_nodes, d, num_his]
-        # value: [K * batch_size, num_nodes, num_his, d]
         query = query.permute(0, 2, 1, 3)
         key = key.permute(0, 2, 3, 1)
         value = value.permute(0, 2, 1, 3)
-        # [K * batch_size, num_nodes, num_pred, num_his]
         attention = torch.matmul(query, key)
         attention /= (self._d ** 0.5)
         attention = F.softmax(attention, dim=-1)
-        # [batch_size, num_pred, num_nodes, D]
         X = torch.matmul(attention, value)
         X = X.permute(0, 2, 1, 3)
         X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
-        X = self._FC(X)
+        X = self._fully_connected(X)
         del query, key, value, attention
         return X
 
 
 class GMAN(nn.Module):
     r"""An implementation of GMAN.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." <https://arxiv.org/pdf/1911.08415.pdf>`_
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        num_his (int): number of history steps.
-        num_pred (int): number of prediction steps.
-        T (int) : one day is divided into T steps.
-        L (int) : number of STAtt blocks in the encoder/decoder.
-        K (int) : number of attention heads.
-        d (int) : dimension of each attention head outputs.
-        bn_decay (float): batch normalization momentum.
+        L (int) : Number of STAtt blocks in the encoder/decoder.
+        K (int) : Number of attention heads.
+        d (int) : Dimension of each attention head outputs.
+        num_his (int): Number of history steps.
+        bn_decay (float): Batch normalization momentum.
+        steps_per_day (int): Number of steps in a day.
     """
 
-    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float):
+    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float, steps_per_day: int):
         super(GMAN, self).__init__()
         D = K * d
         self._num_his = num_his
-        self._st_embedding = STEmbedding(D, bn_decay)
+        self._steps_per_day = steps_per_day
+        self._st_embedding = SpatioTemporalEmbedding(D, bn_decay, steps_per_day)
         self._st_att_block1 = nn.ModuleList(
-            [STAttBlock(K, d, bn_decay) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay) for _ in range(L)])
         self._st_att_block2 = nn.ModuleList(
-            [STAttBlock(K, d, bn_decay) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay) for _ in range(L)])
         self._transform_attention = TransformAttention(K, d, bn_decay)
-        self._FC_1 = FC(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
-                        bn_decay=bn_decay)
-        self._FC_2 = FC(input_dims=[D, D], units=[D, 1], activations=[F.relu, None],
-                        bn_decay=bn_decay)
+        self._fully_connected_1 = FullyConnected(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
+                                                 bn_decay=bn_decay)
+        self._fully_connected_2 = FullyConnected(input_dims=[D, D], units=[D, 1], activations=[F.relu, None],
+                                                 bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, SE: torch.FloatTensor, TE: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of GMAN.
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_hist, num of nodes).
-            * **SE** (Pytorch Float Tensor) ： spatial embedding, with shape (numbed of nodes, K * d).
-            * **TE** (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2) (time-of-day, day-of-week).
+            * **X** (PyTorch Float Tensor) - Input sequence, with shape (batch_size, num_hist, num of nodes).
+            * **SE** (Pytorch Float Tensor) - Spatial embedding, with shape (numbed of nodes, K * d).
+            * **TE** (Pytorch Float Tensor) - Temporal embedding, with shape (batch_size, num_his + num_pred, 2).
 
         Return types:
-            * **X** (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num of nodes).
+            * **X** (PyTorch Float Tensor) - Output sequence for prediction, with shape (batch_size, num_pred, num of nodes).
         """
         # input
         X = torch.unsqueeze(X, -1)
-        X = self._FC_1(X)
+        X = self._fully_connected_1(X)
         # STE
-        STE = self._st_embedding(SE, TE)
+        STE = self._st_embedding(SE, TE, self._steps_per_day)
         STE_his = STE[:, :self._num_his]
         STE_pred = STE[:, self._num_his:]
         # encoder
@@ -438,6 +473,6 @@ class GMAN(nn.Module):
         for net in self._st_att_block2:
             X = net(X, STE_pred)
         # output
-        X = self._FC_2(X)
+        X = self._fully_connected_2(X)
         del STE, STE_his, STE_pred
         return torch.squeeze(X, 3)

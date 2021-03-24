@@ -1,4 +1,4 @@
 from .stgcn import STConv, TemporalConv
 from .astgcn import ASTGCN
 from .mstgcn import MSTGCN
-from .gman import GMAN, STEmbedding, STAttBlock
+from .gman import GMAN, SpatioTemporalEmbedding, SpatioTemporalAttention
