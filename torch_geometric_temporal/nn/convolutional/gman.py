@@ -82,9 +82,9 @@ class STEmbedding(nn.Module):
         Making a forward pass of the spatial-temporal embedding.
 
         Arg types:
-            * SE (PyTorch Float Tensor) - spatial embedding, with shape (num_nodes, D).
-            * TE (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2).(dayofweek, timeofday)
-            * T (int, optional) - num of time steps in one day, default 288.
+            * **SE** (PyTorch Float Tensor) - spatial embedding, with shape (num_nodes, D).
+            * **TE** (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2).(dayofweek, timeofday)
+            * **T** (int, optional) - num of time steps in one day, default 288.
 
         Return types:
             * output (PyTorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_his + num_pred, num_nodes, D).
@@ -135,11 +135,11 @@ class SpatialAttention(nn.Module):
         Making a forward pass of the spatial attention mechanism.
 
         Arg types:
-            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
-            * STE (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
+            * **STE** (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
 
         Return types:
-            * output (PyTorch Float Tensor) - spatial attention scores, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - spatial attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
         batch_size = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
@@ -195,11 +195,11 @@ class TemporalAttention(nn.Module):
         Making a forward pass of the temporal attention mechanism.
 
         Arg types:
-            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
-            * STE (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
+            * **STE** (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
 
         Return types:
-            * output (PyTorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
         batch_size_ = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
@@ -266,11 +266,11 @@ class GatedFusion(nn.Module):
         Making a forward pass of the gated fusion mechanism.
 
         Arg types:
-            * HS (PyTorch Float Tensor) - spatial attention scores, with shape (batch_size, num_step, num_nodes, D), where num_step can be num_his or num_pred.
-            * HT (Pytorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
+            * **HS** (PyTorch Float Tensor) - spatial attention scores, with shape (batch_size, num_step, num_nodes, D), where num_step can be num_his or num_pred.
+            * **HT** (Pytorch Float Tensor) - temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
 
         Return types:
-            * output (PyTorch Float Tensor) - spatial-temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
+            * **H** (PyTorch Float Tensor) - spatial-temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
         """
         XS = self.FC_xs(HS)
         XT = self.FC_xt(HT)
@@ -303,17 +303,18 @@ class STAttBlock(nn.Module):
         Making a forward pass of the spatial-temporal attention block.
 
         Arg types:
-            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
-            * STE (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_step, num_nodes, K*d), where num_step can be num_his or num_pred.
+            * **STE** (Pytorch Float Tensor) - spatial-temporal embedding, with shape (batch_size, num_step, num_nodes, K*d).
 
         Return types:
-            * output (PyTorch Float Tensor) - attention scores, with shape (batch_size, num_step, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
         HS = self.SpatialAttention(X, STE)
         HT = self.TemporalAttention(X, STE)
         H = self.GatedFusion(HS, HT)
         del HS, HT
-        return torch.add(X, H)
+        X = torch.add(X, H)
+        return X
 
 
 class TransformAttention(nn.Module):
@@ -345,12 +346,12 @@ class TransformAttention(nn.Module):
         Making a forward pass of the transform attention layer.
 
         Arg types:
-            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_his, num_nodes, K*d).
-            * STE_his (Pytorch Float Tensor) - spatial-temporal embedding for history, with shape (batch_size, num_his, num_nodes, K*d).
-            * STE_pred (Pytorch Float Tensor) - spatial-temporal embedding for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_his, num_nodes, K*d).
+            * **STE_his** (Pytorch Float Tensor) - spatial-temporal embedding for history, with shape (batch_size, num_his, num_nodes, K*d).
+            * **STE_pred** (Pytorch Float Tensor) - spatial-temporal embedding for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
 
         Return types:
-            * X (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
+            * **X** (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num_nodes, K*d).
         """
         batch_size = X.shape[0]
         # [batch_size, num_step, num_nodes, K * d]
@@ -414,12 +415,12 @@ class GMAN(nn.Module):
         Making a forward pass of GMAN.
 
         Arg types:
-            * X (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_hist, num of nodes).
-            * SE (Pytorch Float Tensor) ： spatial embedding, with shape (numbed of nodes, K * d).
-            * TE (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2) (time-of-day, day-of-week).
+            * **X** (PyTorch Float Tensor) - input sequence, with shape (batch_size, num_hist, num of nodes).
+            * **SE** (Pytorch Float Tensor) ： spatial embedding, with shape (numbed of nodes, K * d).
+            * **TE** (Pytorch Float Tensor) - temporal embedding, with shape (batch_size, num_his + num_pred, 2) (time-of-day, day-of-week).
 
         Return types:
-            * output (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num of nodes).
+            * **X** (PyTorch Float Tensor) - output sequence for prediction, with shape (batch_size, num_pred, num of nodes).
         """
         # input
         X = torch.unsqueeze(X, -1)
