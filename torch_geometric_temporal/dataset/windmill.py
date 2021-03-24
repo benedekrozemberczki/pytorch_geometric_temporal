@@ -4,21 +4,16 @@ import numpy as np
 from six.moves import urllib
 from ..signal import StaticGraphTemporalSignal
 
-class WikiMathsDatasetLoader(object):
-    """A dataset of vital mathematics articles from Wikipedia. We made it 
-    public during the development of PyTorch Geometric Temporal. The 
-    underlying graph is static - vertices are Wikipedia pages and edges are 
-    links between them. The graph is directed and weighted. Weights represent
-    the number of links found at the source Wikipedia page linking to the target
-    Wikipedia page. The target is the daily user visits to the Wikipedia pages
-    between March 16th 2019 and March 15th 2021 which results in 731 periods.
+
+class WindmillOutputDatasetLoader(object):
+    """
     """
     def __init__(self):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/wikivital_mathematics.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+        url = "https://graphmining.ai/temporal_datasets/windmill_output.json"
+        self._dataset = json.loads(urllib.request.urlopen(url).read().decode())
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T
@@ -37,12 +32,12 @@ class WikiMathsDatasetLoader(object):
         self.targets = [standardized_target[i+self.lags,:].T for i in range(len(targets)-self.lags)]
 
     def get_dataset(self, lags: int=8) -> StaticGraphTemporalSignal:
-        """Returning the Wikipedia Vital Mathematics data iterator.
+        """Returning the Windmill Output data iterator.
 
         Args types:
             * **lags** *(int)* - The number of time lags.        
         Return types:
-            * **dataset** *(StaticGraphTemporalSignal)* - The Wiki Maths dataset.
+            * **dataset** *(StaticGraphTemporalSignal)* - The Windmill Output dataset.
         """
         self.lags = lags
         self._get_edges()

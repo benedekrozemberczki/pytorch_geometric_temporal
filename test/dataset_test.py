@@ -98,17 +98,17 @@ def test_pedalme():
 def test_wiki():
     loader = WikiMathsDatasetLoader()
     dataset = loader.get_dataset()
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
-            snapshot.edge_index.shape == (2, 27079)
-            snapshot.edge_attr.shape == (27079, )
-            snapshot.x.shape == (1068, 8)
-            snapshot.y.shape == (1068, )
+            snapshot.edge_index.shape == (2, 97032)
+            snapshot.edge_attr.shape == (97032, )
+            snapshot.x.shape == (312, 8)
+            snapshot.y.shape == (312, )
             
 def test_windmill():
     loader = WindmillOutputDatasetLoader()
     dataset = loader.get_dataset()
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             snapshot.edge_index.shape == (2, 27079)
             snapshot.edge_attr.shape == (27079, )
@@ -118,7 +118,7 @@ def test_windmill():
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 1722)
             assert snapshot.edge_attr.shape == (1722, )
@@ -128,7 +128,7 @@ def test_metrla():
 def test_metrla_task_generator():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 1722)
             assert snapshot.edge_attr.shape == (1722, )
@@ -138,7 +138,7 @@ def test_metrla_task_generator():
 def test_pemsbay():
     loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 2694)
             assert snapshot.edge_attr.shape == (2694, )
@@ -148,7 +148,7 @@ def test_pemsbay():
 def test_pemsbay_task_generator():
     loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 2694)
             assert snapshot.edge_attr.shape == (2694, )
