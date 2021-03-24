@@ -15,20 +15,20 @@ class conv2d_(nn.Module):
             self.padding_size = math.ceil(kernel_size)
         else:
             self.padding_size = [0, 0]
-        self.conv = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
-                              padding=0, bias=use_bias)
-        self.batch_norm = nn.BatchNorm2d(output_dims, momentum=bn_decay)
-        torch.nn.init.xavier_uniform_(self.conv.weight)
+        self._conv = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
+                               padding=0, bias=use_bias)
+        self._batch_norm = nn.BatchNorm2d(output_dims, momentum=bn_decay)
+        torch.nn.init.xavier_uniform_(self._conv.weight)
 
         if use_bias:
-            torch.nn.init.zeros_(self.conv.bias)
+            torch.nn.init.zeros_(self._conv.bias)
 
     def forward(self, x: torch.FloatTensor) -> torch.FloatTensor:
         x = x.permute(0, 3, 2, 1)
         x = F.pad(x, ([self.padding_size[1], self.padding_size[1],
                        self.padding_size[0], self.padding_size[0]]))
-        x = self.conv(x)
-        x = self.batch_norm(x)
+        x = self._conv(x)
+        x = self._batch_norm(x)
         if self.activation is not None:
             x = F.relu_(x)
         return x.permute(0, 3, 2, 1)
@@ -46,14 +46,14 @@ class FC(nn.Module):
             input_dims = list(input_dims)
             activations = list(activations)
         assert type(units) == list
-        self.convs = nn.ModuleList([conv2d_(
+        self._convs = nn.ModuleList([conv2d_(
             input_dims=input_dim, output_dims=num_unit, kernel_size=[1, 1], stride=[1, 1],
             padding='VALID', use_bias=use_bias, activation=activation,
             bn_decay=bn_decay) for input_dim, num_unit, activation in
             zip(input_dims, units, activations)])
 
     def forward(self, x: torch.FloatTensor) -> torch.FloatTensor:
-        for conv in self.convs:
+        for conv in self._convs:
             x = conv(x)
         return x
 
@@ -69,11 +69,11 @@ class STEmbedding(nn.Module):
 
     def __init__(self, D: int, bn_decay: float):
         super(STEmbedding, self).__init__()
-        self.FC_se = FC(
+        self._FC_se = FC(
             input_dims=[D, D], units=[D, D], activations=[F.relu, None],
             bn_decay=bn_decay)
 
-        self.FC_te = FC(
+        self._FC_te = FC(
             input_dims=[295, D], units=[D, D], activations=[F.relu, None],
             bn_decay=bn_decay)  # input_dims = time step per day + days per week=288+7=295
 
@@ -91,7 +91,7 @@ class STEmbedding(nn.Module):
         """
         # spatial embedding
         SE = SE.unsqueeze(0).unsqueeze(0)
-        SE = self.FC_se(SE)
+        SE = self._FC_se(SE)
         # temporal embedding
         dayofweek = torch.empty(TE.shape[0], TE.shape[1], 7)
         timeofday = torch.empty(TE.shape[0], TE.shape[1], T)
@@ -101,7 +101,7 @@ class STEmbedding(nn.Module):
             timeofday[j] = F.one_hot(TE[..., 1][j].to(torch.int64) % 288, T)
         TE = torch.cat((dayofweek, timeofday), dim=-1)
         TE = TE.unsqueeze(dim=2)
-        TE = self.FC_te(TE)
+        TE = self._FC_te(TE)
         del dayofweek, timeofday
         return SE + TE
 
@@ -121,14 +121,14 @@ class SpatialAttention(nn.Module):
         D = K * d
         self.d = d
         self.K = K
-        self.FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC_v = FC(input_dims=2 * D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC = FC(input_dims=D, units=D, activations=F.relu,
-                     bn_decay=bn_decay)
+        self._FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC_v = FC(input_dims=2 * D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC = FC(input_dims=D, units=D, activations=F.relu,
+                      bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -144,9 +144,9 @@ class SpatialAttention(nn.Module):
         batch_size = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
         # [batch_size, num_step, num_nodes, K * d]
-        query = self.FC_q(X)
-        key = self.FC_k(X)
-        value = self.FC_v(X)
+        query = self._FC_q(X)
+        key = self._FC_k(X)
+        value = self._FC_v(X)
         # [K * batch_size, num_step, num_nodes, d]
         query = torch.cat(torch.split(query, self.K, dim=-1), dim=0)
         key = torch.cat(torch.split(key, self.K, dim=-1), dim=0)
@@ -159,7 +159,7 @@ class SpatialAttention(nn.Module):
         X = torch.matmul(attention, value)
         # orginal K, change to batch_size
         X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
-        X = self.FC(X)
+        X = self._FC(X)
         del query, key, value, attention
         return X
 
@@ -181,14 +181,14 @@ class TemporalAttention(nn.Module):
         self.d = d
         self.K = K
         self.mask = mask
-        self.FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC_v = FC(input_dims=2 * D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC = FC(input_dims=D, units=D, activations=F.relu,
-                     bn_decay=bn_decay)
+        self._FC_q = FC(input_dims=2 * D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC_k = FC(input_dims=2 * D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC_v = FC(input_dims=2 * D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC = FC(input_dims=D, units=D, activations=F.relu,
+                      bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -204,9 +204,9 @@ class TemporalAttention(nn.Module):
         batch_size_ = X.shape[0]
         X = torch.cat((X, STE), dim=-1)
         # [batch_size, num_step, num_nodes, K * d]
-        query = self.FC_q(X)
-        key = self.FC_k(X)
-        value = self.FC_v(X)
+        query = self._FC_q(X)
+        key = self._FC_k(X)
+        value = self._FC_v(X)
         # [K * batch_size, num_step, num_nodes, d]
         query = torch.cat(torch.split(query, self.K, dim=-1), dim=0)
         key = torch.cat(torch.split(key, self.K, dim=-1), dim=0)
@@ -238,7 +238,7 @@ class TemporalAttention(nn.Module):
         X = X.permute(0, 2, 1, 3)
         # orginal K, change to batch_size
         X = torch.cat(torch.split(X, batch_size_, dim=0), dim=-1)
-        X = self.FC(X)
+        X = self._FC(X)
         del query, key, value, attention
         return X
 
@@ -254,12 +254,12 @@ class GatedFusion(nn.Module):
 
     def __init__(self, D: int, bn_decay: float):
         super(GatedFusion, self).__init__()
-        self.FC_xs = FC(input_dims=D, units=D, activations=None,
-                        bn_decay=bn_decay, use_bias=False)
-        self.FC_xt = FC(input_dims=D, units=D, activations=None,
-                        bn_decay=bn_decay, use_bias=True)
-        self.FC_h = FC(input_dims=[D, D], units=[D, D], activations=[F.relu, None],
-                       bn_decay=bn_decay)
+        self._FC_xs = FC(input_dims=D, units=D, activations=None,
+                         bn_decay=bn_decay, use_bias=False)
+        self._FC_xt = FC(input_dims=D, units=D, activations=None,
+                         bn_decay=bn_decay, use_bias=True)
+        self._FC_h = FC(input_dims=[D, D], units=[D, D], activations=[F.relu, None],
+                        bn_decay=bn_decay)
 
     def forward(self, HS: torch.FloatTensor, HT: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -272,11 +272,11 @@ class GatedFusion(nn.Module):
         Return types:
             * **H** (PyTorch Float Tensor) - spatial-temporal attention scores, with shape (batch_size, num_step, num_nodes, D).
         """
-        XS = self.FC_xs(HS)
-        XT = self.FC_xt(HT)
+        XS = self._FC_xs(HS)
+        XT = self._FC_xt(HT)
         z = torch.sigmoid(torch.add(XS, XT))
         H = torch.add(torch.mul(z, HS), torch.mul(1 - z, HT))
-        H = self.FC_h(H)
+        H = self._FC_h(H)
         del XS, XT, z
         return H
 
@@ -294,9 +294,9 @@ class STAttBlock(nn.Module):
 
     def __init__(self, K: int, d: int, bn_decay: float, mask: bool = False):
         super(STAttBlock, self).__init__()
-        self.SpatialAttention = SpatialAttention(K, d, bn_decay)
-        self.TemporalAttention = TemporalAttention(K, d, bn_decay, mask=mask)
-        self.GatedFusion = GatedFusion(K * d, bn_decay)
+        self._spatial_attention = SpatialAttention(K, d, bn_decay)
+        self._temporal_attention = TemporalAttention(K, d, bn_decay, mask=mask)
+        self._gated_fusion = GatedFusion(K * d, bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -309,9 +309,9 @@ class STAttBlock(nn.Module):
         Return types:
             * **X** (PyTorch Float Tensor) - attention scores, with shape (batch_size, num_step, num_nodes, K*d).
         """
-        HS = self.SpatialAttention(X, STE)
-        HT = self.TemporalAttention(X, STE)
-        H = self.GatedFusion(HS, HT)
+        HS = self._spatial_attention(X, STE)
+        HT = self._temporal_attention(X, STE)
+        H = self._gated_fusion(HS, HT)
         del HS, HT
         X = torch.add(X, H)
         return X
@@ -332,14 +332,14 @@ class TransformAttention(nn.Module):
         D = K * d
         self.K = K
         self.d = d
-        self.FC_q = FC(input_dims=D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC_k = FC(input_dims=D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC_v = FC(input_dims=D, units=D, activations=F.relu,
-                       bn_decay=bn_decay)
-        self.FC = FC(input_dims=D, units=D, activations=F.relu,
-                     bn_decay=bn_decay)
+        self._FC_q = FC(input_dims=D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC_k = FC(input_dims=D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC_v = FC(input_dims=D, units=D, activations=F.relu,
+                        bn_decay=bn_decay)
+        self._FC = FC(input_dims=D, units=D, activations=F.relu,
+                      bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, STE_his: torch.FloatTensor, STE_pred: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -355,9 +355,9 @@ class TransformAttention(nn.Module):
         """
         batch_size = X.shape[0]
         # [batch_size, num_step, num_nodes, K * d]
-        query = self.FC_q(STE_pred)
-        key = self.FC_k(STE_his)
-        value = self.FC_v(X)
+        query = self._FC_q(STE_pred)
+        key = self._FC_k(STE_his)
+        value = self._FC_v(X)
         # [K * batch_size, num_step, num_nodes, d]
         query = torch.cat(torch.split(query, self.K, dim=-1), dim=0)
         key = torch.cat(torch.split(key, self.K, dim=-1), dim=0)
@@ -376,7 +376,7 @@ class TransformAttention(nn.Module):
         X = torch.matmul(attention, value)
         X = X.permute(0, 2, 1, 3)
         X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
-        X = self.FC(X)
+        X = self._FC(X)
         del query, key, value, attention
         return X
 
@@ -399,16 +399,16 @@ class GMAN(nn.Module):
         super(GMAN, self).__init__()
         D = K * d
         self.num_his = num_his
-        self.STEmbedding = STEmbedding(D, bn_decay)
-        self.STAttBlock_1 = nn.ModuleList(
+        self._st_embedding = STEmbedding(D, bn_decay)
+        self._st_att_block1 = nn.ModuleList(
             [STAttBlock(K, d, bn_decay) for _ in range(L)])
-        self.STAttBlock_2 = nn.ModuleList(
+        self._st_att_block2 = nn.ModuleList(
             [STAttBlock(K, d, bn_decay) for _ in range(L)])
-        self.TransformAttention = TransformAttention(K, d, bn_decay)
-        self.FC_1 = FC(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
-                       bn_decay=bn_decay)
-        self.FC_2 = FC(input_dims=[D, D], units=[D, 1], activations=[F.relu, None],
-                       bn_decay=bn_decay)
+        self._transform_attention = TransformAttention(K, d, bn_decay)
+        self._FC_1 = FC(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
+                        bn_decay=bn_decay)
+        self._FC_2 = FC(input_dims=[D, D], units=[D, 1], activations=[F.relu, None],
+                        bn_decay=bn_decay)
 
     def forward(self, X: torch.FloatTensor, SE: torch.FloatTensor, TE: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -424,20 +424,20 @@ class GMAN(nn.Module):
         """
         # input
         X = torch.unsqueeze(X, -1)
-        X = self.FC_1(X)
+        X = self._FC_1(X)
         # STE
-        STE = self.STEmbedding(SE, TE)
+        STE = self._st_embedding(SE, TE)
         STE_his = STE[:, :self.num_his]
         STE_pred = STE[:, self.num_his:]
         # encoder
-        for net in self.STAttBlock_1:
+        for net in self._st_att_block1:
             X = net(X, STE_his)
         # transAtt
-        X = self.TransformAttention(X, STE_his, STE_pred)
+        X = self._transform_attention(X, STE_his, STE_pred)
         # decoder
-        for net in self.STAttBlock_2:
+        for net in self._st_att_block2:
             X = net(X, STE_pred)
         # output
-        X = self.FC_2(X)
+        X = self._FC_2(X)
         del STE, STE_his, STE_pred
         return torch.squeeze(X, 3)
