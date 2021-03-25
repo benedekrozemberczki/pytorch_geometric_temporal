@@ -276,10 +276,24 @@ class MTGNNLayer(nn.Module):
     <https://arxiv.org/pdf/2005.11650.pdf>`_
 
     Args:
-        c_in (int): Number of input channels.
-        c_out (int): Number of output channels.
+        dilation_exponential (int): Dilation exponential.
+        rf_size_i (int): Size of receptive field.
+        kernel_size (int): Size of kernel for convolution, to calculate receptive field size.
+        j (int): Iteration index.
+        residual_channels (int): Residual channels.
+        conv_channels (int): Convolution channels.
+        skip_channels (int): Skip channels.
         kernel_set (list of int): List of kernel sizes.
-        dilated_factor (int, optional): Dilation factor.
+        new_dilation (int): Dilation.
+        layer_norm_affline (bool): Whether to do elementwise affine in Layer Normalization.
+        gcn_true (bool): Whether to add graph convolution layer.
+        seq_length (int): Length of input sequence.
+        receptive_field (int): Receptive field.
+        dropout (float): Droupout rate.
+        gcn_depth (int): Graph convolution depth.
+        num_nodes (int): Number of nodes in the graph.
+        propalpha (float): Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1.
+        
     """
     def __init__(self, dilation_exponential: int, rf_size_i: int, kernel_size: int, j: int, residual_channels: int, 
                 conv_channels: int, skip_channels: int, kernel_set: list, new_dilation: int, layer_norm_affline: bool,
@@ -331,11 +345,19 @@ class MTGNNLayer(nn.Module):
         Making a forward pass of MTGNN layer.
 
         Arg types:
-            * **X** (Pytorch Float Tensor) - Input feature Tensor, with shape (batch_size, c_in, num_nodes, seq_len).
+            * **X** (PyTorch Float Tensor) - Input feature tensor, 
+            with shape (batch size, input dimension, number of nodes, sequence length).
+            * **X_skip** (PyTorch Float Tensor) - Input feature tensor for skip connection, 
+            with shape (batch size, input dimension, number of nodes, sequence length).
+            * **Tilde_A** (Pytorch Float Tensor) - Predefined adjacency matrix.
+            * **idx** (Pytorch Long Tensor) - Input indices.
+            * **training** (bool) - Whether in traning mode.
 
         Return types:
-            * **X** (PyTorch Float Tensor) - Hidden representation for all nodes, 
-            with shape (batch_size, c_out, num_nodes, seq_len-6).
+            * **X** (PyTorch Float Tensor) - Output sequence tensor, 
+            with shape (batch size, input sequence length, number of nodes, sequence length).
+            * **X_skip** (PyTorch Float Tensor) - Output feature tensor for skip connection, 
+            with shape (batch size, input dimension, number of nodes, sequence length).
         """
         X_residual = X
         X_filter = self._filter_conv(X)
@@ -361,27 +383,27 @@ class MTGNN(nn.Module):
     <https://arxiv.org/pdf/2005.11650.pdf>`_
 
     Args:
-        gcn_true (bool) : Whether to add graph convolution layer.
-        build_adj (bool) : Whether to construct adaptive adjacency matrix.
-        gcn_depth (int) : Graph convolution depth.
-        num_nodes (int) : Number of nodes in the graph.
+        gcn_true (bool): Whether to add graph convolution layer.
+        build_adj (bool): Whether to construct adaptive adjacency matrix.
+        gcn_depth (int): Graph convolution depth.
+        num_nodes (int): Number of nodes in the graph.
         kernel_set (list of int): List of kernel sizes.
         kernel_size (int): Size of kernel for convolution, to calculate receptive field size.
-        dropout (float) : Droupout rate.
-        subgraph_size (int) : Size of subgraph.
-        node_dim (int) : Dimension of nodes.
-        dilation_exponential (int) : Dilation exponential.
-        conv_channels (int) : Convolution channels.
-        residual_channels (int) : Residual channels.
-        skip_channels (int) : Skip channels.
+        dropout (float): Droupout rate.
+        subgraph_size (int): Size of subgraph.
+        node_dim (int): Dimension of nodes.
+        dilation_exponential (int): Dilation exponential.
+        conv_channels (int): Convolution channels.
+        residual_channels (int): Residual channels.
+        skip_channels (int): Skip channels.
         end_channels (int): End channels.
-        seq_length (int) : Length of input sequence.
-        in_dim (int) : Input dimension.
-        out_dim (int) : Output dimension.
-        layers (int) : Number of layers.
-        propalpha (float) : Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1.
-        tanhalpha (float) : Tanh alpha for generating adjacency matrix, alpha controls the saturation rate.
-        layer_norm_affline (bool) : Whether to do elementwise affine in Layer Normalization.
+        seq_length (int): Length of input sequence.
+        in_dim (int): Input dimension.
+        out_dim (int): Output dimension.
+        layers (int): Number of layers.
+        propalpha (float): Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1.
+        tanhalpha (float): Tanh alpha for generating adjacency matrix, alpha controls the saturation rate.
+        layer_norm_affline (bool): Whether to do elementwise affine in Layer Normalization.
     """
 
     def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, kernel_size: int, 
