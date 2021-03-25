@@ -329,50 +329,45 @@ class MTGNN(nn.Module):
         else:
             self._receptive_field = layers*(kernel_size-1) + 1
 
-        for i in range(1):
+        rf_size_i = 1
+        new_dilation = 1
+        for j in range(1, layers+1):
             if dilation_exponential > 1:
-                rf_size_i = int(
-                    1 + i*(kernel_size-1)*(dilation_exponential**layers-1)/(dilation_exponential-1))
+                rf_size_j = int(
+                    rf_size_i + (kernel_size-1)*(dilation_exponential**j-1)/(dilation_exponential-1))
             else:
-                rf_size_i = i*layers*(kernel_size-1)+1
-            new_dilation = 1
-            for j in range(1, layers+1):
-                if dilation_exponential > 1:
-                    rf_size_j = int(
-                        rf_size_i + (kernel_size-1)*(dilation_exponential**j-1)/(dilation_exponential-1))
-                else:
-                    rf_size_j = rf_size_i+j*(kernel_size-1)
+                rf_size_j = rf_size_i+j*(kernel_size-1)
 
-                self._filter_convs.append(DilatedInception(
-                    residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
-                self._gate_convs.append(DilatedInception(
-                    residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
-                self._residual_convs.append(nn.Conv2d(in_channels=conv_channels,
-                                                     out_channels=residual_channels,
-                                                     kernel_size=(1, 1)))
-                if self._seq_length > self._receptive_field:
-                    self._skip_convs.append(nn.Conv2d(in_channels=conv_channels,
-                                                     out_channels=skip_channels,
-                                                     kernel_size=(1, self._seq_length-rf_size_j+1)))
-                else:
-                    self._skip_convs.append(nn.Conv2d(in_channels=conv_channels,
-                                                     out_channels=skip_channels,
-                                                     kernel_size=(1, self._receptive_field-rf_size_j+1)))
+            self._filter_convs.append(DilatedInception(
+                residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
+            self._gate_convs.append(DilatedInception(
+                residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
+            self._residual_convs.append(nn.Conv2d(in_channels=conv_channels,
+                                                    out_channels=residual_channels,
+                                                    kernel_size=(1, 1)))
+            if self._seq_length > self._receptive_field:
+                self._skip_convs.append(nn.Conv2d(in_channels=conv_channels,
+                                                    out_channels=skip_channels,
+                                                    kernel_size=(1, self._seq_length-rf_size_j+1)))
+            else:
+                self._skip_convs.append(nn.Conv2d(in_channels=conv_channels,
+                                                    out_channels=skip_channels,
+                                                    kernel_size=(1, self._receptive_field-rf_size_j+1)))
 
-                if self._gcn_true:
-                    self._mixprop_conv1.append(
-                        MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
-                    self._mixprop_conv2.append(
-                        MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
+            if self._gcn_true:
+                self._mixprop_conv1.append(
+                    MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
+                self._mixprop_conv2.append(
+                    MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
 
-                if self._seq_length > self._receptive_field:
-                    self._normlization.append(LayerNormalization(
-                        (residual_channels, num_nodes, self._seq_length - rf_size_j + 1), elementwise_affine=layer_norm_affline))
-                else:
-                    self._normlization.append(LayerNormalization(
-                        (residual_channels, num_nodes, self._receptive_field - rf_size_j + 1), elementwise_affine=layer_norm_affline))
+            if self._seq_length > self._receptive_field:
+                self._normlization.append(LayerNormalization(
+                    (residual_channels, num_nodes, self._seq_length - rf_size_j + 1), elementwise_affine=layer_norm_affline))
+            else:
+                self._normlization.append(LayerNormalization(
+                    (residual_channels, num_nodes, self._receptive_field - rf_size_j + 1), elementwise_affine=layer_norm_affline))
 
-                new_dilation *= dilation_exponential
+            new_dilation *= dilation_exponential
 
         self._layers = layers
         self._end_conv_1 = nn.Conv2d(in_channels=skip_channels,
