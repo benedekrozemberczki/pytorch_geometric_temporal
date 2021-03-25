@@ -89,12 +89,13 @@ class DilatedInception(nn.Module):
     Args:
         c_in (int): Number of input channels.
         c_out (int): Number of output channels.
+        kernel_set (list of int): List of kernel sizes.
         dilated_factor (int, optional): Dilation factor. Default: 2.
     """
-    def __init__(self, c_in: int, c_out: int, dilation_factor: int=2):
+    def __init__(self, c_in: int, c_out: int, kernel_set: list, dilation_factor: int=2):
         super(DilatedInception, self).__init__()
         self._time_conv = nn.ModuleList()
-        self._kernel_set = [2, 3, 6, 7]
+        self._kernel_set = kernel_set
         c_out = int(c_out/len(self._kernel_set))
         for kern in self._kernel_set:
             self._time_conv.append(nn.Conv2d(c_in, c_out, (1, kern),
@@ -244,6 +245,7 @@ class MTGNN(nn.Module):
         build_adj (bool) : Whether to construct adaptive adjacency matrix.
         gcn_depth (int) : Graph convolution depth.
         num_nodes (int) : Number of nodes in the graph.
+        kernel_set (list of int): List of kernel sizes.
         dropout (float, optional) : Droupout rate, default 0.3.
         subgraph_size (int, optional) : Size of subgraph, default 20.
         node_dim (int, optional) : Dimension of nodes, default 40.
@@ -261,7 +263,10 @@ class MTGNN(nn.Module):
         layer_norm_affline (bool, optional) : Whether to do elementwise affine in Layer Normalization, default True.
     """
 
-    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int, dropout: float=0.3, subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, skip_channels: int=64, end_channels: int=128, seq_length: int=12, in_dim: int=2, out_dim: int=12, layers: int=3, propalpha: float=0.05, tanhalpha: float=3, layer_norm_affline: bool=True):
+    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, dropout: float=0.3, 
+    subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, 
+    skip_channels: int=64, end_channels: int=128, seq_length: int=12, in_dim: int=2, out_dim: int=12, layers: int=3, 
+    propalpha: float=0.05, tanhalpha: float=3, layer_norm_affline: bool=True):
         super(MTGNN, self).__init__()
         self._gcn_true = gcn_true
         self._build_adj_true = build_adj
@@ -303,9 +308,9 @@ class MTGNN(nn.Module):
                     rf_size_j = rf_size_i+j*(kernel_size-1)
 
                 self._filter_convs.append(DilatedInception(
-                    residual_channels, conv_channels, dilation_factor=new_dilation))
+                    residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
                 self._gate_convs.append(DilatedInception(
-                    residual_channels, conv_channels, dilation_factor=new_dilation))
+                    residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
                 self._residual_convs.append(nn.Conv2d(in_channels=conv_channels,
                                                      out_channels=residual_channels,
                                                      kernel_size=(1, 1)))
