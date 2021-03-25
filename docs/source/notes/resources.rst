@@ -25,6 +25,8 @@ External Resources - Architectures
 
 * Chuanpan Zheng, Xiaoliang Fan, Cheng Wang, Jianzhong Qi: **GMAN: A Graph Multi-Attention Network for Traffic Prediction** `Paper <https://arxiv.org/pdf/1911.08415.pdf>`_, `Code <https://github.com/zhengchuanpan/GMAN>`_
 
+* Zonghan Wu, Shirui Pan, Guodong Long, Jing Jiang, Xiaojun Chang, Chengqi Zhang: **Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks** `Paper <https://arxiv.org/abs/2005.11650>`_, `Code <https://github.com/nnzhan/MTGNN>`_
+
 External Resources - Datasets
 =============================
 
