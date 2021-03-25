@@ -9,29 +9,6 @@ from torch.nn import init
 import torch.nn.functional as F
 
 
-class Conv(nn.Module):
-    r"""An implementation of the convolution layer.
-    For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks."
-    <https://arxiv.org/pdf/2005.11650.pdf>`_
-    """
-    def __init__(self):
-        super(Conv, self).__init__()
-
-    def forward(self, X: torch.FloatTensor, adj: torch.FloatTensor) -> torch.FloatTensor:
-        """
-        Making a forward pass of the convolution layer.
-
-        Arg types:
-            * **X** (Pytorch Float Tensor) - Input tensor, with shape (batch_size, c_in, num_nodes, seq_len).
-            * **adj** (Pytorch Float Tensor) - Adjacancy matrix, with shape (num_nodes, num_nodes).
-
-        Return types:
-            * **X** (PyTorch Float Tensor) - Output tensor, with shape (batch_size, c_in, num_nodes, seq_len).
-        """
-        X = torch.einsum('ncwl,vw->ncvl', (X, adj))
-        return X.contiguous()
-
-
 class Linear(nn.Module):
     r"""An implementation of the linear layer, conducting 2D convolution.
     For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." 
@@ -98,7 +75,7 @@ class MixProp(nn.Module):
         out = [h]
         a = adj / d.view(-1, 1)
         for i in range(self._gdep):
-            h = self._alpha*X + (1-self._alpha)*self._nconv(h, a)
+            h = self._alpha*X + (1-self._alpha)*torch.einsum('ncwl,vw->ncvl', (h,a))
             out.append(h)
         ho = torch.cat(out, dim=1)
         ho = self._mlp(ho)
