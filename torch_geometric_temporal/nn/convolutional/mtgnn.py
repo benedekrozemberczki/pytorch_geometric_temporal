@@ -254,11 +254,13 @@ class LayerNormalization(nn.Module):
         Making a forward pass of layer normalization.
 
         Arg types:
-            * **X** (Pytorch Float Tensor) - Input tensor, with shape (batch_size, feature_dim, num_nodes, seq_len).
+            * **X** (Pytorch Float Tensor) - Input tensor, 
+            with shape (batch_size, feature_dim, num_nodes, seq_len).
             * **idx** (Pytorch Long Tensor) - Input indices.
             
         Return types:
-            * **X** (PyTorch Float Tensor) - Output tensor, with shape (batch_size, feature_dim, num_nodes, seq_len).
+            * **X** (PyTorch Float Tensor) - Output tensor, 
+            with shape (batch_size, feature_dim, num_nodes, seq_len).
         """
         if self._elementwise_affine:
             return F.layer_norm(X, tuple(X.shape[1:]), self._weight[:, idx, :], self._bias[:, idx, :], self._eps)
@@ -368,16 +370,18 @@ class MTGNNLayer(nn.Module):
 
         Arg types:
             * **X** (PyTorch FloatTensor) - Input feature tensor, 
-            with shape (batch size, input dimension, number of nodes, sequence length).
+            with shape (batch size, input dimension, num_nodes, sequence length).
             * **X_skip** (PyTorch FloatTensor) - Input feature tensor for skip connection, 
-            with shape (batch size, input dimension, number of nodes, sequence length).
+            with shape (batch size, input dimension, num_nodes, sequence length).
             * **A_tilde** (Pytorch FloatTensor) - Predefined adjacency matrix.
             * **idx** (Pytorch LongTensor) - Input indices.
             * **training** (bool) - Whether in traning mode.
 
         Return types:
-            * **X** (PyTorch FloatTensor) - Output sequence tensor, with shape (batch size, input sequence length, number of nodes, sequence length).
-            * **X_skip** (PyTorch FloatTensor) - Output feature tensor for skip connection, with shape (batch size, input dimension, number of nodes, sequence length).
+            * **X** (PyTorch FloatTensor) - Output sequence tensor, 
+            with shape (batch size, seq_len, num_nodes, sequence length).
+            * **X_skip** (PyTorch FloatTensor) - Output feature tensor for skip connection, 
+            with shape (batch size, input dimension, num_nodes, sequence length).
         """
         X_residual = X
         X_filter = self._filter_conv(X)
@@ -537,13 +541,13 @@ class MTGNN(nn.Module):
         Making a forward pass of MTGNN.
 
         Arg types:
-            * **X_in** (PyTorch FloatTensor) - Input sequence, with shape (batch size, input dimension, number of nodes, input sequence length).
+            * **X_in** (PyTorch FloatTensor) - Input sequence, with shape (batch size, input dimension, num_nodes, seq_len).
             * **A_tilde** (Pytorch FloatTensor, optional) - Predefined adjacency matrix, default None.
-            * **idx** (Pytorch LongTensor, optional) - Input indices, a permutation of the number of nodes, default None (no permutation).
+            * **idx** (Pytorch LongTensor, optional) - Input indices, a permutation of the num_nodes, default None (no permutation).
             * **FEAT** (Pytorch FloatTensor, optional) - Static feature, default None.
 
         Return types:
-            * **X** (PyTorch FloatTensor) - Output sequence for prediction, with shape (batch size, input sequence length, number of nodes, 1).
+            * **X** (PyTorch FloatTensor) - Output sequence for prediction, with shape (batch size, seq_len, num_nodes, 1).
         """
         seq_len = X_in.size(3)
         assert seq_len == self._seq_length, 'Input sequence length not equal to preset sequence length.'
