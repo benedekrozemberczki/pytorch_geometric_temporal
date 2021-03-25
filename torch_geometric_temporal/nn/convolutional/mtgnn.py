@@ -298,8 +298,8 @@ class MTGNN(nn.Module):
         layer_norm_affline (bool, optional) : Whether to do elementwise affine in Layer Normalization, default True.
     """
 
-    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, dropout: float=0.3, 
-    subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, 
+    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, kernel_size: int, 
+    dropout: float=0.3, subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, 
     skip_channels: int=64, end_channels: int=128, seq_length: int=12, in_dim: int=2, out_dim: int=12, layers: int=3, 
     propalpha: float=0.05, tanhalpha: float=3, layer_norm_affline: bool=True):
         super(MTGNN, self).__init__()
@@ -421,7 +421,7 @@ class MTGNN(nn.Module):
             with shape (batch size, input sequence length, number of nodes, 1).
         """
         seq_len = X_in.size(3)
-        assert seq_len == self._seq_length, 'input sequence length not equal to preset sequence length'
+        assert seq_len == self._seq_length, 'Input sequence length not equal to preset sequence length.'
 
         if self._seq_length < self._receptive_field:
             X_in = nn.functional.pad(

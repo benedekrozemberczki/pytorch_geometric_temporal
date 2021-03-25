@@ -217,16 +217,17 @@ def test_mtgnn():
     tanhalpha = 3
     num_split = 1
     num_edges = 10
+    kernel_size = 7
     kernel_set = [2, 3, 6, 7]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     Tilde_A = barabasi_albert_graph(num_nodes, num_edges).to(device)
     x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
-                 kernel_set = kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim, dilation_exponential=dilation_exponential,
                 conv_channels=conv_channels, residual_channels=residual_channels,
-                skip_channels=skip_channels, end_channels= end_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
     trainx = torch.Tensor(x_all).to(device)
