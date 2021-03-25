@@ -221,11 +221,7 @@ def test_mtgnn():
     _, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
     mock_adj = to_scipy_sparse_matrix(edge_index)
     predefined_A = torch.tensor(mock_adj.toarray()).to(device)
-    x_all = torch.zeros(batch_size,seq_in_len,num_nodes,in_dim)
-    for i in range(batch_size):
-        for j in range(seq_in_len):
-            x, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
-            x_all[i,j] = x
+    x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
     model = MTGNN(gcn_true, buildA_true, gcn_depth, num_nodes,
                 dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim,
@@ -266,11 +262,7 @@ def test_gman():
     steps_per_day = 288
     trainX = torch.rand(num_sample,num_his, num_nodes)
     SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
-    trainTE = torch.zeros((num_sample, num_his + num_pred, 2))
-    for i in range(num_his+num_pred):
-        x, _ = create_mock_data(number_of_nodes=num_sample, edge_per_node=8, in_channels=2)
-        trainTE[:,i,:] = x
-
+    trainTE = 2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1
     model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day).to(device)
 
     X = trainX[:batch_size].to(device)
