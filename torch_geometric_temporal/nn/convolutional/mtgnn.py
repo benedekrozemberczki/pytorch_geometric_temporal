@@ -57,28 +57,28 @@ class MixProp(nn.Module):
         self._dropout = dropout
         self._alpha = alpha
 
-    def forward(self, X: torch.FloatTensor, adj: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(self, X: torch.FloatTensor, A: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass of mix-hop propagation.
 
         Arg types:
             * **X** (Pytorch Float Tensor) - Input feature Tensor, with shape (batch_size, c_in, num_nodes, seq_len).
-            * **adj** (PyTorch Float Tensor) - Adjacency matrix, with shape (num_nodes, num_nodes).
+            * **A** (PyTorch Float Tensor) - Adjacency matrix, with shape (num_nodes, num_nodes).
 
         Return types:
-            * **ho** (PyTorch Float Tensor) - Hidden representation for all nodes, with shape (batch_size, c_out, num_nodes, seq_len).
+            * **H_0** (PyTorch Float Tensor) - Hidden representation for all nodes, with shape (batch_size, c_out, num_nodes, seq_len).
         """
-        adj = adj + torch.eye(adj.size(0)).to(X.device)  # add self-loops
-        d = adj.sum(1)
-        h = X
-        out = [h]
-        a = adj / d.view(-1, 1)
+        A = A + torch.eye(A.size(0)).to(X.device)  # add self-loops
+        d = A.sum(1)
+        H = X
+        H_0 = X
+        A = A / d.view(-1, 1)
         for i in range(self._gdep):
-            h = self._alpha*X + (1-self._alpha)*torch.einsum('ncwl,vw->ncvl', (h,a))
-            out.append(h)
-        ho = torch.cat(out, dim=1)
-        ho = self._mlp(ho)
-        return ho
+            H = self._alpha*X + (1 - self._alpha) * torch.einsum('ncwl,vw->ncvl', (H, A))
+            H_0 = torch.cat((H_0,H), dim=1)
+        del i
+        H_0 = self._mlp(H_0)
+        return H_0
 
 
 class DilatedInception(nn.Module):
@@ -172,13 +172,13 @@ class GraphConstructor(nn.Module):
 
         a = torch.mm(nodevec1, nodevec2.transpose(1, 0)) - \
             torch.mm(nodevec2, nodevec1.transpose(1, 0))
-        adj = F.relu(torch.tanh(self._alpha*a))
-        mask = torch.zeros(idx.size(0), idx.size(0)).to(adj.device)
+        A = F.relu(torch.tanh(self._alpha*a))
+        mask = torch.zeros(idx.size(0), idx.size(0)).to(A.device)
         mask.fill_(float('0'))
-        s1, t1 = adj.topk(self._k, 1)
+        s1, t1 = A.topk(self._k, 1)
         mask.scatter_(1, t1, s1.fill_(1))
-        adj = adj*mask
-        return adj
+        A = A*mask
+        return A
 
 
 class LayerNorm(nn.Module):
@@ -241,7 +241,7 @@ class MTGNN(nn.Module):
 
     Args:
         gcn_true (bool) : Whether to add graph convolution layer.
-        buildA_true (bool) : Whether to construct adaptive adjacency matrix.
+        build_adj (bool) : Whether to construct adaptive adjacency matrix.
         gcn_depth (int) : Graph convolution depth.
         num_nodes (int) : Number of nodes in the graph.
         dropout (float, optional) : Droupout rate, default 0.3.
@@ -261,10 +261,10 @@ class MTGNN(nn.Module):
         layer_norm_affline (bool, optional) : Whether to do elementwise affine in Layer Normalization, default True.
     """
 
-    def __init__(self, gcn_true: bool, buildA_true: bool, gcn_depth: int, num_nodes: int, dropout: float=0.3, subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, skip_channels: int=64, end_channels: int=128, seq_length: int=12, in_dim: int=2, out_dim: int=12, layers: int=3, propalpha: float=0.05, tanhalpha: float=3, layer_norm_affline: bool=True):
+    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int, dropout: float=0.3, subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, skip_channels: int=64, end_channels: int=128, seq_length: int=12, in_dim: int=2, out_dim: int=12, layers: int=3, propalpha: float=0.05, tanhalpha: float=3, layer_norm_affline: bool=True):
         super(MTGNN, self).__init__()
         self._gcn_true = gcn_true
-        self._build_adj_true = buildA_true
+        self._build_adj_true = build_adj
         self._num_nodes = num_nodes
         self._dropout = dropout
         self._filter_convs = nn.ModuleList()
@@ -356,14 +356,14 @@ class MTGNN(nn.Module):
 
         self._idx = torch.arange(self._num_nodes)
 
-    def forward(self, X_in: torch.FloatTensor, predefined_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, static_feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+    def forward(self, X_in: torch.FloatTensor, Tilde_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, static_feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN.
 
         Arg types:
             * X_in (PyTorch Float Tensor) - Input sequence, 
             with shape (batch size, input dimension, number of nodes, input sequence length).
-            * predefined_A (Pytorch Float Tensor, optional) - Predefined adjacency matrix, default None.
+            * Tilde_A (Pytorch Float Tensor, optional) - Predefined adjacency matrix, default None.
             * idx (Pytorch Long Tensor, optional) - Input indices, a permutation of the number of nodes, default None (no permutation).
             * static_feat (Pytorch Float Tensor, optional) - Static feature, default None.
 
@@ -386,7 +386,7 @@ class MTGNN(nn.Module):
                 else:
                     adp = self._graph_constructor(idx, static_feat=static_feat)
             else:
-                adp = predefined_A
+                adp = Tilde_A
 
         X = self._start_conv(X_in)
         skip = self._skip_conv_0(

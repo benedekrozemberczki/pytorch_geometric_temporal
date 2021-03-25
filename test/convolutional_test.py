@@ -197,7 +197,7 @@ def test_mtgnn():
     Testing MTGNN block
     """
     gcn_true = True
-    buildA_true = True
+    build_adj = True
     dropout = 0.3
     subgraph_size = 20
     gcn_depth = 2
@@ -220,9 +220,9 @@ def test_mtgnn():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     _, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
     mock_adj = to_scipy_sparse_matrix(edge_index)
-    predefined_A = torch.tensor(mock_adj.toarray()).to(device)
+    Tilde_A = torch.tensor(mock_adj.toarray()).to(device)
     x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
-    model = MTGNN(gcn_true, buildA_true, gcn_depth, num_nodes,
+    model = MTGNN(gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim,
                 dilation_exponential=dilation_exponential,
@@ -232,17 +232,16 @@ def test_mtgnn():
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
     trainx = torch.Tensor(x_all).to(device)
     trainx= trainx.transpose(1, 3)
-    perm = np.random.permutation(range(num_nodes))
+    perm = torch.randperm(num_nodes).to(device)
     num_sub = int(num_nodes/num_split)
     for j in range(num_split):
         if j != num_split-1:
             id = perm[j * num_sub:(j + 1) * num_sub]
         else:
             id = perm[j * num_sub:]
-        id = torch.tensor(id).to(device)
         tx = trainx[:, :, id, :]
-        output = model(tx, predefined_A, idx=id)
-        output = output.transpose(1,3)
+        output = model(tx, Tilde_A, idx=id)
+        output = output.transpose(1, 3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
 
 def test_gman():
