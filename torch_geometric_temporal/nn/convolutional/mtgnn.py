@@ -108,9 +108,9 @@ class DilatedInception(nn.Module):
         c_in (int): Number of input channels.
         c_out (int): Number of output channels.
         kernel_set (list of int): List of kernel sizes.
-        dilated_factor (int, optional): Dilation factor. Default: 2.
+        dilated_factor (int, optional): Dilation factor.
     """
-    def __init__(self, c_in: int, c_out: int, kernel_set: list, dilation_factor: int=2):
+    def __init__(self, c_in: int, c_out: int, kernel_set: list, dilation_factor: int):
         super(DilatedInception, self).__init__()
         self._time_conv = nn.ModuleList()
         self._kernel_set = kernel_set
@@ -156,11 +156,11 @@ class GraphConstructor(nn.Module):
         nnodes (int): Number of nodes in the graph.
         k (int): Number of largest values to consider in constructing the neighbourhood of a node (pick the "nearest" k nodes).
         dim (int): Dimension of the node embedding.
-        alpha (float, optional): Tanh alpha for generating adjacency matrix, alpha controls the saturation rate, default 3.
+        alpha (float, optional): Tanh alpha for generating adjacency matrix, alpha controls the saturation rate
         xd (int, optional): Static feature dimension, default None.
     """
 
-    def __init__(self, nnodes: int, k: int, dim: int, alpha: float=3, xd: Optional[int]=None):
+    def __init__(self, nnodes: int, k: int, dim: int, alpha: float, xd: Optional[int]=None):
         super(GraphConstructor, self).__init__()
         if xd is not None:
             self._static_feature_dim = xd
@@ -282,27 +282,27 @@ class MTGNN(nn.Module):
         num_nodes (int) : Number of nodes in the graph.
         kernel_set (list of int): List of kernel sizes.
         kernel_size (int): Size of kernel for convolution, to calculate receptive field size.
-        dropout (float, optional) : Droupout rate, default 0.3.
-        subgraph_size (int, optional) : Size of subgraph, default 20.
-        node_dim (int, optional) : Dimension of nodes, default 40.
-        dilation_exponential (int, optional) : Dilation exponential, default 1.
-        conv_channels (int, optional) : Convolution channels, default 32.
-        residual_channels (int, optional) : Residual channels, default 32.
-        skip_channels (int, optional) : Skip channels, default 64.
-        end_channels (int, optional): End channels, default 128.
-        seq_length (int, optional) : Length of input sequence, default 12.
-        in_dim (int, optional) : Input dimension, default 2.
-        out_dim (int, optional) : Output dimension, default 12.
-        layers (int, optional) : Number of layers, default 3.
-        propalpha (float, optional) : Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1, default 0.05.
-        tanhalpha (float, optional) : Tanh alpha for generating adjacency matrix, alpha controls the saturation rate, default 3.
-        layer_norm_affline (bool, optional) : Whether to do elementwise affine in Layer Normalization, default True.
+        dropout (float) : Droupout rate.
+        subgraph_size (int) : Size of subgraph.
+        node_dim (int) : Dimension of nodes.
+        dilation_exponential (int) : Dilation exponential.
+        conv_channels (int) : Convolution channels.
+        residual_channels (int) : Residual channels.
+        skip_channels (int) : Skip channels.
+        end_channels (int): End channels.
+        seq_length (int) : Length of input sequence.
+        in_dim (int) : Input dimension.
+        out_dim (int) : Output dimension.
+        layers (int) : Number of layers.
+        propalpha (float) : Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1.
+        tanhalpha (float) : Tanh alpha for generating adjacency matrix, alpha controls the saturation rate.
+        layer_norm_affline (bool) : Whether to do elementwise affine in Layer Normalization.
     """
 
     def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, kernel_size: int, 
-    dropout: float=0.3, subgraph_size: int=20, node_dim: int=40, dilation_exponential: int=1, conv_channels: int=32, residual_channels: int=32, 
-    skip_channels: int=64, end_channels: int=128, seq_length: int=12, in_dim: int=2, out_dim: int=12, layers: int=3, 
-    propalpha: float=0.05, tanhalpha: float=3, layer_norm_affline: bool=True):
+    dropout: float, subgraph_size: int, node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
+    skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int, layers: int, propalpha: float, 
+    tanhalpha: float, layer_norm_affline: bool):
         super(MTGNN, self).__init__()
         self._gcn_true = gcn_true
         self._build_adj_true = build_adj
