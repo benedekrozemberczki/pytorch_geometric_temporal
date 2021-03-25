@@ -51,5 +51,3 @@ class WikiMathsDatasetLoader(object):
         self._get_targets_and_features()
         dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
-        
-

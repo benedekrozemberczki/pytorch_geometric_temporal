@@ -66,15 +66,15 @@ Temporal Graph Convolutional Layers
     :undoc-members:
     :exclude-members: MSTGCNBlock
 
-.. automodule:: torch_geometric_temporal.nn.convolutional.mtgnn
-    :members:
-    :undoc-members:
-    :exclude-members:
-
 .. automodule:: torch_geometric_temporal.nn.convolutional.gman
     :members:
     :undoc-members:
     :exclude-members: Conv2D, FullyConnected, SpatioTemporalEmbedding, SpatialAttention, TemporalAttention, GatedFusion, SpatioTemporalAttentionBlock, TransformAttention
+    
+.. automodule:: torch_geometric_temporal.nn.convolutional.mtgnn
+    :members:
+    :undoc-members:
+    :exclude-members: Linear, MixProp, DilatedInception, LayerNormalization, MTGNNLayer
 
 Auxiliary Graph Convolutional Layers
 --------------

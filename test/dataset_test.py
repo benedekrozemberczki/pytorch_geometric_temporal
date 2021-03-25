@@ -98,7 +98,6 @@ def test_pedalme():
 def test_wiki():
     loader = WikiMathsDatasetLoader()
     dataset = loader.get_dataset()
-    print(dataset)
     for epoch in range(1):
         for snapshot in dataset:
             snapshot.edge_index.shape == (2, 27079)

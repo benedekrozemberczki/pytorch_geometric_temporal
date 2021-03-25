@@ -86,7 +86,7 @@ class MixProp(nn.Module):
         Return types:
             * **H_0** (PyTorch Float Tensor) - Hidden representation for all nodes, with shape (batch_size, c_out, num_nodes, seq_len).
         """
-        A = A + torch.eye(A.size(0)).to(X.device)  # add self-loops
+        A = A + torch.eye(A.size(0)).to(X.device)
         d = A.sum(1)
         H = X
         H_0 = X
@@ -184,23 +184,23 @@ class GraphConstructor(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, idx: torch.LongTensor, Feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+    def forward(self, idx: torch.LongTensor, FE: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass to construct an adjacency matrix from node embeddings.
 
         Arg types:
             * **idx** (Pytorch Long Tensor) - Input indices, a permutation of the number of nodes, default None (no permutation).
-            * **Feat** (Pytorch Float Tensor, optional) - Static feature, default None.
+            * **FE** (Pytorch Float Tensor, optional) - Static feature, default None.
         Return types:
             * **adj** (PyTorch Float Tensor) - Adjacency matrix constructed from node embeddings.
         """
 
-        if Feat is None:
+        if FE is None:
             nodevec1 = self._embedding1(idx)
             nodevec2 = self._embedding2(idx)
         else:
-            assert Feat.shape[1] == self._static_feature_dim
-            nodevec1 = Feat[idx, :]
+            assert FE.shape[1] == self._static_feature_dim
+            nodevec1 = FE[idx, :]
             nodevec2 = nodevec1
 
         nodevec1 = torch.tanh(self._alpha*self._linear1(nodevec1))
@@ -233,7 +233,7 @@ class LayerNormalization(nn.Module):
         super(LayerNormalization, self).__init__()
         if isinstance(normalized_shape, numbers.Integral):
             normalized_shape = (normalized_shape,)
-        self._normlizationalized_shape = tuple(normalized_shape)
+        self._normalized_shape = tuple(normalized_shape)
         self._eps = eps
         self._elementwise_affine = elementwise_affine
         if self._elementwise_affine:
@@ -301,16 +301,28 @@ class MTGNNLayer(nn.Module):
                 propalpha: float):
         super(MTGNNLayer, self).__init__()
         self._dropout = dropout
-        
+        self._gcn_true = gcn_true
+
         if dilation_exponential > 1:
             rf_size_j = int(
                 rf_size_i + (kernel_size-1)*(dilation_exponential**j-1)/(dilation_exponential-1))
         else:
             rf_size_j = rf_size_i+j*(kernel_size-1)
 
-        self._filter_conv = DilatedInception(residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation)
-        self._gate_conv = DilatedInception(residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation)
-        self._residual_conv = nn.Conv2d(in_channels=conv_channels, out_channels=residual_channels, kernel_size=(1, 1))
+        self._filter_conv = DilatedInception(residual_channels,
+                                             conv_channels,
+                                             kernel_set=kernel_set,
+                                             dilation_factor=new_dilation)
+                                             
+        self._gate_conv = DilatedInception(residual_channels,
+                                           conv_channels,
+                                           kernel_set=kernel_set,
+                                           dilation_factor=new_dilation)
+                                           
+        self._residual_conv = nn.Conv2d(in_channels=conv_channels,
+                                        out_channels=residual_channels,
+                                        kernel_size=(1, 1))
+        
         if seq_length > receptive_field:
             self._skip_conv = nn.Conv2d(in_channels=conv_channels,
                                                 out_channels=skip_channels,
@@ -319,17 +331,27 @@ class MTGNNLayer(nn.Module):
             self._skip_conv = nn.Conv2d(in_channels=conv_channels,
                                                 out_channels=skip_channels,
                                                 kernel_size=(1, receptive_field-rf_size_j+1))
-        self._gcn_true = gcn_true
+        
         if gcn_true:
-            self._mixprop_conv1 = MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
-            self._mixprop_conv2 = MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
+            self._mixprop_conv1 = MixProp(conv_channels,
+                                          residual_channels,
+                                          gcn_depth,
+                                          dropout,
+                                          propalpha)
+                                          
+            self._mixprop_conv2 = MixProp(conv_channels,
+                                          residual_channels,
+                                          gcn_depth,
+                                          dropout,
+                                          propalpha)
 
         if seq_length > receptive_field:
-            self._normlization = LayerNormalization((residual_channels, num_nodes, seq_length - rf_size_j + 1),
-             elementwise_affine=layer_norm_affline)
+            self._normalization = LayerNormalization((residual_channels, num_nodes, seq_length - rf_size_j + 1),
+                                                     elementwise_affine=layer_norm_affline)
+                                                     
         else:
-            self._normlization = LayerNormalization((residual_channels, num_nodes, receptive_field - rf_size_j + 1), 
-            elementwise_affine=layer_norm_affline)
+            self._normalization = LayerNormalization((residual_channels, num_nodes, receptive_field - rf_size_j + 1), 
+                                                     elementwise_affine=layer_norm_affline)
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -339,24 +361,24 @@ class MTGNNLayer(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, Tilde_A: torch.FloatTensor, 
+    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, A_tilde: torch.FloatTensor, 
                 idx: torch.LongTensor, training: bool) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN layer.
 
         Arg types:
-            * **X** (PyTorch Float Tensor) - Input feature tensor, 
+            * **X** (PyTorch FloatTensor) - Input feature tensor, 
             with shape (batch size, input dimension, number of nodes, sequence length).
-            * **X_skip** (PyTorch Float Tensor) - Input feature tensor for skip connection, 
+            * **X_skip** (PyTorch FloatTensor) - Input feature tensor for skip connection, 
             with shape (batch size, input dimension, number of nodes, sequence length).
-            * **Tilde_A** (Pytorch Float Tensor) - Predefined adjacency matrix.
-            * **idx** (Pytorch Long Tensor) - Input indices.
+            * **A_tilde** (Pytorch FloatTensor) - Predefined adjacency matrix.
+            * **idx** (Pytorch LongTensor) - Input indices.
             * **training** (bool) - Whether in traning mode.
 
         Return types:
-            * **X** (PyTorch Float Tensor) - Output sequence tensor, 
+            * **X** (PyTorch FloatTensor) - Output sequence tensor, 
             with shape (batch size, input sequence length, number of nodes, sequence length).
-            * **X_skip** (PyTorch Float Tensor) - Output feature tensor for skip connection, 
+            * **X_skip** (PyTorch FloatTensor) - Output feature tensor for skip connection, 
             with shape (batch size, input dimension, number of nodes, sequence length).
         """
         X_residual = X
@@ -368,13 +390,13 @@ class MTGNNLayer(nn.Module):
         X = F.dropout(X, self._dropout, training=training)
         X_skip = self._skip_conv(X) + X_skip
         if self._gcn_true:
-            X = self._mixprop_conv1(X, Tilde_A)+self._mixprop_conv2(X,
-                                                        Tilde_A.transpose(1, 0))
+            X = self._mixprop_conv1(X, A_tilde)+self._mixprop_conv2(X,
+                                                        A_tilde.transpose(1, 0))
         else:
             X = self._residual_conv(X)
 
         X = X + X_residual[:, :, :, -X.size(3):]
-        X = self._normlization(X, idx)
+        X = self._normalization(X, idx)
         return X, X_skip
 
 class MTGNN(nn.Module):
@@ -406,59 +428,95 @@ class MTGNN(nn.Module):
         layer_norm_affline (bool): Whether to do elementwise affine in Layer Normalization.
     """
 
-    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, kernel_size: int, 
-                dropout: float, subgraph_size: int, node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
-                skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int, layers: int, propalpha: float, 
-                tanhalpha: float, layer_norm_affline: bool):
+    def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,
+                 kernel_set: list, kernel_size: int, dropout: float, subgraph_size: int,
+                 node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
+                 skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int,
+                 layers: int, propalpha: float, tanhalpha: float, layer_norm_affline: bool):
         super(MTGNN, self).__init__()
+        
         self._gcn_true = gcn_true
         self._build_adj_true = build_adj
         self._num_nodes = num_nodes
         self._dropout = dropout
+        self._seq_length = seq_length 
+        self._layers = layers    
+           
         self._mtgnn_layers = nn.ModuleList()
-        self._start_conv = nn.Conv2d(in_channels=in_dim,
-                                    out_channels=residual_channels,
-                                    kernel_size=(1, 1))
-        self._graph_constructor = GraphConstructor(
-            num_nodes, subgraph_size, node_dim, alpha=tanhalpha)
-
-        self._seq_length = seq_length
+                                    
+        self._graph_constructor = GraphConstructor(num_nodes,
+                                                   subgraph_size,
+                                                   node_dim,
+                                                   alpha=tanhalpha)
         
         self._set_receptive_field(dilation_exponential, kernel_size, layers)
 
         new_dilation = 1
         for j in range(1, layers+1):
-            self._mtgnn_layers.append(MTGNNLayer(dilation_exponential=dilation_exponential, rf_size_i=1, kernel_size=kernel_size, j=j, 
-                residual_channels=residual_channels, conv_channels=conv_channels, skip_channels=skip_channels, kernel_set=kernel_set,
-                new_dilation=new_dilation, layer_norm_affline=layer_norm_affline, gcn_true=gcn_true, seq_length=seq_length, 
-                receptive_field=self._receptive_field, dropout=dropout, gcn_depth=gcn_depth, num_nodes=num_nodes, propalpha=propalpha))
+            self._mtgnn_layers.append(MTGNNLayer(dilation_exponential=dilation_exponential,
+                                                 rf_size_i=1,
+                                                 kernel_size=kernel_size,
+                                                 j=j, 
+                                                 residual_channels=residual_channels,
+                                                 conv_channels=conv_channels,
+                                                 skip_channels=skip_channels,
+                                                 kernel_set=kernel_set,
+                                                 new_dilation=new_dilation,
+                                                 layer_norm_affline=layer_norm_affline,
+                                                 gcn_true=gcn_true,
+                                                 seq_length=seq_length, 
+                                                 receptive_field=self._receptive_field,
+                                                 dropout=dropout,
+                                                 gcn_depth=gcn_depth,
+                                                 num_nodes=num_nodes,
+                                                 propalpha=propalpha))
 
             new_dilation *= dilation_exponential
+        
+        self._setup_conv(in_dim, skip_channels, end_channels, residual_channels, out_dim)
+                            
+        self._idx = torch.arange(self._num_nodes)
 
-        self._layers = layers
+        self._reset_parameters()
+        
+    def _setup_conv(self, in_dim, skip_channels, end_channels, residual_channels, out_dim):
+    
+        self._start_conv = nn.Conv2d(in_channels=in_dim,
+                                    out_channels=residual_channels,
+                                    kernel_size=(1, 1))
+    
+        if self._seq_length > self._receptive_field:
+        
+            self._skip_conv_0 = nn.Conv2d(in_channels=in_dim,
+                                          out_channels=skip_channels, 
+                                          kernel_size=(1, self._seq_length),
+                                          bias=True)
+                
+            self._skip_conv_E = nn.Conv2d(in_channels=residual_channels,
+                                          out_channels=skip_channels,
+                                          kernel_size=(1, self._seq_length-self._receptive_field+1),
+                                          bias=True)
+
+        else:
+            self._skip_conv_0 = nn.Conv2d(in_channels=in_dim,
+                                          out_channels=skip_channels,
+                                          kernel_size=(1, self._receptive_field),
+                                          bias=True)
+                
+            self._skip_conv_E = nn.Conv2d(in_channels=residual_channels,
+                                          out_channels=skip_channels,
+                                          kernel_size=(1, 1),
+                                          bias=True)
+    
         self._end_conv_1 = nn.Conv2d(in_channels=skip_channels,
                                     out_channels=end_channels,
                                     kernel_size=(1, 1),
                                     bias=True)
+                                    
         self._end_conv_2 = nn.Conv2d(in_channels=end_channels,
                                     out_channels=out_dim,
                                     kernel_size=(1, 1),
                                     bias=True)
-        if self._seq_length > self._receptive_field:
-            self._skip_conv_0 = nn.Conv2d(in_channels=in_dim, out_channels=skip_channels, kernel_size=(
-                1, self._seq_length), bias=True)
-            self._skip_conv_E = nn.Conv2d(in_channels=residual_channels, out_channels=skip_channels, kernel_size=(
-                1, self._seq_length-self._receptive_field+1), bias=True)
-
-        else:
-            self._skip_conv_0 = nn.Conv2d(in_channels=in_dim, out_channels=skip_channels, kernel_size=(
-                1, self._receptive_field), bias=True)
-            self._skip_conv_E = nn.Conv2d(in_channels=residual_channels,
-                                   out_channels=skip_channels, kernel_size=(1, 1), bias=True)
-
-        self._idx = torch.arange(self._num_nodes)
-
-        self._reset_parameters()
 
     def _reset_parameters(self):
         for p in self.parameters():
@@ -474,19 +532,22 @@ class MTGNN(nn.Module):
         else:
             self._receptive_field = layers*(kernel_size-1) + 1
 
-    def forward(self, X_in: torch.FloatTensor, Tilde_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, Feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+    def forward(self, X_in: torch.FloatTensor,
+                A_tilde: Optional[torch.FloatTensor]=None,
+                idx: Optional[torch.LongTensor]=None,
+                FE: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN.
 
         Arg types:
-            * **X_in** (PyTorch Float Tensor) - Input sequence, 
+            * **X_in** (PyTorch FloatTensor) - Input sequence, 
             with shape (batch size, input dimension, number of nodes, input sequence length).
-            * **Tilde_A** (Pytorch Float Tensor, optional) - Predefined adjacency matrix, default None.
-            * **idx** (Pytorch Long Tensor, optional) - Input indices, a permutation of the number of nodes, default None (no permutation).
-            * **Feat** (Pytorch Float Tensor, optional) - Static feature, default None.
+            * **A_tilde** (Pytorch FloatTensor, optional) - Predefined adjacency matrix, default None.
+            * **idx** (Pytorch LongTensor, optional) - Input indices, a permutation of the number of nodes, default None (no permutation).
+            * **FE** (Pytorch FloatTensor, optional) - Static feature, default None.
 
         Return types:
-            * **X** (PyTorch Float Tensor) - Output sequence for prediction, 
+            * **X** (PyTorch FloatTensor) - Output sequence for prediction, 
             with shape (batch size, input sequence length, number of nodes, 1).
         """
         seq_len = X_in.size(3)
@@ -499,19 +560,21 @@ class MTGNN(nn.Module):
         if self._gcn_true:
             if self._build_adj_true:
                 if idx is None:
-                    Tilde_A = self._graph_constructor(self._idx.to(X_in.device),
-                                  Feat=Feat)
+                    A_tilde = self._graph_constructor(self._idx.to(X_in.device),
+                                  FE=FE)
                 else:
-                    Tilde_A = self._graph_constructor(idx, Feat=Feat)
+                    A_tilde = self._graph_constructor(idx, FE=FE)
 
         X = self._start_conv(X_in)
-        X_skip = self._skip_conv_0(F.dropout(X_in, self._dropout, training=self.training))
+        X_skip = self._skip_conv_0(F.dropout(X_in, self._dropout,
+                                   training=self.training))
         if idx is None:
             for mtgnn in self._mtgnn_layers:
-                X, X_skip = mtgnn(X, X_skip, Tilde_A, self._idx.to(X_in.device), self.training)
+                X, X_skip = mtgnn(X, X_skip, A_tilde,
+                                  self._idx.to(X_in.device), self.training)
         else:
             for mtgnn in self._mtgnn_layers:
-                X, X_skip = mtgnn(X, X_skip, Tilde_A, idx, self.training)
+                X, X_skip = mtgnn(X, X_skip, A_tilde, idx, self.training)
 
         X_skip = self._skip_conv_E(X) + X_skip
         X = F.relu(X_skip)
