@@ -184,23 +184,23 @@ class GraphConstructor(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, idx: torch.LongTensor, FEAT: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+    def forward(self, idx: torch.LongTensor, FE: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass to construct an adjacency matrix from node embeddings.
 
         Arg types:
             * **idx** (Pytorch Long Tensor) - Input indices, a permutation of the number of nodes, default None (no permutation).
-            * **FEAT** (Pytorch Float Tensor, optional) - Static feature, default None.
+            * **FE** (Pytorch Float Tensor, optional) - Static feature, default None.
         Return types:
             * **adj** (PyTorch Float Tensor) - Adjacency matrix constructed from node embeddings.
         """
 
-        if FEAT is None:
+        if FE is None:
             nodevec1 = self._embedding1(idx)
             nodevec2 = self._embedding2(idx)
         else:
-            assert FEAT.shape[1] == self._static_feature_dim
-            nodevec1 = FEAT[idx, :]
+            assert FE.shape[1] == self._static_feature_dim
+            nodevec1 = FE[idx, :]
             nodevec2 = nodevec1
 
         nodevec1 = torch.tanh(self._alpha*self._linear1(nodevec1))
@@ -255,12 +255,12 @@ class LayerNormalization(nn.Module):
 
         Arg types:
             * **X** (Pytorch Float Tensor) - Input tensor, 
-            with shape (batch_size, feature_dim, num_nodes, seq_len).
+                with shape (batch_size, feature_dim, num_nodes, seq_len).
             * **idx** (Pytorch Long Tensor) - Input indices.
             
         Return types:
             * **X** (PyTorch Float Tensor) - Output tensor, 
-            with shape (batch_size, feature_dim, num_nodes, seq_len).
+                with shape (batch_size, feature_dim, num_nodes, seq_len).
         """
         if self._elementwise_affine:
             return F.layer_norm(X, tuple(X.shape[1:]), self._weight[:, idx, :], self._bias[:, idx, :], self._eps)
@@ -370,18 +370,18 @@ class MTGNNLayer(nn.Module):
 
         Arg types:
             * **X** (PyTorch FloatTensor) - Input feature tensor, 
-            with shape (batch_size, in_dim, num_nodes, seq_len).
+                with shape (batch_size, in_dim, num_nodes, seq_len).
             * **X_skip** (PyTorch FloatTensor) - Input feature tensor for skip connection, 
-            with shape (batch_size, in_dim, num_nodes, seq_len).
+                with shape (batch_size, in_dim, num_nodes, seq_len).
             * **A_tilde** (Pytorch FloatTensor) - Predefined adjacency matrix.
             * **idx** (Pytorch LongTensor) - Input indices.
             * **training** (bool) - Whether in traning mode.
 
         Return types:
             * **X** (PyTorch FloatTensor) - Output sequence tensor, 
-            with shape (batch_size, seq_len, num_nodes, seq_len).
+                with shape (batch_size, seq_len, num_nodes, seq_len).
             * **X_skip** (PyTorch FloatTensor) - Output feature tensor for skip connection, 
-            with shape (batch_size, in_dim, num_nodes, seq_len).
+                with shape (batch_size, in_dim, num_nodes, seq_len).
         """
         X_residual = X
         X_filter = self._filter_conv(X)
@@ -536,7 +536,7 @@ class MTGNN(nn.Module):
     def forward(self, X_in: torch.FloatTensor,
                 A_tilde: Optional[torch.FloatTensor]=None,
                 idx: Optional[torch.LongTensor]=None,
-                FEAT: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+                FE: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN.
 
@@ -544,7 +544,7 @@ class MTGNN(nn.Module):
             * **X_in** (PyTorch FloatTensor) - Input sequence, with shape (batch_size, in_dim, num_nodes, seq_len).
             * **A_tilde** (Pytorch FloatTensor, optional) - Predefined adjacency matrix, default None.
             * **idx** (Pytorch LongTensor, optional) - Input indices, a permutation of the num_nodes, default None (no permutation).
-            * **FEAT** (Pytorch FloatTensor, optional) - Static feature, default None.
+            * **FE** (Pytorch FloatTensor, optional) - Static feature, default None.
 
         Return types:
             * **X** (PyTorch FloatTensor) - Output sequence for prediction, with shape (batch_size, seq_len, num_nodes, 1).
@@ -560,9 +560,9 @@ class MTGNN(nn.Module):
             if self._build_adj_true:
                 if idx is None:
                     A_tilde = self._graph_constructor(self._idx.to(X_in.device),
-                                  FEAT=FEAT)
+                                  FE=FE)
                 else:
-                    A_tilde = self._graph_constructor(idx, FEAT=FEAT)
+                    A_tilde = self._graph_constructor(idx, FE=FE)
 
         X = self._start_conv(X_in)
         X_skip = self._skip_conv_0(F.dropout(X_in, self._dropout,
