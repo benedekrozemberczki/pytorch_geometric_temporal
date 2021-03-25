@@ -441,6 +441,7 @@ class MTGNN(nn.Module):
         self._dropout = dropout
         self._seq_length = seq_length 
         self._layers = layers    
+        self._idx = torch.arange(self._num_nodes)   
            
         self._mtgnn_layers = nn.ModuleList()
                                     
@@ -474,8 +475,6 @@ class MTGNN(nn.Module):
             new_dilation *= dilation_exponential
         
         self._setup_conv(in_dim, skip_channels, end_channels, residual_channels, out_dim)
-                            
-        self._idx = torch.arange(self._num_nodes)
 
         self._reset_parameters()
         
