@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import networkx as nx
 from torch_geometric.data import Data
-from torch_geometric.utils import to_scipy_sparse_matrix
+from torch_geometric.utils import barabasi_albert_graph
 from torch_geometric.transforms import LaplacianLambdaMax
 from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN
 from torch_geometric_temporal.nn.convolutional import GMAN, SpatioTemporalAttention, SpatioTemporalEmbedding
@@ -216,12 +216,11 @@ def test_mtgnn():
     propalpha = 0.05
     tanhalpha = 3
     num_split = 1
+    num_edges = 10
     kernel_set = [2, 3, 6, 7]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    _, edge_index = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=in_dim)
-    mock_adj = to_scipy_sparse_matrix(edge_index)
-    Tilde_A = torch.tensor(mock_adj.toarray()).to(device)
+    Tilde_A = barabasi_albert_graph(num_nodes, num_edges).to(device)
     x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                  kernel_set = kernel_set, dropout=dropout, subgraph_size=subgraph_size,

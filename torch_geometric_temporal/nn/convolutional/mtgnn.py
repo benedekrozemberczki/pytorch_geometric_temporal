@@ -21,8 +21,17 @@ class Linear(nn.Module):
     """
     def __init__(self, c_in: int, c_out: int, bias: bool=True):
         super(Linear, self).__init__()
-        self._mlp = torch.nn.Conv2d(c_in, c_out, kernel_size=(
-            1, 1), padding=(0, 0), stride=(1, 1), bias=bias)
+        self._mlp = torch.nn.Conv2d(c_in, c_out, kernel_size=(1, 1), 
+        padding=(0, 0), stride=(1, 1), bias=bias)
+
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -56,6 +65,15 @@ class MixProp(nn.Module):
         self._gdep = gdep
         self._dropout = dropout
         self._alpha = alpha
+
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, X: torch.FloatTensor, A: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -100,6 +118,14 @@ class DilatedInception(nn.Module):
         for kern in self._kernel_set:
             self._time_conv.append(nn.Conv2d(c_in, c_out, (1, kern),
                                         dilation=(1, dilation_factor)))
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, X_in: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -148,6 +174,15 @@ class GraphConstructor(nn.Module):
 
         self._k = k
         self._alpha = alpha
+        
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, idx: torch.LongTensor, static_feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
@@ -182,7 +217,7 @@ class GraphConstructor(nn.Module):
         return A
 
 
-class LayerNorm(nn.Module):
+class LayerNormalization(nn.Module):
     __constants__ = ['normalized_shape', 'weight',
                      'bias', 'eps', 'elementwise_affine']
     r"""An implementation of the layer normalization layer.
@@ -195,7 +230,7 @@ class LayerNorm(nn.Module):
         elementwise_affine (bool, optional): Whether to conduct elementwise affine transformation or not. Default: True.
     """
     def __init__(self, normalized_shape: int, eps: float=1e-5, elementwise_affine: bool=True):
-        super(LayerNorm, self).__init__()
+        super(LayerNormalization, self).__init__()
         if isinstance(normalized_shape, numbers.Integral):
             normalized_shape = (normalized_shape,)
         self._normlizationalized_shape = tuple(normalized_shape)
@@ -330,10 +365,10 @@ class MTGNN(nn.Module):
                         MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
 
                 if self._seq_length > self._receptive_field:
-                    self._normlization.append(LayerNorm(
+                    self._normlization.append(LayerNormalization(
                         (residual_channels, num_nodes, self._seq_length - rf_size_j + 1), elementwise_affine=layer_norm_affline))
                 else:
-                    self._normlization.append(LayerNorm(
+                    self._normlization.append(LayerNormalization(
                         (residual_channels, num_nodes, self._receptive_field - rf_size_j + 1), elementwise_affine=layer_norm_affline))
 
                 new_dilation *= dilation_exponential
@@ -360,6 +395,15 @@ class MTGNN(nn.Module):
                                    out_channels=skip_channels, kernel_size=(1, 1), bias=True)
 
         self._idx = torch.arange(self._num_nodes)
+
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
 
     def forward(self, X_in: torch.FloatTensor, Tilde_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, static_feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
