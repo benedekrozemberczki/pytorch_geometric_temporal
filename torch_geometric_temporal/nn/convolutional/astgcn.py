@@ -67,7 +67,7 @@ class ChebConvAttention(MessagePassing):
 
     def _reset_parameters(self):
         nn.init.xavier_uniform_(self.weight)
-        nn.init.uniform(self.bias)
+        nn.init.uniform_(self.bias)
 
     def __norm__(self, edge_index, num_nodes: Optional[int],
                  edge_weight: OptTensor, normalization: Optional[str],
