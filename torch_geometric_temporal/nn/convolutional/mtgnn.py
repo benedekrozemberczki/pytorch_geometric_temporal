@@ -192,7 +192,7 @@ class GraphConstructor(nn.Module):
             * **idx** (Pytorch Long Tensor) - Input indices, a permutation of the number of nodes, default None (no permutation).
             * **FE** (Pytorch Float Tensor, optional) - Static feature, default None.
         Return types:
-            * **adj** (PyTorch Float Tensor) - Adjacency matrix constructed from node embeddings.
+            * **A** (PyTorch Float Tensor) - Adjacency matrix constructed from node embeddings.
         """
 
         if FE is None:
