@@ -184,23 +184,23 @@ class GraphConstructor(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, idx: torch.LongTensor, FE: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+    def forward(self, idx: torch.LongTensor, FEAT: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass to construct an adjacency matrix from node embeddings.
 
         Arg types:
             * **idx** (Pytorch Long Tensor) - Input indices, a permutation of the number of nodes, default None (no permutation).
-            * **FE** (Pytorch Float Tensor, optional) - Static feature, default None.
+            * **FEAT** (Pytorch Float Tensor, optional) - Static feature, default None.
         Return types:
             * **adj** (PyTorch Float Tensor) - Adjacency matrix constructed from node embeddings.
         """
 
-        if FE is None:
+        if FEAT is None:
             nodevec1 = self._embedding1(idx)
             nodevec2 = self._embedding2(idx)
         else:
-            assert FE.shape[1] == self._static_feature_dim
-            nodevec1 = FE[idx, :]
+            assert FEAT.shape[1] == self._static_feature_dim
+            nodevec1 = FEAT[idx, :]
             nodevec2 = nodevec1
 
         nodevec1 = torch.tanh(self._alpha*self._linear1(nodevec1))
@@ -376,10 +376,8 @@ class MTGNNLayer(nn.Module):
             * **training** (bool) - Whether in traning mode.
 
         Return types:
-            * **X** (PyTorch FloatTensor) - Output sequence tensor, 
-            with shape (batch size, input sequence length, number of nodes, sequence length).
-            * **X_skip** (PyTorch FloatTensor) - Output feature tensor for skip connection, 
-            with shape (batch size, input dimension, number of nodes, sequence length).
+            * **X** (PyTorch FloatTensor) - Output sequence tensor, with shape (batch size, input sequence length, number of nodes, sequence length).
+            * **X_skip** (PyTorch FloatTensor) - Output feature tensor for skip connection, with shape (batch size, input dimension, number of nodes, sequence length).
         """
         X_residual = X
         X_filter = self._filter_conv(X)
@@ -534,20 +532,18 @@ class MTGNN(nn.Module):
     def forward(self, X_in: torch.FloatTensor,
                 A_tilde: Optional[torch.FloatTensor]=None,
                 idx: Optional[torch.LongTensor]=None,
-                FE: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
+                FEAT: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN.
 
         Arg types:
-            * **X_in** (PyTorch FloatTensor) - Input sequence, 
-            with shape (batch size, input dimension, number of nodes, input sequence length).
+            * **X_in** (PyTorch FloatTensor) - Input sequence, with shape (batch size, input dimension, number of nodes, input sequence length).
             * **A_tilde** (Pytorch FloatTensor, optional) - Predefined adjacency matrix, default None.
             * **idx** (Pytorch LongTensor, optional) - Input indices, a permutation of the number of nodes, default None (no permutation).
-            * **FE** (Pytorch FloatTensor, optional) - Static feature, default None.
+            * **FEAT** (Pytorch FloatTensor, optional) - Static feature, default None.
 
         Return types:
-            * **X** (PyTorch FloatTensor) - Output sequence for prediction, 
-            with shape (batch size, input sequence length, number of nodes, 1).
+            * **X** (PyTorch FloatTensor) - Output sequence for prediction, with shape (batch size, input sequence length, number of nodes, 1).
         """
         seq_len = X_in.size(3)
         assert seq_len == self._seq_length, 'Input sequence length not equal to preset sequence length.'
@@ -560,9 +556,9 @@ class MTGNN(nn.Module):
             if self._build_adj_true:
                 if idx is None:
                     A_tilde = self._graph_constructor(self._idx.to(X_in.device),
-                                  FE=FE)
+                                  FEAT=FEAT)
                 else:
-                    A_tilde = self._graph_constructor(idx, FE=FE)
+                    A_tilde = self._graph_constructor(idx, FEAT=FEAT)
 
         X = self._start_conv(X_in)
         X_skip = self._skip_conv_0(F.dropout(X_in, self._dropout,
