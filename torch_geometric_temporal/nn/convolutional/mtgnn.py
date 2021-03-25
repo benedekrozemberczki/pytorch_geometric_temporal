@@ -300,9 +300,9 @@ class MTGNN(nn.Module):
     """
 
     def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,  kernel_set: list, kernel_size: int, 
-    dropout: float, subgraph_size: int, node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
-    skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int, layers: int, propalpha: float, 
-    tanhalpha: float, layer_norm_affline: bool):
+                dropout: float, subgraph_size: int, node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
+                skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int, layers: int, propalpha: float, 
+                tanhalpha: float, layer_norm_affline: bool):
         super(MTGNN, self).__init__()
         self._gcn_true = gcn_true
         self._build_adj_true = build_adj
@@ -431,29 +431,27 @@ class MTGNN(nn.Module):
         if self._gcn_true:
             if self._build_adj_true:
                 if idx is None:
-                    adp = self._graph_constructor(self._idx.to(X_in.device),
+                    Tilde_A = self._graph_constructor(self._idx.to(X_in.device),
                                   Feat=Feat)
                 else:
-                    adp = self._graph_constructor(idx, Feat=Feat)
-            else:
-                adp = Tilde_A
+                    Tilde_A = self._graph_constructor(idx, Feat=Feat)
 
         X = self._start_conv(X_in)
-        skip = self._skip_conv_0(F.dropout(X_in, self._dropout, training=self.training))
+        X_skip = self._skip_conv_0(F.dropout(X_in, self._dropout, training=self.training))
         for i in range(self._layers):
             residual = X
-            filter = self._filter_convs[i](X)
-            filter = torch.tanh(filter)
-            gate = self._gate_convs[i](X)
-            gate = torch.sigmoid(gate)
-            X = filter * gate
+            X_filter = self._filter_convs[i](X)
+            X_filter = torch.tanh(X_filter)
+            X_gate = self._gate_convs[i](X)
+            X_gate = torch.sigmoid(X_gate)
+            X = X_filter * X_gate
             X = F.dropout(X, self._dropout, training=self.training)
-            s = X
-            s = self._skip_convs[i](s)
-            skip = s + skip
+            S = X
+            S = self._skip_convs[i](S)
+            X_skip = S + X_skip
             if self._gcn_true:
-                X = self._mixprop_conv1[i](X, adp)+self._mixprop_conv2[i](X,
-                                                          adp.transpose(1, 0))
+                X = self._mixprop_conv1[i](X, Tilde_A)+self._mixprop_conv2[i](X,
+                                                          Tilde_A.transpose(1, 0))
             else:
                 X = self._residual_convs[i](X)
 
@@ -463,8 +461,8 @@ class MTGNN(nn.Module):
             else:
                 X = self._normlization[i](X, idx)
 
-        skip = self._skip_conv_E(X) + skip
-        X = F.relu(skip)
+        X_skip = self._skip_conv_E(X) + X_skip
+        X = F.relu(X_skip)
         X = F.relu(self._end_conv_1(X))
         X = self._end_conv_2(X)
         return X
