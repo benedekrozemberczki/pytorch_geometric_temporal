@@ -270,6 +270,91 @@ class LayerNormalization(nn.Module):
             'elementwise_affine={elementwise_affine}'.format(**self.__dict__)
 
 
+class MTGNNLayer(nn.Module):
+    r"""An implementation of the MTGNN layer.
+    For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." 
+    <https://arxiv.org/pdf/2005.11650.pdf>`_
+
+    Args:
+        c_in (int): Number of input channels.
+        c_out (int): Number of output channels.
+        kernel_set (list of int): List of kernel sizes.
+        dilated_factor (int, optional): Dilation factor.
+    """
+    def __init__(self, dilation_exponential: int, rf_size_i: int, kernel_size: int, j: int, residual_channels: int, 
+                conv_channels: int, skip_channels: int, kernel_set: list, new_dilation: int, layer_norm_affline: bool,
+                gcn_true: bool, seq_length: int, receptive_field: int, dropout: float, gcn_depth: int, num_nodes: int,
+                propalpha: float):
+        super(MTGNNLayer, self).__init__()
+        self._dropout = dropout
+        
+        if dilation_exponential > 1:
+            rf_size_j = int(
+                rf_size_i + (kernel_size-1)*(dilation_exponential**j-1)/(dilation_exponential-1))
+        else:
+            rf_size_j = rf_size_i+j*(kernel_size-1)
+
+        self._filter_conv = DilatedInception(residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation)
+        self._gate_conv = DilatedInception(residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation)
+        self._residual_conv = nn.Conv2d(in_channels=conv_channels, out_channels=residual_channels, kernel_size=(1, 1))
+        if seq_length > receptive_field:
+            self._skip_conv = nn.Conv2d(in_channels=conv_channels,
+                                                out_channels=skip_channels,
+                                                kernel_size=(1, self._seq_length-rf_size_j+1))
+        else:
+            self._skip_conv = nn.Conv2d(in_channels=conv_channels,
+                                                out_channels=skip_channels,
+                                                kernel_size=(1, receptive_field-rf_size_j+1))
+        self._gcn_true = gcn_true
+        if gcn_true:
+            self._mixprop_conv1 = MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
+            self._mixprop_conv2 = MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha)
+
+        if seq_length > receptive_field:
+            self._normlization = LayerNormalization((residual_channels, num_nodes, seq_length - rf_size_j + 1),
+             elementwise_affine=layer_norm_affline)
+        else:
+            self._normlization = LayerNormalization((residual_channels, num_nodes, receptive_field - rf_size_j + 1), 
+            elementwise_affine=layer_norm_affline)
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+            else:
+                nn.init.uniform_(p)
+
+    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, Tilde_A: torch.FloatTensor, 
+                idx: torch.LongTensor, training: bool) -> torch.FloatTensor:
+        """
+        Making a forward pass of MTGNN layer.
+
+        Arg types:
+            * **X** (Pytorch Float Tensor) - Input feature Tensor, with shape (batch_size, c_in, num_nodes, seq_len).
+
+        Return types:
+            * **X** (PyTorch Float Tensor) - Hidden representation for all nodes, 
+            with shape (batch_size, c_out, num_nodes, seq_len-6).
+        """
+        X_residual = X
+        X_filter = self._filter_conv(X)
+        X_filter = torch.tanh(X_filter)
+        X_gate = self._gate_conv(X)
+        X_gate = torch.sigmoid(X_gate)
+        X = X_filter * X_gate
+        X = F.dropout(X, self._dropout, training=training)
+        X_skip = self._skip_conv(X) + X_skip
+        if self._gcn_true:
+            X = self._mixprop_conv1(X, Tilde_A)+self._mixprop_conv2(X,
+                                                        Tilde_A.transpose(1, 0))
+        else:
+            X = self._residual_conv(X)
+
+        X = X + X_residual[:, :, :, -X.size(3):]
+        X = self._normlization(X, idx)
+        return X, X_skip
+
 class MTGNN(nn.Module):
     r"""An implementation of the Multivariate Time Series Forecasting Graph Neural Networks.
     For details see this paper: `"Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." 
@@ -308,13 +393,7 @@ class MTGNN(nn.Module):
         self._build_adj_true = build_adj
         self._num_nodes = num_nodes
         self._dropout = dropout
-        self._filter_convs = nn.ModuleList()
-        self._gate_convs = nn.ModuleList()
-        self._residual_convs = nn.ModuleList()
-        self._skip_convs = nn.ModuleList()
-        self._mixprop_conv1 = nn.ModuleList()
-        self._mixprop_conv2 = nn.ModuleList()
-        self._normlization = nn.ModuleList()
+        self._mtgnn_layers = nn.ModuleList()
         self._start_conv = nn.Conv2d(in_channels=in_dim,
                                     out_channels=residual_channels,
                                     kernel_size=(1, 1))
@@ -323,49 +402,14 @@ class MTGNN(nn.Module):
 
         self._seq_length = seq_length
         
-        if dilation_exponential > 1:
-            self._receptive_field = int(
-                1+(kernel_size-1)*(dilation_exponential**layers-1)/(dilation_exponential-1))
-        else:
-            self._receptive_field = layers*(kernel_size-1) + 1
+        self._set_receptive_field(dilation_exponential, kernel_size, layers)
 
-        rf_size_i = 1
         new_dilation = 1
         for j in range(1, layers+1):
-            if dilation_exponential > 1:
-                rf_size_j = int(
-                    rf_size_i + (kernel_size-1)*(dilation_exponential**j-1)/(dilation_exponential-1))
-            else:
-                rf_size_j = rf_size_i+j*(kernel_size-1)
-
-            self._filter_convs.append(DilatedInception(
-                residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
-            self._gate_convs.append(DilatedInception(
-                residual_channels, conv_channels, kernel_set=kernel_set, dilation_factor=new_dilation))
-            self._residual_convs.append(nn.Conv2d(in_channels=conv_channels,
-                                                    out_channels=residual_channels,
-                                                    kernel_size=(1, 1)))
-            if self._seq_length > self._receptive_field:
-                self._skip_convs.append(nn.Conv2d(in_channels=conv_channels,
-                                                    out_channels=skip_channels,
-                                                    kernel_size=(1, self._seq_length-rf_size_j+1)))
-            else:
-                self._skip_convs.append(nn.Conv2d(in_channels=conv_channels,
-                                                    out_channels=skip_channels,
-                                                    kernel_size=(1, self._receptive_field-rf_size_j+1)))
-
-            if self._gcn_true:
-                self._mixprop_conv1.append(
-                    MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
-                self._mixprop_conv2.append(
-                    MixProp(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
-
-            if self._seq_length > self._receptive_field:
-                self._normlization.append(LayerNormalization(
-                    (residual_channels, num_nodes, self._seq_length - rf_size_j + 1), elementwise_affine=layer_norm_affline))
-            else:
-                self._normlization.append(LayerNormalization(
-                    (residual_channels, num_nodes, self._receptive_field - rf_size_j + 1), elementwise_affine=layer_norm_affline))
+            self._mtgnn_layers.append(MTGNNLayer(dilation_exponential=dilation_exponential, rf_size_i=1, kernel_size=kernel_size, j=j, 
+                residual_channels=residual_channels, conv_channels=conv_channels, skip_channels=skip_channels, kernel_set=kernel_set,
+                new_dilation=new_dilation, layer_norm_affline=layer_norm_affline, gcn_true=gcn_true, seq_length=seq_length, 
+                receptive_field=self._receptive_field, dropout=dropout, gcn_depth=gcn_depth, num_nodes=num_nodes, propalpha=propalpha))
 
             new_dilation *= dilation_exponential
 
@@ -401,6 +445,13 @@ class MTGNN(nn.Module):
             else:
                 nn.init.uniform_(p)
 
+    def _set_receptive_field(self, dilation_exponential, kernel_size, layers):
+        if dilation_exponential > 1:
+            self._receptive_field = int(
+                1+(kernel_size-1)*(dilation_exponential**layers-1)/(dilation_exponential-1))
+        else:
+            self._receptive_field = layers*(kernel_size-1) + 1
+
     def forward(self, X_in: torch.FloatTensor, Tilde_A: Optional[torch.FloatTensor]=None, idx: Optional[torch.LongTensor]=None, Feat: Optional[torch.FloatTensor]=None) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN.
@@ -433,28 +484,12 @@ class MTGNN(nn.Module):
 
         X = self._start_conv(X_in)
         X_skip = self._skip_conv_0(F.dropout(X_in, self._dropout, training=self.training))
-        for i in range(self._layers):
-            residual = X
-            X_filter = self._filter_convs[i](X)
-            X_filter = torch.tanh(X_filter)
-            X_gate = self._gate_convs[i](X)
-            X_gate = torch.sigmoid(X_gate)
-            X = X_filter * X_gate
-            X = F.dropout(X, self._dropout, training=self.training)
-            S = X
-            S = self._skip_convs[i](S)
-            X_skip = S + X_skip
-            if self._gcn_true:
-                X = self._mixprop_conv1[i](X, Tilde_A)+self._mixprop_conv2[i](X,
-                                                          Tilde_A.transpose(1, 0))
-            else:
-                X = self._residual_convs[i](X)
-
-            X = X + residual[:, :, :, -X.size(3):]
-            if idx is None:
-                X = self._normlization[i](X, self._idx)
-            else:
-                X = self._normlization[i](X, idx)
+        if idx is None:
+            for mtgnn in self._mtgnn_layers:
+                X, X_skip = mtgnn(X, X_skip, Tilde_A, self._idx.to(X_in.device), self.training)
+        else:
+            for mtgnn in self._mtgnn_layers:
+                X, X_skip = mtgnn(X, X_skip, Tilde_A, idx, self.training)
 
         X_skip = self._skip_conv_E(X) + X_skip
         X = F.relu(X_skip)
