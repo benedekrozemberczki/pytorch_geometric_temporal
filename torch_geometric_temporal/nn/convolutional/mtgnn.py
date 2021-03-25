@@ -281,6 +281,7 @@ class MTGNN(nn.Module):
         gcn_depth (int) : Graph convolution depth.
         num_nodes (int) : Number of nodes in the graph.
         kernel_set (list of int): List of kernel sizes.
+        kernel_size (int): Size of kernel for convolution, to calculate receptive field size.
         dropout (float, optional) : Droupout rate, default 0.3.
         subgraph_size (int, optional) : Size of subgraph, default 20.
         node_dim (int, optional) : Dimension of nodes, default 40.
@@ -321,7 +322,7 @@ class MTGNN(nn.Module):
             num_nodes, subgraph_size, node_dim, alpha=tanhalpha)
 
         self._seq_length = seq_length
-        kernel_size = 7
+        
         if dilation_exponential > 1:
             self._receptive_field = int(
                 1+(kernel_size-1)*(dilation_exponential**layers-1)/(dilation_exponential-1))
@@ -438,8 +439,7 @@ class MTGNN(nn.Module):
                 adp = Tilde_A
 
         X = self._start_conv(X_in)
-        skip = self._skip_conv_0(
-            F.dropout(X_in, self._dropout, training=self.training))
+        skip = self._skip_conv_0(F.dropout(X_in, self._dropout, training=self.training))
         for i in range(self._layers):
             residual = X
             filter = self._filter_convs[i](X)
