@@ -52,7 +52,6 @@ class MixProp(nn.Module):
 
     def __init__(self, c_in: int, c_out: int, gdep: int, dropout: float, alpha: float):
         super(MixProp, self).__init__()
-        self._nconv = Conv()
         self._mlp = Linear((gdep+1)*c_in, c_out)
         self._gdep = gdep
         self._dropout = dropout
