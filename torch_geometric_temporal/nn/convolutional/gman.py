@@ -59,14 +59,14 @@ class FullyConnected(nn.Module):
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        input_dims (int, list or tuple): Dimension(s) of input.
-        units (int, list or tuple): Dimension(s) of outputs in each 2D convolution block.
+        input_dims (int or list): Dimension(s) of input.
+        units (int or list): Dimension(s) of outputs in each 2D convolution block.
         activations (Callable or list): Activation function(s).
         bn_decay (float, optional): Batch normalization momentum, default is None.
         use_bias (bool, optional): Whether to use bias, default is True.
     """
 
-    def __init__(self, input_dims: Union[int, list, tuple], units: Union[int, list, tuple], 
+    def __init__(self, input_dims: Union[int, list], units: Union[int, list], 
                 activations: Union[Callable[[torch.FloatTensor], torch.FloatTensor], list],
                 bn_decay: float, use_bias: bool=True):
         super(FullyConnected, self).__init__()
@@ -74,10 +74,6 @@ class FullyConnected(nn.Module):
             units = [units]
             input_dims = [input_dims]
             activations = [activations]
-        elif isinstance(units, tuple):
-            units = list(units)
-            input_dims = list(input_dims)
-            activations = list(activations)
         assert type(units) == list
         self._conv2ds = nn.ModuleList([Conv2D(
             input_dims=input_dim, output_dims=num_unit, kernel_size=[1, 1],
