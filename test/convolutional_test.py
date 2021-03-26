@@ -287,6 +287,13 @@ def test_mtgnn():
                 skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True, xd=xd)
+    model3 = MTGNN(gcn_true=False, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
     trainx = torch.Tensor(x_all).to(device)
     trainx= trainx.transpose(1, 3)
     for j in range(num_split):
@@ -300,6 +307,9 @@ def test_mtgnn():
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
         output2 = model2(tx, A_tilde, idx=id, FE=FE)
         output2 = output2.transpose(1, 3)
+        assert output2.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output3 = model3(tx, A_tilde)
+        output3 = output3.transpose(1, 3)
         assert output2.shape == (batch_size, 1, num_nodes, seq_out_len)
 
 def test_gman():
