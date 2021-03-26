@@ -116,9 +116,16 @@ def test_astgcn():
     nb_chev_filter = 64
     nb_time_filter = 64
     batch_size = 32
+    normalization = None
+    bias = True
 
     x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count).to(device)
+    model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, 
+            len_input, node_count, normalization, bias).to(device)
+    model2 = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, 
+            len_input, node_count, 'sym', False).to(device)
+    model3 = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, 
+            len_input, node_count, 'rw', bias).to(device)
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
     target_seq = torch.zeros([batch_size,node_count,T]).to(device)
@@ -137,10 +144,14 @@ def test_astgcn():
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
     for batch_data in train_loader:
         encoder_inputs, _ = batch_data
-        outputs1 = model(encoder_inputs, edge_index_seq)
-        outputs2 = model(encoder_inputs, edge_index_seq[0])
+        outputs0 = model(encoder_inputs, edge_index_seq)
+        outputs1 = model(encoder_inputs, edge_index_seq[0])
+        outputs2 = model2(encoder_inputs, edge_index_seq)
+        outputs3 = model3(encoder_inputs, edge_index_seq[0])
+    assert outputs0.shape == (batch_size, node_count, num_for_predict)
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
+    assert outputs3.shape == (batch_size, node_count, num_for_predict)
 
 def test_mstgcn():
     """

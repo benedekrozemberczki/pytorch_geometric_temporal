@@ -294,6 +294,7 @@ class ASTGCNBlock(nn.Module):
         self._time_convolution = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self._residual_convolution = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self._layer_norm = nn.LayerNorm(nb_time_filter)
+        self._normalization = normalization
         
         self._reset_parameters()
 
@@ -324,7 +325,10 @@ class ASTGCNBlock(nn.Module):
 
         if not isinstance(edge_index, list):
             data = Data(edge_index=edge_index, edge_attr=None, num_nodes=num_of_vertices)
-            lambda_max = LaplacianLambdaMax()(data).lambda_max
+            if self._normalization != 'sym':
+                lambda_max = LaplacianLambdaMax()(data).lambda_max
+            else:
+                lambda_max = None
             X_hat = []
             for t in range(num_of_timesteps):
                 X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index, X_tilde, lambda_max=lambda_max), -1))
@@ -334,7 +338,10 @@ class ASTGCNBlock(nn.Module):
             X_hat = []
             for t in range(num_of_timesteps):
                 data = Data(edge_index=edge_index[t], edge_attr=None, num_nodes=num_of_vertices)
-                lambda_max = LaplacianLambdaMax()(data).lambda_max
+                if self._normalization != 'sym':
+                    lambda_max = LaplacianLambdaMax()(data).lambda_max
+                else:
+                    lambda_max = None
                 X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index[t], X_tilde, lambda_max=lambda_max), -1))
             X_hat = F.relu(torch.cat(X_hat, dim=-1))
 
