@@ -240,8 +240,8 @@ class LayerNormalization(nn.Module):
             self._weight = nn.Parameter(torch.Tensor(*normalized_shape))
             self._bias = nn.Parameter(torch.Tensor(*normalized_shape))
         else:
-            self.register_parameter('weight', None)
-            self.register_parameter('bias', None)
+            self.register_parameter('_weight', None)
+            self.register_parameter('_bias', None)
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -328,7 +328,7 @@ class MTGNNLayer(nn.Module):
         if seq_length > receptive_field:
             self._skip_conv = nn.Conv2d(in_channels=conv_channels,
                                                 out_channels=skip_channels,
-                                                kernel_size=(1, self._seq_length-rf_size_j+1))
+                                                kernel_size=(1, seq_length-rf_size_j+1))
         else:
             self._skip_conv = nn.Conv2d(in_channels=conv_channels,
                                                 out_channels=skip_channels,

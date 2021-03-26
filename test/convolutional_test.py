@@ -268,6 +268,27 @@ def test_mtgnn():
         output3 = output3.transpose(1, 3)
         assert output3.shape == (batch_size, 1, num_nodes, seq_out_len)
 
+    seq_in_len = 24
+    x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
+    model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
+    trainx = torch.Tensor(x_all).to(device)
+    trainx= trainx.transpose(1, 3)
+    for j in range(num_split):
+        if j != num_split-1:
+            id = perm[j * num_sub:(j + 1) * num_sub]
+        else:
+            id = perm[j * num_sub:]
+        tx = trainx[:, :, id, :]
+        output = model(tx, A_tilde, idx=id)
+        output = output.transpose(1, 3)
+        assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
+
 def test_gman():
     """
     Testing GMAN
