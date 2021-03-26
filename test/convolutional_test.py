@@ -250,7 +250,7 @@ def test_mtgnn():
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True, xd=xd)
     model4 = MTGNN(gcn_true=False, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
-                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                node_dim=node_dim, dilation_exponential=2,
                 conv_channels=conv_channels, residual_channels=residual_channels,
                 skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
@@ -280,7 +280,6 @@ def test_mtgnn():
 
     seq_in_len = 24
     seq_out_len = 5
-    build_adj = False
     x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
@@ -290,6 +289,7 @@ def test_mtgnn():
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
     dilation_exponential = 2
+    build_adj = False
     model2 = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim, dilation_exponential=dilation_exponential,

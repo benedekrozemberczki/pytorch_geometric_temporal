@@ -363,7 +363,7 @@ class MTGNNLayer(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, A_tilde: torch.FloatTensor, 
+    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, A_tilde: Optional[torch.FloatTensor], 
                 idx: torch.LongTensor, training: bool) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN layer.
@@ -373,7 +373,7 @@ class MTGNNLayer(nn.Module):
                 with shape (batch_size, in_dim, num_nodes, seq_len).
             * **X_skip** (PyTorch FloatTensor) - Input feature tensor for skip connection, 
                 with shape (batch_size, in_dim, num_nodes, seq_len).
-            * **A_tilde** (Pytorch FloatTensor) - Predefined adjacency matrix.
+            * **A_tilde** (Pytorch FloatTensor or None) - Predefined adjacency matrix.
             * **idx** (Pytorch LongTensor) - Input indices.
             * **training** (bool) - Whether in traning mode.
 
