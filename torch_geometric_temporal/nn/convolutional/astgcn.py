@@ -45,8 +45,8 @@ class ChebConvAttention(MessagePassing):
         **kwargs (optional): Additional arguments of
             :class:`torch_geometric.nn.conv.MessagePassing`.
     """
-    def __init__(self, in_channels: int, out_channels: int, K: int, normalization=None,
-                 bias=True, **kwargs):
+    def __init__(self, in_channels: int, out_channels: int, K: int, normalization: Optional[str]=None,
+                 bias: bool=True, **kwargs):
         kwargs.setdefault('aggr', 'add')
         super(ChebConvAttention, self).__init__(**kwargs)
 
@@ -244,7 +244,6 @@ class TemporalAttention(nn.Module):
         Return types:
             * **E** (PyTorch FloatTensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
         """
-        _, num_of_vertices, num_of_features, num_of_timesteps = X.shape
         LHS = torch.matmul(torch.matmul(X.permute(0, 3, 2, 1), self._U1), self._U2)
         RHS = torch.matmul(self._U3, X)
         E = torch.matmul(self._Ve, torch.sigmoid(torch.matmul(LHS, RHS) + self._be))
@@ -264,17 +263,37 @@ class ASTGCNBlock(nn.Module):
         time_strides (int): Time strides during temporal convolution.
         num_of_vertices (int): Number of vertices in the graph.
         num_of_timesteps (int): Number of time lags.
+        normalization (str, optional): The normalization scheme for the graph
+            Laplacian (default: :obj:`"sym"`):
+            1. :obj:`None`: No normalization
+            :math:`\mathbf{L} = \mathbf{D} - \mathbf{A}`
+            2. :obj:`"sym"`: Symmetric normalization
+            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1/2} \mathbf{A}
+            \mathbf{D}^{-1/2}`
+            3. :obj:`"rw"`: Random-walk normalization
+            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1} \mathbf{A}`
+            You need to pass :obj:`lambda_max` to the :meth:`forward` method of
+            this operator in case the normalization is non-symmetric.
+            :obj:`\lambda_max` should be a :class:`torch.Tensor` of size
+            :obj:`[num_graphs]` in a mini-batch scenario and a
+            scalar/zero-dimensional tensor when operating on single graphs.
+            You can pre-compute :obj:`lambda_max` via the
+            :class:`torch_geometric.transforms.LaplacianLambdaMax` transform.
+        bias (bool, optional): If set to :obj:`False`, the layer will not learn
+            an additive bias. (default: :obj:`True`)
     """
     def __init__(self, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int,
-                 time_strides: int, num_of_vertices: int, num_of_timesteps: int):
+                 time_strides: int, num_of_vertices: int, num_of_timesteps: int, 
+                 normalization: Optional[str]=None,bias: bool=True):
         super(ASTGCNBlock, self).__init__()
         
         self._temporal_attention = TemporalAttention(in_channels, num_of_vertices, num_of_timesteps)
         self._spatial_attention = SpatialAttention(in_channels, num_of_vertices, num_of_timesteps)
-        self._chebconv_attention = ChebConvAttention(in_channels, nb_chev_filter, K)
+        self._chebconv_attention = ChebConvAttention(in_channels, nb_chev_filter, K, normalization, bias)
         self._time_convolution = nn.Conv2d(nb_chev_filter, nb_time_filter, kernel_size=(1, 3), stride=(1, time_strides), padding=(0, 1))
         self._residual_convolution = nn.Conv2d(in_channels, nb_time_filter, kernel_size=(1, 1), stride=(1, time_strides))
         self._layer_norm = nn.LayerNorm(nb_time_filter)
+        self._normalization = normalization
         
         self._reset_parameters()
 
@@ -305,7 +324,10 @@ class ASTGCNBlock(nn.Module):
 
         if not isinstance(edge_index, list):
             data = Data(edge_index=edge_index, edge_attr=None, num_nodes=num_of_vertices)
-            lambda_max = LaplacianLambdaMax()(data).lambda_max
+            if self._normalization != 'sym':
+                lambda_max = LaplacianLambdaMax()(data).lambda_max
+            else:
+                lambda_max = None
             X_hat = []
             for t in range(num_of_timesteps):
                 X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index, X_tilde, lambda_max=lambda_max), -1))
@@ -315,7 +337,10 @@ class ASTGCNBlock(nn.Module):
             X_hat = []
             for t in range(num_of_timesteps):
                 data = Data(edge_index=edge_index[t], edge_attr=None, num_nodes=num_of_vertices)
-                lambda_max = LaplacianLambdaMax()(data).lambda_max
+                if self._normalization != 'sym':
+                    lambda_max = LaplacianLambdaMax()(data).lambda_max
+                else:
+                    lambda_max = None
                 X_hat.append(torch.unsqueeze(self._chebconv_attention(X[:,:,:,t], edge_index[t], X_tilde, lambda_max=lambda_max), -1))
             X_hat = F.relu(torch.cat(X_hat, dim=-1))
 
@@ -342,16 +367,36 @@ class ASTGCN(nn.Module):
         num_for_predict (int): Number of predictions to make in the future.
         len_input (int): Length of the input sequence.
         num_of_vertices (int): Number of vertices in the graph.
+        normalization (str, optional): The normalization scheme for the graph
+            Laplacian (default: :obj:`"sym"`):
+            1. :obj:`None`: No normalization
+            :math:`\mathbf{L} = \mathbf{D} - \mathbf{A}`
+            2. :obj:`"sym"`: Symmetric normalization
+            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1/2} \mathbf{A}
+            \mathbf{D}^{-1/2}`
+            3. :obj:`"rw"`: Random-walk normalization
+            :math:`\mathbf{L} = \mathbf{I} - \mathbf{D}^{-1} \mathbf{A}`
+            You need to pass :obj:`lambda_max` to the :meth:`forward` method of
+            this operator in case the normalization is non-symmetric.
+            :obj:`\lambda_max` should be a :class:`torch.Tensor` of size
+            :obj:`[num_graphs]` in a mini-batch scenario and a
+            scalar/zero-dimensional tensor when operating on single graphs.
+            You can pre-compute :obj:`lambda_max` via the
+            :class:`torch_geometric.transforms.LaplacianLambdaMax` transform.
+        bias (bool, optional): If set to :obj:`False`, the layer will not learn
+            an additive bias. (default: :obj:`True`)
     """
     def __init__(self, nb_block: int, in_channels: int, K: int, nb_chev_filter: int, nb_time_filter: int,
-                 time_strides: int, num_for_predict: int, len_input: int, num_of_vertices: int):
+                 time_strides: int, num_for_predict: int, len_input: int, num_of_vertices: int, 
+                 normalization: Optional[str]=None,bias: bool=True):
 
         super(ASTGCN, self).__init__()
 
-        self._blocklist = nn.ModuleList([ASTGCNBlock(in_channels, K, nb_chev_filter,
-                                        nb_time_filter, time_strides, num_of_vertices, len_input)])
+        self._blocklist = nn.ModuleList([ASTGCNBlock(in_channels, K, nb_chev_filter, nb_time_filter,
+                                         time_strides, num_of_vertices, len_input, normalization, bias)])
 
-        self._blocklist.extend([ASTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, num_of_vertices, len_input//time_strides) for _ in range(nb_block-1)])
+        self._blocklist.extend([ASTGCNBlock(nb_time_filter, K, nb_chev_filter, nb_time_filter, 1, 
+                        num_of_vertices, len_input//time_strides, normalization, bias) for _ in range(nb_block-1)])
 
         self._final_conv = nn.Conv2d(int(len_input/time_strides), num_for_predict, kernel_size=(1, nb_time_filter))
 

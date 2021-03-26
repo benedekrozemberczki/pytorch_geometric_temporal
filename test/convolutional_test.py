@@ -4,7 +4,7 @@ import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.utils import barabasi_albert_graph
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN
+from torch_geometric_temporal.nn.convolutional import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention
 from torch_geometric_temporal.nn.convolutional import GMAN, SpatioTemporalAttention, SpatioTemporalEmbedding
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
@@ -99,8 +99,24 @@ def test_stconv():
 
 def test_astgcn():
     """
-    Testing ASTGCN block with changing edge index over time or not
+    Testing ASTGCN block and its component ChebConvAttention with changing edge index over time or not
     """
+    in_channels, out_channels = (16, 32)
+    batch_size = 3
+    edge_index = torch.tensor([[0, 0, 0, 1, 2, 3], [1, 2, 3, 0, 0, 0]])
+    num_nodes = edge_index.max().item() + 1
+    edge_weight = torch.rand(edge_index.size(1))
+    x = torch.randn((batch_size, num_nodes, in_channels))
+    attention = torch.nn.functional.softmax(torch.rand((batch_size, num_nodes, num_nodes)), dim=1)
+
+    conv = ChebConvAttention(in_channels, out_channels, K=3, normalization='sym')
+    out1 = conv(x, edge_index, attention)
+    assert out1.size() == (batch_size, num_nodes, out_channels)
+    out2 = conv(x, edge_index, attention, edge_weight)
+    assert out2.size() == (batch_size, num_nodes, out_channels)
+    out3 = conv(x, edge_index, attention, edge_weight, lambda_max=3.0)
+    assert out3.size() == (batch_size, num_nodes, out_channels)
+
     node_count = 307
     num_classes = 10
     edge_per_node = 15
@@ -116,9 +132,15 @@ def test_astgcn():
     nb_chev_filter = 64
     nb_time_filter = 64
     batch_size = 32
+    normalization = None
+    bias = True
 
-    x, edge_index = create_mock_data(node_count, edge_per_node, node_features)
-    model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, len_input, node_count).to(device)
+    model = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, 
+            len_input, node_count, normalization, bias).to(device)
+    model2 = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, 
+            len_input, node_count, 'sym', False).to(device)
+    model3 = ASTGCN(nb_block, node_features, K, nb_chev_filter, nb_time_filter, nb_time_strides, num_for_predict, 
+            len_input, node_count, 'rw', bias).to(device)
     T = len_input
     x_seq = torch.zeros([batch_size,node_count, node_features,T]).to(device)
     target_seq = torch.zeros([batch_size,node_count,T]).to(device)
@@ -137,10 +159,14 @@ def test_astgcn():
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
     for batch_data in train_loader:
         encoder_inputs, _ = batch_data
-        outputs1 = model(encoder_inputs, edge_index_seq)
-        outputs2 = model(encoder_inputs, edge_index_seq[0])
+        outputs0 = model(encoder_inputs, edge_index_seq)
+        outputs1 = model(encoder_inputs, edge_index_seq[0])
+        outputs2 = model2(encoder_inputs, edge_index_seq)
+        outputs3 = model3(encoder_inputs, edge_index_seq[0])
+    assert outputs0.shape == (batch_size, node_count, num_for_predict)
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
+    assert outputs3.shape == (batch_size, node_count, num_for_predict)
 
 def test_mstgcn():
     """
