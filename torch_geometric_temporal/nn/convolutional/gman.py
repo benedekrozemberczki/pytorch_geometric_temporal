@@ -16,22 +16,17 @@ class Conv2D(nn.Module):
         output_dims (int): Dimension of output.
         kernel_size (tuple or list): Size of the convolution kernel.
         stride (tuple or list, optional): Convolution strides, default (1,1).
-        padding (str, optional): Whether to use the same padding size as kernel size, default 'SAME', otherwise padding size is [0,0].
         use_bias (bool, optional): Whether to use bias, default is True.
         activation (Callable, optional): Activation function, default is torch.nn.functional.relu.
         bn_decay (float, optional): Batch normalization momentum, default is None.
     """
 
     def __init__(self, input_dims: int, output_dims: int, kernel_size: Union[tuple, list], 
-                stride: Union[tuple, list]=(1, 1), padding: str='SAME', use_bias: bool=True, 
-                activation: Callable[[torch.FloatTensor], torch.FloatTensor]=F.relu,
+                stride: Union[tuple, list]=(1, 1), use_bias: bool=True, 
+                activation: Optional[Callable[[torch.FloatTensor], torch.FloatTensor]]=F.relu,
                 bn_decay: Optional[float]=None):
         super(Conv2D, self).__init__()
         self._activation = activation
-        if padding == 'SAME':
-            self._padding_size = math.ceil(kernel_size)
-        else:
-            self._padding_size = [0, 0]
         self._conv2d = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
                                padding=0, bias=use_bias)
         self._batch_norm = nn.BatchNorm2d(output_dims, momentum=bn_decay)
@@ -51,12 +46,10 @@ class Conv2D(nn.Module):
             * **X** (PyTorch Float Tensor) - Output tensor, with shape (batch_size, num_his, num_nodes, output_dims).
         """
         X = X.permute(0, 3, 2, 1)
-        X = F.pad(X, ([self._padding_size[1], self._padding_size[1],
-                       self._padding_size[0], self._padding_size[0]]))
         X = self._conv2d(X)
         X = self._batch_norm(X)
         if self._activation is not None:
-            X = F.relu_(X)
+            X = self._activation(X)
         return X.permute(0, 3, 2, 1)
 
 
@@ -66,14 +59,14 @@ class FullyConnected(nn.Module):
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
-        input_dims (int, list or tuple): Dimension(s) of input.
-        units (int, list or tuple): Dimension(s) of outputs in each 2D convolution block.
+        input_dims (int or list): Dimension(s) of input.
+        units (int or list): Dimension(s) of outputs in each 2D convolution block.
         activations (Callable or list): Activation function(s).
         bn_decay (float, optional): Batch normalization momentum, default is None.
         use_bias (bool, optional): Whether to use bias, default is True.
     """
 
-    def __init__(self, input_dims: Union[int, list, tuple], units: Union[int, list, tuple], 
+    def __init__(self, input_dims: Union[int, list], units: Union[int, list], 
                 activations: Union[Callable[[torch.FloatTensor], torch.FloatTensor], list],
                 bn_decay: float, use_bias: bool=True):
         super(FullyConnected, self).__init__()
@@ -81,14 +74,10 @@ class FullyConnected(nn.Module):
             units = [units]
             input_dims = [input_dims]
             activations = [activations]
-        elif isinstance(units, tuple):
-            units = list(units)
-            input_dims = list(input_dims)
-            activations = list(activations)
         assert type(units) == list
         self._conv2ds = nn.ModuleList([Conv2D(
-            input_dims=input_dim, output_dims=num_unit, kernel_size=[1, 1], stride=[1, 1],
-            padding='VALID', use_bias=use_bias, activation=activation,
+            input_dims=input_dim, output_dims=num_unit, kernel_size=[1, 1],
+            stride=[1, 1], use_bias=use_bias, activation=activation,
             bn_decay=bn_decay) for input_dim, num_unit, activation in
             zip(input_dims, units, activations)])
 
@@ -116,17 +105,18 @@ class SpatioTemporalEmbedding(nn.Module):
         D (int) : Dimension of output.
         bn_decay (float): Batch normalization momentum.
         steps_per_day (int): Steps to take for a day.
+        use_bias (bool, optional): Whether to use bias in Fully Connected layers, default is True.
     """
 
-    def __init__(self, D: int, bn_decay: float, steps_per_day: int):
+    def __init__(self, D: int, bn_decay: float, steps_per_day: int, use_bias: bool=True):
         super(SpatioTemporalEmbedding, self).__init__()
         self._fully_connected_se = FullyConnected(
             input_dims=[D, D], units=[D, D], activations=[F.relu, None],
-            bn_decay=bn_decay)
+            bn_decay=bn_decay, use_bias=use_bias)
 
         self._fully_connected_te = FullyConnected(
             input_dims=[steps_per_day+7, D], units=[D, D], activations=[F.relu, None],
-            bn_decay=bn_decay)
+            bn_decay=bn_decay, use_bias=use_bias)
 
     def forward(self, SE: torch.FloatTensor, TE: torch.FloatTensor, T: int) -> torch.FloatTensor:
         """
@@ -218,10 +208,10 @@ class TemporalAttention(nn.Module):
         K (int) : Number of attention heads.
         d (int) : Dimension of each attention head outputs.
         bn_decay (float): Batch normalization momentum.
-        mask (bool, optional): Whether to mask attention score.
+        mask (bool): Whether to mask attention score.
     """
 
-    def __init__(self, K: int, d: int, bn_decay: float, mask: bool=True):
+    def __init__(self, K: int, d: int, bn_decay: float, mask: bool):
         super(TemporalAttention, self).__init__()
         D = K * d
         self._d = d
@@ -269,7 +259,8 @@ class TemporalAttention(nn.Module):
             mask = torch.unsqueeze(torch.unsqueeze(mask, dim=0), dim=0)
             mask = mask.repeat(self._K * batch_size, num_nodes, 1, 1)
             mask = mask.to(torch.bool)
-            attention = torch.where(mask, attention, -2 ** 15 + 1)
+            condition = torch.FloatTensor([-2 ** 15 + 1])
+            attention = torch.where(mask, attention, condition)
         attention = F.softmax(attention, dim=-1)
         X = torch.matmul(attention, value)
         X = X.permute(0, 2, 1, 3)
@@ -327,10 +318,10 @@ class SpatioTemporalAttention(nn.Module):
         K (int) : Number of attention heads.
         d (int) : Dimension of each attention head outputs.
         bn_decay (float): Batch normalization momentum.
-        mask (bool, optional): Whether to mask attention score in temporal attention.
+        mask (bool): Whether to mask attention score in temporal attention.
     """
 
-    def __init__(self, K: int, d: int, bn_decay: float, mask: bool=False):
+    def __init__(self, K: int, d: int, bn_decay: float, mask: bool):
         super(SpatioTemporalAttention, self).__init__()
         self._spatial_attention = SpatialAttention(K, d, bn_decay)
         self._temporal_attention = TemporalAttention(K, d, bn_decay, mask=mask)
@@ -427,18 +418,20 @@ class GMAN(nn.Module):
         num_his (int): Number of history steps.
         bn_decay (float): Batch normalization momentum.
         steps_per_day (int): Number of steps in a day.
+        use_bias (bool): Whether to use bias in Fully Connected layers.
+        mask (bool): Whether to mask attention score in temporal attention.
     """
 
-    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float, steps_per_day: int):
+    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float, steps_per_day: int, use_bias: bool, mask: bool):
         super(GMAN, self).__init__()
         D = K * d
         self._num_his = num_his
         self._steps_per_day = steps_per_day
-        self._st_embedding = SpatioTemporalEmbedding(D, bn_decay, steps_per_day)
+        self._st_embedding = SpatioTemporalEmbedding(D, bn_decay, steps_per_day, use_bias)
         self._st_att_block1 = nn.ModuleList(
-            [SpatioTemporalAttention(K, d, bn_decay) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)])
         self._st_att_block2 = nn.ModuleList(
-            [SpatioTemporalAttention(K, d, bn_decay) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)])
         self._transform_attention = TransformAttention(K, d, bn_decay)
         self._fully_connected_1 = FullyConnected(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
                                                  bn_decay=bn_decay)

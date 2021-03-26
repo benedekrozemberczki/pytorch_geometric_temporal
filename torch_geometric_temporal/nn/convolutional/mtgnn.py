@@ -240,8 +240,8 @@ class LayerNormalization(nn.Module):
             self._weight = nn.Parameter(torch.Tensor(*normalized_shape))
             self._bias = nn.Parameter(torch.Tensor(*normalized_shape))
         else:
-            self.register_parameter('weight', None)
-            self.register_parameter('bias', None)
+            self.register_parameter('_weight', None)
+            self.register_parameter('_bias', None)
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -328,7 +328,7 @@ class MTGNNLayer(nn.Module):
         if seq_length > receptive_field:
             self._skip_conv = nn.Conv2d(in_channels=conv_channels,
                                                 out_channels=skip_channels,
-                                                kernel_size=(1, self._seq_length-rf_size_j+1))
+                                                kernel_size=(1, seq_length-rf_size_j+1))
         else:
             self._skip_conv = nn.Conv2d(in_channels=conv_channels,
                                                 out_channels=skip_channels,
@@ -363,7 +363,7 @@ class MTGNNLayer(nn.Module):
             else:
                 nn.init.uniform_(p)
 
-    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, A_tilde: torch.FloatTensor, 
+    def forward(self, X: torch.FloatTensor, X_skip: torch.FloatTensor, A_tilde: Optional[torch.FloatTensor], 
                 idx: torch.LongTensor, training: bool) -> torch.FloatTensor:
         """
         Making a forward pass of MTGNN layer.
@@ -373,7 +373,7 @@ class MTGNNLayer(nn.Module):
                 with shape (batch_size, in_dim, num_nodes, seq_len).
             * **X_skip** (PyTorch FloatTensor) - Input feature tensor for skip connection, 
                 with shape (batch_size, in_dim, num_nodes, seq_len).
-            * **A_tilde** (Pytorch FloatTensor) - Predefined adjacency matrix.
+            * **A_tilde** (Pytorch FloatTensor or None) - Predefined adjacency matrix.
             * **idx** (Pytorch LongTensor) - Input indices.
             * **training** (bool) - Whether in traning mode.
 
@@ -428,13 +428,14 @@ class MTGNN(nn.Module):
         propalpha (float): Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1.
         tanhalpha (float): Tanh alpha for generating adjacency matrix, alpha controls the saturation rate.
         layer_norm_affline (bool): Whether to do elementwise affine in Layer Normalization.
+        xd (int, optional): Static feature dimension, default None.
     """
 
     def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,
                  kernel_set: list, kernel_size: int, dropout: float, subgraph_size: int,
                  node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
                  skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int,
-                 layers: int, propalpha: float, tanhalpha: float, layer_norm_affline: bool):
+                 layers: int, propalpha: float, tanhalpha: float, layer_norm_affline: bool, xd: Optional[int]=None):
         super(MTGNN, self).__init__()
         
         self._gcn_true = gcn_true
@@ -450,7 +451,8 @@ class MTGNN(nn.Module):
         self._graph_constructor = GraphConstructor(num_nodes,
                                                    subgraph_size,
                                                    node_dim,
-                                                   alpha=tanhalpha)
+                                                   alpha=tanhalpha,
+                                                   xd=xd)
         
         self._set_receptive_field(dilation_exponential, kernel_size, layers)
 

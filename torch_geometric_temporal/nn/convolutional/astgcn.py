@@ -53,21 +53,22 @@ class ChebConvAttention(MessagePassing):
         assert K > 0
         assert normalization in [None, 'sym', 'rw'], 'Invalid normalization'
 
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.normalization = normalization
-        self.weight = Parameter(torch.Tensor(K, in_channels, out_channels))
+        self._in_channels = in_channels
+        self._out_channels = out_channels
+        self._normalization = normalization
+        self._weight = Parameter(torch.Tensor(K, in_channels, out_channels))
 
         if bias:
-            self.bias = Parameter(torch.Tensor(out_channels))
+            self._bias = Parameter(torch.Tensor(out_channels))
         else:
-            self.register_parameter('bias', None)
+            self.register_parameter('_bias', None)
 
         self._reset_parameters()
 
     def _reset_parameters(self):
-        nn.init.xavier_uniform_(self.weight)
-        nn.init.uniform_(self.bias)
+        nn.init.xavier_uniform_(self._weight)
+        if self._bias is not None:
+            nn.init.uniform_(self._bias)
 
     def __norm__(self, edge_index, num_nodes: Optional[int],
                  edge_weight: OptTensor, normalization: Optional[str],
@@ -110,7 +111,7 @@ class ChebConvAttention(MessagePassing):
         Return types:
             * out (PyTorch Float Tensor) - Hidden state tensor for all nodes, with shape (B, N_nodes, F_out).
         """
-        if self.normalization != 'sym' and lambda_max is None:
+        if self._normalization != 'sym' and lambda_max is None:
             raise ValueError('You need to pass `lambda_max` to `forward() in`'
                              'case the normalization is non-symmetric.')
 
@@ -122,27 +123,27 @@ class ChebConvAttention(MessagePassing):
         assert lambda_max is not None
 
         edge_index, norm = self.__norm__(edge_index, x.size(self.node_dim),
-                                         edge_weight, self.normalization,
+                                         edge_weight, self._normalization,
                                          lambda_max, dtype=x.dtype,
                                          batch=batch)
         row, col = edge_index
         Att_norm = norm * spatial_attention[:,row,col]
         num_nodes = x.size(self.node_dim)
         TAx_0 = torch.matmul((torch.eye(num_nodes)*spatial_attention).permute(0,2,1),x)
-        out = torch.matmul(TAx_0, self.weight[0])
+        out = torch.matmul(TAx_0, self._weight[0])
         edge_index_transpose = edge_index[[1,0]]
-        if self.weight.size(0) > 1:
+        if self._weight.size(0) > 1:
             TAx_1 = self.propagate(edge_index_transpose, x=TAx_0, norm=Att_norm, size=None)
-            out = out + torch.matmul(TAx_1, self.weight[1])
+            out = out + torch.matmul(TAx_1, self._weight[1])
 
-        for k in range(2, self.weight.size(0)):
+        for k in range(2, self._weight.size(0)):
             TAx_2 = self.propagate(edge_index_transpose, x=TAx_1, norm=norm, size=None)
             TAx_2 = 2. * TAx_2 - TAx_0
-            out = out + torch.matmul(TAx_2, self.weight[k])
+            out = out + torch.matmul(TAx_2, self._weight[k])
             TAx_0, TAx_1 = TAx_1, TAx_2
 
-        if self.bias is not None:
-            out += self.bias
+        if self._bias is not None:
+            out += self._bias
 
         return out
 
@@ -155,8 +156,8 @@ class ChebConvAttention(MessagePassing):
 
     def __repr__(self):
         return '{}({}, {}, K={}, normalization={})'.format(
-            self.__class__.__name__, self.in_channels, self.out_channels,
-            self.weight.size(0), self.normalization)
+            self.__class__.__name__, self._in_channels, self._out_channels,
+            self._weight.size(0), self._normalization)
 
 
 class SpatialAttention(nn.Module):

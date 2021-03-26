@@ -192,6 +192,36 @@ def test_mstgcn():
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
 
+def test_gman():
+    """
+    Testing GMAN
+    """
+    L = 1
+    K = 8
+    d = 8
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    num_his = 12
+    num_pred = 10
+    num_nodes = 50
+    num_sample = 100
+    batch_size = 32
+    bn_decay = 0.1
+    steps_per_day = 288
+    use_bias = True
+    mask = False
+    trainX = torch.rand(num_sample,num_his, num_nodes)
+    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
+    trainTE = 2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1
+    model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias, mask=mask).to(device)
+    model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False, mask=True).to(device)
+
+    X = trainX[:batch_size].to(device)
+    TE = trainTE[:batch_size].to(device)
+    pred = model(X, SE, TE)
+    assert pred.shape == (batch_size, num_pred, num_nodes)
+    pred = model2(X, SE, TE)
+    assert pred.shape == (batch_size, num_pred, num_nodes)
+
 def test_mtgnn():
     """
     Testing MTGNN block
@@ -221,7 +251,8 @@ def test_mtgnn():
     kernel_set = [2, 3, 6, 7]
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    Tilde_A = barabasi_albert_graph(num_nodes, num_edges).to(device)
+    edge_index = barabasi_albert_graph(num_nodes, num_edges).to(device)
+    A_tilde = torch.sparse_coo_tensor(edge_index, torch.ones(edge_index.size(1)), (num_nodes, num_nodes)).to_dense()
     x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
@@ -230,6 +261,30 @@ def test_mtgnn():
                 skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
+    xd = 8
+    FE = torch.rand(num_nodes, xd)
+    model2 = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True, xd=xd)
+
+    model3 = MTGNN(gcn_true=gcn_true, build_adj=False, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True, xd=xd)
+    model4 = MTGNN(gcn_true=False, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=2,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
     trainx = torch.Tensor(x_all).to(device)
     trainx= trainx.transpose(1, 3)
     perm = torch.randperm(num_nodes).to(device)
@@ -240,32 +295,60 @@ def test_mtgnn():
         else:
             id = perm[j * num_sub:]
         tx = trainx[:, :, id, :]
-        output = model(tx, Tilde_A, idx=id)
+        output = model(tx, A_tilde, idx=id)
         output = output.transpose(1, 3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output2 = model2(tx, A_tilde, idx=id, FE=FE)
+        output2 = output2.transpose(1, 3)
+        assert output2.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output3 = model3(tx, A_tilde, FE=FE)
+        output3 = output3.transpose(1, 3)
+        assert output3.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output4 = model4(tx, A_tilde)
+        output4 = output4.transpose(1, 3)
+        assert output4.shape == (batch_size, 1, num_nodes, seq_out_len)
 
-def test_gman():
-    """
-    Testing GMAN
-    """
-    L = 1
-    K = 8
-    d = 8
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    num_his = 12
-    num_pred = 10
-    num_nodes = 50
-    num_sample = 100
-    batch_size = 32
-    bn_decay = 0.1
-    steps_per_day = 288
-    trainX = torch.rand(num_sample,num_his, num_nodes)
-    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
-    trainTE = 2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1
-    model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day).to(device)
-
-    X = trainX[:batch_size].to(device)
-    TE = trainTE[:batch_size].to(device)
-    pred = model(X, SE, TE)
-    assert pred.shape == (batch_size, num_pred, num_nodes)
+    seq_in_len = 24
+    seq_out_len = 5
+    x_all = 2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1
+    model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
+    dilation_exponential = 2
+    build_adj = False
+    model2 = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True, xd=xd)
+    model3 = MTGNN(gcn_true=False, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
+    trainx = torch.Tensor(x_all).to(device)
+    trainx= trainx.transpose(1, 3)
+    for j in range(num_split):
+        if j != num_split-1:
+            id = perm[j * num_sub:(j + 1) * num_sub]
+        else:
+            id = perm[j * num_sub:]
+        tx = trainx[:, :, id, :]
+        output = model(tx, A_tilde, idx=id)
+        output = output.transpose(1, 3)
+        assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output2 = model2(tx, A_tilde, idx=id, FE=FE)
+        output2 = output2.transpose(1, 3)
+        assert output2.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output3 = model3(tx, A_tilde)
+        output3 = output3.transpose(1, 3)
+        assert output3.shape == (batch_size, 1, num_nodes, seq_out_len)
 
