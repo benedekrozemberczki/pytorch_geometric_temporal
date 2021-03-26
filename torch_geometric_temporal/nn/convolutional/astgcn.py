@@ -244,7 +244,6 @@ class TemporalAttention(nn.Module):
         Return types:
             * **E** (PyTorch FloatTensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
         """
-        _, num_of_vertices, num_of_features, num_of_timesteps = X.shape
         LHS = torch.matmul(torch.matmul(X.permute(0, 3, 2, 1), self._U1), self._U2)
         RHS = torch.matmul(self._U3, X)
         E = torch.matmul(self._Ve, torch.sigmoid(torch.matmul(LHS, RHS) + self._be))
