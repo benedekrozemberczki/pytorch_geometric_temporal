@@ -212,10 +212,10 @@ class TemporalAttention(nn.Module):
         K (int) : Number of attention heads.
         d (int) : Dimension of each attention head outputs.
         bn_decay (float): Batch normalization momentum.
-        mask (bool, optional): Whether to mask attention score.
+        mask (bool): Whether to mask attention score.
     """
 
-    def __init__(self, K: int, d: int, bn_decay: float, mask: bool=True):
+    def __init__(self, K: int, d: int, bn_decay: float, mask: bool):
         super(TemporalAttention, self).__init__()
         D = K * d
         self._d = d
@@ -321,10 +321,10 @@ class SpatioTemporalAttention(nn.Module):
         K (int) : Number of attention heads.
         d (int) : Dimension of each attention head outputs.
         bn_decay (float): Batch normalization momentum.
-        mask (bool, optional): Whether to mask attention score in temporal attention.
+        mask (bool): Whether to mask attention score in temporal attention.
     """
 
-    def __init__(self, K: int, d: int, bn_decay: float, mask: bool=False):
+    def __init__(self, K: int, d: int, bn_decay: float, mask: bool):
         super(SpatioTemporalAttention, self).__init__()
         self._spatial_attention = SpatialAttention(K, d, bn_decay)
         self._temporal_attention = TemporalAttention(K, d, bn_decay, mask=mask)
@@ -421,20 +421,20 @@ class GMAN(nn.Module):
         num_his (int): Number of history steps.
         bn_decay (float): Batch normalization momentum.
         steps_per_day (int): Number of steps in a day.
-        use_bias (bool, optional): Whether to use bias in Fully Connected layers, default is True.
-
+        use_bias (bool): Whether to use bias in Fully Connected layers.
+        mask (bool): Whether to mask attention score in temporal attention.
     """
 
-    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float, steps_per_day: int, use_bias: bool):
+    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float, steps_per_day: int, use_bias: bool, mask: bool):
         super(GMAN, self).__init__()
         D = K * d
         self._num_his = num_his
         self._steps_per_day = steps_per_day
         self._st_embedding = SpatioTemporalEmbedding(D, bn_decay, steps_per_day, use_bias)
         self._st_att_block1 = nn.ModuleList(
-            [SpatioTemporalAttention(K, d, bn_decay) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)])
         self._st_att_block2 = nn.ModuleList(
-            [SpatioTemporalAttention(K, d, bn_decay) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)])
         self._transform_attention = TransformAttention(K, d, bn_decay)
         self._fully_connected_1 = FullyConnected(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
                                                  bn_decay=bn_decay)

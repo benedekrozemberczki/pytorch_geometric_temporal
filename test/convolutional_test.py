@@ -338,11 +338,12 @@ def test_gman():
     bn_decay = 0.1
     steps_per_day = 288
     use_bias = True
+    mask = False
     trainX = torch.rand(num_sample,num_his, num_nodes)
     SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
     trainTE = 2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1
-    model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias).to(device)
-    model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False).to(device)
+    model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias, mask=mask).to(device)
+    model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False, mask=False).to(device)
 
     X = trainX[:batch_size].to(device)
     TE = trainTE[:batch_size].to(device)
