@@ -192,6 +192,36 @@ def test_mstgcn():
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
 
+def test_gman():
+    """
+    Testing GMAN
+    """
+    L = 1
+    K = 8
+    d = 8
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    num_his = 12
+    num_pred = 10
+    num_nodes = 50
+    num_sample = 100
+    batch_size = 32
+    bn_decay = 0.1
+    steps_per_day = 288
+    use_bias = True
+    mask = False
+    trainX = torch.rand(num_sample,num_his, num_nodes)
+    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
+    trainTE = 2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1
+    model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias, mask=mask).to(device)
+    model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False, mask=True).to(device)
+
+    X = trainX[:batch_size].to(device)
+    TE = trainTE[:batch_size].to(device)
+    pred = model(X, SE, TE)
+    assert pred.shape == (batch_size, num_pred, num_nodes)
+    pred = model2(X, SE, TE)
+    assert pred.shape == (batch_size, num_pred, num_nodes)
+
 def test_mtgnn():
     """
     Testing MTGNN block
@@ -321,34 +351,4 @@ def test_mtgnn():
         output3 = model3(tx, A_tilde)
         output3 = output3.transpose(1, 3)
         assert output3.shape == (batch_size, 1, num_nodes, seq_out_len)
-
-def test_gman():
-    """
-    Testing GMAN
-    """
-    L = 1
-    K = 8
-    d = 8
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    num_his = 12
-    num_pred = 10
-    num_nodes = 50
-    num_sample = 100
-    batch_size = 32
-    bn_decay = 0.1
-    steps_per_day = 288
-    use_bias = True
-    mask = False
-    trainX = torch.rand(num_sample,num_his, num_nodes)
-    SE, _ = create_mock_data(number_of_nodes=num_nodes, edge_per_node=8, in_channels=64)
-    trainTE = 2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1
-    model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias, mask=mask).to(device)
-    model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False, mask=False).to(device)
-
-    X = trainX[:batch_size].to(device)
-    TE = trainTE[:batch_size].to(device)
-    pred = model(X, SE, TE)
-    assert pred.shape == (batch_size, num_pred, num_nodes)
-    pred = model2(X, SE, TE)
-    assert pred.shape == (batch_size, num_pred, num_nodes)
 
