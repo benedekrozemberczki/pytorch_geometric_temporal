@@ -230,6 +230,15 @@ def test_mtgnn():
                 skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True)
+    xd = 8
+    FE = torch.rand(num_nodes, xd)
+    model_with_feat = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
+                kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
+                node_dim=node_dim, dilation_exponential=dilation_exponential,
+                conv_channels=conv_channels, residual_channels=residual_channels,
+                skip_channels=skip_channels, end_channels=end_channels,
+                seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=True, xd=xd)
     trainx = torch.Tensor(x_all).to(device)
     trainx= trainx.transpose(1, 3)
     perm = torch.randperm(num_nodes).to(device)
@@ -243,6 +252,9 @@ def test_mtgnn():
         output = model(tx, Tilde_A, idx=id)
         output = output.transpose(1, 3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
+        output_with_feat = model_with_feat(tx, Tilde_A, idx=id, FE=FE)
+        output_with_feat = output_with_feat.transpose(1, 3)
+        assert output_with_feat.shape == (batch_size, 1, num_nodes, seq_out_len)
 
 def test_gman():
     """

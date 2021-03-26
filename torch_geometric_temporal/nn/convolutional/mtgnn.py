@@ -428,13 +428,14 @@ class MTGNN(nn.Module):
         propalpha (float): Prop alpha, ratio of retaining the root nodes's original states in mix-hop propagation, a value between 0 and 1.
         tanhalpha (float): Tanh alpha for generating adjacency matrix, alpha controls the saturation rate.
         layer_norm_affline (bool): Whether to do elementwise affine in Layer Normalization.
+        xd (int, optional): Static feature dimension, default None.
     """
 
     def __init__(self, gcn_true: bool, build_adj: bool, gcn_depth: int, num_nodes: int,
                  kernel_set: list, kernel_size: int, dropout: float, subgraph_size: int,
                  node_dim: int, dilation_exponential: int, conv_channels: int, residual_channels: int, 
                  skip_channels: int, end_channels: int, seq_length: int, in_dim: int, out_dim: int,
-                 layers: int, propalpha: float, tanhalpha: float, layer_norm_affline: bool):
+                 layers: int, propalpha: float, tanhalpha: float, layer_norm_affline: bool, xd: Optional[int]=None):
         super(MTGNN, self).__init__()
         
         self._gcn_true = gcn_true
@@ -450,7 +451,8 @@ class MTGNN(nn.Module):
         self._graph_constructor = GraphConstructor(num_nodes,
                                                    subgraph_size,
                                                    node_dim,
-                                                   alpha=tanhalpha)
+                                                   alpha=tanhalpha,
+                                                   xd=xd)
         
         self._set_receptive_field(dilation_exponential, kernel_size, layers)
 
