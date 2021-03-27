@@ -3,17 +3,6 @@ import torch
 from torch_geometric.utils import to_dense_adj
 from torch_geometric.nn.conv import MessagePassing
 
-
-def glorot(tensor):
-    if tensor is not None:
-        stdv = math.sqrt(6.0 / (tensor.size(-2) + tensor.size(-1)))
-        tensor.data.uniform_(-stdv, stdv)
-
-def zeros(tensor):
-    if tensor is not None:
-        tensor.data.fill_(0)
-
-# Diffusion Convolution Layer
 class DConv(MessagePassing):
     r"""An implementation of the Diffusion Convolution Layer. 
     For details see: `"Diffusion Convolutional Recurrent Neural Network:
@@ -24,7 +13,7 @@ class DConv(MessagePassing):
         out_channels (int): Number of output features.
         K (int): Filter size :math:`K`.
         bias (bool, optional): If set to :obj:`False`, the layer 
-            will not learn an additive bias (default :obj:`True`)
+            will not learn an additive bias (default :obj:`True`).
 
     """
 
@@ -40,48 +29,11 @@ class DConv(MessagePassing):
         else:
             self.register_parameter('bias', None)
 
-        self.reset_parameters()
+        self.__reset_parameters()
 
-    def reset_parameters(self):
-        glorot(self.weight)
-        zeros(self.bias)
-
-    def forward(self, x, edge_index, edge_weight):
-        adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
-        adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
-        deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)))
-        deg_out = deg_out.flatten()
-        deg_in = torch.matmul(torch.ones(size=(1, adj_mat.size(0))), adj_mat)
-        deg_in = deg_in.flatten()
-
-        deg_out_inv = torch.reciprocal(deg_out)
-        deg_in_inv = torch.reciprocal(deg_in)
-        row, col = edge_index
-        norm_out = deg_out_inv[row]
-        norm_in = deg_in_inv[row] # row for W^T
-
-        Tx_0 = x
-        Tx_1 = x
-        out = torch.matmul(Tx_0, (self.weight[0])[0]) + torch.matmul(Tx_0, (self.weight[1])[0]) 
-
-        # propagate_type
-        if self.weight.size(1) > 1:
-            Tx_1_o = self.propagate(edge_index, x=x, norm=norm_out, size=None)
-            Tx_1_i = self.propagate(edge_index, x=x, norm=norm_in, size=None)
-            out = out + torch.matmul(Tx_1_o, (self.weight[0])[1]) + torch.matmul(Tx_1_i, (self.weight[1])[1])
-
-        for k in range(2, self.weight.size(1)):
-            Tx_2_o = self.propagate(edge_index, x=Tx_1_o, norm=norm_out, size=None)
-            Tx_2_o = 2. * Tx_2_o - Tx_0
-            Tx_2_i = self.propagate(edge_index, x=Tx_1_i, norm=norm_in, size=None) 
-            Tx_2_i = 2. * Tx_2_i - Tx_0
-            out = out + torch.matmul(Tx_2_o, (self.weight[0])[k]) + torch.matmul(Tx_2_i, (self.weight[1])[k])
-            Tx_0, Tx_1_o, Tx_1_i = Tx_1, Tx_2_o, Tx_2_i
-
-        if self.bias is not None:
-            out += self.bias
-
-        return out
+    def __reset_parameters(self):
+        torch.nn.init.xavier_uniform_(self.weight)
+        torch.nn.init.zeros_(self.bias)
 
     def message(self, x_j, norm):
         return norm.view(-1, 1) * x_j
@@ -89,6 +41,54 @@ class DConv(MessagePassing):
     def __repr__(self):
         return '{}({}, {}, K={})'.format(self.__class__.__name__,
             self.in_channels, self.out_channels, self.weight.size(0))
+
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
+                edge_weight: torch.FloatTensor) -> torch.FloatTensor:
+        r"""Making a forward pass. If edge weights are not present the forward pass
+        defaults to an unweighted graph.
+
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Node features.
+            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional) - Edge weight vector.
+
+        Return types:
+            * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+        """
+        adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
+        adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
+        deg_out = torch.matmul(adj_mat, torch.ones(size=(adj_mat.size(0), 1)).to(X.device))
+        deg_out = deg_out.flatten()
+        deg_in = torch.matmul(torch.ones(size=(1, adj_mat.size(0))).to(X.device), adj_mat)
+        deg_in = deg_in.flatten()
+
+        deg_out_inv = torch.reciprocal(deg_out)
+        deg_in_inv = torch.reciprocal(deg_in)
+        row, col = edge_index
+        norm_out = deg_out_inv[row]
+        norm_in = deg_in_inv[row]
+
+        Tx_0 = X
+        Tx_1 = X
+        H = torch.matmul(Tx_0, (self.weight[0])[0]) + torch.matmul(Tx_0, (self.weight[1])[0]) 
+
+        if self.weight.size(1) > 1:
+            Tx_1_o = self.propagate(edge_index, x=X, norm=norm_out, size=None)
+            Tx_1_i = self.propagate(edge_index, x=X, norm=norm_in, size=None)
+            H = H + torch.matmul(Tx_1_o, (self.weight[0])[1]) + torch.matmul(Tx_1_i, (self.weight[1])[1])
+
+        for k in range(2, self.weight.size(1)):
+            Tx_2_o = self.propagate(edge_index, x=Tx_1_o, norm=norm_out, size=None)
+            Tx_2_o = 2. * Tx_2_o - Tx_0
+            Tx_2_i = self.propagate(edge_index, x=Tx_1_i, norm=norm_in, size=None) 
+            Tx_2_i = 2. * Tx_2_i - Tx_0
+            H = H + torch.matmul(Tx_2_o, (self.weight[0])[k]) + torch.matmul(Tx_2_i, (self.weight[1])[k])
+            Tx_0, Tx_1_o, Tx_1_i = Tx_1, Tx_2_o, Tx_2_i
+
+        if self.bias is not None:
+            H += self.bias
+
+        return H
 
 class DCRNN(torch.nn.Module):
     r"""An implementation of the Diffusion Convolutional Gated Recurrent Unit.
@@ -172,14 +172,14 @@ class DCRNN(torch.nn.Module):
         defaults to an unweighted graph. If the hidden state matrix is not present
         when the forward pass is called it is initialized with zeros.
 
-        Args:
-            X (PyTorch Float Tensor): Node features.
-            edge_index (PyTorch Long Tensor): Graph edge indices.
-            edge_weight (PyTorch Long Tensor, optional): Edge weight vector.
-            H (PyTorch Float Tensor, optional): Hidden state matrix for all nodes.
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Node features.
+            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional) - Edge weight vector.
+            * **H** (PyTorch Float Tensor, optional) - Hidden state matrix for all nodes.
 
         Return types:
-            H (PyTorch Float Tensor): Hidden state matrix for all nodes.
+            * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """
         H = self._set_hidden_state(X, H)
         Z = self._calculate_update_gate(X, edge_index, edge_weight, H)

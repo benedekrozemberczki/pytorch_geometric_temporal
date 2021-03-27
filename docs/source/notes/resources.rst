@@ -1,5 +1,5 @@
-External Resources
-==================
+External Resources - Architectures
+==================================
 
 * Yaguang Li, Rose Yu, Cyrus Shahabi, Yan Liu: **Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting** `Paper <https://arxiv.org/abs/1707.01926>`_, `TensorFlow Code <https://github.com/liyaguang/DCRNN>`_, `PyTorch Code <https://github.com/chnsh/DCRNN_PyTorch>`_
 
@@ -17,6 +17,17 @@ External Resources
 
 * Bing Yu, Haoteng Yin, Zhanxing Zhu: **Spatio-Temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting** `Paper <https://arxiv.org/abs/1709.04875>`_, `Code <https://github.com/VeritasYin/STGCN_IJCAI-18>`_ 
 
+* Ling Zhao, Yujiao Song, Chao Zhang, Yu Liu, Pu Wang, Tao Lin, Min Deng, Haifeng Li: **T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction** `Paper <https://arxiv.org/abs/1811.05320>`_, `Code <https://github.com/lehaifeng/T-GCN/T-GCN>`_
 
+* Jiawei Zhu, Yujiao Song, Ling Zhao, Haifeng Li: **A3T-GCN: Attention Temporal Graph Convolutional Network for Traffic Forecasting** `Paper <https://arxiv.org/abs/2006.11583>`_, `Code <https://github.com/lehaifeng/T-GCN/tree/master/A3T-GCN>`_
 
+* Shengnan Guo, Youfang Lin, Ning Feng, Chao Song, Huaiyu Wan: **Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow Forecasting** `Paper <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_, `Code <https://github.com/guoshnBJTU/ASTGCN-r-pytorch>`_
 
+* Chuanpan Zheng, Xiaoliang Fan, Cheng Wang, Jianzhong Qi: **GMAN: A Graph Multi-Attention Network for Traffic Prediction** `Paper <https://arxiv.org/pdf/1911.08415.pdf>`_, `Code <https://github.com/zhengchuanpan/GMAN>`_
+
+* Zonghan Wu, Shirui Pan, Guodong Long, Jing Jiang, Xiaojun Chang, Chengqi Zhang: **Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks** `Paper <https://arxiv.org/abs/2005.11650>`_, `Code <https://github.com/nnzhan/MTGNN>`_
+
+External Resources - Datasets
+=============================
+
+* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 

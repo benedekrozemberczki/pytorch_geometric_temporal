@@ -1,7 +1,7 @@
 Introduction
 =======================
 
-`*PyTorch Geometric Temporal* <https://github.com/benedekrozemberczki/pytorch_geometric_temporal>`_ is an temporal graph neural network extension library for `PyTorch Geometric <https://github.com/rusty1s/pytorch_geometric/>`_. It builds on open-source deep-learning and graph processing libraries. *PyTorch Geometric Temporal* consists of state-of-the-art deep learning and parametric learning methods to process spatio-temporal signals. It is the first open-source library for temporal deep learning on geometric structures. First, it provides discrete time graph neural networks on dynamic and static graphs. Second, it allows for spatio-temporal learning when the time is represented continuously without the use of discrete snapshots. Implemented methods cover a wide range of data mining (`WWW <https://www2021.thewebconf.org/>`_, `KDD <https://www.kdd.org/kdd2020/>`_), artificial intelligence and machine learning (`AAAI <http://www.aaai.org/Conferences/conferences.php>`_, `ICONIP <https://www.apnns.org/ICONIP2020/>`_, `ICLR <https://iclr.cc/>`_) conferences, workshops, and pieces from prominent journals. 
+`PyTorch Geometric Temporal <https://github.com/benedekrozemberczki/pytorch_geometric_temporal>`_ is an temporal graph neural network extension library for `PyTorch Geometric <https://github.com/rusty1s/pytorch_geometric/>`_. It builds on open-source deep-learning and graph processing libraries. *PyTorch Geometric Temporal* consists of state-of-the-art deep learning and parametric learning methods to process spatio-temporal signals. It is the first open-source library for temporal deep learning on geometric structures and provides constant time difference graph neural networks on dynamic and static graphs. We make this happen with the use of discrete time graph snapshots. Implemented methods cover a wide range of data mining (`WWW <https://www2021.thewebconf.org/>`_, `KDD <https://www.kdd.org/kdd2020/>`_), artificial intelligence and machine learning (`AAAI <http://www.aaai.org/Conferences/conferences.php>`_, `ICONIP <https://www.apnns.org/ICONIP2020/>`_, `ICLR <https://iclr.cc/>`_) conferences, workshops, and pieces from prominent journals. 
  
 
 Citing
@@ -11,7 +11,7 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
 .. code-block:: latex
 
     >@misc{pytorch_geometric_temporal,
-           author = {Benedek, Rozemberczki and Paul, Scherer},
+           author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Maria, Astefanoaei and Oliver, Kiss and Nicolas, Collignon},
            title = {{PyTorch Geometric Temporal}},
            year = {2020},
            publisher = {GitHub},
@@ -24,29 +24,29 @@ We briefly overview the fundamental concepts and features of PyTorch Geometric T
 Data Structures
 =============================
 
-Discrete Dataset Iterators
+Temporal Signal Iterators
 --------------------------
 
-PyTorch Geometric Tenporal offers data iterators for discrete time datasets which contain the temporal snapshots. There are two types of discrete time data iterators:
+PyTorch Geometric Tenporal offers data iterators for constant time difference spatio-temporal datasets which contain the temporal snapshots. There are two types of constant time difference data iterators:
 
-- ``StaticGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **static** graph.
-- ``DynamicGraphDiscreteSignal`` - Is designed for discrete spatio-temporal signals defined on a **dynamic** graph.
+- ``StaticGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **static** graph.
+- ``DynamicGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **dynamic** graph.
 
 
-Static Graphs with Discrete Signal
+Static Graph with Temporal Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``StaticGraphDiscreteSignal`` object requires the following parameters:
+The constructor of a ``StaticGraphTemporalSignal`` object requires the following parameters:
 
 - ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
 - ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
  
-Static Graphs with Dynamic Signal
+Dynamic Graph with Temporal Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``DynamicGraphDiscreteSignal`` object requires the following parameters:
+The constructor of a ``DynamicGraphTemporalSignal`` object requires the following parameters:
 
 - ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
 - ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
@@ -56,7 +56,7 @@ The constructor of a ``DynamicGraphDiscreteSignal`` object requires the followin
 Temporal Snapshots
 ^^^^^^^^^^^^^^^^^^ 
 
-A discrete temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
+A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
 
 - ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation (optional).
 - ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation (optional).
@@ -68,14 +68,26 @@ Benchmark Datasets
 
 We released and included a number of datasets which can be used for comparing the performance of temporal graph neural networks algorithms. The related machine learning tasks are node and graph level supervised learning.
 
-Discrete Time Datasets
+Newly Released Datasets
 ^^^^^^^^^^^^^^^^^^^^^^
-In case of discrete time graph neural networks these datasets are as follows:
+In order to benchmark  graph neural networks we released the following datasets:
 
 - `Hungarian Chickenpox Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.chickenpox.ChickenpoxDatasetLoader>`_
+- `PedalMe London Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pedalme.PedalMeDatasetLoader>`_
+- `Wikipedia Vital Math Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.wikimath.WikiMathsDatasetLoader>`_
+- `Windmill Output Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.windmill.WindmillOutputDatasetLoader>`_
 
 
-The Hungarian Chickenpox Dataset can be loaded by the following code snippet. The ``dataset`` returned by the public ``get_dataset`` method is a ``StaticGraphDiscreteSignal`` object. 
+Integrated Datasets
+^^^^^^^^^^^^^^^^^^^^^^
+
+We also integrated existing datasets for performance evaluation:
+
+- `Pems Bay Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pems_bay.PemsBayDatasetLoader>`_
+- `Metr LA Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.metr_la.METRLADatasetLoader>`_
+
+
+The Hungarian Chickenpox Dataset can be loaded by the following code snippet. The ``dataset`` returned by the public ``get_dataset`` method is a ``StaticGraphTemporalSignal`` object. 
 
 .. code-block:: python
 
@@ -85,48 +97,45 @@ The Hungarian Chickenpox Dataset can be loaded by the following code snippet. Th
 
     dataset = loader.get_dataset()
 
-Train-Test Splitter
--------------------
+Smatiotemporal Signal Splitting
+-------------------------------
 
 
-Discrete Train-Test Splitter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-We provide functions to create temporal splits of the discrete time iterators. These functions return train and test data iterators which split the original iterator using a fix ratio. Snapshots from the earlier time periods from the training dataset and snapshots from the later periods form the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``discrete_train_tes_split`` takes either a ``StaticGraphDiscreteSignal`` or a ``DynamicGraphDiscreteSignal`` and returns two iterattors according to the split ratio specified by ``train_ratio``.
+We provide functions to create temporal splits of the data iterators. These functions return train and test data iterators which split the original iterator using a fix train-test ratio. Snapshots from the earlier time periods contribute to the the training dataset and snapshots from the later periods contribute to the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``split_temporal_signal`` takes either a ``StaticGraphTemporalSignal`` or a ``DynamicGraphTemporalSignal`` object and returns two iterattors according to the split ratio specified by ``train_ratio``.
 
 .. code-block:: python
 
-    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
-    from torch_geometric_temporal.data.splitter import discrete_train_test_split
+    from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.signal import split_temporal_signal
 
     loader = ChickenpoxDatasetLoader()
 
     dataset = loader.get_dataset()
 
-    train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.8)
+    train_dataset, test_dataset = split_temporal_signal(dataset, train_ratio=0.8)
 
 
 
 Applications
 =============
 
-In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is on discrete time spatial data and the other one uses continuous time graphs.   
+In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is about epidmeiological forecasting the other on is about predicting web traffic.
 
-Learning from a Discrete Temporal Signal
--------------------------------------------
+Epidemiological Forecasting
+---------------------------
 
 We are using the Hungarian Chickenpox Cases dataset in this case study. We will train a regressor to predict the weekly cases reported by the counties using a recurrent graph convolutional network. First, we will load the dataset and create an appropriate spatio-temporal split.
 
 .. code-block:: python
 
-    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
-    from torch_geometric_temporal.data.splitter import discrete_train_test_split
+    from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.signal import temporal_signal_split
 
     loader = ChickenpoxDatasetLoader()
 
     dataset = loader.get_dataset()
 
-    train_dataset, test_dataset = discrete_train_test_split(dataset, train_ratio=0.2)
+    train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.2)
 
 In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is important to note that the final non-linearity is not integrated into the recurrent graph convolutional operation. This design principle is used consistently and it was taken from PyTorch Geometric. Because of this, we defined a ``ReLU`` non-linearity between the recurrent and linear layers manually. The final linear layer is not followed by a non-linearity as we solve a regression problem with zero-mean targets.
 
@@ -182,7 +191,7 @@ Using the holdout we will evaluate the performance of the trained recurrent grap
     cost = cost / (time+1)
     cost = cost.item()
     print("MSE: {:.4f}".format(cost))
-    >>> Accuracy: 0.6866
-
-Learning from a Continuous Temporal Signal
--------------------------------------------
+    >>> MSE: 0.6866
+    
+Web Traffic Prediction
+----------------------

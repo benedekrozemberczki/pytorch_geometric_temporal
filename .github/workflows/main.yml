@@ -11,12 +11,17 @@ on:
 
 jobs:
     build:
-      runs-on: ubuntu-latest
+      runs-on: ${{ matrix.os }}
+        
+      strategy:
+        matrix:
+          os: [ubuntu-latest, windows-latest, ubuntu-18.04, ubuntu-16.04]
+
       steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: 3.7.10
+          python-version: 3.8.8
       - uses: s-weigand/setup-conda@v1
         with:
           activate-conda: true
@@ -25,16 +30,14 @@ jobs:
       - run: which python
       - name: Run installation.
         run: |
-         TORCH_VERSION="1.6.0"
-         IDX="cpu"
          conda install -y scipy
          pip install codecov
-         pip install torch==${TORCH_VERSION}+${IDX} -f https://download.pytorch.org/whl/torch_stable.html
-         pip install torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-         pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
-         pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
-         pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
-         pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.6.0+${IDX}.html
+         pip install torch==1.7.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+         pip install torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
+         pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
+         pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
+         pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
+         pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
          pip install torch-geometric
          pip install codecov
          pip install sphinx sphinx_rtd_theme

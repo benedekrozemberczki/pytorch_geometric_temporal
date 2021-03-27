@@ -1,9 +1,13 @@
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader, METRLADatasetLoader, PemsBayDatasetLoader
-from torch_geometric_temporal.data.discrete.static_graph_discrete_signal import StaticGraphDiscreteSignal
-from torch_geometric_temporal.data.discrete.dynamic_graph_discrete_signal import DynamicGraphDiscreteSignal
-from torch_geometric_temporal.data.splitter import discrete_train_test_split
+
+from torch_geometric_temporal.signal import temporal_signal_split
+from torch_geometric_temporal.signal import StaticGraphTemporalSignal
+from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
+
+from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
+from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader
+
  
 def get_edge_array(n_count):
     return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
@@ -24,7 +28,7 @@ def test_dynamic_graph_discrete_signal_real():
 
     targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
 
-    dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
+    dataset = DynamicGraphTemporalSignal(edge_indices, edge_weights, features, targets)
 
     for epoch in range(2):
         for snapshot in dataset:
@@ -37,7 +41,7 @@ def test_dynamic_graph_discrete_signal_real():
     
     targets = [np.floor(np.random.uniform(0,10,(n_count,))).astype(int) for _ in range(snapshot_count)]
 
-    dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
+    dataset = DynamicGraphTemporalSignal(edge_indices, edge_weights, features, targets)
 
     for epoch in range(2):
         for snapshot in dataset:
@@ -48,7 +52,7 @@ def test_dynamic_graph_discrete_signal_real():
 
 
 def test_static_graph_discrete_signal():
-    dataset = StaticGraphDiscreteSignal(None, None, [None, None],[None, None])
+    dataset = StaticGraphTemporalSignal(None, None, [None, None],[None, None])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
@@ -56,7 +60,7 @@ def test_static_graph_discrete_signal():
         assert snapshot.y is None
 
 def test_dynamic_graph_discrete_signal():
-    dataset = DynamicGraphDiscreteSignal([None, None], [None, None], [None, None],[None, None])
+    dataset = DynamicGraphTemporalSignal([None, None], [None, None], [None, None],[None, None])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
@@ -64,7 +68,7 @@ def test_dynamic_graph_discrete_signal():
         assert snapshot.y is None
 
 def test_static_graph_discrete_signal_typing():
-    dataset = StaticGraphDiscreteSignal(None, None, [np.array([1])],[np.array([2])])
+    dataset = StaticGraphTemporalSignal(None, None, [np.array([1])],[np.array([2])])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
@@ -80,11 +84,41 @@ def test_chickenpox():
             assert snapshot.edge_attr.shape == (102, )
             assert snapshot.x.shape == (20, 4)
             assert snapshot.y.shape == (20, )
+            
+def test_pedalme():
+    loader = PedalMeDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 225)
+            assert snapshot.edge_attr.shape == (225, )
+            assert snapshot.x.shape == (15, 4)
+            assert snapshot.y.shape == (15, )
+            
+def test_wiki():
+    loader = WikiMathsDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(1):
+        for snapshot in dataset:
+            snapshot.edge_index.shape == (2, 27079)
+            snapshot.edge_attr.shape == (27079, )
+            snapshot.x.shape == (1068, 8)
+            snapshot.y.shape == (1068, )
+            
+def test_windmill():
+    loader = WindmillOutputDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(2):
+        for snapshot in dataset:
+            snapshot.edge_index.shape == (2, 97032)
+            snapshot.edge_attr.shape == (97032, )
+            snapshot.x.shape == (312, 8)
+            snapshot.y.shape == (312, )
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 1722)
             assert snapshot.edge_attr.shape == (1722, )
@@ -94,7 +128,7 @@ def test_metrla():
 def test_metrla_task_generator():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 1722)
             assert snapshot.edge_attr.shape == (1722, )
@@ -104,7 +138,7 @@ def test_metrla_task_generator():
 def test_pemsbay():
     loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 2694)
             assert snapshot.edge_attr.shape == (2694, )
@@ -114,7 +148,7 @@ def test_pemsbay():
 def test_pemsbay_task_generator():
     loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset(num_timesteps_in=6, num_timesteps_out=5)
-    for epoch in range(3):
+    for epoch in range(2):
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 2694)
             assert snapshot.edge_attr.shape == (2694, )
@@ -124,7 +158,7 @@ def test_pemsbay_task_generator():
 def test_discrete_train_test_split_static():
     loader = ChickenpoxDatasetLoader()
     dataset = loader.get_dataset()
-    train_dataset, test_dataset = discrete_train_test_split(dataset, 0.8)
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
     for epoch in range(2):
         for snapshot in train_dataset:
@@ -142,6 +176,7 @@ def test_discrete_train_test_split_static():
 
 
 def test_discrete_train_test_split_dynamic():
+
     snapshot_count = 250
     n_count = 100
     feature_count = 32
@@ -150,11 +185,9 @@ def test_discrete_train_test_split_dynamic():
 
     targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
 
-    dataset = DynamicGraphDiscreteSignal(edge_indices, edge_weights, features, targets)
+    dataset = DynamicGraphTemporalSignal(edge_indices, edge_weights, features, targets)
 
-
-    train_dataset, test_dataset = discrete_train_test_split(dataset, 0.8)
-
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
     for epoch in range(2):
         for snapshot in test_dataset:
@@ -169,7 +202,3 @@ def test_discrete_train_test_split_dynamic():
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
             assert snapshot.x.shape == (100, 32)
             assert snapshot.y.shape == (100, )
-
-
-
-    
