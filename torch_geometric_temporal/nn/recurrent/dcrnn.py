@@ -38,10 +38,6 @@ class DConv(MessagePassing):
     def message(self, x_j, norm):
         return norm.view(-1, 1) * x_j
 
-    def __repr__(self): # pragma: no cover
-        return '{}({}, {}, K={})'.format(self.__class__.__name__,
-            self.in_channels, self.out_channels, self.weight.size(0))
-
     def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
                 edge_weight: torch.FloatTensor) -> torch.FloatTensor:
         r"""Making a forward pass. If edge weights are not present the forward pass
