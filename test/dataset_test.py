@@ -76,6 +76,14 @@ def test_static_graph_temporal_signal_typing():
         assert snapshot.edge_attr is None
         assert snapshot.x.shape == (1,)
         assert snapshot.y.shape == (1,)
+        
+def test_dynamic_graph_static_signal_typing():
+    dataset = DynamicGraphStaticSignal([None], [None], None,[None])
+    for snapshot in dataset:
+        assert snapshot.edge_index is None
+        assert snapshot.edge_attr is None
+        assert snapshot.x.shape is None
+        assert snapshot.y.shape is None
 
 def test_chickenpox():
     loader = ChickenpoxDatasetLoader()
