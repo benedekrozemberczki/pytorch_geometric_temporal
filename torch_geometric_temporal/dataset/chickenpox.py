@@ -22,6 +22,7 @@ class ChickenpoxDatasetLoader(object):
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T
+        print(self._edges.shape)
 
     def _get_edge_weights(self):
         self._edge_weights = np.ones(self._edges.shape[1])
