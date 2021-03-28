@@ -12,11 +12,11 @@ Targets = List[Union[np.ndarray, None]]
 
 class DynamicGraphStaticSignal(object):
     r""" A data iterator object to contain a dynamic graph with a
-    changing edge set and weights . The feature set and node labels
+    changing edge set and weights . The node labels
     (target) are also dynamic. The iterator returns a single discrete temporal
     snapshot for a time period (e.g. day or week). This single snapshot is a 
     Pytorch Geometric Data object. Between two temporal snapshots the edges,
-    edge weights, the feature matrix and target matrices might change.
+    edge weights and target matrices might change.
  
     Args:
         edge_indices (List of Numpy arrays): List of edge index tensors.
