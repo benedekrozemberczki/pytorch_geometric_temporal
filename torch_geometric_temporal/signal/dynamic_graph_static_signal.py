@@ -52,11 +52,11 @@ class DynamicGraphStaticSignal(object):
         else:
             return torch.FloatTensor(self.edge_weights[self.t])
 
-    def _get_features(self): 
-        if self.features[self.t] is None:
-            return self.features[self.t]
+    def _get_feature(self): 
+        if self.feature is None:
+            return self.feature
         else:       
-            return torch.FloatTensor(self.features[self.t])
+            return torch.FloatTensor(self.feature)
 
     def _get_target(self):
         if self.targets[self.t] is None:
@@ -69,7 +69,7 @@ class DynamicGraphStaticSignal(object):
          
 
     def _get_snapshot(self):
-        x = self._get_features()
+        x = self._get_feature()
         edge_index = self._get_edge_index()
         edge_weight = self._get_edge_weight()
         y = self._get_target()
