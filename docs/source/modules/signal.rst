@@ -15,6 +15,10 @@ Temporal Signal Iterators
     :members:
     :undoc-members:
 
+.. automodule:: torch_geometric_temporal.signal.dynamic_graph_static_signal
+    :members:
+    :undoc-members:
+
 Temporal Signal Train-Test Split
 --------------------------
 
