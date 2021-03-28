@@ -189,6 +189,20 @@ def test_dcrnn_layer():
 
     assert H.shape == (number_of_nodes, out_channels)
 
+    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=3)
+
+    H = layer(X, edge_index, edge_weight, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
 
 def test_gc_lstm_layer():
     """
