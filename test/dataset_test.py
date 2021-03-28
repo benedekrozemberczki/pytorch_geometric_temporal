@@ -78,12 +78,12 @@ def test_static_graph_temporal_signal_typing():
         assert snapshot.y.shape == (1,)
         
 def test_dynamic_graph_static_signal_typing():
-    dataset = DynamicGraphStaticSignal([None], [None], None,[None])
+    dataset = DynamicGraphStaticSignal([None], [None], None, [None])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
-        assert snapshot.x.shape is None
-        assert snapshot.y.shape is None
+        assert snapshot.x is None
+        assert snapshot.y is None
 
 def test_chickenpox():
     loader = ChickenpoxDatasetLoader()
@@ -196,6 +196,34 @@ def test_discrete_train_test_split_dynamic():
     targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
 
     dataset = DynamicGraphTemporalSignal(edge_indices, edge_weights, features, targets)
+
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
+
+    for epoch in range(2):
+        for snapshot in test_dataset:
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
+            assert snapshot.x.shape == (100, 32)
+            assert snapshot.y.shape == (100, )
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
+            assert snapshot.x.shape == (100, 32)
+            assert snapshot.y.shape == (100, )
+            
+def test_train_test_split_dynamic_graph_static_signal():
+
+    snapshot_count = 250
+    n_count = 100
+    feature_count = 32
+
+    edge_indices, edge_weights, features = generate_signal(250, 100, 32)
+
+    targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
+
+    dataset = DynamicGraphStaticSignal(edge_indices, edge_weights, features[0], targets)
 
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
