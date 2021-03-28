@@ -38,7 +38,7 @@ class DynamicGraphStaticSignal(object):
         assert len(self.targets) == len(self.edge_indices), "Temporal dimension inconsistency."
 
     def _set_snapshot_count(self):
-        self.snapshot_count = len(self.features)
+        self.snapshot_count = len(self.targets)
 
     def _get_edge_index(self):
         if self.edge_indices[self.t] is None:
