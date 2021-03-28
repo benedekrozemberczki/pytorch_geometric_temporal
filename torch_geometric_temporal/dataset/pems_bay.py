@@ -15,7 +15,7 @@ class PemsBayDatasetLoader(object):
         self.raw_data_dir = raw_data_dir
         self._read_web_data()
 
-    def _download_url(self, url, save_path):
+    def _download_url(self, url, save_path): # pragma: no cover
         with urllib.request.urlopen(url) as dl_file:
             with open(save_path, 'wb') as out_file:
                 out_file.write(dl_file.read())
@@ -24,12 +24,12 @@ class PemsBayDatasetLoader(object):
         url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
         
         # Check if zip file is in data folder from working directory, otherwise download
-        if (not os.path.isfile(os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))):
+        if (not os.path.isfile(os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))): # pragma: no cover
             if not os.path.exists(self.raw_data_dir):
                 os.makedirs(self.raw_data_dir)
             self._download_url(url, os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))
 
-        if (not os.path.isfile(os.path.join(self.raw_data_dir, "pems_adj_mat.npy")) or not os.path.isfile(os.path.join(self.raw_data_dir, "pems_node_values.npy"))):
+        if (not os.path.isfile(os.path.join(self.raw_data_dir, "pems_adj_mat.npy")) or not os.path.isfile(os.path.join(self.raw_data_dir, "pems_node_values.npy"))): # pragma: no cover
             with zipfile.ZipFile(os.path.join(self.raw_data_dir, "PEMS-BAY.zip"), "r") as zip_fh:
                 zip_fh.extractall(self.raw_data_dir)
 
@@ -77,7 +77,6 @@ class PemsBayDatasetLoader(object):
         self.features = features
         self.targets = target
 
-
     def get_dataset(self, num_timesteps_in: int=12, num_timesteps_out: int=12)  -> StaticGraphTemporalSignal:
         """Returns data iterator for PEMS-BAY dataset as an instance of the
         static graph temporal signal class.
@@ -90,8 +89,3 @@ class PemsBayDatasetLoader(object):
         self._generate_task(num_timesteps_in, num_timesteps_out)
         dataset = StaticGraphTemporalSignal(self.edges, self.edge_weights, self.features, self.targets)
         return dataset
-
-if __name__ == '__main__':
-    from ..signal import StaticGraphTemporalSignal
-    loader = PemsBayDatasetLoader(raw_data_dir="/tmp/")
-    dataset = loader.get_dataset()
