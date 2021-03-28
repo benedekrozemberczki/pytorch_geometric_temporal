@@ -32,7 +32,7 @@ class ChickenpoxDatasetLoader(object):
             self._features.append(np.array(self._dataset[str(time)]["X"]))
 
     def _get_targets(self):
-        self.targets = []
+        self._targets = []
         for time in range(self._dataset["time_periods"]):
             self._targets.append(np.array(self._dataset[str(time)]["y"]))
 
