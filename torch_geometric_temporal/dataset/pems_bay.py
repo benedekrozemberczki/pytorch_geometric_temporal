@@ -7,7 +7,10 @@ from six.moves import urllib
 from ..signal import StaticGraphTemporalSignal
 
 class PemsBayDatasetLoader(object):
-    """A traffic forecasting dataset as described in DCRNN paper
+    """A traffic forecasting dataset as described in Diffusion Convolution Layer Paper. 
+    
+    For details see: `"Diffusion Convolutional Recurrent Neural Network:
+    Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
     """
 
     def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data")):

@@ -38,7 +38,7 @@ class DConv(MessagePassing):
     def message(self, x_j, norm):
         return norm.view(-1, 1) * x_j
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return '{}({}, {}, K={})'.format(self.__class__.__name__,
             self.in_channels, self.out_channels, self.weight.size(0))
 
