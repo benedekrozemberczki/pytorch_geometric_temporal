@@ -22,20 +22,19 @@ class ChickenpoxDatasetLoader(object):
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T
-        print(self._edges.shape)
 
     def _get_edge_weights(self):
         self._edge_weights = np.ones(self._edges.shape[1])
 
     def _get_features(self):
-        self.features = []
+        self._features = []
         for time in range(self._dataset["time_periods"]):
-            self.features.append(np.array(self._dataset[str(time)]["X"]))
+            self._features.append(np.array(self._dataset[str(time)]["X"]))
 
     def _get_targets(self):
         self.targets = []
         for time in range(self._dataset["time_periods"]):
-            self.targets.append(np.array(self._dataset[str(time)]["y"]))
+            self._targets.append(np.array(self._dataset[str(time)]["y"]))
 
     def get_dataset(self) -> StaticGraphTemporalSignal:
         """Returning the Hungarian Chickenpox cases data iterator.
@@ -47,6 +46,6 @@ class ChickenpoxDatasetLoader(object):
         self._get_edge_weights()
         self._get_features()
         self._get_targets()
-        dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
+        dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self._features, self._targets)
         return dataset
 
