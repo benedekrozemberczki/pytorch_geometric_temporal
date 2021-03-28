@@ -22,19 +22,18 @@ class DynamicGraphStaticSignal(object):
         edge_indices (List of Numpy arrays): List of edge index tensors.
         edge_weights (List of Numpy arrays): List of edge weight tensors.
         feature (Numpy array): Node feature tensor.
-        target (Numpy array): Node label (target) tensor.
+        targets (List of Numpy arrays): List of node label (target) tensors.
     """
     def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
                  features: Features, targets: Targets):
         self.edge_indices = edge_indices
         self.edge_weights = edge_weights
-        self.features = features
+        self.feature = feature
         self.targets = targets
         self._check_temporal_consistency()
         self._set_snapshot_count()
 
     def _check_temporal_consistency(self):
-        assert len(self.features) == len(self.targets), "Temporal dimension inconsistency."
         assert len(self.edge_indices) == len(self.edge_weights), "Temporal dimension inconsistency."
         assert len(self.features) == len(self.edge_weights), "Temporal dimension inconsistency."
 
