@@ -13,6 +13,10 @@ class METRLADatasetLoader(object):
     readings collected from 207 loop detectors on highways in Los Angeles 
     County in aggregated 5 minute intervals for 4 months between March 2012 
     to June 2012.
+
+    For further details on the version of the sensor network and 
+    discretization see: `"Diffusion Convolutional Recurrent Neural Network:
+    Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
     """
     def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data")):
         super(METRLADatasetLoader, self).__init__()
