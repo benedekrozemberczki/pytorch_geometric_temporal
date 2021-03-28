@@ -21,8 +21,8 @@ class DynamicGraphStaticSignal(object):
     Args:
         edge_indices (List of Numpy arrays): List of edge index tensors.
         edge_weights (List of Numpy arrays): List of edge weight tensors.
-        features (List of Numpy arrays): List of node feature tensors.
-        targets (List of Numpy arrays): List of node label (target) tensors.
+        feature (Numpy array): Node feature tensor.
+        target (Numpy array): Node label (target) tensor.
     """
     def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
                  features: Features, targets: Targets):
