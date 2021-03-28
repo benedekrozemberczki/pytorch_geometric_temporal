@@ -19,7 +19,7 @@ def generate_signal(snapshot_count, n_count, feature_count):
     features = [np.random.uniform(0,1,(n_count, feature_count)) for _ in range(snapshot_count)]
     return edge_indices, edge_weights, features
 
-def test_dynamic_graph_discrete_signal_real():
+def test_dynamic_graph_temporal_signal_real():
 
     snapshot_count = 250
     n_count = 100
