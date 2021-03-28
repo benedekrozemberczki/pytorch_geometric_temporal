@@ -6,7 +6,7 @@ from torch_geometric.data import Data
 
 Edge_Indices = List[Union[np.ndarray, None]]
 Edge_Weights = List[Union[np.ndarray, None]]
-Features = List[Union[np.ndarray, None]]
+Feature = Union[np.ndarray, None]
 Targets = List[Union[np.ndarray, None]]
 
 
@@ -25,7 +25,7 @@ class DynamicGraphStaticSignal(object):
         targets (List of Numpy arrays): List of node label (target) tensors.
     """
     def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
-                 features: Features, targets: Targets):
+                 feature: Feature, targets: Targets):
         self.edge_indices = edge_indices
         self.edge_weights = edge_weights
         self.feature = feature
