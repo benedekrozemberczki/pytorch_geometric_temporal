@@ -221,9 +221,8 @@ def test_train_test_split_dynamic_graph_static_signal():
 
     edge_indices, edge_weights, features = generate_signal(250, 100, 32)
 
-    targets = [np.random.uniform(0,10,(n_count,)) for _ in range(snapshot_count)]
-
-    dataset = StaticGraphTemporalSignal(edge_indices, edge_weights, features, targets)
+    targets = [np.random.uniform(0, 10, (n_count,)) for _ in range(snapshot_count)]
+    dataset = StaticGraphTemporalSignal(edge_indices[0], edge_weights[0], features, targets)
 
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
