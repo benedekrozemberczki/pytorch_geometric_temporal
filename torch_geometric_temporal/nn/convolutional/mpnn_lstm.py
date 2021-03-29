@@ -72,8 +72,6 @@ class MPNN_LSTM(nn.Module):
             *  **H** *(PyTorch Float Tensor)* - The hidden representation of size 2*nhid+2*in_channels-1 for each node.
         """
         lst = list()
-        #weight = adj.coalesce().values()
-        #adj = adj.coalesce().indices()
         
         skip = x.view(-1,self.window,self.n_nodes,self.in_channels)#self.batch_size
         skip = torch.transpose(skip, 1, 2).reshape(-1,self.window,self.in_channels)#self.batch_size*self.n_nodes
@@ -82,11 +80,10 @@ class MPNN_LSTM(nn.Module):
         for l in range(1,self.window):
             overlap.append(skip[:,l,self.in_channels-1].unsqueeze(1))
         skip = torch.cat(overlap,dim=1)
-        #skip = skip.reshape(skip.size(0),-1)
-        #print(x.size())
+        
         x = self.hgcn1(x,edge_index,edge_weight)
         lst.append(x)
-        #print(x.size())
+        
         x = self.hgcn2(x,edge_index,edge_weight)
         lst.append(x)
         
