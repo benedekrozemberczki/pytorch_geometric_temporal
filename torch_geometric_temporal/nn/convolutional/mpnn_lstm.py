@@ -22,7 +22,7 @@ class MPNN_LSTM(nn.Module):
         dropout (float): Dropout rate.
     """
     def __init__(self, in_channels: int, hidden_size: int , out_channels: int, n_nodes: int, window: int, dropout: float):
-        super(MPNN_LSTM, self).__init__()
+        super(MPNN_LSTM_, self).__init__()
         self.window = window
         self.n_nodes = n_nodes
         self.hidden_size = hidden_size
@@ -42,8 +42,8 @@ class MPNN_LSTM(nn.Module):
         self.rnn2 = nn.LSTM(self.hidden_size, self.hidden_size, 1)
         self.dropout = nn.Dropout(self.dropout)
         self.relu = nn.ReLU()
-        self.fc1 = nn.Linear(2*self.hidden_size+2*self.in_channels-1, self.hidden_size)#self.window*
-        self.fc2 = nn.Linear( self.hidden_size, self.out_channels)
+        #self.fc1 = nn.Linear(2*self.hidden_size+2*self.in_channels-1, self.hidden_size)#self.window*
+        #self.fc2 = nn.Linear( self.hidden_size, self.out_channels)
 
         
     def hgcn1(self, x, edge_index, edge_weight):
@@ -104,12 +104,13 @@ class MPNN_LSTM(nn.Module):
         x = torch.cat([hn1[0,:,:],hn2[0,:,:],skip], dim=1)
                 
         #--------------------------------------
-        x = self.relu(self.fc1(x))
-        x = self.dropout(x)
-        x = self.relu(self.fc2(x)).squeeze()
-        x = x.view(-1)
+        #x = self.relu(self.fc1(x))
+        #x = self.dropout(x)
+        #x = self.relu(self.fc2(x)).squeeze()
+        #x = x.view(-1)
         
         return x
+
 
 
     
