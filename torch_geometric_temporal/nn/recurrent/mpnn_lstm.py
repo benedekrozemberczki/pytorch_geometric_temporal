@@ -91,8 +91,8 @@ class MPNNLSTM(nn.Module):
         X = X.contiguous().view(self.window, -1, X.size(3))
         
         
-        _, (H_1, C_1) = self._recurrent_1(X)
-        _, (H_2, C_2) = self._recurrent_2(X)
+        X, (H_1, C_1) = self._recurrent_1(X)
+        X, (H_2, C_2) = self._recurrent_2(X)
         
         H = torch.cat([H_1[0, :, :], H_2[0, :, :], S], dim=1)        
         return H
