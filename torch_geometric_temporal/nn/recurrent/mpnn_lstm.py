@@ -47,7 +47,7 @@ class MPNNLSTM(nn.Module):
         return X
     
     def _graph_convolution_2(self, X, edge_index, edge_weight):
-        X = F.relu(self.convolution_2(X, edge_index, edge_weight))
+        X = F.relu(self._convolution_2(X, edge_index, edge_weight))
         X = self._batch_norm_2(X)
         X = F.dropout(X, p=self.dropout, training=self.training)
         return X
