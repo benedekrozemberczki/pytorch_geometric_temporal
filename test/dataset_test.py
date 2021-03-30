@@ -29,7 +29,6 @@ def test_covid_dataset():
     loader = EnglandCovidDatasetLoader()
     dataset = loader.get_dataset()
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
-    print(train_dataset)
 
     for epoch in range(2):
         for snapshot in train_dataset:
