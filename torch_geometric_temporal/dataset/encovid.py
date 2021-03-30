@@ -37,7 +37,7 @@ class EnglandCovidDatasetLoader(object):
     def _get_targets_and_features(self):
 
         stacked_target = np.array(self._dataset["y"])
-        standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) /( np.std(stacked_target, axis=0)+10**-10)
+        standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) /(np.std(stacked_target, axis=0)+10**-10)
         self.features = [standardized_target[i:i+self.lags,:].T for i in range(self._dataset["time_periods"]-self.lags)]
         self.targets = [standardized_target[i+self.lags,:].T for i in range(self._dataset["time_periods"]-self.lags)]
 
