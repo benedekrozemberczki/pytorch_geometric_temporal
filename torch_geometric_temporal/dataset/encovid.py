@@ -13,7 +13,7 @@ class EnCovidDatasetLoader(object):
     The graph indicates how many people moved from one region to the other each day, based on Facebook Data For 
     Good disease prevention maps (https://dataforgood.fb.com/tools/disease-prevention-maps).
     The node features correspond to the number of COVID-19 cases in the region in the past **window** days.
-    The task is to predict the number of cases in each node after **lag** days.
+    The task is to predict the number of cases in each node after 1 day.
     For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting
 ." <https://arxiv.org/abs/2009.08388>`.
     
@@ -117,14 +117,12 @@ class EnCovidDatasetLoader(object):
         return Gs        
     
     
-    def get_dataset(self, lags: int=1) -> DynamicGraphTemporalSignal:
+    def get_dataset(self) -> DynamicGraphTemporalSignal:
         """Returning the COVID-19 England data iterator.
-        Args types:
-            * **lags** *(int)* - The number of time lags.        
         Return types:
             * **dataset** *(DynamicGraphTemporalSignal)* - The COVID19EN dataset.
         """
-        self.lags = lags
+        #self.lags = lags to do
         
         dataset = DynamicGraphTemporalSignal(self._edge_index, self._edge_weight, self.features, self.targets)
         return dataset
