@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 
-
 class MPNNLSTM(nn.Module):
     r"""An implementation of the Message Passing Neural Network with Long Short Term Memory.
     For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting
@@ -96,7 +95,3 @@ class MPNNLSTM(nn.Module):
         
         X = torch.cat([H_1[0, :, :], H_2[0, :, :], S], dim=1)        
         return X
-
-
-
-    
