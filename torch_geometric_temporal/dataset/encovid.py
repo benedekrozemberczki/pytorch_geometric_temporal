@@ -5,7 +5,7 @@ from scipy.sparse import csr_matrix
 from datetime import date, timedelta
 from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 
-class ENCovidDatasetLoader(object):
+class EnglandCovidDatasetLoader(object):
     """A dataset of mobility and history of reported cases of COVID-19 in England NUTS3 
     regions, from 3 March to 12 of May.
     The dataset is segmented in days and the graph is directed and weighted. 
