@@ -7,12 +7,12 @@ from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 
 class EnglandCovidDatasetLoader(object):
     """A dataset of mobility and history of reported cases of COVID-19 in England NUTS3 
-    regions, from 3 March to 12 of May.
-    The dataset is segmented in days and the graph is directed and weighted. 
-    The graph indicates how many people moved from one region to the other each day, based on Facebook Data For 
-    Good disease prevention maps (https://dataforgood.fb.com/tools/disease-prevention-maps).
-    The node features correspond to the number of COVID-19 cases in the region in the past **window** days.
-    The task is to predict the number of cases in each node after 1 day. For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting." <https://arxiv.org/abs/2009.08388>`.
+    regions, from 3 March to 12 of May. The dataset is segmented in days and the graph
+    is directed and weighted. The graph indicates how many people moved from one region
+    to the other each day, based on Facebook Data For Good disease prevention maps.
+    The node features correspond to the number of COVID-19 cases in the region in the past
+    **window** days. The task is to predict the number of cases in each node after 1 day.
+     For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting." <https://arxiv.org/abs/2009.08388>`.
     
     Args:
         window (int): Number of past day measurements used for node features.
