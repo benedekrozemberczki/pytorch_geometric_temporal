@@ -1,11 +1,7 @@
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
-import networkx as nx
-import numpy as np
-#import scipy.sparse as sp
 
 
 class MPNNLSTM(nn.Module):
@@ -42,8 +38,6 @@ class MPNNLSTM(nn.Module):
         self.rnn2 = nn.LSTM(self.hidden_size, self.hidden_size, 1)
         self.dropout = nn.Dropout(self.dropout)
         self.relu = nn.ReLU()
-        #self.fc1 = nn.Linear(2*self.hidden_size+2*self.in_channels-1, self.hidden_size)#self.window*
-        #self.fc2 = nn.Linear( self.hidden_size, self.out_channels)
 
         
     def hgcn1(self, x, edge_index, edge_weight):
@@ -73,9 +67,8 @@ class MPNNLSTM(nn.Module):
         """
         lst = list()
         
-        skip = x.view(-1,self.window,self.n_nodes,self.in_channels)#self.batch_size
-        skip = torch.transpose(skip, 1, 2).reshape(-1,self.window,self.in_channels)#self.batch_size*self.n_nodes
-        #------ remove overlapping features from the windows
+        skip = x.view(-1,self.window,self.n_nodes,self.in_channels)
+        skip = torch.transpose(skip, 1, 2).reshape(-1,self.window,self.in_channels)
         overlap = [skip[:,0,:]]
         for l in range(1,self.window):
             overlap.append(skip[:,l,self.in_channels-1].unsqueeze(1))
@@ -88,23 +81,16 @@ class MPNNLSTM(nn.Module):
         lst.append(x)
         
         x = torch.cat(lst, dim=1)
-        
-        #--------------------------------------
+
         x = x.view(-1, self.window, self.n_nodes, x.size(1))
         x = torch.transpose(x, 0, 1)
-        x = x.contiguous().view(self.window, -1, x.size(3))#self.batch_size*self.n_nodes
+        x = x.contiguous().view(self.window, -1, x.size(3))
         
         
         x, (hn1, cn1) = self.rnn1(x)
         x, (hn2,  cn2) = self.rnn2(x)
         
         x = torch.cat([hn1[0,:,:],hn2[0,:,:],skip], dim=1)
-                
-        #--------------------------------------
-        #x = self.relu(self.fc1(x))
-        #x = self.dropout(x)
-        #x = self.relu(self.fc2(x)).squeeze()
-        #x = x.view(-1)
         
         return x
 
