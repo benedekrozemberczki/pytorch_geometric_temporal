@@ -64,7 +64,7 @@ class MPNNLSTM(nn.Module):
             * **edge_weight** *(PyTorch LongTensor, optional)* - Edge weight vector.
 
         Return types:
-            *  **H** *(PyTorch FloatTensor)* - The hidden representation for each node.
+            *  **H** *(PyTorch FloatTensor)* - The hidden representation of size 2*nhid+in_channels+window-1 for each node.
         """
         R = list()
         
