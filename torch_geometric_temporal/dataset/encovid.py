@@ -21,9 +21,9 @@ class EnglandCovidDatasetLoader(object):
     def __init__(self, window: int, scaled: bool=False):
         self.window = window
         self.scaled = scaled
-        self.read_web_data()
+        self._read_web_data()
 
-    def read_web_data(self):
+    def _read_web_data(self):
         labels = pd.read_csv("https://github.com/geopanag/pandemic_tgnn/blob/master/data/England/england_labels.csv?raw=true")
         labels = labels.set_index("name")
 
@@ -35,10 +35,10 @@ class EnglandCovidDatasetLoader(object):
         
         labels = labels.loc[:,dates]    
         
-        Gs = self.download_graphs(dates,"EN")
+        Gs = self._download_graphs(dates,"EN")
         labels = labels.loc[list(Gs[0].nodes()),:]
         
-        features = self.generate_features(Gs ,labels ,dates)
+        features = self._generate_features(Gs ,labels ,dates)
         
         gs_adj = [csr_matrix(nx.adjacency_matrix(kgs).toarray().T) for kgs in Gs]
         edge_index = [kgs.indices for kgs in gs_adj]
@@ -56,7 +56,7 @@ class EnglandCovidDatasetLoader(object):
         self.targets = y
 
 
-    def generate_features(self, Gs, labels, dates,scaled = False ):
+    def _generate_features(self, Gs, labels, dates,scaled = False ):
         """
         Generate the node features based on the numebr of cases in each day.
         Features[0] contains the features to predict y[0].
@@ -94,7 +94,7 @@ class EnglandCovidDatasetLoader(object):
         return features
 
 
-    def download_graphs(self,dates,country):
+    def _download_graphs(self, dates, country):
         """
         Download the list of graphs of each day.
         """
