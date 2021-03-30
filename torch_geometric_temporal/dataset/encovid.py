@@ -48,8 +48,8 @@ class EnglandCovidDatasetLoader(object):
         for i,G in enumerate(Gs):
             y.append(list())
             for node in G.nodes():
-                y[i].append(np.array(labels.loc[node,dates[i]]))
-                
+                y[i].append(labels.loc[node,dates[i]])
+            y[i] = np.array(y[i])
         self._edge_index=edge_index
         self._edge_weight = edge_weight
         self.features =features
