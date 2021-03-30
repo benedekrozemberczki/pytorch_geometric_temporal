@@ -10,6 +10,8 @@ from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
 
+
+
  
 def get_edge_array(n_count):
     return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
@@ -19,6 +21,21 @@ def generate_signal(snapshot_count, n_count, feature_count):
     edge_weights = [np.ones(edge_indices[t].shape[1]) for t in range(snapshot_count)]
     features = [np.random.uniform(0,1,(n_count, feature_count)) for _ in range(snapshot_count)]
     return edge_indices, edge_weights, features
+    
+
+
+            
+def test_covid_dataset():
+    loader = EnglandCovidDatasetLoader()
+    dataset = loader.get_dataset()
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert snapshot.edge_index.shape  == (100, 2) 
+            assert snapshot.edge_attr.shape  == (100, 1)
+            assert snapshot.x.shape  == (100, 2)
+            assert snapshot.y.shape  == (100, 3)
 
 def test_dynamic_graph_temporal_signal_real():
 
@@ -184,18 +201,6 @@ def test_discrete_train_test_split_static():
             assert snapshot.x.shape == (20, 4)
             assert snapshot.y.shape == (20, )
             
-            
-def test_discrete_train_test_split_static():
-    loader = EnglandCovidDatasetLoader()
-    dataset = loader.get_dataset()
-    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
-
-    for epoch in range(2):
-        for snapshot in train_dataset:
-            print(snapshot.edge_index.shape)
-            print(snapshot.edge_attr.shape)
-            print(snapshot.x.shape)
-            print(snapshot.y.shape)
 
 
 def test_discrete_train_test_split_dynamic():

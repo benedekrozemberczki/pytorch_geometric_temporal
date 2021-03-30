@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import networkx as nx
-from scipy.sparse import csr_matrix
 from datetime import date, timedelta
 from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 
@@ -18,7 +17,7 @@ class EnglandCovidDatasetLoader(object):
         window (int): Number of past day measurements used for node features.
         scaled (bool): Normalize the features.
     """
-    def __init__(self, window: int, scaled: bool=False):
+    def __init__(self, window: int=8, scaled: bool=False):
         self.window = window
         self.scaled = scaled
         self._read_web_data()
@@ -40,19 +39,19 @@ class EnglandCovidDatasetLoader(object):
         
         features = self._generate_features(Gs ,labels ,dates)
         
-        gs_adj = [csr_matrix(nx.adjacency_matrix(kgs).toarray().T) for kgs in Gs]
-        edge_index = [kgs.indices for kgs in gs_adj]
-        edge_weight = [kgs.data for kgs in gs_adj]
+        edge_index = [np.array([edge for edge in G.edges()]).T for G in Gs]
+        edge_weight = [np.array([G[edge[0]][edge[1]]['weight'] for edge in G.edges()]) for G in Gs]
         
         y = list()
         for i,G in enumerate(Gs):
             y.append(list())
             for node in G.nodes():
                 y[i].append(labels.loc[node,dates[i]])
-                
+            y[i] = np.array(y[i])
+            
         self._edge_index=edge_index
         self._edge_weight = edge_weight
-        self.features = features
+        self.features =features
         self.targets = y
 
 
@@ -90,7 +89,6 @@ class EnglandCovidDatasetLoader(object):
           
                 
             features.append(H)
-            
         return features
 
 
@@ -110,13 +108,13 @@ class EnglandCovidDatasetLoader(object):
                 
             Gs.append(G)
             
-        return Gs        
-    
-    
+        return Gs
+
+
     def get_dataset(self) -> DynamicGraphTemporalSignal:
         """Returning the COVID-19 England data iterator.
         Return types:
-            * **dataset** *(DynamicGraphTemporalSignal)* - The COVID19EN dataset.
+            * **dataset** *(DynamicGraphTemporalSignal)* - The COVID19 England dataset.
         """
         dataset = DynamicGraphTemporalSignal(self._edge_index, self._edge_weight, self.features, self.targets)
         return dataset
