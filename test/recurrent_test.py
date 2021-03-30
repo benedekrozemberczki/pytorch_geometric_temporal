@@ -117,6 +117,7 @@ def test_mpnn_lstm_layer():
     in_channels = 64
     hidden_size = 32
     out_channels = 16
+    window=1
 
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
     edge_weight = create_mock_edge_weight(edge_index)
@@ -125,8 +126,10 @@ def test_mpnn_lstm_layer():
                      hidden_size=hidden_size,
                      out_channels=out_channels,
                      num_nodes=number_of_nodes,
-                     window = 1,
+                     window = window,
                      dropout = 0.5)
+                     
+    X = layer(X, edge_index, edge_weight)
     
     assert H.shape == (number_of_nodes, 2*hidden_size + in_channels + window-1)
     
