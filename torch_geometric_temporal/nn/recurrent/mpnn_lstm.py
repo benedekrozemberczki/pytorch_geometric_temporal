@@ -5,8 +5,7 @@ from torch_geometric.nn import GCNConv
 
 class MPNNLSTM(nn.Module):
     r"""An implementation of the Message Passing Neural Network with Long Short Term Memory.
-    For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting
-." <https://arxiv.org/abs/2009.08388>`_
+    For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting." <https://arxiv.org/abs/2009.08388>`_
 
     Args:
         in_channels (int): Number of input features.
@@ -18,7 +17,7 @@ class MPNNLSTM(nn.Module):
     """
     def __init__(self, in_channels: int, hidden_size: int ,
                  out_channels: int, num_nodes: int, window: int, dropout: float):
-        super(MPNNLSTM_, self).__init__()
+        super(MPNNLSTM, self).__init__()
         
         self.window = window
         self.num_nodes = num_nodes
@@ -65,7 +64,7 @@ class MPNNLSTM(nn.Module):
             * **edge_weight** *(PyTorch LongTensor, optional)* - Edge weight vector.
 
         Return types:
-            *  **X** *(PyTorch FloatTensor)* - The hidden representation of size 2*nhid+2*in_channels-1 for each node.
+            *  **H** *(PyTorch FloatTensor)* - The hidden representation of size 2*nhid+2*in_channels-1 for each node.
         """
         R = list()
         
@@ -95,5 +94,5 @@ class MPNNLSTM(nn.Module):
         X, (H_1, C_1) = self._recurrent_1(X)
         X, (H_2, C_2) = self._recurrent_2(X)
         
-        X = torch.cat([H_1[0, :, :], H_2[0, :, :], S], dim=1)        
-        return X
+        H = torch.cat([H_1[0, :, :], H_2[0, :, :], S], dim=1)        
+        return H
