@@ -1,12 +1,12 @@
 
 import numpy as np
-from datetime import date, timedelta
 import pandas as pd
 import networkx as nx
-from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 from scipy.sparse import csr_matrix
+from datetime import date, timedelta
+from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 
-class EnCovidDatasetLoader(object):
+class ENCovidDatasetLoader(object):
     """A dataset of mobility and history of reported cases of COVID-19 in England NUTS3 
     regions, from 3 March to 12 of May.
     The dataset is segmented in days and the graph is directed and weighted. 
@@ -21,9 +21,9 @@ class EnCovidDatasetLoader(object):
         window (int): Number of past day measurements used for node features.
         scaled (bool): Normalize the features.
     """
-    def __init__(self,window:int,scaled:bool=False ):
-        self.window=window
-        self.scaled=scaled
+    def __init__(self, window: int, scaled: bool=False):
+        self.window = window
+        self.scaled = scaled
         self.read_web_data()
 
     def read_web_data(self):
@@ -32,7 +32,6 @@ class EnCovidDatasetLoader(object):
 
         sdate = date(2020, 3, 13)
         edate = date(2020, 5, 12)
-        #Gs = generate_graphs(dates)
         delta = edate - sdate
         dates = [sdate + timedelta(days=i) for i in range(delta.days+1)]
         dates = [str(date) for date in dates]
@@ -60,7 +59,7 @@ class EnCovidDatasetLoader(object):
         self.targets = y
 
 
-    def generate_features(self,Gs, labels, dates,scaled = False ):
+    def generate_features(self, Gs, labels, dates,scaled = False ):
         """
         Generate the node features based on the numebr of cases in each day.
         Features[0] contains the features to predict y[0].
@@ -71,7 +70,7 @@ class EnCovidDatasetLoader(object):
         
         labs = labels.copy()
         
-        for idx,G in enumerate(Gs):
+        for idx, G in enumerate(Gs):
             H = np.zeros([G.number_of_nodes(),self.window])
             me = labs.loc[:, dates[:(idx)]].mean(1)
             sd = labs.loc[:, dates[:(idx)]].std(1)+1
@@ -122,7 +121,5 @@ class EnCovidDatasetLoader(object):
         Return types:
             * **dataset** *(DynamicGraphTemporalSignal)* - The COVID19EN dataset.
         """
-        #self.lags = lags to do
-        
         dataset = DynamicGraphTemporalSignal(self._edge_index, self._edge_weight, self.features, self.targets)
         return dataset
