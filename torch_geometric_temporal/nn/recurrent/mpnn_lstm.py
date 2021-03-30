@@ -28,72 +28,73 @@ class MPNNLSTM(nn.Module):
         self._create_parameters_and_layers()
         
     def _create_parameters_and_layers(self):
-        self.conv1 = GCNConv(self.in_channels, self.hidden_size)
-        self.conv2 = GCNConv(self.hidden_size, self.hidden_size)
+    
+        self._convolution_1 = GCNConv(self.in_channels, self.hidden_size)
+        self._convolution_2 = GCNConv(self.hidden_size, self.hidden_size)
         
-        self.bn1 = nn.BatchNorm1d(self.hidden_size)
-        self.bn2 = nn.BatchNorm1d(self.hidden_size)
+        self._batch_norm_1 = nn.BatchNorm1d(self.hidden_size)
+        self._batch_norm_2 = nn.BatchNorm1d(self.hidden_size)
         
-        self.rnn1 = nn.LSTM(2*self.hidden_size, self.hidden_size, 1)
-        self.rnn2 = nn.LSTM(self.hidden_size, self.hidden_size, 1)
-        self.dropout = nn.Dropout(self.dropout)
-        self.relu = nn.ReLU()
+        self._recurrent_1 = nn.LSTM(2*self.hidden_size, self.hidden_size, 1)
+        self._recurrent_2 = nn.LSTM(self.hidden_size, self.hidden_size, 1)
 
         
-    def hgcn1(self, x, edge_index, edge_weight):
-        x = self.relu(self.conv1(x, edge_index, edge_weight))
-        x = self.bn1(x)
-        x = torch.nn.dropout(x, self.training)
-        return x
+    def _graph_convolution_1(self, X, edge_index, edge_weight):
+        X = F.relu(self._convolution_1(X, edge_index, edge_weight))
+        X = self._batch_norm_1(X)
+        X = F.dropout(X, p=self.dropout, training=self.training)
+        return X
     
-    def hgcn2(self, x, edge_index, edge_weight):
-        x = self.relu(self.conv2(x, edge_index, edge_weight))
-        x = self.bn1(x)
-        x = self.dropout(x)
-        return x
+    def _graph_convolution_2(self, X, edge_index, edge_weight):
+        X = F.relu(self.convolution_2(X, edge_index, edge_weight))
+        X = self._batch_norm_2(X)
+        X = F.dropout(X, p=self.dropout, training=self.training)
+        return X
      
         
-    def forward(self, x: torch.FloatTensor, edge_index: torch.LongTensor,
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
                edge_weight: torch.FloatTensor) -> torch.FloatTensor:
         """
         Making a forward pass through the whole architecture.
         
         Arg types:
-            * **x** *(PyTorch FloatTensor)* - Node features.
+            * **X** *(PyTorch FloatTensor)* - Node features.
             * **edge_index** *(PyTorch LongTensor)* - Graph edge indices.
             * **edge_weight** *(PyTorch LongTensor, optional)* - Edge weight vector.
 
         Return types:
-            *  **x** *(PyTorch Float Tensor)* - The hidden representation of size 2*nhid+2*in_channels-1 for each node.
+            *  **X** *(PyTorch FloatTensor)* - The hidden representation of size 2*nhid+2*in_channels-1 for each node.
         """
-        lst = list()
+        R = list()
         
-        skip = x.view(-1,self.window,self.num_nodes,self.in_channels)
-        skip = torch.transpose(skip, 1, 2).reshape(-1,self.window,self.in_channels)
-        overlap = [skip[:,0,:]]
-        for l in range(1,self.window):
-            overlap.append(skip[:,l,self.in_channels-1].unsqueeze(1))
-        skip = torch.cat(overlap,dim=1)
+        S = X.view(-1, self.window, self.num_nodes, self.in_channels)
+        S = torch.transpose(S, 1, 2)
+        S = S.reshape(-1, self.window, self.in_channels)
+        O = [S[:,0,:]]
         
-        x = self.hgcn1(x,edge_index,edge_weight)
-        lst.append(x)
-        
-        x = self.hgcn2(x,edge_index,edge_weight)
-        lst.append(x)
-        
-        x = torch.cat(lst, dim=1)
+        for l in range(1, self.window):
+            O.append(S[:, l, self.in_channels-1].unsqueeze(1))
 
-        x = x.view(-1, self.window, self.num_nodes, x.size(1))
-        x = torch.transpose(x, 0, 1)
-        x = x.contiguous().view(self.window, -1, x.size(3))
+        S = torch.cat(O, dim=1)
+        
+        X = self._graph_convolution_1(X, edge_index, edge_weight)
+        R.append(X)
+        
+        X = self._graph_convolution_2(X, edge_index, edge_weight)
+        R.append(X)
+        
+        X = torch.cat(R, dim=1)
+
+        X = X.view(-1, self.window, self.num_nodes, X.size(1))
+        X = torch.transpose(X, 0, 1)
+        X = X.contiguous().view(self.window, -1, X.size(3))
         
         
-        x, (hn1, cn1) = self.rnn1(x)
-        x, (hn2, cn2) = self.rnn2(x)
+        X, (H_1, C_1) = self._recurrent_1(X)
+        X, (H_2, C_2) = self._recurrent_2(X)
         
-        x = torch.cat([hn1[0,:,:],hn2[0,:,:],skip], dim=1)
-        
-        return x
+        X = torch.cat([H_1[0, :, :], H_2[0, :, :], S], dim=1)        
+        return X
 
 
 
