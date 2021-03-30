@@ -19,12 +19,14 @@ class MPNNLSTM(nn.Module):
     def __init__(self, in_channels: int, hidden_size: int ,
                  out_channels: int, num_nodes: int, window: int, dropout: float):
         super(MPNNLSTM_, self).__init__()
+        
         self.window = window
         self.num_nodes = num_nodes
         self.hidden_size = hidden_size
         self.dropout = dropout
         self.in_channels = in_channels
         self.out_channels = out_channels
+        
         self._create_parameters_and_layers()
         
     def _create_parameters_and_layers(self):

@@ -8,7 +8,7 @@ from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 
 from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
-from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader
+from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
 
  
 def get_edge_array(n_count):
@@ -183,6 +183,19 @@ def test_discrete_train_test_split_static():
             assert snapshot.edge_attr.shape == (102, )
             assert snapshot.x.shape == (20, 4)
             assert snapshot.y.shape == (20, )
+            
+            
+def test_discrete_train_test_split_static():
+    loader = EnglandCovidDatasetLoader()
+    dataset = loader.get_dataset()
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            print(snapshot.edge_index.shape)
+            print(snapshot.edge_attr.shape)
+            print(snapshot.x.shape)
+            print(snapshot.y.shape)
 
 
 def test_discrete_train_test_split_dynamic():
