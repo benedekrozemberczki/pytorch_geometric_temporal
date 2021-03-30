@@ -36,7 +36,7 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
 
 ```bibtex
 @misc{pytorch_geometric_temporal,
-      author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Maria, Astefanoaei and Oliver, Kiss and Nicolas, Collignon},
+      author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Panagopoulos, George and Maria, Astefanoaei and Oliver, Kiss and Nicolas, Collignon},
       title = {{PyTorch Geometric Temporal}},
       year = {2020},
       publisher = {GitHub},
@@ -81,7 +81,7 @@ class RecurrentGCN(torch.nn.Module):
 In detail, the following temporal graph neural networks were implemented.
 
 
-**Discrete Recurrent Graph Convolutions**
+**Recurrent Graph Convolutions**
 
 * **[DCRNN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.dcrnn.DCRNN)** from Li *et al.*: [Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting](https://arxiv.org/abs/1707.01926) (ICLR 2018)
 
@@ -102,6 +102,8 @@ In detail, the following temporal graph neural networks were implemented.
 * **[T-GCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.temporalgcn.TGCN)** from Zhao *et al.*: [T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction](https://arxiv.org/abs/1811.05320) (IEEE TITS 2019)
 
 * **[A3T-GCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.attentiontemporalgcn.A3TGCN)** from Zhu *et al.*: [A3T-GCN: Attention Temporal Graph Convolutional Network for Traffic Forecasting](https://arxiv.org/abs/2006.11583) (CoRR 2020)
+
+* **[MPNN LSTM](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.mpnn_lstm.MPNNLSTM)** from Panagopoulos *et al.*: [Transfer Graph Neural Networks for Pandemic Forecasting](https://arxiv.org/abs/2009.08388) (CoRR 2020)
 
 **Temporal Graph Convolutions**
 
