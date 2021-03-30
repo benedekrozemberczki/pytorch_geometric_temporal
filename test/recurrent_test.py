@@ -129,7 +129,7 @@ def test_mpnn_lstm_layer():
                      window = window,
                      dropout = 0.5)
                      
-    X = layer(X, edge_index, edge_weight)
+    H = layer(X, edge_index, edge_weight)
     
     assert H.shape == (number_of_nodes, 2*hidden_size + in_channels + window-1)
     
