@@ -17,14 +17,15 @@ class EnglandCovidDatasetLoader(object):
 
     def _get_edges(self):
         self._edges = []
-        for time in range(self._dataset["time_periods"]):      
-            self._edges.append(np.array(self._dataset["edge_mapping"]["edge_index"][time]).T)
+        for time in range(self._dataset["time_periods"]-1):      
+            self._edges.append(np.array(self._dataset["edge_mapping"]["edge_index"][str(time)]).T)
 
 
     def _get_edge_weights(self):
         self._edge_weights = []
-        for time in range(self._dataset["time_periods"]):      
-            self._edge_weights.append(np.array(self._dataset["edge_mapping"]["edge_weight"][time]))
+        print(self._dataset["time_periods"])
+        for time in range(self._dataset["time_periods"]-1):      
+            self._edge_weights.append(np.array(self._dataset["edge_mapping"]["edge_weight"][str(time)]))
 
     def _get_targets_and_features(self):
 
