@@ -17,7 +17,8 @@ class MPNNLSTM(nn.Module):
         window (int): Number of past samples included in the input.
         dropout (float): Dropout rate.
     """
-    def __init__(self, in_channels: int, hidden_size: int , out_channels: int, num_nodes: int, window: int, dropout: float):
+    def __init__(self, in_channels: int, hidden_size: int ,
+                 out_channels: int, num_nodes: int, window: int, dropout: float):
         super(MPNNLSTM_, self).__init__()
         self.window = window
         self.num_nodes = num_nodes
