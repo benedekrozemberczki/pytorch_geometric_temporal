@@ -8,7 +8,7 @@ import numpy as np
 #import scipy.sparse as sp
 
 
-class MPNN_LSTM(nn.Module):
+class MPNNLSTM(nn.Module):
     r"""An implementation of the Message Passing Neural Network with Long Short Term Memory.
     For details see this paper: `"Transfer Graph Neural Networks for Pandemic Forecasting
 ." <https://arxiv.org/abs/2009.08388>`_
@@ -22,7 +22,7 @@ class MPNN_LSTM(nn.Module):
         dropout (float): Dropout rate.
     """
     def __init__(self, in_channels: int, hidden_size: int , out_channels: int, n_nodes: int, window: int, dropout: float):
-        super(MPNN_LSTM_, self).__init__()
+        super(MPNNLSTM_, self).__init__()
         self.window = window
         self.n_nodes = n_nodes
         self.hidden_size = hidden_size
