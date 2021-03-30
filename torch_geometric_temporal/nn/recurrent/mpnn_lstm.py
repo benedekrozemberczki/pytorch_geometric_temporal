@@ -90,7 +90,6 @@ class MPNNLSTM(nn.Module):
         X = torch.transpose(X, 0, 1)
         X = X.contiguous().view(self.window, -1, X.size(3))
         
-        
         X, (H_1, C_1) = self._recurrent_1(X)
         X, (H_2, C_2) = self._recurrent_2(X)
         

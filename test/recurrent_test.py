@@ -124,7 +124,7 @@ def test_mpnn_lstm_layer():
     layer = MPNNLSTM(in_channels=in_channels,
                      hidden_size=hidden_size,
                      out_channels=out_channels,
-                     num_nodes=100,
+                     num_nodes=number_of_nodes,
                      window = 1,
                      dropout = 0.5)
     
