@@ -129,7 +129,7 @@ def test_mpnn_lstm_layer():
                      dropout = 0.5)
     
     H = layer(X, edge_index, edge_weight)
-    print(H.shape)
+    assert H.shape == (number_of_nodes, in_channels*2)
     
 def test_tgcn_layer():
     """
