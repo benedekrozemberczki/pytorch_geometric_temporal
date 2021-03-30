@@ -128,7 +128,7 @@ def test_mpnn_lstm_layer():
                      window = 1,
                      dropout = 0.5)
     
-    H = layer(X, edge_index, edge_weight, H)
+    H = layer(X, edge_index, edge_weight)
     print(H.shape)
     
 def test_tgcn_layer():
