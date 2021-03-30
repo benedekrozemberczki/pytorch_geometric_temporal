@@ -18,7 +18,7 @@ class EnglandCovidDatasetLoader(object):
         window (int): Number of past day measurements used for node features.
         scaled (bool): Normalize the features.
     """
-    def __init__(self, window: int, scaled: bool=False):
+    def __init__(self, window: int=8, scaled: bool=False):
         self.window = window
         self.scaled = scaled
         self._read_web_data()
@@ -48,11 +48,11 @@ class EnglandCovidDatasetLoader(object):
         for i,G in enumerate(Gs):
             y.append(list())
             for node in G.nodes():
-                y[i].append(labels.loc[node,dates[i]])
+                y[i].append(np.array(labels.loc[node,dates[i]]))
                 
         self._edge_index=edge_index
         self._edge_weight = edge_weight
-        self.features = features
+        self.features =features
         self.targets = y
 
 
@@ -90,7 +90,6 @@ class EnglandCovidDatasetLoader(object):
           
                 
             features.append(H)
-            
         return features
 
 
@@ -110,13 +109,13 @@ class EnglandCovidDatasetLoader(object):
                 
             Gs.append(G)
             
-        return Gs        
-    
-    
+        return Gs
+
+
     def get_dataset(self) -> DynamicGraphTemporalSignal:
         """Returning the COVID-19 England data iterator.
         Return types:
-            * **dataset** *(DynamicGraphTemporalSignal)* - The COVID19EN dataset.
+            * **dataset** *(DynamicGraphTemporalSignal)* - The COVID19 England dataset.
         """
         dataset = DynamicGraphTemporalSignal(self._edge_index, self._edge_weight, self.features, self.targets)
         return dataset
