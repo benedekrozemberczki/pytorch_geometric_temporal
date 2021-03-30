@@ -42,6 +42,10 @@ Recurrent Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.recurrent.attentiontemporalgcn
     :members:
     :undoc-members:
+    
+.. automodule:: torch_geometric_temporal.nn.recurrent.mpnn_lstm
+    :members:
+    :undoc-members:
 
 .. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
