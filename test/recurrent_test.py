@@ -3,7 +3,7 @@ import numpy as np
 import networkx as nx
 from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU, DCRNN
 from torch_geometric_temporal.nn.recurrent import GCLSTM, LRGCN, DyGrEncoder
-from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO, TGCN, A3TGCN
+from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO, TGCN, A3TGCN, MPNNLSTM
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     """
@@ -107,6 +107,29 @@ def test_gconv_gru_layer():
     H = layer(X, edge_index, edge_weight, H)
 
     assert H.shape == (number_of_nodes, out_channels)
+    
+def test_mpnn_lstm_layer():
+    """
+    Testing the MPNN LSTM Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    hidden_size = 32
+    out_channels = 16
+
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    edge_weight = create_mock_edge_weight(edge_index)
+
+    layer = MPNNLSTM(in_channels=in_channels,
+                     hidden_size=hidden_size,
+                     out_channels=out_channels,
+                     num_nodes=100,
+                     window = 1,
+                     dropout = 0.5)
+    
+    H = layer(X, edge_index, edge_weight, H)
+    print(H.shape)
     
 def test_tgcn_layer():
     """
