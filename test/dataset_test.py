@@ -8,7 +8,7 @@ from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 
 from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
-from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader
+from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
 
 
 
@@ -126,6 +126,16 @@ def test_windmill():
             snapshot.edge_attr.shape == (97032, )
             snapshot.x.shape == (312, 8)
             snapshot.y.shape == (312, )
+            
+def test_covid():
+    loader = EnglandCovidDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(2):
+        for snapshot in dataset:
+            snapshot.edge_index.shape[0] == 2
+            snapshot.edge_attr.shape[0] == snapshot.edge_index.shape[1]
+            snapshot.x.shape == (129, 8)
+            snapshot.y.shape == (129, )
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")

@@ -23,24 +23,23 @@ class EnglandCovidDatasetLoader(object):
 
     def _get_edge_weights(self):
         self._edge_weights = []
-        print(self._dataset["time_periods"])
         for time in range(self._dataset["time_periods"]-1):      
             self._edge_weights.append(np.array(self._dataset["edge_mapping"]["edge_weight"][str(time)]))
 
     def _get_targets_and_features(self):
 
-        stacked_target = np.array(targets["y"])
-        standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / np.std(stacked_target, axis=0)
+        stacked_target = np.array(self._dataset["y"])
+        standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) /( np.std(stacked_target, axis=0)+10**-10)
         self.features = [standardized_target[i:i+self.lags,:].T for i in range(self._dataset["time_periods"]-self.lags)]
         self.targets = [standardized_target[i+self.lags,:].T for i in range(self._dataset["time_periods"]-self.lags)]
 
     def get_dataset(self, lags: int=8) -> StaticGraphTemporalSignal:
-        """Returning the Wikipedia Vital Mathematics data iterator.
+        """Returning the England COVID19 data iterator.
 
         Args types:
             * **lags** *(int)* - The number of time lags.        
         Return types:
-            * **dataset** *(StaticGraphTemporalSignal)* - The Wiki Maths dataset.
+            * **dataset** *(StaticGraphTemporalSignal)* - The England Covid dataset.
         """
         self.lags = lags
         self._get_edges()
@@ -48,6 +47,3 @@ class EnglandCovidDatasetLoader(object):
         self._get_targets_and_features()
         dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
-        
-x = EnglandCovidDatasetLoader()
-x.get_dataset()
