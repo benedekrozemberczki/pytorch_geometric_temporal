@@ -13,15 +13,17 @@ class METRLADatasetLoader(object):
     readings collected from 207 loop detectors on highways in Los Angeles 
     County in aggregated 5 minute intervals for 4 months between March 2012 
     to June 2012.
-    """
 
+    For further details on the version of the sensor network and 
+    discretization see: `"Diffusion Convolutional Recurrent Neural Network:
+    Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
+    """
     def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data")):
         super(METRLADatasetLoader, self).__init__()
         self.raw_data_dir = raw_data_dir
         self._read_web_data()
 
-
-    def _download_url(self, url, save_path):
+    def _download_url(self, url, save_path): # pragma: no cover
         with urllib.request.urlopen(url) as dl_file:
             with open(save_path, 'wb') as out_file:
                 out_file.write(dl_file.read())
@@ -30,12 +32,12 @@ class METRLADatasetLoader(object):
         url = "https://graphmining.ai/temporal_datasets/METR-LA.zip"
 
         # Check if zip file is in data folder from working directory, otherwise download
-        if (not os.path.isfile(os.path.join(self.raw_data_dir, "METR-LA.zip"))):
+        if (not os.path.isfile(os.path.join(self.raw_data_dir, "METR-LA.zip"))): # pragma: no cover
             if not os.path.exists(self.raw_data_dir):
                 os.makedirs(self.raw_data_dir)
             self._download_url(url, os.path.join(self.raw_data_dir, "METR-LA.zip"))
 
-        if (not os.path.isfile(os.path.join(self.raw_data_dir, "adj_mat.npy")) or not os.path.isfile(os.path.join(self.raw_data_dir, "node_values.npy"))):
+        if (not os.path.isfile(os.path.join(self.raw_data_dir, "adj_mat.npy")) or not os.path.isfile(os.path.join(self.raw_data_dir, "node_values.npy"))): # pragma: no cover
             with zipfile.ZipFile(os.path.join(self.raw_data_dir, "METR-LA.zip"), "r") as zip_fh:
                 zip_fh.extractall(self.raw_data_dir)
 
@@ -96,9 +98,3 @@ class METRLADatasetLoader(object):
         dataset = StaticGraphTemporalSignal(self.edges, self.edge_weights, self.features, self.targets)
 
         return dataset
-
-
-if __name__ == '__main__':
-    from ..signal import StaticGraphTemporalSignal
-    loader = METRLADatasetLoader(raw_data_dir="/tmp/")
-    dataset = loader.get_dataset()
