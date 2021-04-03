@@ -11,7 +11,7 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
 .. code-block:: latex
 
     >@misc{pytorch_geometric_temporal,
-           author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and Panagopoulos, George and Maria, Astefanoaei and Oliver, Kiss and Nicolas, Collignon},
+           author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and George, Panagopoulos and Maria, Astefanoaei and Oliver, Kiss and Nicolas, Collignon},
            title = {{PyTorch Geometric Temporal}},
            year = {2020},
            publisher = {GitHub},
