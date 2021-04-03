@@ -129,7 +129,7 @@ In detail, the following temporal graph neural networks were implemented.
 
 
 Head over to our [documentation](https://pytorch-geometric-temporal.readthedocs.io) to find out more about installation, creation of datasets and a full list of implemented methods and available datasets.
-For a quick start, check out the [examples](https://github.com/benedekrozemberczki/pytorch_geometric_temporal/tree/master/examples) in the `examples/` directory.
+For a quick start, check out the [examples](https://pytorch-geometric-temporal.readthedocs.io) in the `examples/` directory.
 
 If you notice anything unexpected, please open an [issue](https://benedekrozemberczki/pytorch_geometric_temporal/issues). If you are missing a specific method, feel free to open a [feature request](https://github.com/benedekrozemberczki/pytorch_geometric_temporal/issues).
 

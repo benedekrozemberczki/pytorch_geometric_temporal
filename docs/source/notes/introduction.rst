@@ -266,4 +266,4 @@ Using the holdout time periods we will evaluate the performance of the trained r
     cost = cost / (time+1)
     cost = cost.item()
     print("MSE: {:.4f}".format(cost))
-    >>> MSE: 0.6866
+    >>> MSE: 0.7760
