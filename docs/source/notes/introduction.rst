@@ -214,7 +214,7 @@ We are using the Wikipedia Maths dataset in this case study. We will train a rec
 
     train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.5)
 
-In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is **important to note again** that the final non-linearity is not integrated into the recurrent graph convolutional operation. 
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is **important to note again** that the non-linearity is not integrated into the recurrent graph convolutional operation. The convolutional model has a fixed number of filters (which can be parametrized) and considers 2nd order neighbourhoods. 
 
 .. code-block:: python
 
@@ -223,10 +223,10 @@ In the next steps we will define the **recurrent graph neural network** architec
     from torch_geometric_temporal.nn.recurrent import GConvGRU
 
     class RecurrentGCN(torch.nn.Module):
-        def __init__(self, node_features):
+        def __init__(self, node_features, filters):
             super(RecurrentGCN, self).__init__()
-            self.recurrent = GConvGRU(node_features, 32, 1)
-            self.linear = torch.nn.Linear(32, 1)
+            self.recurrent = GConvGRU(node_features, filters, 2)
+            self.linear = torch.nn.Linear(filters, 1)
 
         def forward(self, x, edge_index, edge_weight):
             h = self.recurrent(x, edge_index, edge_weight)
@@ -234,15 +234,15 @@ In the next steps we will define the **recurrent graph neural network** architec
             h = self.linear(h)
             return h
 
-Let us define a model (we have 14 node features) and train it on the training split (first 50% of the temporal snapshots) for 50 epochs. We backpropagate the loss from every temporal snapshot individually. We will use the **Adam optimizer** with a learning rate of **0.05**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
+Let us define a model (we have 14 node features) and train it on the training split (first 50% of the temporal snapshots) for 50 epochs. We **backpropagate the loss from every temporal snapshot** individually. We will use the **Adam optimizer** with a learning rate of **0.01**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
 
 .. code-block:: python
 
     from tqdm import tqdm
 
-    model = RecurrentGCN(node_features = 14)
+    model = RecurrentGCN(node_features=14, filters=32)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
     model.train()
 
