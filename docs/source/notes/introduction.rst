@@ -244,14 +244,12 @@ Let us define a model (we have 16 node features) and train it on the training sp
     model.train()
 
     for epoch in tqdm(range(200)):
-        costs = 0
         for time, snapshot in enumerate(train_dataset):
             y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
             cost = torch.mean((y_hat-snapshot.y)**2)
-        cost = cost / (time+1)
-        cost.backward()
-        optimizer.step()
-        optimizer.zero_grad()
+            cost.backward()
+            optimizer.step()
+            optimizer.zero_grad()
 
 Using the holdout time periods we will evaluate the performance of the trained recurrent graph convolutional network and calculate the mean squared error across **all of the web pages and days**. 
 
