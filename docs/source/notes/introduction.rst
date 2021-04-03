@@ -196,3 +196,73 @@ Using the holdout we will evaluate the performance of the trained recurrent grap
     
 Web Traffic Prediction
 ----------------------
+
+
+We are using the Hungarian Chickenpox Cases dataset in this case study. We will train a regressor to predict the weekly cases reported by the counties using a recurrent graph convolutional network. First, we will load the dataset and create an appropriate spatio-temporal split.
+
+.. code-block:: python
+
+    from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.signal import temporal_signal_split
+
+    loader = WikiMathDatasetLoader()
+
+    dataset = loader.get_dataset()
+
+    train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.2)
+
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is important to note that the final non-linearity is not integrated into the recurrent graph convolutional operation. This design principle is used consistently and it was taken from PyTorch Geometric. Because of this, we defined a ``ReLU`` non-linearity between the recurrent and linear layers manually. The final linear layer is not followed by a non-linearity as we solve a regression problem with zero-mean targets.
+
+.. code-block:: python
+
+    import torch
+    import torch.nn.functional as F
+    from torch_geometric_temporal.nn.recurrent import DCRNN
+
+    class RecurrentGCN(torch.nn.Module):
+        def __init__(self, node_features):
+            super(RecurrentGCN, self).__init__()
+            self.recurrent = DCRNN(node_features, 32, 1)
+            self.linear = torch.nn.Linear(32, 1)
+
+        def forward(self, x, edge_index, edge_weight):
+            h = self.recurrent(x, edge_index, edge_weight)
+            h = F.relu(h)
+            h = self.linear(h)
+            return h
+
+Let us define a model (we have 16 node features) and train it on the training split (first 50% of the temporal snapshots) for 50 epochs. We backpropagate the loss from every temporal snapshot individually. We will use the **Adam optimizer** with a learning rate of **0.05**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
+
+.. code-block:: python
+
+    from tqdm import tqdm
+
+    model = RecurrentGCN(node_features = 16)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
+
+    model.train()
+
+    for epoch in tqdm(range(200)):
+        costs = 0
+        for time, snapshot in enumerate(train_dataset):
+            y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
+            cost = torch.mean((y_hat-snapshot.y)**2)
+        cost = cost / (time+1)
+        cost.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+Using the holdout time periods we will evaluate the performance of the trained recurrent graph convolutional network and calculate the mean squared error across **all of the web pages and days**. 
+
+.. code-block:: python
+
+    model.eval()
+    cost = 0
+    for time, snapshot in enumerate(test_dataset):
+        y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+        cost = cost + torch.mean((y_hat-snapshot.y)**2)
+    cost = cost / (time+1)
+    cost = cost.item()
+    print("MSE: {:.4f}".format(cost))
+    >>> MSE: 0.6866
