@@ -1,6 +1,7 @@
 from setuptools import find_packages, setup
 
-install_requires = ["torch",
+install_requires = ["decorator==4.4.2",
+                    "torch",
                     "torch_sparse",
                     "torch_scatter",
                     "torch_cluster", 
@@ -8,7 +9,6 @@ install_requires = ["torch",
                     "torch_geometric",
                     "numpy",
                     "scipy==1.5.4",
-                    "networkx==2.5",
                     "tqdm",
                     "six"]
 
