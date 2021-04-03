@@ -20,14 +20,6 @@ To install the binaries for PyTorch 1.8.0, simply run
 
 where `${CUDA}` should be replaced by either `cpu`, `cu101`, `cu102`, or `cu111` depending on your PyTorch installation.
 
-+=============+=======+========+==========+=========+
-|             | `cpu` | `cu101` | `cu102` | `cu111` |
-+=============+=======+========+==========+=========+
-| **Linux**   | ✅    | ✅     | ✅      | ✅      |
-| **Windows** | ✅    | ✅     | ✅      | ✅      |
-| **macOS**   | ✅    |         |         |         |
-+=============+=======+========+==========+=========+
-
 **PyTorch 1.7.0**
 
 To install the binaries for PyTorch 1.7.0, simply run
@@ -45,15 +37,18 @@ To install the binaries for PyTorch 1.7.0, simply run
 where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101`, `cu102` or `cu110` depending on your PyTorch installation.
 
 
-+=============+=======+========+==========+========+=========+
-|             | `cpu` | `cu92` | `cu101` | `cu102` | `cu110` |
-+=============+=======+========+=========+=========+=========+
-| **Linux**   | ✅    | ✅     | ✅     | ✅     |  ✅     |
-| **Windows** | ✅    | ❌     | ✅     | ✅     |  ✅     |
-| **macOS**   | ✅    |        |         |        |          |
-+=============+=======+========+==========+=========+
+**PyTorch 1.6.0**
 
---------------------------------------------------------------------------------
+To install the binaries for PyTorch 1.6.0, simply run
+
+```sh
+$ pip install torch-scatter==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+$ pip install torch-sparse==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+$ pip install torch-cluster==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+$ pip install torch-spline-conv==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+$ pip install torch-geometric
+$ pip install torch-geometric-temporal
+```
 
 **Generic Installation**
 
