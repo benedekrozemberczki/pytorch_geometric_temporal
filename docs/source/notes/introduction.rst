@@ -198,14 +198,17 @@ Web Traffic Prediction
 ----------------------
 
 
-We are using the Hungarian Chickenpox Cases dataset in this case study. We will train a regressor to predict the weekly cases reported by the counties using a recurrent graph convolutional network. First, we will load the dataset and create an appropriate spatio-temporal split.
+We are using the Wikipedia Maths dataset in this case study. We will train a recurrent graph neural network to predict the daiy views on Wikipedia Pages using a recurrent graph convolutional network. First, we will load the dataset and use 14 lagged traffic variables. Next, we create an appropriate spatio-temporal split using 50% of days for training of the model.
 
 .. code-block:: python
 
     from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
     from torch_geometric_temporal.signal import temporal_signal_split
 
-    loader = WikiMathDatasetLoader()
+    loader = WikiMathsDatasetLoader()
+
+    dataset = loader.get_dataset(lags=14)
+
 
     dataset = loader.get_dataset()
 
