@@ -231,19 +231,19 @@ In the next steps we will define the **recurrent graph neural network** architec
             h = self.linear(h)
             return h
 
-Let us define a model (we have 16 node features) and train it on the training split (first 50% of the temporal snapshots) for 50 epochs. We backpropagate the loss from every temporal snapshot individually. We will use the **Adam optimizer** with a learning rate of **0.05**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
+Let us define a model (we have 14 node features) and train it on the training split (first 50% of the temporal snapshots) for 50 epochs. We backpropagate the loss from every temporal snapshot individually. We will use the **Adam optimizer** with a learning rate of **0.05**. The ``tqdm`` function is used for measuring the runtime need for each training epoch.
 
 .. code-block:: python
 
     from tqdm import tqdm
 
-    model = RecurrentGCN(node_features = 16)
+    model = RecurrentGCN(node_features = 14)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
 
     model.train()
 
-    for epoch in tqdm(range(200)):
+    for epoch in tqdm(range(50)):
         for time, snapshot in enumerate(train_dataset):
             y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
             cost = torch.mean((y_hat-snapshot.y)**2)
