@@ -214,18 +214,18 @@ We are using the Wikipedia Maths dataset in this case study. We will train a rec
 
     train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.5)
 
-In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is important to note that the final non-linearity is not integrated into the recurrent graph convolutional operation. This design principle is used consistently and it was taken from PyTorch Geometric. Because of this, we defined a ``ReLU`` non-linearity between the recurrent and linear layers manually. The final linear layer is not followed by a non-linearity as we solve a regression problem with zero-mean targets.
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is **important to note again** that the final non-linearity is not integrated into the recurrent graph convolutional operation. 
 
 .. code-block:: python
 
     import torch
     import torch.nn.functional as F
-    from torch_geometric_temporal.nn.recurrent import DCRNN
+    from torch_geometric_temporal.nn.recurrent import GConvGRU
 
     class RecurrentGCN(torch.nn.Module):
         def __init__(self, node_features):
             super(RecurrentGCN, self).__init__()
-            self.recurrent = DCRNN(node_features, 32, 1)
+            self.recurrent = GConvGRU(node_features, 32, 1)
             self.linear = torch.nn.Linear(32, 1)
 
         def forward(self, x, edge_index, edge_weight):
