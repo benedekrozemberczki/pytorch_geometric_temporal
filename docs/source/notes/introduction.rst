@@ -198,7 +198,7 @@ Web Traffic Prediction
 ----------------------
 
 
-We are using the Wikipedia Maths dataset in this case study. We will train a recurrent graph neural network to predict the daiy views on Wikipedia Pages using a recurrent graph convolutional network. First, we will load the dataset and use 14 lagged traffic variables. Next, we create an appropriate spatio-temporal split using 50% of days for training of the model.
+We are using the Wikipedia Maths dataset in this case study. We will train a recurrent graph neural network to predict the daiy views on Wikipedia pages using a recurrent graph convolutional network. First, we will load the dataset and use 14 lagged traffic variables. Next, we create an appropriate spatio-temporal split using 50% of days for training of the model.
 
 .. code-block:: python
 
@@ -214,7 +214,7 @@ We are using the Wikipedia Maths dataset in this case study. We will train a rec
 
     train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.5)
 
-In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``DCRNN`` layer and a feedforward layer. It is **important to note again** that the non-linearity is not integrated into the recurrent graph convolutional operation. The convolutional model has a fixed number of filters (which can be parametrized) and considers 2nd order neighbourhoods. 
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``GConvGRU`` layer and a feedforward layer. It is **important to note again** that the non-linearity is not integrated into the recurrent graph convolutional operation. The convolutional model has a fixed number of filters (which can be parametrized) and considers 2nd order neighbourhoods. 
 
 .. code-block:: python
 
