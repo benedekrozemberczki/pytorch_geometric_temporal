@@ -254,7 +254,7 @@ Let us define a model (we have 14 node features) and train it on the training sp
             optimizer.step()
             optimizer.zero_grad()
 
-Using the holdout time periods we will evaluate the performance of the trained recurrent graph convolutional network and calculate the mean squared error across **all of the web pages and days**. 
+Using the holdout traffic data we will evaluate the performance of the trained recurrent graph convolutional network and calculate the mean squared error across **all of the web pages and days**. 
 
 .. code-block:: python
 
