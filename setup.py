@@ -8,7 +8,7 @@ install_requires = ["torch",
                     "torch_geometric",
                     "numpy",
                     "scipy==1.5.4",
-                    "networkx",
+                    "networkx==2.5",
                     "tqdm",
                     "six"]
 
