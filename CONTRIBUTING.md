@@ -40,5 +40,5 @@ Start reading our code and you'll get the hang of it. We optimize for readabilit
   * Also for the CDN, always use cwd-relative paths rather than root-relative paths in image URLs in any CSS. So instead of url('/images/blah.gif'), use url('../images/blah.gif').
 
 Thanks,
-Carl Tashian, Participatory Politics Foundation
+Benedek Rozemberczki
 
