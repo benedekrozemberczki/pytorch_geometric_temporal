@@ -19,8 +19,6 @@ Run the entire test suite with
 python setup.py test
 ```
 
-or run individual test files, like `pytest --no-cov test/recurrent_test.py`, for individual test suites.
-
 ## Submitting changes
 
 Please send a [GitHub Pull Request to PyTorch Geometric Temporal](https://github.com/benedekrozemberczki/pytorch_geometric_temporal/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
