@@ -4,21 +4,22 @@ I'm really glad you're reading this, because we need volunteer developers to hel
 
 Here are some important things to check when you contribute:
 
-  * 
-  * 
-  * [Pivotal Tracker](http://pivotaltracker.com/projects/64842).
+  * Please make sure that you write tests.
+  * Update the documentation.
+  * Add the new model to the readme.
+  * If your contribution is a paper please update the resource documentation file. 
   
 ## Testing
 
 
-PyTorch Geometric's testing is located under `test/`.
+PyTorch Geometric Temporal's testing is located under `test/`.
 Run the entire test suite with
 
 ```
 python setup.py test
 ```
 
-or run individual test files, like `pytest --no-cov test/utils/test_convert.py`, for individual test suites.
+or run individual test files, like `pytest --no-cov test/recurrent_test.py`, for individual test suites.
 
 ## Submitting changes
 
@@ -42,5 +43,5 @@ Start reading our code and you'll get the hang of it. We optimize for readabilit
   * Make linear algebra operations line-by-line.
 
 Thanks,
-Benedek Rozemberczki
+Benedek
 
