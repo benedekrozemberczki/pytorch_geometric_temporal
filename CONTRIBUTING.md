@@ -33,8 +33,10 @@ Start reading our code and you'll get the hang of it. We optimize for readabilit
 
   * We write tests for the data loaders, iterators and layers.
   * We use the type hinting feature of Python.
-  * We avoid the uses of public methods in the layers.
-  * 
+  * We avoid the uses of public methods and vaiarbles in the classes.
+  * Hyperparameters belong to the constructors.
+  * Auxiliiary layer instances should have long names.
+  * Make linear algebra operations line-by-line.
 
 Thanks,
 Benedek Rozemberczki
