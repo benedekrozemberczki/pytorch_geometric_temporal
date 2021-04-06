@@ -27,11 +27,11 @@ Data Structures
 Temporal Signal Iterators
 --------------------------
 
-PyTorch Geometric Tenporal offers data iterators for constant time difference spatio-temporal datasets which contain the temporal snapshots. There are two types of constant time difference data iterators:
+PyTorch Geometric Tenporal offers data iterators for spatio-temporal datasets which contain the temporal snapshots. There are three types of data iterators:
 
-- ``StaticGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **static** graph.
-- ``DynamicGraphTemporalSignal`` - Is designed for constant time difference spatio-temporal signals defined on a **dynamic** graph.
-
+- ``StaticGraphTemporalSignal`` - Is desiggned for **temporal signals** defined on a **static** graph.
+- ``DynamicGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **dynamic** graph.
+- ``DynamicGraphStaticSignal`` - Is designed for **static signals** defined on a **dynamic** graph.
 
 Static Graph with Temporal Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
