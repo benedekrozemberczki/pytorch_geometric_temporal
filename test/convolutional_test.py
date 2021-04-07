@@ -117,6 +117,19 @@ def test_astgcn():
     assert out2.size() == (batch_size, num_nodes, out_channels)
     out3 = conv(x, edge_index, attention, edge_weight, lambda_max=3.0)
     assert out3.size() == (batch_size, num_nodes, out_channels)
+    
+    batch = torch.tensor([0, 0, 1, 1])
+    edge_index = torch.tensor([[0, 1, 2, 3], [1, 0, 3, 2]])
+    num_nodes = edge_index.max().item() + 1
+    edge_weight = torch.rand(edge_index.size(1))
+    x = torch.randn((batch_size, num_nodes, in_channels))
+    lambda_max = torch.tensor([2.0, 3.0])
+    attention = torch.nn.functional.softmax(torch.rand((batch_size, num_nodes, num_nodes)), dim=1)
+
+    out4 = conv(x, edge_index, attention, edge_weight, batch)
+    assert out4.size() == (batch_size, num_nodes, out_channels)
+    out5 = conv(x, edge_index, attention, edge_weight, batch, lambda_max)
+    assert out5.size() == (batch_size, num_nodes, out_channels)
 
     node_count = 307
     num_classes = 10
