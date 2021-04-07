@@ -110,6 +110,7 @@ def test_astgcn():
     attention = torch.nn.functional.softmax(torch.rand((batch_size, num_nodes, num_nodes)), dim=1)
 
     conv = ChebConvAttention(in_channels, out_channels, K=3, normalization='sym')
+    assert conv.__repr__() == 'ChebConvAttention(16, 32, K=3, normalization=sym)'
     out1 = conv(x, edge_index, attention)
     assert out1.size() == (batch_size, num_nodes, out_channels)
     out2 = conv(x, edge_index, attention, edge_weight)
