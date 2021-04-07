@@ -324,7 +324,7 @@ def test_mtgnn():
         output = model(tx, A_tilde, idx=id)
         output = output.transpose(1, 3)
         assert output.shape == (batch_size, 1, num_nodes, seq_out_len)
-        output2 = model2(tx, A_tilde, idx=id, FE=FE)
+        output2 = model2(tx, A_tilde, FE=FE)
         output2 = output2.transpose(1, 3)
         assert output2.shape == (batch_size, 1, num_nodes, seq_out_len)
         output3 = model3(tx, A_tilde, FE=FE)
