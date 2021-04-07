@@ -162,12 +162,16 @@ def test_astgcn():
         encoder_inputs, _ = batch_data
         outputs0 = model(encoder_inputs, edge_index_seq)
         outputs1 = model(encoder_inputs, edge_index_seq[0])
-        outputs2 = model2(encoder_inputs, edge_index_seq)
-        outputs3 = model3(encoder_inputs, edge_index_seq[0])
+        outputs2 = model2(encoder_inputs, edge_index_seq[0])
+        outputs3 = model2(encoder_inputs, edge_index_seq)
+        outputs4 = model3(encoder_inputs, edge_index_seq[0])
+        outputs5 = model3(encoder_inputs, edge_index_seq)
     assert outputs0.shape == (batch_size, node_count, num_for_predict)
     assert outputs1.shape == (batch_size, node_count, num_for_predict)
     assert outputs2.shape == (batch_size, node_count, num_for_predict)
     assert outputs3.shape == (batch_size, node_count, num_for_predict)
+    assert outputs4.shape == (batch_size, node_count, num_for_predict)
+    assert outputs5.shape == (batch_size, node_count, num_for_predict)
 
 def test_mstgcn():
     """
