@@ -117,7 +117,7 @@ def test_mpnn_lstm_layer():
     in_channels = 64
     hidden_size = 32
     out_channels = 16
-    window=1
+    window = 1
 
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
     edge_weight = create_mock_edge_weight(edge_index)
