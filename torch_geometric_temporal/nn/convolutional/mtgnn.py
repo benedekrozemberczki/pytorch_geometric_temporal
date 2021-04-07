@@ -267,10 +267,6 @@ class LayerNormalization(nn.Module):
         else:
             return F.layer_norm(X, tuple(X.shape[1:]), self._weight, self._bias, self._eps)
 
-    def extra_repr(self):
-        return '{normalized_shape}, eps={eps}, ' \
-            'elementwise_affine={elementwise_affine}'.format(**self.__dict__)
-
 
 class MTGNNLayer(nn.Module):
     r"""An implementation of the MTGNN layer.
