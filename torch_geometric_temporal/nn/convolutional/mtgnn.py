@@ -91,10 +91,9 @@ class MixProp(nn.Module):
         H = X
         H_0 = X
         A = A / d.view(-1, 1)
-        for i in range(self._gdep):
+        for _ in range(self._gdep):
             H = self._alpha*X + (1 - self._alpha) * torch.einsum('ncwl,vw->ncvl', (H, A))
             H_0 = torch.cat((H_0,H), dim=1)
-        del i
         H_0 = self._mlp(H_0)
         return H_0
 
