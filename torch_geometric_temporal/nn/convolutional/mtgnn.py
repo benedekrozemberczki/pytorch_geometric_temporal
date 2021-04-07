@@ -231,8 +231,6 @@ class LayerNormalization(nn.Module):
     """
     def __init__(self, normalized_shape: int, eps: float=1e-5, elementwise_affine: bool=True):
         super(LayerNormalization, self).__init__()
-        if isinstance(normalized_shape, numbers.Integral):
-            normalized_shape = (normalized_shape,)
         self._normalized_shape = tuple(normalized_shape)
         self._eps = eps
         self._elementwise_affine = elementwise_affine
