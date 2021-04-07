@@ -1,6 +1,7 @@
 from setuptools import find_packages, setup
 
-install_requires = ["torch",
+install_requires = ["decorator==4.4.2",
+                    "torch",
                     "torch_sparse",
                     "torch_scatter",
                     "torch_cluster", 
@@ -8,7 +9,6 @@ install_requires = ["torch",
                     "torch_geometric",
                     "numpy",
                     "scipy==1.5.4",
-                    "networkx",
                     "tqdm",
                     "six"]
 
@@ -41,13 +41,13 @@ keywords = ["machine-learning",
 setup(
   name = "torch_geometric_temporal",
   packages = find_packages(),
-  version = "0.22",
+  version = "0.25",
   license = "MIT",
   description = "A Temporal Extension Library for PyTorch Geometric.",
   author = "Benedek Rozemberczki",
   author_email = "benedek.rozemberczki@gmail.com",
   url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal",
-  download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00021.tar.gz",
+  download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00025.tar.gz",
   keywords = keywords,
   install_requires = install_requires,
   setup_requires = setup_requires,

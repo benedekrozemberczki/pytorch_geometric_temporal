@@ -19,11 +19,19 @@ Datasets
     :members:
     :undoc-members:
     
+.. automodule:: torch_geometric_temporal.dataset.windmill
+    :members:
+    :undoc-members:
+    
 .. automodule:: torch_geometric_temporal.dataset.metr_la
     :members:
     :undoc-members:
     
 .. automodule:: torch_geometric_temporal.dataset.pems_bay
+    :members:
+    :undoc-members:
+
+.. automodule:: torch_geometric_temporal.dataset.encovid
     :members:
     :undoc-members:
 

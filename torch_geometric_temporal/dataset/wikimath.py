@@ -4,6 +4,7 @@ import numpy as np
 from six.moves import urllib
 from ..signal import StaticGraphTemporalSignal
 
+
 class WikiMathsDatasetLoader(object):
     """A dataset of vital mathematics articles from Wikipedia. We made it 
     public during the development of PyTorch Geometric Temporal. The 
@@ -50,4 +51,3 @@ class WikiMathsDatasetLoader(object):
         self._get_targets_and_features()
         dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
-
