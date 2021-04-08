@@ -16,20 +16,21 @@ class ChickenpoxDatasetLoader(object):
     def __init__(self):
         self._read_web_data()
 
+
     def _read_web_data(self):
         url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/chickenpox.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
 
+
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T
+
 
     def _get_edge_weights(self):
         self._edge_weights = np.ones(self._edges.shape[1])
 
 
-
     def _get_targets_and_features(self):
-
         stacked_target = np.array(self._dataset["FX"])
         self.features = [stacked_target[i:i+self.lags,:].T for i in range(stacked_target.shape[0]-self.lags)]
         self.targets = [stacked_target[i+self.lags,:].T for i in range(stacked_target.shape[0]-self.lags)]
