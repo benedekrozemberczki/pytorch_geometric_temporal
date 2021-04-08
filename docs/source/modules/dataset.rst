@@ -37,4 +37,5 @@ Datasets
 
 .. automodule:: torch_geometric_temporal.dataset.twitter_tennis
     :members:
-    :undoc-members: transform_degree, transform_transitivity, encode_features, onehot_encoding
+    :undoc-members:
+    :exclude-members: transform_degree, transform_transitivity, encode_features, onehot_encoding
