@@ -33,8 +33,7 @@ class TwitterTennisDatasetLoader(object):
     Each snapshot contains the graph induced by the most popular nodes 
     of the original dataset. Node labels encode the number of mentions 
     received in the original dataset for the next snapshot. Read more 
-    on the original Twitter data in the 'Temporal Walk Based Centrality
-     Metric for Graph Streams' paper.
+    on the original Twitter data in the 'Temporal Walk Based Centrality Metric for Graph Streams' paper.
     
     Parameters
     ----------
