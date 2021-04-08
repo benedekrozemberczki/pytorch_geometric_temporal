@@ -16,7 +16,7 @@ class PedalMeDatasetLoader(object):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/pedalme.json"
+        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/pedalme_london.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
 
     def _get_edges(self):
@@ -25,26 +25,26 @@ class PedalMeDatasetLoader(object):
     def _get_edge_weights(self):
         self._edge_weights = np.array(self._dataset["weights"]).T
 
-    def _get_features(self):
-        self.features = []
-        for time in range(self._dataset["time_periods"]):
-            self.features.append(np.array(self._dataset[str(time)]["X"]))
 
-    def _get_targets(self):
-        self.targets = []
-        for time in range(self._dataset["time_periods"]):
-            self.targets.append(np.array(self._dataset[str(time)]["y"]))
+    def _get_targets_and_features(self):
 
-    def get_dataset(self) -> StaticGraphTemporalSignal:
+        stacked_target = np.array(self._dataset["X"])
+        self.features = [stacked_target[i:i+self.lags,:].T for i in range(stacked_target.shape[0]-self.lags)]
+        self.targets = [stacked_target[i+self.lags,:].T for i in range(stacked_target.shape[0]-self.lags)]
+
+
+    def get_dataset(self, lags: int=4) -> StaticGraphTemporalSignal:
         """Returning the PedalMe London demand data iterator.
 
+        Args types:
+            * **lags** *(int)* - The number of time lags. 
         Return types:
             * **dataset** *(StaticGraphTemporalSignal)* - The PedalMe dataset.
         """
+        self.lags = lags
         self._get_edges()
         self._get_edge_weights()
-        self._get_features()
-        self._get_targets()
+        self._get_targets_and_features()
         dataset = StaticGraphTemporalSignal(self._edges, self._edge_weights, self.features, self.targets)
         return dataset
 
