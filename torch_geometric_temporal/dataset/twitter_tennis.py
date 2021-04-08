@@ -29,7 +29,12 @@ def encode_features(X, log_degree_cutoff=4):
 class TwitterTennisDatasetLoader(object):
     """
     Twitter mention graphs related to major tennis tournaments from 2017. 
-    Nodes are Twitter accounts and edges are mentions between them. Each snapshot contains the graph induced by the most popular nodes of the original dataset. Node labels encode the number of mentions received in the original dataset for the next snapshot. Read more on the original Twitter data in the 'Temporal Walk Based Centrality Metric for Graph Streams' paper.
+    Nodes are Twitter accounts and edges are mentions between them. 
+    Each snapshot contains the graph induced by the most popular nodes 
+    of the original dataset. Node labels encode the number of mentions 
+    received in the original dataset for the next snapshot. Read more 
+    on the original Twitter data in the 'Temporal Walk Based Centrality
+     Metric for Graph Streams' paper.
     
     Parameters
     ----------
