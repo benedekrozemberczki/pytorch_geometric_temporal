@@ -219,9 +219,6 @@ We are using the Wikipedia Maths dataset in this case study. We will train a rec
 
     dataset = loader.get_dataset(lags=14)
 
-
-    dataset = loader.get_dataset()
-
     train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.5)
 
 In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``GConvGRU`` layer and a feedforward layer. It is **important to note again** that the non-linearity is not integrated into the recurrent graph convolutional operation. The convolutional model has a fixed number of filters (which can be parametrized) and considers 2nd order neighbourhoods. 
