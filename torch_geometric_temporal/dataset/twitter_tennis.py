@@ -13,9 +13,9 @@ def transform_transitivity(x):
     return np.floor(trans)
 
 def onehot_encoding(x, unique_vals):
-    E = np.zeros((len(x),len(unique_vals)))
-    for i,val in enumerate(x):
-        E[i,unique_vals.index(val)] = 1.0
+    E = np.zeros((len(x), len(unique_vals)))
+    for i, val in enumerate(x):
+        E[i, unique_vals.index(val)] = 1.0
     return E
 
 def encode_features(X, log_degree_cutoff=4):
