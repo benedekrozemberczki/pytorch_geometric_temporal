@@ -57,10 +57,13 @@ def test_gconv_lstm_layer():
     out_channels = 16
     K = 2
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
 
     H, C = layer(X, edge_index)
@@ -90,10 +93,13 @@ def test_gconv_gru_layer():
     out_channels = 16
     K = 2
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
 
     H = layer(X, edge_index)
@@ -119,15 +125,18 @@ def test_mpnn_lstm_layer():
     out_channels = 16
     window = 1
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
     layer = MPNNLSTM(in_channels=in_channels,
                      hidden_size=hidden_size,
                      out_channels=out_channels,
                      num_nodes=number_of_nodes,
                      window = window,
-                     dropout = 0.5)
+                     dropout = 0.5).to(device)
                      
     H = layer(X, edge_index, edge_weight)
     
