@@ -212,11 +212,13 @@ def test_dcrnn_layer():
     in_channels = 64
     out_channels = 16
     K = 2
-
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
     H = layer(X, edge_index)
 
@@ -230,7 +232,7 @@ def test_dcrnn_layer():
 
     assert H.shape == (number_of_nodes, out_channels)
 
-    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=3)
+    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=3).to(device)
 
     H = layer(X, edge_index, edge_weight, H)
 
