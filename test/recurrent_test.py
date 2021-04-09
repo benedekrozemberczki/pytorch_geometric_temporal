@@ -151,10 +151,13 @@ def test_tgcn_layer():
     in_channels = 64
     out_channels = 16
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = TGCN(in_channels=in_channels, out_channels=out_channels)
+    layer = TGCN(in_channels=in_channels, out_channels=out_channels).to(device)
 
 
     H = layer(X, edge_index)
@@ -179,10 +182,13 @@ def test_a3tgcn_layer():
     out_channels = 16
     periods = 7
     
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, periods)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = A3TGCN(in_channels=in_channels, out_channels=out_channels, periods=periods)
+    layer = A3TGCN(in_channels=in_channels, out_channels=out_channels, periods=periods).to(device)
 
     H = layer(X, edge_index)
 
@@ -206,6 +212,7 @@ def test_dcrnn_layer():
     in_channels = 64
     out_channels = 16
     K = 2
+
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
     edge_weight = create_mock_edge_weight(edge_index)
 
@@ -248,10 +255,13 @@ def test_gc_lstm_layer():
     out_channels = 16
     K = 2
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = GCLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = GCLSTM(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
     H, C = layer(X, edge_index)
 
@@ -281,13 +291,16 @@ def test_lrgcn_layer():
     num_relations = 5
     num_bases = 3
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_relations = create_mock_edge_relations(edge_index, num_relations)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_relations = create_mock_edge_relations(edge_index, num_relations).to(device)
 
     layer = LRGCN(in_channels=in_channels,
                   out_channels=out_channels,
                   num_relations=num_relations,
-                  num_bases=num_bases)
+                  num_bases=num_bases).to(device)
 
     H, C = layer(X, edge_index, edge_relations)
 
