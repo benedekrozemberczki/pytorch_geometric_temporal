@@ -296,8 +296,7 @@ def test_mtgnn():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     edge_index = barabasi_albert_graph(num_nodes, num_edges).to(device)
-    A_tilde = (torch.sparse_coo_tensor(edge_index, torch.ones(edge_index.size(1).to(device)), (num_nodes, num_nodes)).to_dense())
-    x_all = (2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1).to(device)
+    A_tilde = (torch.sparse_coo_tensor(edge_index, torch.ones(edge_index.size(1)).to(device), (num_nodes, num_nodes)).to_dense()).to(device)
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim, dilation_exponential=dilation_exponential,
@@ -328,8 +327,8 @@ def test_mtgnn():
                 conv_channels=conv_channels, residual_channels=residual_channels,
                 skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
-                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False)
-    trainx = torch.Tensor(x_all).to(device)
+                layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False).to(device)
+    trainx = (2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1).to(device)
     trainx= trainx.transpose(1, 3)
     perm = torch.randperm(num_nodes).to(device)
     num_sub = int(num_nodes/num_split)
@@ -354,7 +353,6 @@ def test_mtgnn():
 
     seq_in_len = 24
     seq_out_len = 5
-    x_all = (2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1).to(device)
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,
                 node_dim=node_dim, dilation_exponential=dilation_exponential,
@@ -378,7 +376,7 @@ def test_mtgnn():
                 skip_channels=skip_channels, end_channels=end_channels,
                 seq_length=seq_in_len, in_dim=in_dim, out_dim=seq_out_len,
                 layers=layers, propalpha=propalpha, tanhalpha=tanhalpha, layer_norm_affline=False).to(device)
-    trainx = torch.Tensor(x_all).to(device)
+    trainx = (2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1).to(device)
     trainx= trainx.transpose(1, 3)
     for j in range(num_split):
         if j != num_split-1:
