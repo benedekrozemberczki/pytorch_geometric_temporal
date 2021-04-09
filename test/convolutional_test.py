@@ -259,8 +259,8 @@ def test_gman():
     model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias, mask=mask).to(device)
     model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False, mask=True).to(device)
 
-    X = trainX[:batch_size].to(device)
-    TE = trainTE[:batch_size].to(device)
+    X = trainX[:batch_size]
+    TE = trainTE[:batch_size]
     pred = model(X, SE, TE)
     assert pred.shape == (batch_size, num_pred, num_nodes)
     pred = model2(X, SE, TE)
@@ -296,7 +296,7 @@ def test_mtgnn():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     edge_index = barabasi_albert_graph(num_nodes, num_edges).to(device)
-    A_tilde = (torch.sparse_coo_tensor(edge_index, torch.ones(edge_index.size(1)), (num_nodes, num_nodes)).to_dense()).to(device)
+    A_tilde = (torch.sparse_coo_tensor(edge_index, torch.ones(edge_index.size(1).to(device)), (num_nodes, num_nodes)).to_dense())
     x_all = (2 * torch.rand(batch_size, seq_in_len, num_nodes, in_dim) - 1).to(device)
     model = MTGNN(gcn_true=gcn_true, build_adj=build_adj, gcn_depth=gcn_depth, num_nodes=num_nodes,
                 kernel_size=kernel_size, kernel_set=kernel_set, dropout=dropout, subgraph_size=subgraph_size,

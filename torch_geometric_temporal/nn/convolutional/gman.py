@@ -132,8 +132,8 @@ class SpatioTemporalEmbedding(nn.Module):
         """
         SE = SE.unsqueeze(0).unsqueeze(0)
         SE = self._fully_connected_se(SE)
-        dayofweek = torch.empty(TE.shape[0], TE.shape[1], 7)
-        timeofday = torch.empty(TE.shape[0], TE.shape[1], T)
+        dayofweek = torch.empty(TE.shape[0], TE.shape[1], 7).to(SE.device)
+        timeofday = torch.empty(TE.shape[0], TE.shape[1], T).to(SE.device)
         for i in range(TE.shape[0]):
             dayofweek[i] = F.one_hot(TE[..., 0][i].to(torch.int64) % 7, 7)
         for j in range(TE.shape[0]):
@@ -254,12 +254,12 @@ class TemporalAttention(nn.Module):
             batch_size = X.shape[0]
             num_step = X.shape[1]
             num_nodes = X.shape[2]
-            mask = torch.ones(num_step, num_step)
+            mask = torch.ones(num_step, num_step).to(X.device)
             mask = torch.tril(mask)
             mask = torch.unsqueeze(torch.unsqueeze(mask, dim=0), dim=0)
             mask = mask.repeat(self._K * batch_size, num_nodes, 1, 1)
             mask = mask.to(torch.bool)
-            condition = torch.FloatTensor([-2 ** 15 + 1])
+            condition = torch.FloatTensor([-2 ** 15 + 1]).to(X.device)
             attention = torch.where(mask, attention, condition)
         attention = F.softmax(attention, dim=-1)
         X = torch.matmul(attention, value)
