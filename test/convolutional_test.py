@@ -71,12 +71,13 @@ def test_temporalconv():
     in_channels = 100
     edge_per_node = 15
     out_channels = 10
-    batch, batch_targets, edge_index, edge_weight = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    batch, _, _, _ = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
 
     kernel_size = 3
-    temporal_conv = TemporalConv(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size)
+    temporal_conv = TemporalConv(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size).to(device)
 
-    H = temporal_conv(batch)
+    H = temporal_conv(batch.to(device))
     assert H.shape == (batch_size, sequence_length-(kernel_size-1), number_of_nodes, out_channels)    
 
 def test_stconv():
@@ -90,11 +91,12 @@ def test_stconv():
     in_channels = 100
     edge_per_node = 15
     out_channels = 10
-    batch, batch_targets, edge_index, edge_weight = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    batch, _, edge_index, edge_weight = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
 
     kernel_size = 3
-    stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2)
-    H = stconv(batch, edge_index, edge_weight)
+    stconv = STConv(num_nodes=number_of_nodes, in_channels=in_channels, hidden_channels=8, out_channels=out_channels, kernel_size=3, K=2).to(device)
+    H = stconv(batch.to(device), edge_index.to(device), edge_weight.to(device))
     assert H.shape == (batch_size, sequence_length-2*(kernel_size-1), number_of_nodes, out_channels)
 
 def test_astgcn():
