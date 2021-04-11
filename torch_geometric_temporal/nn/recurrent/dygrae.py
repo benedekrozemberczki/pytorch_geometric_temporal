@@ -8,7 +8,7 @@ class DyGrEncoder(torch.nn.Module):
     of Dynamic Graphs." <https://ieeexplore.ieee.org/document/9073186>`_
 
     Args:
-        conv_out_channels (int): Number of output challes for the GGCN.
+        conv_out_channels (int): Number of output channels for the GGCN.
         conv_num_layers (int): Number of Gated Graph Convolutions.
         conv_aggr (str): Aggregation scheme to use
             (:obj:`"add"`, :obj:`"mean"`, :obj:`"max"`).
