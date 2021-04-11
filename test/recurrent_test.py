@@ -57,10 +57,13 @@ def test_gconv_lstm_layer():
     out_channels = 16
     K = 2
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = GConvLSTM(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
 
     H, C = layer(X, edge_index)
@@ -90,10 +93,13 @@ def test_gconv_gru_layer():
     out_channels = 16
     K = 2
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = GConvGRU(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
 
     H = layer(X, edge_index)
@@ -119,15 +125,18 @@ def test_mpnn_lstm_layer():
     out_channels = 16
     window = 1
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
     layer = MPNNLSTM(in_channels=in_channels,
                      hidden_size=hidden_size,
                      out_channels=out_channels,
                      num_nodes=number_of_nodes,
                      window = window,
-                     dropout = 0.5)
+                     dropout = 0.5).to(device)
                      
     H = layer(X, edge_index, edge_weight)
     
@@ -142,10 +151,13 @@ def test_tgcn_layer():
     in_channels = 64
     out_channels = 16
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = TGCN(in_channels=in_channels, out_channels=out_channels)
+    layer = TGCN(in_channels=in_channels, out_channels=out_channels).to(device)
 
 
     H = layer(X, edge_index)
@@ -170,10 +182,13 @@ def test_a3tgcn_layer():
     out_channels = 16
     periods = 7
     
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, periods)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = A3TGCN(in_channels=in_channels, out_channels=out_channels, periods=periods)
+    layer = A3TGCN(in_channels=in_channels, out_channels=out_channels, periods=periods).to(device)
 
     H = layer(X, edge_index)
 
@@ -197,10 +212,13 @@ def test_dcrnn_layer():
     in_channels = 64
     out_channels = 16
     K = 2
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
     H = layer(X, edge_index)
 
@@ -214,7 +232,7 @@ def test_dcrnn_layer():
 
     assert H.shape == (number_of_nodes, out_channels)
 
-    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=3)
+    layer = DCRNN(in_channels=in_channels, out_channels=out_channels, K=3).to(device)
 
     H = layer(X, edge_index, edge_weight, H)
 
@@ -239,10 +257,13 @@ def test_gc_lstm_layer():
     out_channels = 16
     K = 2
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = GCLSTM(in_channels=in_channels, out_channels=out_channels, K=K)
+    layer = GCLSTM(in_channels=in_channels, out_channels=out_channels, K=K).to(device)
 
     H, C = layer(X, edge_index)
 
@@ -272,13 +293,16 @@ def test_lrgcn_layer():
     num_relations = 5
     num_bases = 3
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_relations = create_mock_edge_relations(edge_index, num_relations)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_relations = create_mock_edge_relations(edge_index, num_relations).to(device)
 
     layer = LRGCN(in_channels=in_channels,
                   out_channels=out_channels,
                   num_relations=num_relations,
-                  num_bases=num_bases)
+                  num_bases=num_bases).to(device)
 
     H, C = layer(X, edge_index, edge_relations)
 
@@ -305,14 +329,17 @@ def test_dygrencoder_layer():
     lstm_out_channels = 8
     lstm_num_layers = 1
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
     layer = DyGrEncoder(conv_out_channels = conv_out_channels,
                         conv_num_layers = conv_num_layers,
                         conv_aggr = conv_aggr,
                         lstm_out_channels = lstm_out_channels,
-                        lstm_num_layers = lstm_num_layers)
+                        lstm_num_layers = lstm_num_layers).to(device)
 
 
     H_tilde, H, C = layer(X, edge_index)
@@ -341,11 +368,14 @@ def test_evolve_gcn_h_layer():
     edge_per_node = 10
     in_channels = 8
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
     layer = EvolveGCNH(in_channels = in_channels,
-                       num_of_nodes = number_of_nodes)
+                       num_of_nodes = number_of_nodes).to(device)
 
 
     X = layer(X, edge_index)
@@ -364,10 +394,13 @@ def test_evolve_gcn_o_layer():
     edge_per_node = 10
     in_channels = 8
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
-    edge_weight = create_mock_edge_weight(edge_index)
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = EvolveGCNO(in_channels = in_channels)
+    layer = EvolveGCNO(in_channels = in_channels).to(device)
 
     X = layer(X, edge_index)
     

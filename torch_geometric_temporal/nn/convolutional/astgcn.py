@@ -129,7 +129,7 @@ class ChebConvAttention(MessagePassing):
         row, col = edge_index
         Att_norm = norm * spatial_attention[:,row,col]
         num_nodes = x.size(self.node_dim)
-        TAx_0 = torch.matmul((torch.eye(num_nodes)*spatial_attention).permute(0,2,1),x)
+        TAx_0 = torch.matmul((torch.eye(num_nodes).to(edge_index.device)*spatial_attention).permute(0,2,1),x)
         out = torch.matmul(TAx_0, self._weight[0])
         edge_index_transpose = edge_index[[1,0]]
         if self._weight.size(0) > 1:
