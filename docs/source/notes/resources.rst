@@ -36,4 +36,4 @@ External Resources - Datasets
 
 * Ferenc Béres, Róbert Pálovics, Anna Oláh, András A. Benczúr: **Temporal Walk Based Centrality Metric for Graph Streams** `Paper <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6214300/>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
 
-* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Node Embeddings in Dynamic Graphs** `Paper <https://appliednetsci.springeropen.com/articles/10.1007/s41109-019-0169-5>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
+* Ferenc Béres, Domokos M. Kelen, Róbert Pálovics, András A. Benczúr : **Node Embeddings in Dynamic Graphs** `Paper <https://appliednetsci.springeropen.com/articles/10.1007/s41109-019-0169-5>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
