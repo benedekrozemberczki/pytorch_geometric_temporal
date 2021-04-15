@@ -34,6 +34,6 @@ External Resources - Datasets
 
 * Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 
 
-* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 
+* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Temporal Walk Based Centrality Metric for Graph Streams** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
 
-* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/benedekrozemberczki/spatiotemporal_datasets/>`_ 
+* Benedek Rozemberczki, Paul Scherer, Oliver Kiss, Rik Sarkar, Tamas Ferenci: **Chickenpox Cases in Hungary: a Benchmark Dataset for Spatiotemporal Signal Processing with Graph Neural Networks** `Paper <https://arxiv.org/abs/2102.08100>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
