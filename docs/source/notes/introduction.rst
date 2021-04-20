@@ -10,13 +10,11 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
 
 .. code-block:: latex
 
-    >@misc{pytorch_geometric_temporal,
-           author = {Benedek, Rozemberczki and Paul, Scherer and Yixuan, He and George, Panagopoulos and Maria, Astefanoaei and Oliver, Kiss and Ferenc, Beres and Nicolas, Collignon},
-           title = {{PyTorch Geometric Temporal}},
-           year = {2020},
-           publisher = {GitHub},
-           journal = {GitHub repository},
-           howpublished = {\url{https://github.com/benedekrozemberczki/pytorch_geometric_temporal}},
+    >@misc{rozemberczki2021pytorch,
+           author = {Benedek Rozemberczki and Paul Scherer and Yixuan He and George Panagopoulos and Maria Astefanoaei and Oliver Kiss and Ferenc Beres and Nicolas Collignon and Rik Sarkar},
+           title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
+           year = {2021},
+           eprint = {arXiv:2104.07788},
     }
 
 We briefly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples.
