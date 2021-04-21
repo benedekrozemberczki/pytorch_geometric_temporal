@@ -107,7 +107,7 @@ The Hungarian Chickenpox Dataset can be loaded by the following code snippet. Th
 
     dataset = loader.get_dataset()
 
-Smatiotemporal Signal Splitting
+Spatiotemporal Signal Splitting
 -------------------------------
 
 
