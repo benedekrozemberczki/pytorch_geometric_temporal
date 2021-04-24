@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 class AVWGCN(nn.Module):
     r"""An implementation of the Node Adaptive Graph Convolution Layer. 
-    For details see: `" Adaptive Graph Convolutional Recurrent Network 
+    For details see: `"Adaptive Graph Convolutional Recurrent Network 
     for Traffic Forecasting" <https://arxiv.org/abs/2007.02842>`_
 
     Args:
@@ -48,6 +48,18 @@ class AVWGCN(nn.Module):
 
 
 class AGCRN(nn.Module):
+    r"""An implementation of the Adaptive Graph Convolutional Recurrent Unit.
+    For details see: `"Adaptive Graph Convolutional Recurrent Network 
+    for Traffic Forecasting" <https://arxiv.org/abs/2007.02842>`_
+
+    Args:
+        node_num (int): Number of vertices.
+        in_channels (int): Number of input features.
+        out_channels (int): Number of output features.
+        K (int): Filter size :math:`K`.
+        embedding_dimensions (int): Number of node embedding dimensions.
+
+    """
     def __init__(self, node_num, in_channels, out_channels, K, embedding_dimensions):
         super(AGCRN, self).__init__()
         self.node_num = node_num
