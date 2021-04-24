@@ -25,7 +25,7 @@ class AVWGCN(nn.Module):
 
         Arg types:
             * **X** (PyTorch Float Tensor) - Node features.
-            * **E** (PyTorch Long Tensor) - Node embeddings.
+            * **E** (PyTorch Float Tensor) - Node embeddings.
 
         Return types:
             * **E** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
@@ -82,8 +82,17 @@ class AGCRN(nn.Module):
                               K = self.K,
                               embedding_dimensions = self.embedding_dimensions)
 
-    def forward(self, X, H, E):
+    def forward(self, X: torch.FloatTensor, H: torch.FloatTensor, E: torch.FloatTensor) -> torch.FloatTensor:
+        r"""Making a forward pass.
 
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Node feature matrix.
+            * **H** (PyTorch Float Tensor) - Node hidden state matrix.
+            * **E** (PyTorch Float Tensor) - Node embedding matrix.
+
+        Return types:
+            * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+        """       
         H = H.to(X.device)
         X_H = torch.cat((X, H), dim=-1)
         X_r = torch.sigmoid(self._gate(X_H, E))
