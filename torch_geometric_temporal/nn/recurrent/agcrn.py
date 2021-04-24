@@ -60,7 +60,8 @@ class AGCRN(nn.Module):
         embedding_dimensions (int): Number of node embedding dimensions.
 
     """
-    def __init__(self, node_num, in_channels, out_channels, K, embedding_dimensions):
+    def __init__(self, node_num: int, in_channels: int,
+                 out_channels: int, K: int, embedding_dimensions: int):
         super(AGCRN, self).__init__()
         self.node_num = node_num
         self.hidden_dim = out_channels
