@@ -106,6 +106,3 @@ class AGCRN(nn.Module):
         HC = torch.tanh(self._update(C, E))
         H = R*H + (1-R)*HC
         return H
-
-    def init_hidden_state(self, batch_size):
-        return torch.zeros(batch_size, self.node_num, self.hidden_dim)
