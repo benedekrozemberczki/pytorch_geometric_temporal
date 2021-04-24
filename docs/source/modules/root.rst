@@ -51,6 +51,11 @@ Recurrent Graph Convolutional Layers
     :members:
     :undoc-members:
     :exclude-members: DConv
+    
+.. automodule:: torch_geometric_temporal.nn.recurrent.agcrn
+    :members:
+    :undoc-members:
+    :exclude-members: AVWGCN
 
 Temporal Graph Convolutional Layers
 --------------
@@ -97,3 +102,8 @@ Auxiliary Graph Convolutional Layers
     :members:
     :undoc-members:
     :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ASTGCN
+    
+.. automodule:: torch_geometric_temporal.nn.convolutional.agcrn
+    :members:
+    :undoc-members:
+    :exclude-members: AGCRN
