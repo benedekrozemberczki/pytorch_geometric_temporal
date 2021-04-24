@@ -81,6 +81,11 @@ class AGCRN(nn.Module):
                               out_channels = self.out_channels,
                               K = self.K,
                               embedding_dimensions = self.embedding_dimensions)
+                              
+    def _set_hidden_state(self, X, H):
+        if H is None:
+            H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
+        return H
 
     def forward(self, X: torch.FloatTensor, H: torch.FloatTensor=None, E: torch.FloatTensor) -> torch.FloatTensor:
         r"""Making a forward pass.
@@ -93,10 +98,10 @@ class AGCRN(nn.Module):
         Return types:
             * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """       
-        H = H.to(X.device)
+        H = self._set_hidden_state(X, H)    
         X_H = torch.cat((X, H), dim=-1)
-        X_r = torch.sigmoid(self._gate(X_H, E))
-        Z, R = torch.split(Z_r, self.out_channels, dim=-1)
+        Z_R = torch.sigmoid(self._gate(X_H, E))
+        Z, R = torch.split(Z_R, self.out_channels, dim=-1)
         C = torch.cat((X, Z*H), dim=-1)
         HC = torch.tanh(self._update(C, E))
         H = R*H + (1-R)*HC
