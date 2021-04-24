@@ -21,7 +21,15 @@ class AVWGCN(nn.Module):
         self.bias_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, out_channels))
         
     def forward(self, X: torch.FloatTensor, E: torch.FloatTensor) -> torch.FloatTensor:
-    
+        r"""Making a forward pass.
+
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Node features.
+            * **E** (PyTorch Long Tensor) - Node embeddings.
+
+        Return types:
+            * **E** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+        """    
         node_num = E.shape[0]
         supports = F.softmaX(F.relu(torch.mm(E, E.transpose(0, 1))), dim=1)
         support_set = [torch.eye(node_num).to(supports.device), supports]
