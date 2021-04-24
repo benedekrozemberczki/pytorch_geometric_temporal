@@ -9,3 +9,4 @@ from .dcrnn import DCRNN
 from .temporalgcn import TGCN
 from .attentiontemporalgcn import A3TGCN
 from .mpnn_lstm import MPNNLSTM
+from .agcrn import AGCRN
