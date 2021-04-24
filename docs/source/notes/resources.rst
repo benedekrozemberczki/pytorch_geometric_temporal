@@ -27,6 +27,8 @@ External Resources - Architectures
 
 * Zonghan Wu, Shirui Pan, Guodong Long, Jing Jiang, Xiaojun Chang, Chengqi Zhang: **Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks** `Paper <https://arxiv.org/abs/2005.11650>`_, `Code <https://github.com/nnzhan/MTGNN>`_
 
+* Lei Bai, Lina Yao, Can Li, Xianzhi Wang, Can Wang: **Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting** `Paper <https://arxiv.org/abs/2007.02842>`_, `Code <https://github.com/LeiBAI/AGCRN>`_
+
 * George Panagopoulos, Giannis Nikolentzos, Michalis Vazirgiannis: **Transfer Graph Neural Networks for Pandemic Forecasting** `Paper <https://arxiv.org/abs/2009.08388>`_, `Code <https://github.com/geopanag/pandemic_tgnn>`_
 
 External Resources - Datasets
