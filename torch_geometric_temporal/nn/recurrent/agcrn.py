@@ -72,26 +72,26 @@ class AGCRN(nn.Module):
 
     def _setup_layers(self):
     
-        self.gate = AVWGCN(in_channels = self.in_channels + self.out_channels,
-                           out_channels = 2*self.out_channels,
-                           K = self.K,
-                           embedding_dimensions = self.embedding_dimensions)
+        self._gate = AVWGCN(in_channels = self.in_channels + self.out_channels,
+                            out_channels = 2*self.out_channels,
+                            K = self.K,
+                            embedding_dimensions = self.embedding_dimensions)
                            
-        self.update = AVWGCN(in_channels = self.in_channels + self.out_channels,
-                             out_channels = self.out_channels,
-                             K = self.K,
-                             embedding_dimensions = self.embedding_dimensions)
+        self._update = AVWGCN(in_channels = self.in_channels + self.out_channels,
+                              out_channels = self.out_channels,
+                              K = self.K,
+                              embedding_dimensions = self.embedding_dimensions)
 
-    def forward(self, X, state, E):
+    def forward(self, X, H, E):
 
-        state = state.to(X.device)
-        input_and_state = torch.cat((X, state), dim=-1)
-        z_r = torch.sigmoid(self.gate(input_and_state, E))
-        z, r = torch.split(z_r, self.hidden_dim, dim=-1)
-        candidate = torch.cat((X, z*state), dim=-1)
-        hc = torch.tanh(self.update(candidate, E))
-        h = r*state + (1-r)*hc
-        return h
+        H = H.to(X.device)
+        X_H = torch.cat((X, H), dim=-1)
+        X_r = torch.sigmoid(self._gate(X_H, E))
+        Z, R = torch.split(Z_r, self.out_channels, dim=-1)
+        C = torch.cat((X, Z*H), dim=-1)
+        HC = torch.tanh(self._update(C, E))
+        H = R*H + (1-R)*HC
+        return H
 
     def init_hidden_state(self, batch_size):
         return torch.zeros(batch_size, self.node_num, self.hidden_dim)
