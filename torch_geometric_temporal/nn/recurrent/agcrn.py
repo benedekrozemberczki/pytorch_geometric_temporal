@@ -5,8 +5,7 @@ import torch.nn.functional as F
 
 class AVWGCN(nn.Module):
     r"""An implementation of the Diffusion Convolution Layer. 
-    For details see: `"Diffusion Convolutional Recurrent Neural Network:
-    Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
+    For details see: `" Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting" <https://arxiv.org/abs/2007.02842>`_
 
     Args:
         in_channels (int): Number of input features.
