@@ -14,7 +14,7 @@ class AVWGCN(nn.Module):
         K (int): Filter size :math:`K`.
         embedding_dimensions (int): Number of node embedding dimensions.
     """
-    def __init__(self, in_channels, out_channels, K, embedding_dimensions):
+    def __init__(self, in_channels: int, out_channels: int, K: int, embedding_dimensions: int):
         super(AVWGCN, self).__init__()
         self.K = K
         self.weights_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, K, in_channels, out_channels))
