@@ -31,7 +31,7 @@ class AVWGCN(nn.Module):
             * **E** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """    
         number_of_nodes = E.shape[0]
-        supports = F.softmaX(F.relu(torch.mm(E, E.transpose(0, 1))), dim=1)
+        supports = F.softmax(F.relu(torch.mm(E, E.transpose(0, 1))), dim=1)
         support_set = [torch.eye(number_of_nodes).to(supports.device), supports]
         
         for _ in range(2, self.K):
