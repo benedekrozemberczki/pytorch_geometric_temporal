@@ -103,7 +103,7 @@ Auxiliary Graph Convolutional Layers
     :undoc-members:
     :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ASTGCN
     
-.. automodule:: torch_geometric_temporal.nn.convolutional.agcrn
+.. automodule:: torch_geometric_temporal.nn.recurrent.agcrn
     :members:
     :undoc-members:
     :exclude-members: AGCRN
