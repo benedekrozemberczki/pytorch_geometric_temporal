@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import networkx as nx
-from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU, DCRNN
+from torch_geometric_temporal.nn.recurrent import GConvLSTM, GConvGRU, DCRNN, AGCRN
 from torch_geometric_temporal.nn.recurrent import GCLSTM, LRGCN, DyGrEncoder
 from torch_geometric_temporal.nn.recurrent import EvolveGCNH, EvolveGCNO, TGCN, A3TGCN, MPNNLSTM
 
@@ -31,7 +31,6 @@ def create_mock_states(number_of_nodes, out_channels):
     H = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     C = torch.FloatTensor(np.random.uniform(-1, 1, (number_of_nodes, in_channels)))
     return H, C
-
 
 def create_mock_edge_weight(edge_index):
     """
@@ -245,6 +244,45 @@ def test_dcrnn_layer():
     H = layer(X, edge_index, edge_weight, H)
 
     assert H.shape == (number_of_nodes, out_channels)
+    
+def test_agcrn_layer():
+    """
+    Testing the AGCRN Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    embedding_dimensions = 32
+    K = 2
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
+    X = X.to(device)
+    E = X.to(device)
+    
+    layer = AGCRN(number_of_nodes=number_of_nodes,
+                  in_channels=in_channels,
+                  out_channels=out_channels,
+                  K=K, embedding_dimensions=embedding_dimensions).to(device)
+
+    H = layer(X, E)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, E, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    layer = AGCRN(number_of_nodes=number_of_nodes, 
+                  in_channels=in_channels,
+                  out_channels=out_channels,
+                  K=3, embedding_dimensions=embedding_dimensions).to(device)
+
+    H = layer(X, E, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, E, H)
 
 
 def test_gc_lstm_layer():

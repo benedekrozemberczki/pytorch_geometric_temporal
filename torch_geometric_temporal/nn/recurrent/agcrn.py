@@ -30,9 +30,9 @@ class AVWGCN(nn.Module):
         Return types:
             * **E** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """    
-        node_num = E.shape[0]
+        number_of_nodes = E.shape[0]
         supports = F.softmaX(F.relu(torch.mm(E, E.transpose(0, 1))), dim=1)
-        support_set = [torch.eye(node_num).to(supports.device), supports]
+        support_set = [torch.eye(number_of_nodes).to(supports.device), supports]
         
         for _ in range(2, self.K):
             support = torch.matmul(2 * supports, support_set[-1]) - support_set[-2]
@@ -53,18 +53,18 @@ class AGCRN(nn.Module):
     for Traffic Forecasting" <https://arxiv.org/abs/2007.02842>`_
 
     Args:
-        node_num (int): Number of vertices.
+        number_of_nodes (int): Number of vertices.
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Filter size :math:`K`.
         embedding_dimensions (int): Number of node embedding dimensions.
 
     """
-    def __init__(self, node_num: int, in_channels: int,
+    def __init__(self, number_of_nodes: int, in_channels: int,
                  out_channels: int, K: int, embedding_dimensions: int):
         super(AGCRN, self).__init__()
         
-        self.node_num = node_num
+        self.number_of_nodes = number_of_nodes
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.embedding_dimensions = embedding_dimensions
@@ -87,7 +87,7 @@ class AGCRN(nn.Module):
             H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return H
 
-    def forward(self, X: torch.FloatTensor, H: torch.FloatTensor=None, E: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(self, X: torch.FloatTensor, E: torch.FloatTensor, H: torch.FloatTensor=None)  -> torch.FloatTensor:
         r"""Making a forward pass.
 
         Arg types:
