@@ -33,10 +33,10 @@ class AVWGCN(nn.Module):
         supports = torch.stack(support_set, dim=0)
         W = torch.einsum('nd,dkio->nkio', E, self.weights_pool) 
         bias = torch.matmul(E, self.bias_pool)
-        X_g = torch.einsum("knm,bmc->bknc", supports, X)
-        X_g = X_g.permute(0, 2, 1, 3)
-        X_gconv = torch.einsum('bnki,nkio->bno', X_g, W) + bias
-        return X_gconv
+        X = torch.einsum("knm,bmc->bknc", supports, X)
+        X = X.permute(0, 2, 1, 3)
+        X = torch.einsum('bnki,nkio->bno', X, W) + bias
+        return X
 
 
 class AGCRN(nn.Module):
