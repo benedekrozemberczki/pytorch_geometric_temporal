@@ -67,6 +67,7 @@ class AGCRN(nn.Module):
         self.number_of_nodes = number_of_nodes
         self.in_channels = in_channels
         self.out_channels = out_channels
+        self.K = K
         self.embedding_dimensions = embedding_dimensions
         self._setup_layers()
 
