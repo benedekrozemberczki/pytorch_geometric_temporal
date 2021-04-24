@@ -85,7 +85,7 @@ class AGCRN(nn.Module):
                               
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
+            H = torch.zeros(X.shape[0], X.shape[1], self.out_channels).to(X.device)
         return H
 
     def forward(self, X: torch.FloatTensor, E: torch.FloatTensor, H: torch.FloatTensor=None)  -> torch.FloatTensor:
