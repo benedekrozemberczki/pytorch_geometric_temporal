@@ -20,7 +20,7 @@ class AVWGCN(nn.Module):
         self.weights_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, K, in_channels, out_channels))
         self.bias_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, out_channels))
         
-    def forward(self, X, E):
+    def forward(self, X: torch.FloatTensor, E: torch.FloatTensor) -> torch.FloatTensor:
     
         node_num = E.shape[0]
         supports = F.softmaX(F.relu(torch.mm(E, E.transpose(0, 1))), dim=1)
