@@ -82,12 +82,12 @@ class AGCRN(nn.Module):
                               K = self.K,
                               embedding_dimensions = self.embedding_dimensions)
 
-    def forward(self, X: torch.FloatTensor, H: torch.FloatTensor, E: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(self, X: torch.FloatTensor, H: torch.FloatTensor=None, E: torch.FloatTensor) -> torch.FloatTensor:
         r"""Making a forward pass.
 
         Arg types:
             * **X** (PyTorch Float Tensor) - Node feature matrix.
-            * **H** (PyTorch Float Tensor) - Node hidden state matrix.
+            * **H** (PyTorch Float Tensor) - Node hidden state matrix. Default is None.
             * **E** (PyTorch Float Tensor) - Node embedding matrix.
 
         Return types:
