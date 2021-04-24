@@ -1,4 +1,3 @@
-
 import math
 import torch
 from torch_geometric.utils import to_dense_adj
