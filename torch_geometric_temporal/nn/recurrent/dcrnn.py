@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
 class AVWGCN(nn.Module):
     def __init__(self, dim_in, dim_out, cheb_k, embed_dim):
         super(AVWGCN, self).__init__()
@@ -26,6 +25,7 @@ class AVWGCN(nn.Module):
         x_g = x_g.permute(0, 2, 1, 3)  # B, N, cheb_k, dim_in
         x_gconv = torch.einsum('bnki,nkio->bno', x_g, weights) + bias     #b, N, dim_out
         return x_gconv
+
 
 class AGCRN(nn.Module):
     def __init__(self, node_num, dim_in, dim_out, cheb_k, embed_dim):
