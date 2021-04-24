@@ -63,13 +63,24 @@ class AGCRN(nn.Module):
     def __init__(self, node_num: int, in_channels: int,
                  out_channels: int, K: int, embedding_dimensions: int):
         super(AGCRN, self).__init__()
+        
         self.node_num = node_num
-        self.hidden_dim = out_channels
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.embedding_dimensions = embedding_dimensions
         self._setup_layers()
 
     def _setup_layers(self):
-        self.gate = AVWGCN(in_channels + self.hidden_dim, 2*out_channels, K, embedding_dimensions)
-        self.update = AVWGCN(in_channels + self.hidden_dim, out_channels, K, embedding_dimensions)
+    
+        self.gate = AVWGCN(in_channels = self.in_channels + self.out_channels,
+                           out_channels = 2*self.out_channels,
+                           K = self.K,
+                           embedding_dimensions = self.embedding_dimensions)
+                           
+        self.update = AVWGCN(in_channels = self.in_channels + self.out_channels,
+                             out_channels = self.out_channels,
+                             K = self.K,
+                             embedding_dimensions = self.embedding_dimensions)
 
     def forward(self, X, state, E):
 
