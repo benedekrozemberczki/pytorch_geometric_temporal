@@ -268,22 +268,24 @@ def test_agcrn_layer():
 
     H = layer(X, E)
 
-    assert H.shape == (number_of_nodes, out_channels)
+    assert H.shape == (1, number_of_nodes, out_channels)
 
     H = layer(X, E, H)
 
-    assert H.shape == (number_of_nodes, out_channels)
+    assert H.shape == (1, number_of_nodes, out_channels)
 
     layer = AGCRN(number_of_nodes=number_of_nodes, 
                   in_channels=in_channels,
                   out_channels=out_channels,
                   K=3, embedding_dimensions=embedding_dimensions).to(device)
 
+    H = layer(X, E)
+
+    assert H.shape == (1, number_of_nodes, out_channels)
+
     H = layer(X, E, H)
 
-    assert H.shape == (number_of_nodes, out_channels)
-
-    H = layer(X, E, H)
+    assert H.shape == (1, number_of_nodes, out_channels)
 
 
 def test_gc_lstm_layer():
