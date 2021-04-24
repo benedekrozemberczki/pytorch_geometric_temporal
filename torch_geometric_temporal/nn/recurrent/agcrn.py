@@ -56,8 +56,7 @@ class AGCRN(nn.Module):
         self.update = AVWGCN(in_channels+self.hidden_dim, out_channels, K, embedding_dimensions)
 
     def forward(self, X, state, E):
-        #X: B, num_nodes, input_dim
-        #state: B, num_nodes, hidden_dim
+
         state = state.to(X.device)
         input_and_state = torch.cat((X, state), dim=-1)
         z_r = torch.sigmoid(self.gate(input_and_state, E))
