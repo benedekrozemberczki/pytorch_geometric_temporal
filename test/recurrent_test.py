@@ -258,7 +258,7 @@ def test_agcrn_layer():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     X, edge_index = create_mock_data(number_of_nodes, edge_per_node, in_channels)
     X = X.to(device)
-    E = nn.Parameter(torch.FloatTensor(embedding_dimensions, out_channels))
+    E = nn.Parameter(torch.FloatTensor(embedding_dimensions, out_channels)).to(device)
     
     layer = AGCRN(number_of_nodes=number_of_nodes,
                   in_channels=in_channels,
