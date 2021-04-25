@@ -1,4 +1,5 @@
 from typing import Union, Tuple
+
 from .static_graph_temporal_signal import StaticGraphTemporalSignal
 from .dynamic_graph_temporal_signal import DynamicGraphTemporalSignal
 from .dynamic_graph_static_signal import DynamicGraphStaticSignal
@@ -6,7 +7,6 @@ from .dynamic_graph_static_signal import DynamicGraphStaticSignal
 from .static_graph_temporal_signal_batch import StaticGraphTemporalSignalBatch
 from .dynamic_graph_temporal_signal_batch import DynamicGraphTemporalSignalBatch
 from .dynamic_graph_static_signal_batch import DynamicGraphStaticSignalBatch
-
 
 
 Discrete_Signal = Union[StaticGraphTemporalSignal, StaticGraphTemporalSignalBatch,
