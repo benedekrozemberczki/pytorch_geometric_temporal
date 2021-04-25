@@ -52,7 +52,7 @@ class DynamicGraphStaticSignalBatch(object):
             
     def _get_batch_index(self):
         if self.batches[self.t] is None:
-            return self.edge_indices[self.t]
+            return self.batches[self.t]
         else:
             return torch.LongTensor(self.batches[self.t])
 

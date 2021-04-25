@@ -102,5 +102,5 @@ def temporal_signal_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discre
                                                       data_iterator.edge_weights[train_snapshots:],
                                                       data_iterator.feature,
                                                       data_iterator.targets[train_snapshots:],
-                                                      ata_iterator.batches[train_snapshots:]) 
+                                                      data_iterator.batches[train_snapshots:]) 
     return train_iterator, test_iterator

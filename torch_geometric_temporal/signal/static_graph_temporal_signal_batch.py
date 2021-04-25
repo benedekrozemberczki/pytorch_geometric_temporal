@@ -48,6 +48,14 @@ class StaticGraphTemporalSignalBatch(object):
             return self.edge_index
         else:
             return torch.LongTensor(self.edge_index)
+            
+            
+    def _get_batch_index(self):
+        if self.batches[self.t] is None:
+            return self.batches[self.t]
+        else:
+            return torch.LongTensor(self.batches[self.t])
+
 
     def _get_edge_weight(self):
         if self.edge_weight is None:
@@ -55,7 +63,7 @@ class StaticGraphTemporalSignalBatch(object):
         else:
             return torch.FloatTensor(self.edge_weight)
 
-    def _get_features(self): 
+    def _get_feature(self): 
         if self.features[self.t] is None:
             return self.features[self.t]
         else:       
@@ -72,17 +80,17 @@ class StaticGraphTemporalSignalBatch(object):
          
 
     def _get_snapshot(self):
-        x = self._get_features()
+        x = self._get_feature()
         edge_index = self._get_edge_index()
         edge_weight = self._get_edge_weight()
         batch = self._get_batch_index()
         y = self._get_target()
 
-        snapshot = Data(x = x,
-                        edge_index = edge_index,
-                        edge_attr = edge_weight,
-                        y = y,
-                        batch = batch)
+        snapshot = Batch(x = x,
+                         edge_index = edge_index,
+                         edge_attr = edge_weight,
+                         y = y,
+                         batch = batch)
         return snapshot
 
     def __next__(self):

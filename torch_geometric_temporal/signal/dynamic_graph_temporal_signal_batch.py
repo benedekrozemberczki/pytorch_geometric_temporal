@@ -32,7 +32,7 @@ class DynamicGraphTemporalSignalBatch(object):
         self.edge_weights = edge_weights
         self.features = features
         self.targets = targets
-        self.bacthes = batches
+        self.batches = batches
         self._check_temporal_consistency()
         self._set_snapshot_count()
 
@@ -54,7 +54,7 @@ class DynamicGraphTemporalSignalBatch(object):
             
     def _get_batch_index(self):
         if self.batches[self.t] is None:
-            return self.edge_indices[self.t]
+            return self.batches[self.t]
         else:
             return torch.LongTensor(self.batches[self.t])
 
@@ -64,7 +64,7 @@ class DynamicGraphTemporalSignalBatch(object):
         else:
             return torch.FloatTensor(self.edge_weights[self.t])
 
-    def _get_features(self): 
+    def _get_feature(self): 
         if self.features[self.t] is None:
             return self.features[self.t]
         else:       
