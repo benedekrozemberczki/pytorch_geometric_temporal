@@ -67,34 +67,40 @@ def temporal_signal_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discre
                                                  
     if type(data_iterator) == StaticGraphTemporalSignalBatch:
         train_iterator = StaticGraphTemporalSignalBatch(data_iterator.edge_index,
-                                                   data_iterator.edge_weight,
-                                                   data_iterator.features[0:train_snapshots],
-                                                   data_iterator.targets[0:train_snapshots])
+                                                        data_iterator.edge_weight,
+                                                        data_iterator.features[0:train_snapshots],
+                                                        data_iterator.targets[0:train_snapshots],
+                                                        data_iterator.batches[0:train_snapshots])
 
         test_iterator = StaticGraphTemporalSignalBatch(data_iterator.edge_index,
-                                                  data_iterator.edge_weight,
-                                                  data_iterator.features[train_snapshots:],
-                                                  data_iterator.targets[train_snapshots:])
+                                                       data_iterator.edge_weight,
+                                                       data_iterator.features[train_snapshots:],
+                                                       data_iterator.targets[train_snapshots:],
+                                                       data_iterator.batches[train_snapshots:])
 
     elif type(data_iterator) == DynamicGraphTemporalSignalBatch:
         train_iterator = DynamicGraphTemporalSignalBatch(data_iterator.edge_indices[0:train_snapshots],
-                                                    data_iterator.edge_weights[0:train_snapshots],
-                                                    data_iterator.features[0:train_snapshots],
-                                                    data_iterator.targets[0:train_snapshots])
+                                                         data_iterator.edge_weights[0:train_snapshots],
+                                                         data_iterator.features[0:train_snapshots],
+                                                         data_iterator.targets[0:train_snapshots],
+                                                         data_iterator.batches[0:train_snapshots])
 
         test_iterator = DynamicGraphTemporalSignalBatch(data_iterator.edge_indices[train_snapshots:],
-                                                   data_iterator.edge_weights[train_snapshots:],
-                                                   data_iterator.features[train_snapshots:],
-                                                   data_iterator.targets[train_snapshots:])
+                                                        data_iterator.edge_weights[train_snapshots:],
+                                                        data_iterator.features[train_snapshots:],
+                                                        data_iterator.targets[train_snapshots:],
+                                                        data_iterator.batches[train_snapshots:])
                                                    
     elif type(data_iterator) == DynamicGraphStaticSignalBatch:
         train_iterator = DynamicGraphStaticSignalBatch(data_iterator.edge_indices[0:train_snapshots],
-                                                  data_iterator.edge_weights[0:train_snapshots],
-                                                  data_iterator.feature,
-                                                  data_iterator.targets[0:train_snapshots])
+                                                       data_iterator.edge_weights[0:train_snapshots],
+                                                       data_iterator.feature,
+                                                       data_iterator.targets[0:train_snapshots],
+                                                       data_iterator.batches[0:train_snapshots:])
 
         test_iterator = DynamicGraphStaticSignalBatch(data_iterator.edge_indices[train_snapshots:],
-                                                 data_iterator.edge_weights[train_snapshots:],
-                                                 data_iterator.feature,
-                                                 data_iterator.targets[train_snapshots:])    
+                                                      data_iterator.edge_weights[train_snapshots:],
+                                                      data_iterator.feature,
+                                                      data_iterator.targets[train_snapshots:],
+                                                      ata_iterator.batches[train_snapshots:]) 
     return train_iterator, test_iterator
