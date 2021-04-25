@@ -16,7 +16,7 @@ def generate_signal(snapshot_count, node_count, feature_count):
     features = [np.random.uniform(0, 1, (node_count, feature_count)) for _ in range(snapshot_count)]
     return edge_indices, edge_weights, features
     
-def generate_batch_data(node_count, snapshot_count, feature_count, batch_size)
+def generate_batch_data(node_count, snapshot_count, feature_count, batch_size):
     edges = []
     edge_weights = []
     features = []
