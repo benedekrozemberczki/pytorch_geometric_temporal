@@ -21,6 +21,56 @@ We briefly overview the fundamental concepts and features of PyTorch Geometric T
 
 Data Structures
 =============================
+PyTorch Geometric Temporal is designed to provide easy to use data iterators which are parametrized with spatiotemporal data. These iterators can serve snapshots which are formed bu a single graph or multiple graphs which are batched together with the block diagonal batching trick.
+
+Temporal Signal Iterators
+--------------------------
+
+PyTorch Geometric Tenporal offers data iterators for spatio-temporal datasets which contain the temporal snapshots. There are three types of data iterators:
+
+- ``StaticGraphTemporalSignal`` - Is desiggned for **temporal signals** defined on a **static** graph.
+- ``DynamicGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **dynamic** graph.
+- ``DynamicGraphStaticSignal`` - Is designed for **static signals** defined on a **dynamic** graph.
+
+Static Graph with Temporal Signal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The constructor of a ``StaticGraphTemporalSignal`` object requires the following parameters:
+
+- ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
+- ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
+- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
+- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+ 
+Dynamic Graph with Temporal Signal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The constructor of a ``DynamicGraphTemporalSignal`` object requires the following parameters:
+
+- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
+- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
+- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
+- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+ 
+Dyanmic Graph with Static Signal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The constructor of a ``DynamicGraphStaticSignal`` object requires the following parameters:
+
+- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
+- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
+- ``feature`` - A **single** ``NumPy`` array to hold the vertex features.
+- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+
+Temporal Snapshots
+^^^^^^^^^^^^^^^^^^ 
+
+A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
+
+- ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation (optional).
+- ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation (optional).
+- ``x`` - A PyTorch ``FloatTensor`` of vertex features (optional).
+- ``y`` - A PyTorch ``FloatTensor`` or ``LongTensor`` of vertex targets (optional).
 
 Temporal Signal Iterators
 --------------------------
