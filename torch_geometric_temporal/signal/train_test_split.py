@@ -29,6 +29,8 @@ def temporal_signal_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discre
         Train and test data iterators.
 
     """
+    assert train_ratio > 0 and train_ratio < 0
+
     train_snapshots = int(train_ratio*data_iterator.snapshot_count)
 
     if type(data_iterator) == StaticGraphTemporalSignal:
