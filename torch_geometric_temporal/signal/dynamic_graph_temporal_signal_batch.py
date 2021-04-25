@@ -10,7 +10,7 @@ Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
 
 
-class DynamicGraphTemporalSignal(object):
+class DynamicGraphTemporalSignalBatch(object):
     r""" A data iterator object to contain a dynamic graph with a
     changing edge set and weights . The feature set and node labels
     (target) are also dynamic. The iterator returns a single discrete temporal

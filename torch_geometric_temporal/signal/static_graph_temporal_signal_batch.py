@@ -10,7 +10,7 @@ Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
 
 
-class StaticGraphTemporalSignal(object):
+class StaticGraphTemporalSignalBatch(object):
     r""" A data iterator object to contain a static graph with a dynamically 
     changing constant time difference temporal feature set (multiple signals).
     The node labels (target) are also temporal. The iterator returns a single 
