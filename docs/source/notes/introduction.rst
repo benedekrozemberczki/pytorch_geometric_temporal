@@ -117,12 +117,13 @@ The constructor of a ``DynamicGraphStaticSignalBatch`` object requires the follo
 Temporal Batch Snapshots
 ^^^^^^^^^^^^^^^^^^^^^^^  
 
-A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
+A temporal batch snapshot is a PyTorch Geometric ``Batch`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal batch snapshot has the following attributes:
 
 - ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation (optional).
 - ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation (optional).
 - ``x`` - A PyTorch ``FloatTensor`` of vertex features (optional).
 - ``y`` - A PyTorch ``FloatTensor`` or ``LongTensor`` of vertex targets (optional).
+- ``batch`` - A PyTorch ``LongTensor`` of batch indices (optional).
 
 Benchmark Datasets
 -------------------
