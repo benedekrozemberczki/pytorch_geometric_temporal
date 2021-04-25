@@ -1,11 +1,11 @@
 PyTorch Geometric Temporal Signal
-========================
+=================================
 
 .. contents:: Contents
     :local:
     
 Temporal Signal Iterators
-----------------------------------
+-------------------------
 
 .. automodule:: torch_geometric_temporal.signal.static_graph_temporal_signal
     :members:
@@ -20,7 +20,7 @@ Temporal Signal Iterators
     :undoc-members:
 
 Temporal Signal Batch Iterators
-----------------------------------
+-------------------------------
     
 .. automodule:: torch_geometric_temporal.signal.static_graph_temporal_signal_batch
     :members:
@@ -35,7 +35,7 @@ Temporal Signal Batch Iterators
     :undoc-members:
 
 Temporal Signal Train-Test Split
---------------------------
+--------------------------------
 
 .. automodule:: torch_geometric_temporal.signal.temporal_signal_split
     :members:
