@@ -32,36 +32,6 @@ PyTorch Geometric Tenporal offers data iterators for spatio-temporal datasets wh
 - ``DynamicGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **dynamic** graph.
 - ``DynamicGraphStaticSignal`` - Is designed for **static signals** defined on a **dynamic** graph.
 
-Static Graph with Temporal Signal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The constructor of a ``StaticGraphTemporalSignal`` object requires the following parameters:
-
-- ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
-- ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
-- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
- 
-Dynamic Graph with Temporal Signal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The constructor of a ``DynamicGraphTemporalSignal`` object requires the following parameters:
-
-- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
-- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
-- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
- 
-Dyanmic Graph with Static Signal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The constructor of a ``DynamicGraphStaticSignal`` object requires the following parameters:
-
-- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
-- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
-- ``feature`` - A **single** ``NumPy`` array to hold the vertex features.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
-
 Temporal Data Snapshots
 ^^^^^^^^^^^^^^^^^^^^^^  
 
@@ -81,38 +51,6 @@ PyTorch Geometric Tenporal offers data iterators for batched spatiotemporal data
 - ``DynamicGraphTemporalSignalBatch`` - Is designed for **temporal signals** defined on a batch of **dynamic** graphs.
 - ``DynamicGraphStaticSignalBatch`` - Is designed for **static signals** defined on a batch of **dynamic** graphs.
 
-Static Graph with Temporal Signal Batch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The constructor of a ``StaticGraphTemporalSignalBatch`` object requires the following parameters:
-
-- ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
-- ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
-- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
-- ``batches`` - A **list** of ``NumPy`` arrays to hold the batch group indices.
- 
-Dynamic Graph with Temporal Signal Batch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The constructor of a ``DynamicGraphTemporalSignalBatch`` object requires the following parameters:
-
-- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
-- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
-- ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
-- ``batches`` - A **list** of ``NumPy`` arrays to hold the batch group indices.
- 
-Dyanmic Graph with Static Signal Batch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The constructor of a ``DynamicGraphStaticSignalBatch`` object requires the following parameters:
-
-- ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
-- ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
-- ``feature`` - A **single** ``NumPy`` array to hold the vertex features.
-- ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
-- ``batches`` - A **list** of ``NumPy`` arrays to hold the batch group indices.
 
 Temporal Batch Snapshots
 ^^^^^^^^^^^^^^^^^^^^^^^  

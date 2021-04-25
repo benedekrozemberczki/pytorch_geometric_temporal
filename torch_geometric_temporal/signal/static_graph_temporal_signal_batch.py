@@ -8,7 +8,7 @@ Edge_Index = Union[np.ndarray, None]
 Edge_Weight = Union[np.ndarray, None]
 Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
-Batches = List[Union[np.ndarray, None]]
+Batches = Union[np.ndarray, None]
 
 
 class StaticGraphTemporalSignalBatch(object):
@@ -25,7 +25,7 @@ class StaticGraphTemporalSignalBatch(object):
         edge_weight (Numpy array): Edge weight tensor.
         features (List of Numpy arrays): List of node feature tensors.
         targets (List of Numpy arrays): List of node label (target) tensors.
-        batches (List of Numpy arrays): List of batch index tensors.
+        batches (Numpy array): Batch index tensor.
     """
     def __init__(self, edge_index: Edge_Index, edge_weight: Edge_Weight,
                  features: Features, targets: Targets, batches: Batches):
@@ -51,10 +51,10 @@ class StaticGraphTemporalSignalBatch(object):
             
             
     def _get_batch_index(self):
-        if self.batches[self.t] is None:
-            return self.batches[self.t]
+        if self.batches is None:
+            return self.batches
         else:
-            return torch.LongTensor(self.batches[self.t])
+            return torch.LongTensor(self.batches)
 
 
     def _get_edge_weight(self):

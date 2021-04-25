@@ -62,7 +62,7 @@ def test_dynamic_graph_temporal_signal_real_batch():
 
 
 def test_static_graph_temporal_signal_batch():
-    dataset = StaticGraphTemporalSignalBatch(None, None, [None, None],[None, None], [None, None])
+    dataset = StaticGraphTemporalSignalBatch(None, None, [None, None],[None, None], None)
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
@@ -80,7 +80,7 @@ def test_dynamic_graph_temporal_signal_batch():
         assert snapshot.batch is None
 
 def test_static_graph_temporal_signal_typing_batch():
-    dataset = StaticGraphTemporalSignalBatch(None, None, [np.array([1])],[np.array([2])], [None])
+    dataset = StaticGraphTemporalSignalBatch(None, None, [np.array([1])],[np.array([2])], None)
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
@@ -134,7 +134,7 @@ def test_train_test_split_dynamic_graph_static_signal_batch():
 
     edge_indices, edge_weights, features, targets, batches = generate_signal(250, 100, 32, 10)
     
-    dataset = StaticGraphTemporalSignalBatch(edge_indices[0], edge_weights[0], features, targets, batches)
+    dataset = StaticGraphTemporalSignalBatch(edge_indices[0], edge_weights[0], features, targets, batches[0])
 
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 

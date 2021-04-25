@@ -70,13 +70,13 @@ def temporal_signal_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discre
                                                         data_iterator.edge_weight,
                                                         data_iterator.features[0:train_snapshots],
                                                         data_iterator.targets[0:train_snapshots],
-                                                        data_iterator.batches[0:train_snapshots])
+                                                        data_iterator.batches)
 
         test_iterator = StaticGraphTemporalSignalBatch(data_iterator.edge_index,
                                                        data_iterator.edge_weight,
                                                        data_iterator.features[train_snapshots:],
                                                        data_iterator.targets[train_snapshots:],
-                                                       data_iterator.batches[train_snapshots:])
+                                                       data_iterator.batches)
 
     elif type(data_iterator) == DynamicGraphTemporalSignalBatch:
         train_iterator = DynamicGraphTemporalSignalBatch(data_iterator.edge_indices[0:train_snapshots],
