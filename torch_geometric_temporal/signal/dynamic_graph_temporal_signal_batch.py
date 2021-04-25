@@ -1,13 +1,14 @@
 import torch
 import numpy as np
 from typing import List, Union
-from torch_geometric.data import Data
+from torch_geometric.data import Batch
 
 
 Edge_Indices = List[Union[np.ndarray, None]]
 Edge_Weights = List[Union[np.ndarray, None]]
 Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
+Batches = List[Union[np.ndarray, None]]
 
 
 class DynamicGraphTemporalSignalBatch(object):
@@ -15,7 +16,7 @@ class DynamicGraphTemporalSignalBatch(object):
     changing edge set and weights . The feature set and node labels
     (target) are also dynamic. The iterator returns a single discrete temporal
     snapshot for a time period (e.g. day or week). This single snapshot is a 
-    Pytorch Geometric Data object. Between two temporal snapshots the edges,
+    Pytorch Geometric Batch object. Between two temporal snapshots the edges,
     edge weights, the feature matrix and target matrices might change.
  
     Args:
@@ -23,6 +24,7 @@ class DynamicGraphTemporalSignalBatch(object):
         edge_weights (List of Numpy arrays): List of edge weight tensors.
         features (List of Numpy arrays): List of node feature tensors.
         targets (List of Numpy arrays): List of node label (target) tensors.
+        batches (List of Numpy arrays): List of batch index tensors.
     """
     def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
                  features: Features, targets: Targets):
@@ -37,6 +39,7 @@ class DynamicGraphTemporalSignalBatch(object):
         assert len(self.features) == len(self.targets), "Temporal dimension inconsistency."
         assert len(self.edge_indices) == len(self.edge_weights), "Temporal dimension inconsistency."
         assert len(self.features) == len(self.edge_weights), "Temporal dimension inconsistency."
+        assert len(self.features) == len(self.batches), "Temporal dimension inconsistency."
 
     def _set_snapshot_count(self):
         self.snapshot_count = len(self.features)
@@ -46,6 +49,13 @@ class DynamicGraphTemporalSignalBatch(object):
             return self.edge_indices[self.t]
         else:
             return torch.LongTensor(self.edge_indices[self.t])
+            
+            
+    def _get_batch_index(self):
+        if self.batches[self.t] is None:
+            return self.edge_indices[self.t]
+        else:
+            return torch.LongTensor(self.batches[self.t])
 
     def _get_edge_weight(self):
         if self.edge_weights[self.t] is None:
@@ -70,15 +80,17 @@ class DynamicGraphTemporalSignalBatch(object):
          
 
     def _get_snapshot(self):
-        x = self._get_features()
+        x = self._get_feature()
         edge_index = self._get_edge_index()
         edge_weight = self._get_edge_weight()
+        batch = self._get_batch_index()
         y = self._get_target()
 
-        snapshot = Data(x = x,
-                        edge_index = edge_index,
-                        edge_attr = edge_weight,
-                        y = y)
+        snapshot = Batch(x = x,
+                         edge_index = edge_index,
+                         edge_attr = edge_weight,
+                         y = y,
+                         batch = batch)
         return snapshot
 
     def __next__(self):
