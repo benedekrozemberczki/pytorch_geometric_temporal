@@ -101,11 +101,11 @@ def test_dynamic_graph_static_signal_typing_batch():
 def test_discrete_train_test_split_dynamic_batch():
 
     snapshot_count = 250
-    n_count = 100
+    node_count = 100
     feature_count = 32
     graph_count = 10
 
-    edge_indices, edge_weights, features, targets, batches = generate_signal(250, 100, 32, 10)
+    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count , node_count, feature_count, graph_count)
 
     dataset = DynamicGraphTemporalSignalBatch(edge_indices, edge_weights, features, targets, batches)
 
@@ -115,24 +115,27 @@ def test_discrete_train_test_split_dynamic_batch():
         for snapshot in test_dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
+            assert snapshot.x.shape == (node_count*graph_count, feature_count)
+            assert snapshot.y.shape == (node_count*graph_count, )
 
     for epoch in range(2):
         for snapshot in train_dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
+            assert snapshot.x.shape == (node_count*graph_count, feature_count)
+            assert snapshot.y.shape == (node_count*graph_count, )
             
 def test_train_test_split_dynamic_graph_static_signal_batch():
 
     snapshot_count = 250
-    n_count = 100
+    node_count = 100
     feature_count = 32
     graph_count = 10
 
-    edge_indices, edge_weights, features, targets, batches = generate_signal(250, 100, 32, 10)
+    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count,
+                                                                             node_count,
+                                                                             feature_count,
+                                                                             graph_count)
     
     dataset = StaticGraphTemporalSignalBatch(edge_indices[0], edge_weights[0], features, targets, batches[0])
 
@@ -142,25 +145,28 @@ def test_train_test_split_dynamic_graph_static_signal_batch():
         for snapshot in test_dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
+            assert snapshot.x.shape == (node_count*graph_count, feature_count)
+            assert snapshot.y.shape == (node_count*graph_count, )
 
     for epoch in range(2):
         for snapshot in train_dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
+            assert snapshot.x.shape == (node_count*graph_count, feature_count)
+            assert snapshot.y.shape == (node_count*graph_count, )
             
             
 def test_discrete_train_test_split_dynamic_batch():
 
     snapshot_count = 250
-    n_count = 100
+    node_count = 100
     feature_count = 32
     graph_count = 10
 
-    edge_indices, edge_weights, features, targets, batches = generate_signal(250, 100, 32, 10)
+    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count,
+                                                                             node_count,
+                                                                             feature_count,
+                                                                             graph_count)
     
     feature = features[0]
 
@@ -172,12 +178,12 @@ def test_discrete_train_test_split_dynamic_batch():
         for snapshot in test_dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
+            assert snapshot.x.shape == (node_count*graph_count, feature_count)
+            assert snapshot.y.shape == (node_count*graph_count, )
 
     for epoch in range(2):
         for snapshot in train_dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
+            assert snapshot.x.shape == (node_count*graph_count, feature_count)
+            assert snapshot.y.shape == (node_count*graph_count, )
