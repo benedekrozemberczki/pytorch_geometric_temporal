@@ -62,10 +62,10 @@ The constructor of a ``DynamicGraphStaticSignal`` object requires the following 
 - ``feature`` - A **single** ``NumPy`` array to hold the vertex features.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
 
-Temporal Snapshots
-^^^^^^^^^^^^^^^^^^ 
+Temporal Data Snapshots
+^^^^^^^^^^^^^^^^^^^^^^  
 
-A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
+A temporal data snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
 
 - ``edge_index`` - A PyTorch ``LongTensor`` of edge indices used for node feature aggregation (optional).
 - ``edge_attr`` - A PyTorch ``FloatTensor`` of edge features used for weighting the node feature aggregation (optional).
@@ -81,38 +81,41 @@ PyTorch Geometric Tenporal offers data iterators for batched spatiotemporal data
 - ``DynamicGraphTemporalSignalBatch`` - Is designed for **temporal signals** defined on a batch of **dynamic** graphs.
 - ``DynamicGraphStaticSignalBatch`` - Is designed for **static signals** defined on a batch of **dynamic** graphs.
 
-Static Graph with Temporal Signal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Static Graph with Temporal Signal Batch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``StaticGraphTemporalSignal`` object requires the following parameters:
+The constructor of a ``StaticGraphTemporalSignalBatch`` object requires the following parameters:
 
 - ``edge_index`` - A **single** ``NumPy`` array to hold the edge indices.
 - ``edge_weight`` - A **single** ``NumPy`` array to hold the edge weights.
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+- ``batches`` - A **list** of ``NumPy`` arrays to hold the batch group indices.
  
-Dynamic Graph with Temporal Signal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Dynamic Graph with Temporal Signal Batch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``DynamicGraphTemporalSignal`` object requires the following parameters:
+The constructor of a ``DynamicGraphTemporalSignalBatch`` object requires the following parameters:
 
 - ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
 - ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
 - ``features`` - A **list** of ``NumPy`` arrays to hold the vertex features for each time period.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+- ``batches`` - A **list** of ``NumPy`` arrays to hold the batch group indices.
  
-Dyanmic Graph with Static Signal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Dyanmic Graph with Static Signal Batch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The constructor of a ``DynamicGraphStaticSignal`` object requires the following parameters:
+The constructor of a ``DynamicGraphStaticSignalBatch`` object requires the following parameters:
 
 - ``edge_indices`` - A **list** of ``NumPy`` arrays to hold the edge indices.
 - ``edge_weights`` - A **list** of ``NumPy`` arrays to hold the edge weights.
 - ``feature`` - A **single** ``NumPy`` array to hold the vertex features.
 - ``targets`` - A **list** of ``NumPy`` arrays to hold the vertex level targets for each time period.
+- ``batches`` - A **list** of ``NumPy`` arrays to hold the batch group indices.
 
-Temporal Snapshots
-^^^^^^^^^^^^^^^^^^ 
+Temporal Batch Snapshots
+^^^^^^^^^^^^^^^^^^^^^^^  
 
 A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
 
