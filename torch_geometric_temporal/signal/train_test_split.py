@@ -3,8 +3,15 @@ from .static_graph_temporal_signal import StaticGraphTemporalSignal
 from .dynamic_graph_temporal_signal import DynamicGraphTemporalSignal
 from .dynamic_graph_static_signal import DynamicGraphStaticSignal
 
+from .static_graph_temporal_signal_batch import StaticGraphTemporalSignalBatch
+from .dynamic_graph_temporal_signal_batch import DynamicGraphTemporalSignalBatch
+from .dynamic_graph_static_signal_batch import DynamicGraphStaticSignalBatch
 
-Discrete_Signal = Union[StaticGraphTemporalSignal, DynamicGraphTemporalSignal, DynamicGraphStaticSignal]
+
+
+Discrete_Signal = Union[StaticGraphTemporalSignal, StaticGraphTemporalSignalBatch,
+                        DynamicGraphTemporalSignal, DynamicGraphTemporalSignalBatch,
+                        DynamicGraphStaticSignal, DynamicGraphStaticSignalBatch]
 
 def temporal_signal_split(data_iterator, train_ratio: float=0.8) -> Tuple[Discrete_Signal, Discrete_Signal]:
     r""" Function to split a data iterator according to a fixed ratio.
