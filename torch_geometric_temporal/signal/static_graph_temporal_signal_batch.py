@@ -1,13 +1,14 @@
 import torch
 import numpy as np
 from typing import List, Union
-from torch_geometric.data import Data
+from torch_geometric.data import Batch
 
 
 Edge_Index = Union[np.ndarray, None] 
 Edge_Weight = Union[np.ndarray, None]
 Features = List[Union[np.ndarray, None]]
 Targets = List[Union[np.ndarray, None]]
+Batches = List[Union[np.ndarray, None]]
 
 
 class StaticGraphTemporalSignalBatch(object):
@@ -24,13 +25,15 @@ class StaticGraphTemporalSignalBatch(object):
         edge_weight (Numpy array): Edge weight tensor.
         features (List of Numpy arrays): List of node feature tensors.
         targets (List of Numpy arrays): List of node label (target) tensors.
+        batches (List of Numpy arrays): List of batch index tensors.
     """
     def __init__(self, edge_index: Edge_Index, edge_weight: Edge_Weight,
-                 features: Features, targets: Targets):
+                 features: Features, targets: Targets, batches: Batches):
         self.edge_index = edge_index
         self.edge_weight = edge_weight
         self.features = features
         self.targets = targets
+        self.batches = batches
         self._check_temporal_consistency()
         self._set_snapshot_count()
 
@@ -72,12 +75,14 @@ class StaticGraphTemporalSignalBatch(object):
         x = self._get_features()
         edge_index = self._get_edge_index()
         edge_weight = self._get_edge_weight()
+        batch = self._get_batch_index()
         y = self._get_target()
 
         snapshot = Data(x = x,
                         edge_index = edge_index,
                         edge_attr = edge_weight,
-                        y = y)
+                        y = y,
+                        batch = batch)
         return snapshot
 
     def __next__(self):

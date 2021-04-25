@@ -27,11 +27,12 @@ class DynamicGraphTemporalSignalBatch(object):
         batches (List of Numpy arrays): List of batch index tensors.
     """
     def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
-                 features: Features, targets: Targets):
+                 features: Features, targets: Targets, batches: Batches):
         self.edge_indices = edge_indices
         self.edge_weights = edge_weights
         self.features = features
         self.targets = targets
+        self.bacthes = batches
         self._check_temporal_consistency()
         self._set_snapshot_count()
 
