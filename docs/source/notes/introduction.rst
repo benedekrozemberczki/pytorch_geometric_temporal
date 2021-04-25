@@ -28,7 +28,7 @@ Temporal Signal Iterators
 
 PyTorch Geometric Tenporal offers data iterators for spatio-temporal datasets which contain the temporal snapshots. There are three types of data iterators:
 
-- ``StaticGraphTemporalSignal`` - Is desiggned for **temporal signals** defined on a **static** graph.
+- ``StaticGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **static** graph.
 - ``DynamicGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **dynamic** graph.
 - ``DynamicGraphStaticSignal`` - Is designed for **static signals** defined on a **dynamic** graph.
 
@@ -72,14 +72,14 @@ A temporal snapshot is a PyTorch Geometric ``Data`` object. Please take a look a
 - ``x`` - A PyTorch ``FloatTensor`` of vertex features (optional).
 - ``y`` - A PyTorch ``FloatTensor`` or ``LongTensor`` of vertex targets (optional).
 
-Temporal Signal Iterators
---------------------------
+Temporal Signal Iterators with Batches
+----------------------------------------
 
-PyTorch Geometric Tenporal offers data iterators for spatio-temporal datasets which contain the temporal snapshots. There are three types of data iterators:
+PyTorch Geometric Tenporal offers data iterators for batched spatiotemporal datasets which contain the batched temporal snapshots. There are three types of batched data iterators:
 
-- ``StaticGraphTemporalSignal`` - Is desiggned for **temporal signals** defined on a **static** graph.
-- ``DynamicGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **dynamic** graph.
-- ``DynamicGraphStaticSignal`` - Is designed for **static signals** defined on a **dynamic** graph.
+- ``StaticGraphTemporalSignalBatch`` - Is designed for **temporal signals** defined on a batch of **static** graphs.
+- ``DynamicGraphTemporalSignalBatch`` - Is designed for **temporal signals** defined on a batch of **dynamic** graphs.
+- ``DynamicGraphStaticSignalBatch`` - Is designed for **static signals** defined on a batch of **dynamic** graphs.
 
 Static Graph with Temporal Signal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
