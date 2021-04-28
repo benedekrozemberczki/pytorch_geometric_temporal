@@ -38,7 +38,6 @@ def generate_signal(snapshot_count, node_count, feature_count, graph_count):
         features.append(np.concatenate(features_s))
         targets.append(np.concatenate(targets_s))
         batches.append(np.concatenate(batches_s))
-    
     return edge_indices, edge_weights, features, targets, batches
 
 def test_dynamic_graph_temporal_signal_real_batch():
@@ -75,7 +74,8 @@ def test_static_graph_temporal_signal_batch():
         assert snapshot.batch is None
 
 def test_dynamic_graph_temporal_signal_batch():
-    dataset = DynamicGraphTemporalSignalBatch([None, None], [None, None], [None, None], [None, None], [None, None])
+    dataset = DynamicGraphTemporalSignalBatch([None, None], [None, None],
+                                              [None, None], [None, None], [None, None])
     for snapshot in dataset:
         assert snapshot.edge_index is None
         assert snapshot.edge_attr is None
@@ -91,7 +91,7 @@ def test_static_graph_temporal_signal_typing_batch():
         assert snapshot.x.shape == (1,)
         assert snapshot.y.shape == (1,)
         assert snapshot.batch is None
-        
+
 def test_dynamic_graph_static_signal_typing_batch():
     dataset = DynamicGraphStaticSignalBatch([None], [None], None, [None], [None])
     for snapshot in dataset:
@@ -132,7 +132,8 @@ def test_discrete_train_test_split_dynamic_batch():
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
             assert snapshot.x.shape == (node_count*graph_count, feature_count)
             assert snapshot.y.shape == (node_count*graph_count, )
-            
+
+
 def test_train_test_split_static_graph_temporal_signal_batch():
 
     snapshot_count = 250
@@ -144,8 +145,9 @@ def test_train_test_split_static_graph_temporal_signal_batch():
                                                                              node_count,
                                                                              feature_count,
                                                                              graph_count)
-    
-    dataset = StaticGraphTemporalSignalBatch(edge_indices[0], edge_weights[0], features, targets, batches[0])
+
+    dataset = StaticGraphTemporalSignalBatch(edge_indices[0], edge_weights[0],
+                                             features, targets, batches[0])
 
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
@@ -162,9 +164,9 @@ def test_train_test_split_static_graph_temporal_signal_batch():
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
             assert snapshot.x.shape == (node_count*graph_count, feature_count)
             assert snapshot.y.shape == (node_count*graph_count, )
-            
-            
-def test_discrete_train_test_split_dynamic_batch():
+
+
+def test_train_test_split_dynamic_graph_static_signal_batch():
 
     snapshot_count = 250
     node_count = 100
@@ -175,7 +177,7 @@ def test_discrete_train_test_split_dynamic_batch():
                                                                              node_count,
                                                                              feature_count,
                                                                              graph_count)
-    
+
     feature = features[0]
 
     dataset = DynamicGraphStaticSignalBatch(edge_indices, edge_weights, feature, targets, batches)
