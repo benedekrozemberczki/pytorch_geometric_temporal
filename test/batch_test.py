@@ -1,3 +1,5 @@
+"""Tests for batch behaviour."""
+
 import numpy as np
 import networkx as nx
 
@@ -180,7 +182,8 @@ def test_train_test_split_dynamic_graph_static_signal_batch():
 
     feature = features[0]
 
-    dataset = DynamicGraphStaticSignalBatch(edge_indices, edge_weights, feature, targets, batches)
+    dataset = DynamicGraphStaticSignalBatch(edge_indices, edge_weights,
+                                            feature, targets, batches)
 
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
