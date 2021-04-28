@@ -133,7 +133,7 @@ def test_discrete_train_test_split_dynamic_batch():
             assert snapshot.x.shape == (node_count*graph_count, feature_count)
             assert snapshot.y.shape == (node_count*graph_count, )
             
-def test_train_test_split_dynamic_graph_static_signal_batch():
+def test_train_test_split_static_graph_temporal_signal_batch():
 
     snapshot_count = 250
     node_count = 100
