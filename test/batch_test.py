@@ -48,9 +48,13 @@ def test_dynamic_graph_temporal_signal_real_batch():
     feature_count = 32
     graph_count = 10
 
-    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count, node_count, feature_count, graph_count)
+    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count,
+                                                                             node_count,
+                                                                             feature_count,
+                                                                             graph_count)
 
-    dataset = DynamicGraphTemporalSignalBatch(edge_indices, edge_weights, features, targets, batches)
+    dataset = DynamicGraphTemporalSignalBatch(edge_indices, edge_weights,
+                                              features, targets, batches)
 
     for _ in range(15):
         for snapshot in dataset:
@@ -105,9 +109,13 @@ def test_discrete_train_test_split_dynamic_batch():
     feature_count = 32
     graph_count = 10
 
-    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count , node_count, feature_count, graph_count)
+    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count,
+                                                                             node_count,
+                                                                             feature_count,
+                                                                             graph_count)
 
-    dataset = DynamicGraphTemporalSignalBatch(edge_indices, edge_weights, features, targets, batches)
+    dataset = DynamicGraphTemporalSignalBatch(edge_indices, edge_weights,
+                                              features, targets, batches)
 
     train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
 
