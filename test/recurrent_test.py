@@ -421,7 +421,7 @@ def test_evolve_gcn_h_layer():
     assert X.shape == (number_of_nodes, in_channels)
 
     X = layer(X, edge_index, edge_weight)
-    
+
     assert X.shape == (number_of_nodes, in_channels)
 
 def test_evolve_gcn_o_layer():
@@ -441,9 +441,9 @@ def test_evolve_gcn_o_layer():
     layer = EvolveGCNO(in_channels = in_channels).to(device)
 
     X = layer(X, edge_index)
-    
+
     assert X.shape == (number_of_nodes, in_channels)
 
     X = layer(X, edge_index, edge_weight)
-    
+
     assert X.shape == (number_of_nodes, in_channels)
