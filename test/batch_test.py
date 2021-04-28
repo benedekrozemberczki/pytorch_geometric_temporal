@@ -19,7 +19,7 @@ def generate_signal(snapshot_count, node_count, feature_count, graph_count):
     features = []
     targets = []
     batches = []
-    for snapshot in range(snapshot_count):
+    for _ in range(snapshot_count):
         node_start = 0
         edge_indices_s = []
         edge_weights_s = []
@@ -44,21 +44,21 @@ def generate_signal(snapshot_count, node_count, feature_count, graph_count):
 def test_dynamic_graph_temporal_signal_real_batch():
 
     snapshot_count = 250
-    n_count = 100
+    node_count = 100
     feature_count = 32
     graph_count = 10
 
-    edge_indices, edge_weights, features, targets, batches = generate_signal(250, 100, 32, graph_count)
+    edge_indices, edge_weights, features, targets, batches = generate_signal(snapshot_count, node_count, feature_count, graph_count)
 
     dataset = DynamicGraphTemporalSignalBatch(edge_indices, edge_weights, features, targets, batches)
 
-    for _ in range(2):
+    for _ in range(15):
         for snapshot in dataset:
             assert snapshot.edge_index.shape[0] == 2
             assert snapshot.edge_index.shape[1] == snapshot.edge_attr.shape[0]
-            assert snapshot.x.shape == (1000, 32)
-            assert snapshot.y.shape == (1000, )
-            assert snapshot.batch.shape == (1000, )
+            assert snapshot.x.shape == (graph_count*node_count, feature_count)
+            assert snapshot.y.shape == (graph_count*node_count, )
+            assert snapshot.batch.shape == (graph_count*node_count, )
 
 
 def test_static_graph_temporal_signal_batch():
