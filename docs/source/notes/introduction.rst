@@ -1,7 +1,7 @@
 Introduction
 =======================
 
-`PyTorch Geometric Temporal <https://github.com/benedekrozemberczki/pytorch_geometric_temporal>`_ is an temporal graph neural network extension library for `PyTorch Geometric <https://github.com/rusty1s/pytorch_geometric/>`_. It builds on open-source deep-learning and graph processing libraries. *PyTorch Geometric Temporal* consists of state-of-the-art deep learning and parametric learning methods to process spatio-temporal signals. It is the first open-source library for temporal deep learning on geometric structures and provides constant time difference graph neural networks on dynamic and static graphs. We make this happen with the use of discrete time graph snapshots. Implemented methods cover a wide range of data mining (`WWW <https://www2021.thewebconf.org/>`_, `KDD <https://www.kdd.org/kdd2020/>`_), artificial intelligence and machine learning (`AAAI <http://www.aaai.org/Conferences/conferences.php>`_, `ICONIP <https://www.apnns.org/ICONIP2020/>`_, `ICLR <https://iclr.cc/>`_) conferences, workshops, and pieces from prominent journals. 
+`PyTorch Geometric Temporal <https://github.com/benedekrozemberczki/pytorch_geometric_temporal>`_ is a temporal graph neural network extension library for `PyTorch Geometric <https://github.com/rusty1s/pytorch_geometric/>`_. It builds on open-source deep-learning and graph processing libraries. *PyTorch Geometric Temporal* consists of state-of-the-art deep learning and parametric learning methods to process spatio-temporal signals. It is the first open-source library for temporal deep learning on geometric structures and provides constant time difference graph neural networks on dynamic and static graphs. We make this happen with the use of discrete time graph snapshots. Implemented methods cover a wide range of data mining (`WWW <https://www2021.thewebconf.org/>`_, `KDD <https://www.kdd.org/kdd2020/>`_), artificial intelligence and machine learning (`AAAI <http://www.aaai.org/Conferences/conferences.php>`_, `ICONIP <https://www.apnns.org/ICONIP2020/>`_, `ICLR <https://iclr.cc/>`_) conferences, workshops, and pieces from prominent journals. 
  
 
 Citing
@@ -21,19 +21,19 @@ We briefly overview the fundamental concepts and features of PyTorch Geometric T
 
 Data Structures
 =============================
-PyTorch Geometric Temporal is designed to provide easy to use data iterators which are parametrized with spatiotemporal data. These iterators can serve snapshots which are formed bu a single graph or multiple graphs which are batched together with the block diagonal batching trick.
+PyTorch Geometric Temporal is designed to provide easy to use data iterators which are parametrized with spatiotemporal data. These iterators can serve snapshots which are formed by a single graph or multiple graphs which are batched together with the block diagonal batching trick.
 
 Temporal Signal Iterators
 --------------------------
 
-PyTorch Geometric Tenporal offers data iterators for spatio-temporal datasets which contain the temporal snapshots. There are three types of data iterators:
+PyTorch Geometric Temporal offers data iterators for spatio-temporal datasets which contain the temporal snapshots. There are three types of data iterators:
 
 - ``StaticGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **static** graph.
 - ``DynamicGraphTemporalSignal`` - Is designed for **temporal signals** defined on a **dynamic** graph.
 - ``DynamicGraphStaticSignal`` - Is designed for **static signals** defined on a **dynamic** graph.
 
 Temporal Data Snapshots
-^^^^^^^^^^^^^^^^^^^^^^  
+^^^^^^^^^^^^^^^^^^^^^^^
 
 A temporal data snapshot is a PyTorch Geometric ``Data`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal snapshot has the following attributes:
 
@@ -45,7 +45,7 @@ A temporal data snapshot is a PyTorch Geometric ``Data`` object. Please take a l
 Temporal Signal Iterators with Batches
 ----------------------------------------
 
-PyTorch Geometric Tenporal offers data iterators for batched spatiotemporal datasets which contain the batched temporal snapshots. There are three types of batched data iterators:
+PyTorch Geometric Temporal offers data iterators for batched spatiotemporal datasets which contain the batched temporal snapshots. There are three types of batched data iterators:
 
 - ``StaticGraphTemporalSignalBatch`` - Is designed for **temporal signals** defined on a batch of **static** graphs.
 - ``DynamicGraphTemporalSignalBatch`` - Is designed for **temporal signals** defined on a batch of **dynamic** graphs.
@@ -53,7 +53,7 @@ PyTorch Geometric Tenporal offers data iterators for batched spatiotemporal data
 
 
 Temporal Batch Snapshots
-^^^^^^^^^^^^^^^^^^^^^^^  
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 A temporal batch snapshot is a PyTorch Geometric ``Batch`` object. Please take a look at this `readme <https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html#data-handling-of-graphs>`_ for the details. The returned temporal batch snapshot has the following attributes:
 
@@ -70,7 +70,7 @@ We released and included a number of datasets which can be used for comparing th
 
 Newly Released Datasets
 ^^^^^^^^^^^^^^^^^^^^^^
-In order to benchmark  graph neural networks we released the following datasets:
+In order to benchmark graph neural networks we released the following datasets:
 
 - `Hungarian Chickenpox Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.chickenpox.ChickenpoxDatasetLoader>`_
 - `PedalMe London Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pedalme.PedalMeDatasetLoader>`_
@@ -103,7 +103,7 @@ Spatiotemporal Signal Splitting
 -------------------------------
 
 
-We provide functions to create temporal splits of the data iterators. These functions return train and test data iterators which split the original iterator using a fix train-test ratio. Snapshots from the earlier time periods contribute to the the training dataset and snapshots from the later periods contribute to the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``split_temporal_signal`` takes either a ``StaticGraphTemporalSignal`` or a ``DynamicGraphTemporalSignal`` object and returns two iterattors according to the split ratio specified by ``train_ratio``.
+We provide functions to create temporal splits of the data iterators. These functions return train and test data iterators which split the original iterator using a fix train-test ratio. Snapshots from the earlier time periods contribute to the training dataset and snapshots from the later periods contribute to the test dataset. This way temporal forecasts can be evaluated in a real life like scenario. The function ``split_temporal_signal`` takes either a ``StaticGraphTemporalSignal`` or a ``DynamicGraphTemporalSignal`` object and returns two iterators according to the split ratio specified by ``train_ratio``.
 
 .. code-block:: python
 
@@ -121,7 +121,7 @@ We provide functions to create temporal splits of the data iterators. These func
 Applications
 =============
 
-In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is about epidmeiological forecasting the other on is about predicting web traffic.
+In the following we will overview two case studies where PyTorch Geometric Temporal can be used to solve real world relevant machine learning problems. One of them is about epidemiological forecasting the other on is about predicting web traffic.
 
 Epidemiological Forecasting
 ---------------------------
@@ -181,7 +181,7 @@ Let us define a model (we have 4 node features) and train it on the training spl
         optimizer.step()
         optimizer.zero_grad()
 
-Using the holdout we will evaluate the performance of the trained recurrent graph convolutional network and calculate the mean squared error across **all of the spatial units and time periods**. 
+Using the holdout we will evaluate the performance of the trained recurrent graph convolutional network and calculate the mean squared error across **all the spatial units and time periods**. 
 
 .. code-block:: python
 
@@ -199,7 +199,7 @@ Web Traffic Prediction
 ----------------------
 
 
-We are using the Wikipedia Maths dataset in this case study. We will train a recurrent graph neural network to predict the daiy views on Wikipedia pages using a recurrent graph convolutional network. First, we will load the dataset and use 14 lagged traffic variables. Next, we create an appropriate spatio-temporal split using 50% of days for training of the model.
+We are using the Wikipedia Maths dataset in this case study. We will train a recurrent graph neural network to predict the daily views on Wikipedia pages using a recurrent graph convolutional network. First, we will load the dataset and use 14 lagged traffic variables. Next, we create an appropriate spatio-temporal split using 50% of days for training of the model.
 
 .. code-block:: python
 
@@ -212,7 +212,7 @@ We are using the Wikipedia Maths dataset in this case study. We will train a rec
 
     train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.5)
 
-In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``GConvGRU`` layer and a feedforward layer. It is **important to note again** that the non-linearity is not integrated into the recurrent graph convolutional operation. The convolutional model has a fixed number of filters (which can be parametrized) and considers 2nd order neighbourhoods. 
+In the next steps we will define the **recurrent graph neural network** architecture used for solving the supervised task. The constructor defines a ``GConvGRU`` layer and a feedforward layer. It is **important to note again** that the non-linearity is not integrated into the recurrent graph convolutional operation. The convolutional model has a fixed number of filters (which can be parametrized) and considers 2nd order neighborhoods. 
 
 .. code-block:: python
 
@@ -246,7 +246,7 @@ Let us define a model (we have 14 node features) and train it on the training sp
 
     for epoch in tqdm(range(50)):
         for time, snapshot in enumerate(train_dataset):
-            y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)     
+            y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
             cost = torch.mean((y_hat-snapshot.y)**2)
             cost.backward()
             optimizer.step()
