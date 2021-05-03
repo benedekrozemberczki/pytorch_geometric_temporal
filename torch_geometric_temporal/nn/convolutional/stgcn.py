@@ -124,11 +124,11 @@ class STConv(nn.Module):
         Return types:
             * **T** (PyTorch FloatTensor) - Sequence of node features.
         """
-        T = self._temporal_conv1(X)
-
-        for b in range(T.size(0)):
-            for t in range(T.size(1)):
-                T[b][t] = self._graph_conv(T[b][t], edge_index, edge_weight)
+        T_0 = self._temporal_conv1(X)
+        T = torch.zeros_like(T_0).to(T_0.device)
+        for b in range(T_0.size(0)):
+            for t in range(T_0.size(1)):
+                T[b][t] = self._graph_conv(T_0[b][t], edge_index, edge_weight)
 
         T = F.relu(T)
         T = self._temporal_conv2(T)
