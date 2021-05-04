@@ -57,30 +57,30 @@ Recurrent Graph Convolutional Layers
     :undoc-members:
     :exclude-members: AVWGCN
 
-Temporal Graph Convolutional Layers
+Temporal Graph Attention Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.convolutional.stgcn
+.. automodule:: torch_geometric_temporal.nn.attention.stgcn
     :members:
     :undoc-members:
     :exclude-members: TemporalConv
 
-.. automodule:: torch_geometric_temporal.nn.convolutional.astgcn
+.. automodule:: torch_geometric_temporal.nn.attention.astgcn
     :members:
     :undoc-members:
     :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ChebConvAttention
     
-.. automodule:: torch_geometric_temporal.nn.convolutional.mstgcn
+.. automodule:: torch_geometric_temporal.nn.attention.mstgcn
     :members:
     :undoc-members:
     :exclude-members: MSTGCNBlock
 
-.. automodule:: torch_geometric_temporal.nn.convolutional.gman
+.. automodule:: torch_geometric_temporal.nn.attention.gman
     :members:
     :undoc-members:
     :exclude-members: Conv2D, FullyConnected, SpatioTemporalEmbedding, SpatialAttention, TemporalAttention, GatedFusion, SpatioTemporalAttentionBlock, TransformAttention
     
-.. automodule:: torch_geometric_temporal.nn.convolutional.mtgnn
+.. automodule:: torch_geometric_temporal.nn.attention.mtgnn
     :members:
     :undoc-members:
     :exclude-members: Linear, MixProp, DilatedInception, LayerNormalization, MTGNNLayer
@@ -88,7 +88,7 @@ Temporal Graph Convolutional Layers
 Auxiliary Graph Convolutional Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.convolutional.stgcn
+.. automodule:: torch_geometric_temporal.nn.attention.stgcn
     :members:
     :undoc-members:
     :exclude-members: STConv
@@ -98,7 +98,7 @@ Auxiliary Graph Convolutional Layers
     :undoc-members:
     :exclude-members: DCRNN
     
-.. automodule:: torch_geometric_temporal.nn.convolutional.astgcn
+.. automodule:: torch_geometric_temporal.nn.attention.astgcn
     :members:
     :undoc-members:
     :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ASTGCN
