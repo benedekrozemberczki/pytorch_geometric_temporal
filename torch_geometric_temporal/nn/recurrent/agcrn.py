@@ -48,7 +48,7 @@ class AVWGCN(nn.Module):
 
 class AGCRN(nn.Module):
     r"""An implementation of the Adaptive Graph Convolutional Recurrent Unit.
-    For details see: `"Adaptive Graph Convolutional Recurrent Network 
+    For details see: `"Adaptive Graph Convolutional Recurrent Network
     for Traffic Forecasting" <https://arxiv.org/abs/2007.02842>`_
 
     Args:
@@ -71,7 +71,6 @@ class AGCRN(nn.Module):
         self._setup_layers()
 
     def _setup_layers(self):
-    
         self._gate = AVWGCN(in_channels = self.in_channels + self.out_channels,
                             out_channels = 2*self.out_channels,
                             K = self.K,
@@ -81,7 +80,7 @@ class AGCRN(nn.Module):
                               out_channels = self.out_channels,
                               K = self.K,
                               embedding_dimensions = self.embedding_dimensions)
-                              
+
     def _set_hidden_state(self, X, H):
         if H is None:
             H = torch.zeros(X.shape[0], X.shape[1], self.out_channels).to(X.device)
