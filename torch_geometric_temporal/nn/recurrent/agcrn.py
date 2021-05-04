@@ -4,8 +4,8 @@ import torch.nn.functional as F
 
 
 class AVWGCN(nn.Module):
-    r"""An implementation of the Node Adaptive Graph Convolution Layer. 
-    For details see: `"Adaptive Graph Convolutional Recurrent Network 
+    r"""An implementation of the Node Adaptive Graph Convolution Layer.
+    For details see: `"Adaptive Graph Convolutional Recurrent Network
     for Traffic Forecasting" <https://arxiv.org/abs/2007.02842>`_
 
     Args:
@@ -17,7 +17,8 @@ class AVWGCN(nn.Module):
     def __init__(self, in_channels: int, out_channels: int, K: int, embedding_dimensions: int):
         super(AVWGCN, self).__init__()
         self.K = K
-        self.weights_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, K, in_channels, out_channels))
+        self.weights_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, K,
+                                                           in_channels, out_channels))
         self.bias_pool = nn.Parameter(torch.FloatTensor(embedding_dimensions, out_channels))
         
     def forward(self, X: torch.FloatTensor, E: torch.FloatTensor) -> torch.FloatTensor:
