@@ -30,15 +30,13 @@ class AVWGCN(nn.Module):
 
         Return types:
             * **E** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
-        """    
+        """
         number_of_nodes = E.shape[0]
         supports = F.softmax(F.relu(torch.mm(E, E.transpose(0, 1))), dim=1)
         support_set = [torch.eye(number_of_nodes).to(supports.device), supports]
-        
         for _ in range(2, self.K):
             support = torch.matmul(2 * supports, support_set[-1]) - support_set[-2]
             support_set.append(support)
-            
         supports = torch.stack(support_set, dim=0)
         W = torch.einsum('nd,dkio->nkio', E, self.weights_pool) 
         bias = torch.matmul(E, self.bias_pool)
