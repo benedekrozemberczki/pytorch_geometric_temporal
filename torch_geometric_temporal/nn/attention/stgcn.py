@@ -36,7 +36,7 @@ class TemporalConv(nn.Module):
         X = X.permute(0, 3, 2, 1)
         P = self.conv_1(X)
         Q = torch.sigmoid(self.conv_2(X))
-        PQ = P + Q
+        PQ = P * Q
         H = F.relu(PQ + self.conv_3(X))
         H = H.permute(0, 3, 2, 1)
         return H
