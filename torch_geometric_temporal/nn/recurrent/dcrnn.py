@@ -1,6 +1,6 @@
 import math
 import torch
-from torch_geometric.utils import to_dense_adj
+from torch_geometric.utils import to_dense_adj, dense_to_sparse
 from torch_geometric.nn.conv import MessagePassing
 
 class DConv(MessagePassing):
@@ -64,19 +64,22 @@ class DConv(MessagePassing):
         norm_out = deg_out_inv[row]
         norm_in = deg_in_inv[row]
 
+        reverse_edge_index = adj_mat.transpose(0,1)
+        reverse_edge_index, vv = dense_to_sparse(reverse_edge_index)
+
         Tx_0 = X
         Tx_1 = X
         H = torch.matmul(Tx_0, (self.weight[0])[0]) + torch.matmul(Tx_0, (self.weight[1])[0]) 
 
         if self.weight.size(1) > 1:
             Tx_1_o = self.propagate(edge_index, x=X, norm=norm_out, size=None)
-            Tx_1_i = self.propagate(edge_index, x=X, norm=norm_in, size=None)
+            Tx_1_i = self.propagate(reverse_edge_index, x=X, norm=norm_in, size=None)
             H = H + torch.matmul(Tx_1_o, (self.weight[0])[1]) + torch.matmul(Tx_1_i, (self.weight[1])[1])
 
         for k in range(2, self.weight.size(1)):
             Tx_2_o = self.propagate(edge_index, x=Tx_1_o, norm=norm_out, size=None)
             Tx_2_o = 2. * Tx_2_o - Tx_0
-            Tx_2_i = self.propagate(edge_index, x=Tx_1_i, norm=norm_in, size=None) 
+            Tx_2_i = self.propagate(reverse_edge_index, x=Tx_1_i, norm=norm_in, size=None) 
             Tx_2_i = 2. * Tx_2_i - Tx_0
             H = H + torch.matmul(Tx_2_o, (self.weight[0])[k]) + torch.matmul(Tx_2_i, (self.weight[1])[k])
             Tx_0, Tx_1_o, Tx_1_i = Tx_1, Tx_2_o, Tx_2_i
