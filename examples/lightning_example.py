@@ -48,11 +48,18 @@ loader = ChickenpoxDatasetLoader()
 
 dataset_loader = loader.get_dataset(lags=32)
 
-train_loader, val_loader = temporal_signal_split(dataset_loader, train_ratio=0.2)
+train_loader, val_loader = temporal_signal_split(dataset_loader,
+                                                 train_ratio=0.2)
 
-model = LitDiffConvModel(node_features=32, filters=16)
+model = LitDiffConvModel(node_features=32,
+                         filters=16)
 
-early_stop_callback = EarlyStopping(monitor='val_loss', min_delta=0.00, patience=10, verbose=False, mode='max')
+early_stop_callback = EarlyStopping(monitor='val_loss',
+                                    min_delta=0.00,
+                                    patience=10,
+                                    verbose=False,
+                                    mode='max')
 
 trainer = pl.Trainer(callbacks=[early_stop_callback])
+
 trainer.fit(model, train_loader, val_loader)
