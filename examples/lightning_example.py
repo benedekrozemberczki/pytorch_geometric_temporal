@@ -10,6 +10,7 @@ from torch_geometric_temporal.signal import temporal_signal_split
 
 
 class LitDiffConvModel(pl.LightningModule):
+
     def __init__(self, node_features, filters):
         super().__init__()
         self.recurrent = DCRNN(node_features, filters, 1)
@@ -22,7 +23,7 @@ class LitDiffConvModel(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x = train_batch.x
-        y = train_batch.y.view(-1,1)
+        y = train_batch.y.view(-1, 1)
         edge_index = train_batch.edge_index
         h = self.recurrent(x, edge_index)
         h = F.relu(h)
@@ -32,7 +33,7 @@ class LitDiffConvModel(pl.LightningModule):
 
     def validation_step(self, val_batch, batch_idx):
         x = val_batch.x
-        y = val_batch.y.view(-1,1)
+        y = val_batch.y.view(-1, 1)
         edge_index = val_batch.edge_index
         h = self.recurrent(x, edge_index)
         h = F.relu(h)
