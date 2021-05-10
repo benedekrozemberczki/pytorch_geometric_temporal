@@ -29,13 +29,11 @@ class A3TGCN(torch.nn.Module):
 
 
     def _setup_layers(self):
-    
         self._base_tgcn = TGCN(in_channels = self.in_channels,
                               out_channels = self.out_channels,
                               improved = self.improved,
                               cached = self.cached,
                               add_self_loops = self.add_self_loops)
-                              
         self._attention = torch.empty(self.periods)
         torch.nn.init.uniform_(self._attention)
 
