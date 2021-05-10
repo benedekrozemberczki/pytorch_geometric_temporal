@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+1from setuptools import find_packages, setup
 
 install_requires = ["decorator==4.4.2",
                     "torch",
@@ -41,13 +41,13 @@ keywords = ["machine-learning",
 setup(
   name = "torch_geometric_temporal",
   packages = find_packages(),
-  version = "0.30",
+  version = "0.31",
   license = "MIT",
   description = "A Temporal Extension Library for PyTorch Geometric.",
   author = "Benedek Rozemberczki",
   author_email = "benedek.rozemberczki@gmail.com",
   url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal",
-  download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00030.tar.gz",
+  download_url = "https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v_00031.tar.gz",
   keywords = keywords,
   install_requires = install_requires,
   setup_requires = setup_requires,
