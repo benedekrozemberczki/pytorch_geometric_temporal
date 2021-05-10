@@ -1,4 +1,4 @@
-1from setuptools import find_packages, setup
+from setuptools import find_packages, setup
 
 install_requires = ["decorator==4.4.2",
                     "torch",
