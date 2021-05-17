@@ -44,23 +44,23 @@ class DynamicGraphStaticSignalBatch(object):
     def _set_snapshot_count(self):
         self.snapshot_count = len(self.targets)
 
-    def _get_edge_index(self):
-        if self.edge_indices[self.t] is None:
-            return self.edge_indices[self.t]
+    def _get_edge_index(self, time_index: int):
+        if self.edge_indices[time_index] is None:
+            return self.edge_indices[time_index]
         else:
-            return torch.LongTensor(self.edge_indices[self.t])
+            return torch.LongTensor(self.edge_indices[time_index])
             
-    def _get_batch_index(self):
-        if self.batches[self.t] is None:
-            return self.batches[self.t]
+    def _get_batch_index(self, time_index: int):
+        if self.batches[time_index] is None:
+            return self.batches[time_index]
         else:
-            return torch.LongTensor(self.batches[self.t])
+            return torch.LongTensor(self.batches[time_index])
 
-    def _get_edge_weight(self):
-        if self.edge_weights[self.t] is None:
-            return self.edge_weights[self.t]
+    def _get_edge_weight(self, time_index: int):
+        if self.edge_weights[time_index] is None:
+            return self.edge_weights[time_index]
         else:
-            return torch.FloatTensor(self.edge_weights[self.t])
+            return torch.FloatTensor(self.edge_weights[time_index])
 
     def _get_feature(self): 
         if self.feature is None:
@@ -68,22 +68,22 @@ class DynamicGraphStaticSignalBatch(object):
         else:       
             return torch.FloatTensor(self.feature)
 
-    def _get_target(self):
-        if self.targets[self.t] is None:
-            return self.targets[self.t]
+    def _get_target(self, time_index: int):
+        if self.targets[time_index] is None:
+            return self.targets[time_index]
         else:
-            if self.targets[self.t].dtype.kind == 'i':
-                return torch.LongTensor(self.targets[self.t])
-            elif self.targets[self.t].dtype.kind == 'f':
-                return torch.FloatTensor(self.targets[self.t])
+            if self.targets[time_index].dtype.kind == 'i':
+                return torch.LongTensor(self.targets[time_index])
+            elif self.targets[time_index].dtype.kind == 'f':
+                return torch.FloatTensor(self.targets[time_index])
          
 
-    def _get_snapshot(self):
+    def __get_item__(self, time_index: int):
         x = self._get_feature()
-        edge_index = self._get_edge_index()
-        edge_weight = self._get_edge_weight()
-        batch = self._get_batch_index()
-        y = self._get_target()
+        edge_index = self._get_edge_index(time_index)
+        edge_weight = self._get_edge_weight(time_index)
+        batch = self._get_batch_index(time_index)
+        y = self._get_target(time_index)
 
         snapshot = Batch(x = x,
                          edge_index = edge_index,
@@ -94,7 +94,7 @@ class DynamicGraphStaticSignalBatch(object):
 
     def __next__(self):
         if self.t < len(self.targets):
-            snapshot = self._get_snapshot()
+            snapshot = self.__get_item__(self.t)
             self.t = self.t + 1
             return snapshot
         else:
