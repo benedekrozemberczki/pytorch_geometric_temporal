@@ -63,28 +63,28 @@ class StaticGraphTemporalSignalBatch(object):
         else:
             return torch.FloatTensor(self.edge_weight)
 
-    def _get_feature(self): 
-        if self.features[self.t] is None:
-            return self.features[self.t]
+    def _get_feature(self, time_index: int): 
+        if self.features[time_index] is None:
+            return self.features[time_index]
         else:       
-            return torch.FloatTensor(self.features[self.t])
+            return torch.FloatTensor(self.features[time_index])
 
-    def _get_target(self):
-        if self.targets[self.t] is None:
-            return self.targets[self.t]
+    def _get_target(self, time_index: int):
+        if self.targets[time_index] is None:
+            return self.targets[time_index]
         else:
-            if self.targets[self.t].dtype.kind == 'i':
-                return torch.LongTensor(self.targets[self.t])
-            elif self.targets[self.t].dtype.kind == 'f':
-                return torch.FloatTensor(self.targets[self.t])
+            if self.targets[time_index].dtype.kind == 'i':
+                return torch.LongTensor(self.targets[time_index])
+            elif self.targets[time_index].dtype.kind == 'f':
+                return torch.FloatTensor(self.targets[time_index])
          
 
-    def _get_snapshot(self):
-        x = self._get_feature()
+    def __get_item__(self, time_index: int):
+        x = self._get_feature(time_index)
         edge_index = self._get_edge_index()
         edge_weight = self._get_edge_weight()
         batch = self._get_batch_index()
-        y = self._get_target()
+        y = self._get_target(time_index)
 
         snapshot = Batch(x = x,
                          edge_index = edge_index,
@@ -95,7 +95,7 @@ class StaticGraphTemporalSignalBatch(object):
 
     def __next__(self):
         if self.t < len(self.features):
-            snapshot = self._get_snapshot()
+            snapshot = self._get_snapshot(self.t)
             self.t = self.t + 1
             return snapshot
         else:
