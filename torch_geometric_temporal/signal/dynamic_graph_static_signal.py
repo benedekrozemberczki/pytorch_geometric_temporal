@@ -93,7 +93,7 @@ class DynamicGraphStaticSignal(object):
 
     def __next__(self):
         if self.t < len(self.targets):
-            snapshot = self._get_snapshot()
+            snapshot = self. __get_item__(self.t)
             self.t = self.t + 1
             return snapshot
         else:
