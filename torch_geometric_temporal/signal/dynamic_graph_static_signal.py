@@ -66,7 +66,18 @@ class DynamicGraphStaticSignal(object):
                 return torch.LongTensor(self.targets[time_index])
             elif self.targets[time_index].dtype.kind == 'f':
                 return torch.FloatTensor(self.targets[time_index])
-         
+                
+    def __get_item__(self, time_index: int):
+        x = self._get_feature(time_index)
+        edge_index = self._get_edge_index(time_index)
+        edge_weight = self._get_edge_weight(time_index)
+        y = self._get_target(time_index)
+
+        snapshot = Data(x = x,
+                        edge_index = edge_index,
+                        edge_attr = edge_weight,
+                        y = y)
+        return snapshot         
 
     def _get_snapshot(self):
         x = self._get_feature(self.t)
