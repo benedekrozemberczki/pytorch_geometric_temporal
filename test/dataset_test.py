@@ -9,7 +9,7 @@ from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 
 from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
-from torch_geometric_temporal.dataset import TwitterTennisDatasetLoader
+from torch_geometric_temporal.dataset import TwitterTennisDatasetLoader, MontevideoBusDatasetLoader
 
 def get_edge_array(n_count):
     return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
@@ -136,6 +136,16 @@ def test_covid():
             snapshot.edge_attr.shape[0] == snapshot.edge_index.shape[1]
             snapshot.x.shape == (129, 8)
             snapshot.y.shape == (129, )
+
+def test_montevideobus():
+    loader = MontevideoBusDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(1):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 690)
+            assert snapshot.edge_attr.shape == (690,)
+            assert snapshot.x.shape == (675, 4)
+            assert snapshot.y.shape == (675,)
 
 def test_metrla():
     loader = METRLADatasetLoader(raw_data_dir="/tmp/")
