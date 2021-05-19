@@ -6,3 +6,4 @@ from .wikimath import WikiMathsDatasetLoader
 from .windmill import WindmillOutputDatasetLoader
 from .encovid import EnglandCovidDatasetLoader
 from .twitter_tennis import TwitterTennisDatasetLoader
+from .montevideo_bus import MontevideoBusDatasetLoader
