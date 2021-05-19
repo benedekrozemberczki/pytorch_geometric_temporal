@@ -67,11 +67,11 @@ class MontevideoBusDatasetLoader(object):
         Parameters
         ----------
         lags : int, optional
-            The number of time lags, by default 4
+            The number of time lags, by default 4.
         target_var : str, optional
-            Target variable name, by default "y"
+            Target variable name, by default "y".
         feature_vars : List[str], optional
-            List of feature variables, by default ["y"]
+            List of feature variables, by default ["y"].
 
         Returns
         -------
