@@ -35,6 +35,10 @@ Datasets
     :members:
     :undoc-members:
 
+.. automodule:: torch_geometric_temporal.dataset.montevideo_bus
+    :members:
+    :undoc-members:
+
 .. automodule:: torch_geometric_temporal.dataset.twitter_tennis
     :members:
     :undoc-members:
