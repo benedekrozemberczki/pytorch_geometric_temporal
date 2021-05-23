@@ -16,7 +16,7 @@ class StaticGraphTemporalSignalBatch(object):
     changing constant time difference temporal feature set (multiple signals).
     The node labels (target) are also temporal. The iterator returns a single 
     constant time difference temporal snapshot for a time period (e.g. day or week).
-    This single temporal snapshot is a Pytorch Geometric Data object. Between two 
+    This single temporal snapshot is a Pytorch Geometric Batch object. Between two 
     temporal snapshots the feature matrix and the target matrix might change.
     However, the underlying graph is the same.
  
