@@ -8,7 +8,7 @@ install_requires = ["decorator==4.4.2",
                     "torch_spline_conv",
                     "torch_geometric",
                     "numpy",
-                    "scipy==1.5.4",
+                    "scipy",
                     "tqdm",
                     "six"]
 
