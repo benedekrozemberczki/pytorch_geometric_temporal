@@ -93,7 +93,7 @@ The Hungarian Chickenpox Dataset can be loaded by the following code snippet. Th
 
 .. code-block:: python
 
-    from torch_geometric_temporal.data.dataset import ChickenpoxDatasetLoader
+    from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
 
     loader = ChickenpoxDatasetLoader()
 
