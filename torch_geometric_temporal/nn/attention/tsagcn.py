@@ -1,7 +1,6 @@
 import math
-
-import numpy as np
 import torch
+import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
 from torch_geometric.utils.to_dense_adj import to_dense_adj
@@ -27,15 +26,11 @@ class GraphAAGCN:
 
     def get_spatial_graph(self, num_nodes):
         self_mat = torch.eye(num_nodes)
-
         inward_mat = torch.squeeze(to_dense_adj(self.edge_index))
         inward_mat_norm = F.normalize(inward_mat,dim=0, p=1)
-
         outward_mat = inward_mat.transpose(0,1)
         outward_mat_norm = F.normalize(outward_mat,dim=0, p=1)
-
         adj_mat = torch.stack((self_mat, inward_mat_norm, outward_mat_norm))
-
         return adj_mat
 
 class UnitTCN(nn.Module):
@@ -242,14 +237,11 @@ class UnitGCN(nn.Module):
             y = self._adaptive_forward(x, y)
         else:
             y = self._non_adaptive_forward(x,y)
-
         y = self.bn(y)
         y += self.down(x)
         y = self.relu(y)
-
         if self.attention:
             y = self._attentive_forward(y)
-
         return y
 
 
@@ -309,8 +301,6 @@ class AAGCN(nn.Module):
             * **X** (PyTorch FloatTensor)* - Sequence of node features, 
             with shape (B, out_channels, T_in//stride, N_nodes).
         """
-
         y = self.relu(self.tcn1(self.gcn1(x)) + self.residual(x))
-
         return y
 
