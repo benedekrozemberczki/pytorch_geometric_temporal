@@ -31,6 +31,8 @@ External Resources - Architectures
 
 * George Panagopoulos, Giannis Nikolentzos, Michalis Vazirgiannis: **Transfer Graph Neural Networks for Pandemic Forecasting** `Paper <https://arxiv.org/abs/2009.08388>`_, `Code <https://github.com/geopanag/pandemic_tgnn>`_
 
+* Lei Shi, Yifan Zhang, Jian Cheng, Hanqing Lu: **Two-Stream Adaptive Graph Convolutional Networks for Skeleton-Based Action Recognition** `Paper <https://arxiv.org/abs/1805.07694>`_, `Code <https://github.com/lshiwjx/2s-AGCN>`_
+
 External Resources - Datasets
 =============================
 
