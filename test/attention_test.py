@@ -4,7 +4,7 @@ import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.utils import barabasi_albert_graph
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric_temporal.nn.attention import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention
+from torch_geometric_temporal.nn.attention import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention, AAGCN, GraphAAGCN
 from torch_geometric_temporal.nn.attention import GMAN, SpatioTemporalAttention, SpatioTemporalEmbedding
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
@@ -396,3 +396,29 @@ def test_mtgnn():
         output3 = output3.transpose(1, 3)
         assert output3.shape == (batch_size, 1, num_nodes, seq_out_len)
 
+def test_aagcn():
+    """
+    Testing 2s-AGCN unit
+    """
+    batch_size = 10
+    sequence_length = 5
+
+    number_of_nodes = 300
+    in_channels = 100
+    edge_per_node = 15
+    out_channels = 10
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    batch, _, edge_index, edge_weight = create_mock_batch(batch_size, sequence_length, number_of_nodes, edge_per_node, in_channels, out_channels)
+    #(bs, seq, nodes, f_in) -> (bs, f_in, seq, nodes)
+    #also be sure to pass in a contiguous tensor (the created in create_mock_batch() is not!)
+    batch = batch.permute(0,3,1,2).contiguous()
+
+    stride = 2
+    aagcn = AAGCN(num_nodes=number_of_nodes, edge_index=edge_index, in_channels=in_channels, out_channels=out_channels, stride=stride).to(device)
+    A = aagcn.A
+    
+    x_mock = batch.to(device)
+    H = aagcn(x_mock)
+
+    assert H.shape == (batch_size, out_channels, math.ceil(sequence_length/stride), number_of_nodes)
+    assert A.shape == (3, number_of_nodes, number_of_nodes)
