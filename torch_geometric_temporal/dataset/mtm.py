@@ -79,15 +79,3 @@ class MTMDatasetLoader():
             self._edges, self._edge_weights, self.features, self.targets
         )
         return dataset
-
-if __name__ == "__main__":
-    def test_mtm():
-        loader = MTMDatasetLoader()
-        dataset = loader.get_dataset()
-        for epoch in range(3):
-            for snapshot in dataset:
-                assert snapshot.edge_index.shape == (2, 19)
-                assert snapshot.edge_attr.shape == (19, )
-                assert snapshot.x.shape == (3, 21, 16)
-                assert snapshot.y.shape == (16, 6)
-    test_mtm()
