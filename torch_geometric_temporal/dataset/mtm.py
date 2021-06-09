@@ -21,7 +21,7 @@ class MTMDatasetLoader():
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/mtm_1.json"
+        url = "https://raw.githubusercontent.com/alexriedel1/pytorch_geometric_temporal/mtm1-dataset/dataset/mtm_1.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
         
     def _get_edges(self):
