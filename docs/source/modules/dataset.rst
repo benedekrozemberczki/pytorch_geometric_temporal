@@ -43,3 +43,7 @@ Datasets
     :members:
     :undoc-members:
     :exclude-members: transform_degree, transform_transitivity, encode_features, onehot_encoding
+
+.. automodule:: torch_geometric_temporal.dataset.mtm
+    :members:
+    :undoc-members:
