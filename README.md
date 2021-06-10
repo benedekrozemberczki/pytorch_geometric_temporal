@@ -39,7 +39,7 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
 
 ```bibtex
 @misc{rozemberczki2021pytorch,
-      author = {Benedek Rozemberczki and Paul Scherer and Yixuan He and George Panagopoulos and Maria Astefanoaei and Oliver Kiss and Ferenc Beres and Nicolas Collignon and Rik Sarkar},
+      author = {Benedek Rozemberczki and Paul Scherer and Yixuan He and George Panagopoulos and Alexander Riedel and Maria Astefanoaei and Oliver Kiss and Ferenc Beres and Guzmán López and Nicolas Collignon and Rik Sarkar},
       title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
       year = {2021},
       eprint = {arXiv:2104.07788},
