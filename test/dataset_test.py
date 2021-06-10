@@ -9,7 +9,7 @@ from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 
 from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
-from torch_geometric_temporal.dataset import TwitterTennisDatasetLoader, MontevideoBusDatasetLoader
+from torch_geometric_temporal.dataset import TwitterTennisDatasetLoader, MontevideoBusDatasetLoader, MTMDatasetLoader
 
 def get_edge_array(n_count):
     return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
@@ -237,6 +237,16 @@ def test_twitter_tennis_uo17():
 
     check_tennis_data("uo17", 1000, None, edges_in_snapshots)
     check_tennis_data("uo17", 200, "encoded", edges_in_snapshots)
+
+def test_mtm():
+    loader = MTMDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(3):
+        for snapshot in dataset:
+            assert snapshot.edge_index.shape == (2, 19)
+            assert snapshot.edge_attr.shape == (19, )
+            assert snapshot.x.shape == (3, 21, 16)
+            assert snapshot.y.shape == (16, 6)
 
 def test_discrete_train_test_split_static():
     loader = ChickenpoxDatasetLoader()
