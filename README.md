@@ -143,6 +143,7 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 
 **Installation**
 
+Binaries are provided for Python version <= 3.8.
 
 **PyTorch 1.8.0**
 
