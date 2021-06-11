@@ -2,7 +2,7 @@ Installation
 ============
 
 The installation of PyTorch Geometric Temporal requires the presence of certain prerequisites. These are described in great detail in the installation description of PyTorch Geometric. Please follow the instructions laid out `here <https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html>`_. You might also take a look at the `readme file <https://github.com/benedekrozemberczki/pytorch_geometric_temporal>`_ of the PyTorch Geometric Temporal repository.
-
+Binaries are provided for Python version <= 3.8.
 
 **PyTorch 1.8.0**
 
