@@ -129,6 +129,16 @@ def test_windmill_large():
             snapshot.x.shape == (312, 8)
             snapshot.y.shape == (312, )
             
+def test_windmill_small():
+    loader = WindmillOutputSmallDatasetLoader()
+    dataset = loader.get_dataset()
+    for epoch in range(2):
+        for snapshot in dataset:
+            snapshot.edge_index.shape == (2, 121)
+            snapshot.edge_attr.shape == (121, )
+            snapshot.x.shape == (11, 8)
+            snapshot.y.shape == (11, )
+            
 def test_covid():
     loader = EnglandCovidDatasetLoader()
     dataset = loader.get_dataset()
