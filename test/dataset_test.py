@@ -119,7 +119,7 @@ def test_wiki():
             snapshot.x.shape == (1068, 8)
             snapshot.y.shape == (1068, )
             
-def test_windmill_large():
+def test_windmilllarge():
     loader = WindmillOutputLargeDatasetLoader()
     dataset = loader.get_dataset()
     for epoch in range(2):
@@ -129,7 +129,7 @@ def test_windmill_large():
             snapshot.x.shape == (312, 8)
             snapshot.y.shape == (312, )
             
-def test_windmill_small():
+def test_windmillsmall():
     loader = WindmillOutputSmallDatasetLoader()
     dataset = loader.get_dataset()
     for epoch in range(2):
@@ -140,7 +140,7 @@ def test_windmill_small():
             snapshot.y.shape == (11, )
 
             
-def test_windmill_medium():
+def test_windmillmedium():
     loader = WindmillOutputMediumDatasetLoader()
     dataset = loader.get_dataset()
     for epoch in range(2):
