@@ -108,13 +108,13 @@ We provide functions to create temporal splits of the data iterators. These func
 .. code-block:: python
 
     from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
-    from torch_geometric_temporal.signal import split_temporal_signal
+    from torch_geometric_temporal.signal import temporal_signal_split
 
     loader = ChickenpoxDatasetLoader()
 
     dataset = loader.get_dataset()
 
-    train_dataset, test_dataset = split_temporal_signal(dataset, train_ratio=0.8)
+    train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.8)
 
 
 

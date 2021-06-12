@@ -6,9 +6,9 @@ from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 
 class MTMDatasetLoader():
     """
-    A dataset of `Methods-Time Measurement-1 <https://en.wikipedia.org/wiki/Methods-time_measurement>` 
+    A dataset of `Methods-Time Measurement-1 <https://en.wikipedia.org/wiki/Methods-time_measurement>`_ 
     (MTM-1) motions, signalled as consecutive video frames of 21 3D hand keypoints, acquired via 
-    `MediaPipe Hands <https://google.github.io/mediapipe/solutions/hands.html>` from RGB-Video 
+    `MediaPipe Hands <https://google.github.io/mediapipe/solutions/hands.html>`_ from RGB-Video 
     material. Vertices are the finger joints of the human hand and edges are the bones connecting 
     them. The targets are manually labeled for each frame, according to one of the five MTM-1 
     motions (classes :math:`C`): Grasp, Release, Move, Reach, Position plus a negative class for 
@@ -21,7 +21,7 @@ class MTMDatasetLoader():
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/alexriedel1/pytorch_geometric_temporal/mtm1-dataset/dataset/mtm_1.json"
+        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/mtm_1.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read())
         
     def _get_edges(self):

@@ -397,7 +397,7 @@ def test_mtgnn():
         output3 = output3.transpose(1, 3)
         assert output3.shape == (batch_size, 1, num_nodes, seq_out_len)
 
-def test_aagcn():
+def test_tsagcn():
     """
     Testing 2s-AGCN unit
     """
@@ -415,11 +415,14 @@ def test_aagcn():
     batch = batch.permute(0,3,1,2).contiguous()
 
     stride = 2
-    aagcn = AAGCN(num_nodes=number_of_nodes, edge_index=edge_index, in_channels=in_channels, out_channels=out_channels, stride=stride).to(device)
-    A = aagcn.A
+    aagcn_adaptive = AAGCN(num_nodes=number_of_nodes, edge_index=edge_index, in_channels=in_channels, out_channels=out_channels, stride=stride, adaptive=True).to(device)
+    aagcn_non_adaptive = AAGCN(num_nodes=number_of_nodes, edge_index=edge_index, in_channels=in_channels, out_channels=out_channels, stride=stride, adaptive=False).to(device)
+    A = aagcn_adaptive.A
     
     x_mock = batch.to(device)
-    H = aagcn(x_mock)
+    H_adaptive = aagcn_adaptive(x_mock)
+    H_non_adaptive = aagcn_non_adaptive(x_mock)
 
-    assert H.shape == (batch_size, out_channels, math.ceil(sequence_length/stride), number_of_nodes)
+    assert H_adaptive.shape == (batch_size, out_channels, math.ceil(sequence_length/stride), number_of_nodes)
+    assert H_non_adaptive.shape == (batch_size, out_channels, math.ceil(sequence_length/stride), number_of_nodes)
     assert A.shape == (3, number_of_nodes, number_of_nodes)
