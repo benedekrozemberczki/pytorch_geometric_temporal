@@ -7,9 +7,11 @@ from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 
-from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputLargeDatasetLoader
+from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
 from torch_geometric_temporal.dataset import TwitterTennisDatasetLoader, MontevideoBusDatasetLoader, MTMDatasetLoader
+
+from torch_geometric_temporal.dataset import WindmillOutputLargeDatasetLoader, WindmillOutputMediumDatasetLoader, WindmillOutputSmallDatasetLoader
 
 def get_edge_array(n_count):
     return np.array([edge for edge in nx.gnp_random_graph(n_count, 0.1).edges()]).T
