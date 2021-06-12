@@ -23,6 +23,14 @@ Datasets
     :members:
     :undoc-members:
     
+.. automodule:: torch_geometric_temporal.dataset.windmillmedium
+    :members:
+    :undoc-members:
+        
+.. automodule:: torch_geometric_temporal.dataset.windmillsmall
+    :members:
+    :undoc-members:
+        
 .. automodule:: torch_geometric_temporal.dataset.metr_la
     :members:
     :undoc-members:
