@@ -5,7 +5,7 @@ from six.moves import urllib
 from ..signal import StaticGraphTemporalSignal
 
 
-class WindmillOutputDatasetLoader(object):
+class WindmillOutputLargeDatasetLoader(object):
     """Hourly energy output of windmills from a European country
     for more than 2 years. Vertices represent the windmills and
     weighted edges describe the strength of relationships. The target 

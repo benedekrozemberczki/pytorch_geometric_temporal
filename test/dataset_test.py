@@ -7,7 +7,7 @@ from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphTemporalSignal
 from torch_geometric_temporal.signal import DynamicGraphStaticSignal
 
-from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputDatasetLoader
+from torch_geometric_temporal.dataset import METRLADatasetLoader, PemsBayDatasetLoader, WindmillOutputLargeDatasetLoader
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader, PedalMeDatasetLoader, WikiMathsDatasetLoader, EnglandCovidDatasetLoader
 from torch_geometric_temporal.dataset import TwitterTennisDatasetLoader, MontevideoBusDatasetLoader, MTMDatasetLoader
 
@@ -117,8 +117,8 @@ def test_wiki():
             snapshot.x.shape == (1068, 8)
             snapshot.y.shape == (1068, )
             
-def test_windmill():
-    loader = WindmillOutputDatasetLoader()
+def test_windmill_large():
+    loader = WindmillOutputLargeDatasetLoader()
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:
