@@ -15,7 +15,7 @@ class WindmillOutputMediumDatasetLoader(object):
         self._read_web_data()
 
     def _read_web_data(self):
-        url = "https://graphmining.ai/temporal_datasets/windmill_output.json"
+        url = "https://graphmining.ai/temporal_datasets/windmill_output_medium.json"
         self._dataset = json.loads(urllib.request.urlopen(url).read().decode())
 
     def _get_edges(self):
