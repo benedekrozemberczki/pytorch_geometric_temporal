@@ -140,7 +140,7 @@ def test_windmill_small():
             snapshot.y.shape == (11, )
 
             
-def test_windmill_small():
+def test_windmill_medium():
     loader = WindmillOutputMediumDatasetLoader()
     dataset = loader.get_dataset()
     for epoch in range(2):
