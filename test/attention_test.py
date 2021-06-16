@@ -260,6 +260,7 @@ def test_gman():
     SE = SE.to(device)
     trainTE = (2 * torch.rand((num_sample, num_his + num_pred, 2)) - 1).to(device)
     model = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=use_bias, mask=mask).to(device)
+    L = 2
     model2 = GMAN(L, K, d, num_his, bn_decay=bn_decay, steps_per_day=steps_per_day, use_bias=False, mask=True).to(device)
 
     X = trainX[:batch_size]
