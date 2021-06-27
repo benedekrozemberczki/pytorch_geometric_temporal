@@ -149,6 +149,27 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 
 Binaries are provided for Python version <= 3.8.
 
+**PyTorch 1.9.0**
+
+To install the binaries for PyTorch 1.9.0, simply run
+
+```sh
+pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
+pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
+pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
+pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
+pip install torch-geometric
+```
+
+where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu111` depending on your PyTorch installation.
+Binaries are provided for Python version `<= 3.9`.
+
+|             | `cpu` | `cu102` | `cu111` |
+|-------------|-------|---------|---------|
+| **Linux**   | ✅    | ✅      | ✅      |
+| **Windows** | ✅    | ✅      | ✅      |
+| **macOS**   | ✅    |         |         |
+
 **PyTorch 1.8.0**
 
 To install the binaries for PyTorch 1.8.0, simply run
