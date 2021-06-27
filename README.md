@@ -147,7 +147,7 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 
 **Installation**
 
-Binaries are provided for Python version <= 3.8.
+Binaries are provided for Python version <= 3.9.
 
 **PyTorch 1.9.0**
 
