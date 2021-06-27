@@ -162,7 +162,6 @@ pip install torch-geometric
 ```
 
 where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu111` depending on your PyTorch installation.
-Binaries are provided for Python version `<= 3.9`.
 
 |             | `cpu` | `cu102` | `cu111` |
 |-------------|-------|---------|---------|
