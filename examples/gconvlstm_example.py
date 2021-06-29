@@ -25,13 +25,13 @@ class RecurrentGCN(torch.nn.Module):
         h = self.linear(h)
         return h, h_0, c_0
         
-model = RecurrentGCN(node_features = 4)
+model = RecurrentGCN(node_features=4)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
 
-for epoch in tqdm(range(20)):
+for epoch in tqdm(range(200)):
     cost = 0
     h, c = None, None
     for time, snapshot in enumerate(train_dataset):
@@ -45,7 +45,7 @@ for epoch in tqdm(range(20)):
 model.eval()
 cost = 0
 for time, snapshot in enumerate(test_dataset):
-    y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+    y_hat, h, c = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr, h, c)
     cost = cost + torch.mean((y_hat-snapshot.y)**2)
 cost = cost / (time+1)
 cost = cost.item()
