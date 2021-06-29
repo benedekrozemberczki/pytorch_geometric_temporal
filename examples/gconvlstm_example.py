@@ -31,7 +31,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
 
-for epoch in tqdm(range(200)):
+for epoch in tqdm(range(20)):
     cost = 0
     h, c = None, None
     for time, snapshot in enumerate(train_dataset):
