@@ -16,7 +16,7 @@ train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.2)
 class RecurrentGCN(torch.nn.Module):
     def __init__(self, node_features):
         super(RecurrentGCN, self).__init__()
-        self.recurrent = MPNNLSTM(node_features, 32)
+        self.recurrent = MPNNLSTM(node_features, 32, 20, 0.5)
         self.linear = torch.nn.Linear(32, 1)
 
     def forward(self, x, edge_index, edge_weight):
