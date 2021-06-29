@@ -18,7 +18,7 @@ To install the binaries for PyTorch 1.9.0, simply run
         $ pip install torch-geometric-temporal
 
 
-where `${CUDA}` should be replaced by either `cpu`, `cu101`, `cu102`, or `cu111` depending on your PyTorch installation.
+where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu111` depending on your PyTorch installation.
 
 
 **PyTorch 1.8.0**
