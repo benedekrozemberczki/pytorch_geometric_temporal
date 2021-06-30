@@ -9,7 +9,7 @@ from torch_geometric_temporal.signal import temporal_signal_split
 
 loader = ChickenpoxDatasetLoader()
 
-dataset = loader.get_dataset()
+dataset = loader.get_dataset(lags=8)
 
 train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.2)
 
@@ -18,31 +18,33 @@ class RecurrentGCN(torch.nn.Module):
         super(RecurrentGCN, self).__init__()
         self.recurrent = AGCRN(number_of_nodes = 20,
                               in_channels = node_features,
-                              out_channels = 32,
-                              K = 1,
+                              out_channels = 2,
+                              K = 2,
                               embedding_dimensions = 4)
-        self.linear = torch.nn.Linear(32, 1)
+        self.linear = torch.nn.Linear(2, 1)
 
     def forward(self, x, e, h):
-        h = self.recurrent(x, e, h)
-        h = F.relu(h)
-        h = self.linear(h)
-        return h
+        h_0 = self.recurrent(x, e, h)
+        y = F.relu(h_0)
+        y = self.linear(y)
+        return y, h_0
         
-model = RecurrentGCN(node_features = 4)
+model = RecurrentGCN(node_features = 8)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
 
 e = torch.empty(20, 4)
-torch.nn.init.glorot_(e)
+
+torch.nn.init.xavier_uniform_(e)
 
 for epoch in tqdm(range(200)):
     cost = 0
     h = None
     for time, snapshot in enumerate(train_dataset):
-        y_hat = model(snapshot.x, e, h)
+        x = snapshot.x.view(1, 20, 8)
+        y_hat, h = model(x, e, h)
         cost = cost + torch.mean((y_hat-snapshot.y)**2)
     cost = cost / (time+1)
     cost.backward()
@@ -52,7 +54,8 @@ for epoch in tqdm(range(200)):
 model.eval()
 cost = 0
 for time, snapshot in enumerate(test_dataset):
-    y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+    x = snapshot.x.view(1, 20, 8)
+    y_hat, h = model(x, e, h)
     cost = cost + torch.mean((y_hat-snapshot.y)**2)
 cost = cost / (time+1)
 cost = cost.item()
