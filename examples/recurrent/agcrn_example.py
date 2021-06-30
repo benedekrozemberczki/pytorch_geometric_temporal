@@ -19,6 +19,7 @@ class RecurrentGCN(torch.nn.Module):
         self.recurrent = AGCRN(number_of_nodes = 20,
                               in_channels = node_features,
                               out_channels = 32,
+                              K = 1,
                               embedding_dimensions = 4)
         self.linear = torch.nn.Linear(32, 1)
 
