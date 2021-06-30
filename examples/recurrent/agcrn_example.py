@@ -35,12 +35,14 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
 
+e = torch.empty(20, 4)
+torch.nn.init.glorot_(e)
+
 for epoch in tqdm(range(200)):
     cost = 0
     h = None
-    e = None
     for time, snapshot in enumerate(train_dataset):
-        y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+        y_hat = model(snapshot.x, e, h)
         cost = cost + torch.mean((y_hat-snapshot.y)**2)
     cost = cost / (time+1)
     cost.backward()
