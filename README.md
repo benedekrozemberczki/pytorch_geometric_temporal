@@ -35,7 +35,7 @@ The package interfaces well with [Pytorch Lightning](https://pytorch-lightning.r
 
 --------------------------------------------------------------------------------
 
-**Tutorials**
+**Case Study Tutorials**
 
 We provide in-depth case study tutorials in the [Documentation](https://pytorch-geometric-temporal.readthedocs.io/en/latest/), each covers an aspect of PyTorch Geometric Temporal’s functionality.
 
