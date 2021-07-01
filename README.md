@@ -37,11 +37,11 @@ The package interfaces well with [Pytorch Lightning](https://pytorch-lightning.r
 
 **Tutorials**
 
-We provide in-depth tutorials in the [Documentation](https://pytorch-geometric.readthedocs.io/en/latest/notes/introduction.html), each covers an aspect of PyTorch Geometric Temporal’s functionality.
+We provide in-depth case study tutorials in the [Documentation](https://pytorch-geometric-temporal.readthedocs.io/en/latest/), each covers an aspect of PyTorch Geometric Temporal’s functionality.
 
-Tutorial A: []()
+Incremental Training Tutorial: [Epidemiological Forecasting Case Study](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/introduction.html#epidemiological-forecasting)
 
-Tutorial B: []()
+Cumulative Training Tutorial: []()
 
 --------------------------------------------------------------------------------
 
