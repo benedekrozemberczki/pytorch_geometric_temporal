@@ -98,7 +98,7 @@ class DNNTSP(nn.Module):
         nodes_output = self.aggregate_nodes_temporal_feature(graph, lengths, nodes_output)
 
         # (batch_size, items_total, item_embed_dim)
-        nodes_output = self.global_gated_update(graph, nodes, nodes_output)
+        nodes_output = self.GlobalGatedUpdater(graph, nodes, nodes_output)
 
         # (batch_size, items_total)
         output = self.fc_output(nodes_output).squeeze(dim=-1)
