@@ -2,9 +2,9 @@ import math
 import torch
 import numpy as np
 import torch.nn as nn
-from torch.autograd import Variable
-from torch_geometric.utils.to_dense_adj import to_dense_adj
+from typing import List
 import torch.nn.functional as F
+from torch_geometric.nn import GCNConv
 
 class MaskedSelfAttention(nn.Module):
 
