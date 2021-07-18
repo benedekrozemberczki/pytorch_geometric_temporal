@@ -163,14 +163,13 @@ class WeightedGCNBlock(nn.Module):
 
     def forward(self, graph: dgl.DGLGraph, node_features: torch.Tensor, edges_weight: torch.Tensor):
         """
-        :param graph: a graph
-        :param node_features: shape (n_1+n_2+..., n_features)
-               edges_weight: shape (T, n_1^2+n_2^2+...)
+        :param graph:
+        :param node_features:
+        :param edges_weight:
         :return:
         """
         h = node_features
         for gcn, relu, bn in zip(self.gcns, self.relus, self.bns):
-            # (n_1+n_2+..., T, features)
             h = gcn(graph, h, edges_weight)
             h = bn(h.transpose(1, -1)).transpose(1, -1)
             h = relu(h)
