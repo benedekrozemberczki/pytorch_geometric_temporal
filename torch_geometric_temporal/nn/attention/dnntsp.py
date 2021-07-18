@@ -132,7 +132,7 @@ class WeightedGCNBlock(nn.Module):
         gcns, relus, bns = nn.ModuleList(), nn.ModuleList(), nn.ModuleList()
         input_size = in_features
         for hidden_size in hidden_sizes:
-            gcns.append(weighted_graph_conv(input_size, hidden_size))
+            gcns.append(GCNConv(input_size, hidden_size))
             relus.append(nn.ReLU())
             bns.append(nn.BatchNorm1d(hidden_size))
             input_size = hidden_size
@@ -141,7 +141,7 @@ class WeightedGCNBlock(nn.Module):
         bns.append(nn.BatchNorm1d(out_features))
         self.gcns, self.relus, self.bns = gcns, relus, bns
 
-    def forward(self, graph: dgl.DGLGraph, node_features: torch.Tensor, edges_weight: torch.Tensor):
+    def forward(self, node_features: torch.FloatTensor, edge_index: torch.LongTensor, edges_weight: torch.LongTensor):
         """
         :param graph:
         :param node_features:
@@ -150,7 +150,7 @@ class WeightedGCNBlock(nn.Module):
         """
         h = node_features
         for gcn, relu, bn in zip(self.gcns, self.relus, self.bns):
-            h = gcn(graph, h, edges_weight)
+            h = gcn(h, edge_index, edges_weight)
             h = bn(h.transpose(1, -1)).transpose(1, -1)
             h = relu(h)
         return h
