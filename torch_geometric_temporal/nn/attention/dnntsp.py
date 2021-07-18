@@ -215,7 +215,7 @@ class DNNTSP(nn.Module):
         self.global_gated_update = GlobalGatedUpdater(items_total=items_total,
                                                       item_embedding=self.item_embedding)
 
-        self.fc_output = nn.Linear(item_embedding_dim, 1)
+        self.fully_connected = nn.Linear(item_embedding_dim, 1)
 
     def forward(self, graph: dgl.DGLGraph, nodes_feature: torch.Tensor, edges_weight: torch.Tensor,
                 lengths: torch.Tensor, nodes: torch.Tensor, users_frequency: torch.Tensor):
@@ -229,19 +229,10 @@ class DNNTSP(nn.Module):
         :param users_frequency: (batch, items_total), for frequency calculation
         :return:
         """
-        # perform weighted gcn on dynamic graphs (n_1+n_2+..., T_max, item_embed_dim)
         nodes_output = self.stacked_gcn(graph, nodes_feature, edges_weight)
-
-        # self-attention in time dimension, (n_1+n_2+..., T_max,  item_embed_dim)
         nodes_output = self.masked_self_attention(nodes_output)
-        # aggregate node features in temporal dimension, (n_1+n_2+..., item_embed_dim)
         nodes_output = self.aggregate_nodes_temporal_feature(graph, lengths, nodes_output)
-
-        # (batch_size, items_total, item_embed_dim)
         nodes_output = self.global_gated_updater(graph, nodes, nodes_output)
-
-        # (batch_size, items_total)
-        output = self.fc_output(nodes_output).squeeze(dim=-1)
-
+        output = self.fully_connected(nodes_output).squeeze(dim=-1)
         return output
  
