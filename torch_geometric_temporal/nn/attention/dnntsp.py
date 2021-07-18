@@ -31,9 +31,9 @@ class MaskedSelfAttention(nn.Module):
     def forward(self, input_tensor):
         """
         Args:
-            input_tensor: tensor, shape (nodes_num, T_max, features_num)
+            input_tensor:
         Returns:
-            output: tensor, shape (nodes_num, T_max, output_dim = features_num)
+            output:
         """
         seq_length = input_tensor.shape[1]
 
@@ -73,37 +73,27 @@ class GlobalGatedUpdater(nn.Module):
         super(global_gated_update, self).__init__()
         self.items_total = items_total
         self.item_embedding = item_embedding
-
-        # alpha -> the weight for updating
         self.alpha = nn.Parameter(torch.rand(items_total, 1), requires_grad=True)
 
     def forward(self, graph, nodes, nodes_output):
         """
-        :param graph: batched graphs, with the total number of nodes is `node_num`,
-                        including `batch_size` disconnected subgraphs
-        :param nodes: tensor (n_1+n_2+..., )
-        :param nodes_output: the output of self-attention model in time dimension, (n_1+n_2+..., F)
+        :param graph:
+        :param nodes:
+        :param nodes_output:
         :return:
         """
         nums_nodes, id = graph.batch_num_nodes(), 0
         items_embedding = self.item_embedding(torch.tensor([i for i in range(self.items_total)]).to(nodes.device))
         batch_embedding = []
         for num_nodes in nums_nodes:
-            # tensor, shape, (user_nodes, item_embed_dim)
             output_node_features = nodes_output[id:id + num_nodes, :]
-            # get each user's nodes
             output_nodes = nodes[id: id + num_nodes]
-            # beta, tensor, (items_total, 1), indicator vector, appear item -> 1, not appear -> 0
             beta = torch.zeros(self.items_total, 1).to(nodes.device)
             beta[output_nodes] = 1
-            # update global embedding by gated mechanism
-            # broadcast (items_total, 1) * (items_total, item_embed_dim) -> (items_total, item_embed_dim)
             embed = (1 - beta * self.alpha) * items_embedding.clone()
-            # appear items: (1 - self.alpha) * origin + self.alpha * update, not appear items: origin
             embed[output_nodes, :] = embed[output_nodes, :] + self.alpha[output_nodes] * output_node_features
             batch_embedding.append(embed)
             id += num_nodes
-        # (B, items_total, item_embed_dim)
         batch_embedding = torch.stack(batch_embedding)
         return batch_embedding
 
@@ -112,7 +102,7 @@ class AggregateTemporalNodeFeatures(nn.Module):
 
     def __init__(self, item_embed_dim):
         """
-        :param item_embed_dim: the dimension of input features
+        :param item_embed_dim:
         """
         super(aggregate_nodes_temporal_feature, self).__init__()
 
@@ -120,27 +110,19 @@ class AggregateTemporalNodeFeatures(nn.Module):
 
     def forward(self, graph, lengths, nodes_output):
         """
-        :param graph: batched graphs, with the total number of nodes is `node_num`,
-                        including `batch_size` disconnected subgraphs
-        :param lengths: tensor, (batch_size, )
-        :param nodes_output: the output of self-attention model in time dimension, (n_1+n_2+..., T_max, F)
-        :return: aggregated_features, (n_1+n_2+..., F)
+        :param graph:
+        :param lengths:
+        :param nodes_output:
+        :return:
         """
         nums_nodes, id = graph.batch_num_nodes(), 0
         aggregated_features = []
         for num_nodes, length in zip(nums_nodes, lengths):
-            # get each user's length, tensor, shape, (user_nodes, user_length, item_embed_dim)
             output_node_features = nodes_output[id:id + num_nodes, :length, :]
-            # weights for each timestamp, tensor, shape, (user_nodes, 1, user_length)
-            # (user_nodes, user_length, 1) transpose to -> (user_nodes, 1, user_length)
             weights = self.Wq(output_node_features).transpose(1, 2)
-            # (user_nodes, 1, user_length) matmul (user_nodes, user_length, item_embed_dim)
-            # -> (user_nodes, 1, item_embed_dim) squeeze to (user_nodes, item_embed_dim)
-            # aggregated_feature, tensor, shape, (user_nodes, item_embed_dim)
             aggregated_feature = weights.matmul(output_node_features).squeeze(dim=1)
             aggregated_features.append(aggregated_feature)
             id += num_nodes
-        # (n_1+n_2+..., item_embed_dim)
         aggregated_features = torch.cat(aggregated_features, dim=0)
         return aggregated_features
 
@@ -148,14 +130,12 @@ class WeightedGCNBlock(nn.Module):
     def __init__(self, in_features: int, hidden_sizes: List[int], out_features: int):
         super(weighted_GCN, self).__init__()
         gcns, relus, bns = nn.ModuleList(), nn.ModuleList(), nn.ModuleList()
-        # layers for hidden_size
         input_size = in_features
         for hidden_size in hidden_sizes:
             gcns.append(weighted_graph_conv(input_size, hidden_size))
             relus.append(nn.ReLU())
             bns.append(nn.BatchNorm1d(hidden_size))
             input_size = hidden_size
-        # output layer
         gcns.append(weighted_graph_conv(hidden_sizes[-1], out_features))
         relus.append(nn.ReLU())
         bns.append(nn.BatchNorm1d(out_features))
