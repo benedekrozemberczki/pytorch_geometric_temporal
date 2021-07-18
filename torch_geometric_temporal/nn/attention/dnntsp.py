@@ -192,10 +192,10 @@ class DNNTSP(nn.Module):
 
     def __init__(self, items_total, item_embedding_dim):
         """
-        :param items_total: int
-        :param item_embedding_dim: int
-        :param n_heads: int
-        :param attention_aggregate: sre
+        :param items_total:
+        :param item_embedding_dim:
+        :param n_heads:
+        :param attention_aggregate:
         """
         super(temporal_set_prediction, self).__init__()
 
