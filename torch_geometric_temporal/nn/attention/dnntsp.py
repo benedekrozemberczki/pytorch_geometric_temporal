@@ -154,7 +154,39 @@ class AggregateTemporalNodeFeatures(nn.Module):
         # (n_1+n_2+..., item_embed_dim)
         aggregated_features = torch.cat(aggregated_features, dim=0)
         return aggregated_features
-        
+
+class WeightedGCNBlock(nn.Module):
+    def __init__(self, in_features: int, hidden_sizes: List[int], out_features: int):
+        super(weighted_GCN, self).__init__()
+        gcns, relus, bns = nn.ModuleList(), nn.ModuleList(), nn.ModuleList()
+        # layers for hidden_size
+        input_size = in_features
+        for hidden_size in hidden_sizes:
+            gcns.append(weighted_graph_conv(input_size, hidden_size))
+            relus.append(nn.ReLU())
+            bns.append(nn.BatchNorm1d(hidden_size))
+            input_size = hidden_size
+        # output layer
+        gcns.append(weighted_graph_conv(hidden_sizes[-1], out_features))
+        relus.append(nn.ReLU())
+        bns.append(nn.BatchNorm1d(out_features))
+        self.gcns, self.relus, self.bns = gcns, relus, bns
+
+    def forward(self, graph: dgl.DGLGraph, node_features: torch.Tensor, edges_weight: torch.Tensor):
+        """
+        :param graph: a graph
+        :param node_features: shape (n_1+n_2+..., n_features)
+               edges_weight: shape (T, n_1^2+n_2^2+...)
+        :return:
+        """
+        h = node_features
+        for gcn, relu, bn in zip(self.gcns, self.relus, self.bns):
+            # (n_1+n_2+..., T, features)
+            h = gcn(graph, h, edges_weight)
+            h = bn(h.transpose(1, -1)).transpose(1, -1)
+            h = relu(h)
+        return h
+
 class DNNTSP(nn.Module):
 
 
@@ -171,7 +203,7 @@ class DNNTSP(nn.Module):
 
         self.item_embedding_dim = item_embedding_dim
         self.items_total = items_total
-        self.stacked_gcn = stacked_weighted_GCN_blocks([weighted_GCN(item_embedding_dim,
+        self.stacked_gcn = WeightedGCNBlock([weighted_GCN(item_embedding_dim,
                                                                      [item_embedding_dim],
                                                                      item_embedding_dim)])
 
