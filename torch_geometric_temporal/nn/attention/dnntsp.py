@@ -9,7 +9,7 @@ from torch_geometric.nn import GCNConv
 class MaskedSelfAttention(nn.Module):
 
     def __init__(self, input_dim, output_dim, n_heads=4, attention_aggregate="concat"):
-        super(masked_self_attention, self).__init__()
+        super(MaskedSelfAttention, self).__init__()
 
         self.attention_aggregate = attention_aggregate
         self.input_dim = input_dim
@@ -70,32 +70,21 @@ class MaskedSelfAttention(nn.Module):
 class GlobalGatedUpdater(nn.Module):
 
     def __init__(self, items_total, item_embedding):
-        super(global_gated_update, self).__init__()
+        super(GlobalGatedUpdater, self).__init__()
         self.items_total = items_total
         self.item_embedding = item_embedding
         self.alpha = nn.Parameter(torch.rand(items_total, 1), requires_grad=True)
 
-    def forward(self, graph, nodes, nodes_output):
+    def forward(self, nodes, nodes_output):
         """
-        :param graph:
         :param nodes:
         :param nodes_output:
         :return:
         """
-        nums_nodes, id = graph.batch_num_nodes(), 0
         items_embedding = self.item_embedding(torch.tensor([i for i in range(self.items_total)]).to(nodes.device))
-        batch_embedding = []
-        for num_nodes in nums_nodes:
-            output_node_features = nodes_output[id:id + num_nodes, :]
-            output_nodes = nodes[id: id + num_nodes]
-            beta = torch.zeros(self.items_total, 1).to(nodes.device)
-            beta[output_nodes] = 1
-            embed = (1 - beta * self.alpha) * items_embedding.clone()
-            embed[output_nodes, :] = embed[output_nodes, :] + self.alpha[output_nodes] * output_node_features
-            batch_embedding.append(embed)
-            id += num_nodes
-        batch_embedding = torch.stack(batch_embedding)
-        return batch_embedding
+        alpha = torch.sigmoid(self.alpha)
+        embed = (1 - alpha) * items_embedding.clone() + alpha * nodes_output
+        return embed
 
 
 class AggregateTemporalNodeFeatures(nn.Module):
@@ -104,31 +93,29 @@ class AggregateTemporalNodeFeatures(nn.Module):
         """
         :param item_embed_dim:
         """
-        super(aggregate_nodes_temporal_feature, self).__init__()
+        super(AggregateTemporalNodeFeatures, self).__init__()
 
         self.Wq = nn.Linear(item_embed_dim, 1, bias=False)
+        self.node_count = node_count
 
-    def forward(self, graph, lengths, nodes_output):
+    def forward(self, lengths, nodes_output):
         """
-        :param graph:
         :param lengths:
         :param nodes_output:
         :return:
         """
-        nums_nodes, id = graph.batch_num_nodes(), 0
         aggregated_features = []
-        for num_nodes, length in zip(nums_nodes, lengths):
-            output_node_features = nodes_output[id:id + num_nodes, :length, :]
+        for length in lengths:
+            output_node_features = nodes_output[:, :length, :]
             weights = self.Wq(output_node_features).transpose(1, 2)
             aggregated_feature = weights.matmul(output_node_features).squeeze(dim=1)
             aggregated_features.append(aggregated_feature)
-            id += num_nodes
         aggregated_features = torch.cat(aggregated_features, dim=0)
         return aggregated_features
 
 class WeightedGCNBlock(nn.Module):
     def __init__(self, in_features: int, hidden_sizes: List[int], out_features: int):
-        super(weighted_GCN, self).__init__()
+        super(WeightedGCNBlock, self).__init__()
         gcns, relus, bns = nn.ModuleList(), nn.ModuleList(), nn.ModuleList()
         input_size = in_features
         for hidden_size in hidden_sizes:
@@ -136,7 +123,7 @@ class WeightedGCNBlock(nn.Module):
             relus.append(nn.ReLU())
             bns.append(nn.BatchNorm1d(hidden_size))
             input_size = hidden_size
-        gcns.append(weighted_graph_conv(hidden_sizes[-1], out_features))
+        gcns.append(GCNConv(hidden_sizes[-1], out_features))
         relus.append(nn.ReLU())
         bns.append(nn.BatchNorm1d(out_features))
         self.gcns, self.relus, self.bns = gcns, relus, bns
@@ -165,7 +152,7 @@ class DNNTSP(nn.Module):
         :param n_heads:
         :param attention_aggregate:
         """
-        super(temporal_set_prediction, self).__init__()
+        super(DNNTSP, self).__init__()
 
         self.item_embedding = nn.Embedding(items_total, item_embedding_dim)
 
@@ -185,7 +172,7 @@ class DNNTSP(nn.Module):
 
         self.fully_connected = nn.Linear(item_embedding_dim, 1)
 
-    def forward(self, graph: dgl.DGLGraph, nodes_feature: torch.Tensor, edges_weight: torch.Tensor,
+    def forward(self, node_features: torch.Tensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor,
                 lengths: torch.Tensor, nodes: torch.Tensor, users_frequency: torch.Tensor):
         """
         :param graph:
@@ -196,7 +183,7 @@ class DNNTSP(nn.Module):
         :param users_frequency:
         :return:
         """
-        nodes_output = self.stacked_gcn(graph, nodes_feature, edges_weight)
+        nodes_output = self.stacked_gcn(nodes_feature, edges_weight)
         nodes_output = self.masked_self_attention(nodes_output)
         nodes_output = self.aggregate_nodes_temporal_feature(graph, lengths, nodes_output)
         nodes_output = self.global_gated_updater(graph, nodes, nodes_output)
