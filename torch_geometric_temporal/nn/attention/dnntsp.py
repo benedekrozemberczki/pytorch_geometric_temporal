@@ -220,13 +220,12 @@ class DNNTSP(nn.Module):
     def forward(self, graph: dgl.DGLGraph, nodes_feature: torch.Tensor, edges_weight: torch.Tensor,
                 lengths: torch.Tensor, nodes: torch.Tensor, users_frequency: torch.Tensor):
         """
-        :param graph: batched graphs, with the total number of nodes is `node_num`,
-                        including `batch_size` disconnected subgraphs
-        :param nodes_feature:  [n_1+n_2+..., F]
-        :param edges_weight: [T_max, n_1^2+n_2^2+...]
-        :param lengths: [batch_size, ]
-        :param nodes: [n_1+n_2+..., ]
-        :param users_frequency: (batch, items_total), for frequency calculation
+        :param graph:
+        :param nodes_feature:
+        :param edges_weight:
+        :param lengths:
+        :param nodes:
+        :param users_frequency:
         :return:
         """
         nodes_output = self.stacked_gcn(graph, nodes_feature, edges_weight)
