@@ -204,8 +204,8 @@ class DNNTSP(nn.Module):
         self.item_embedding_dim = item_embedding_dim
         self.items_total = items_total
         self.stacked_gcn = WeightedGCNBlock([weighted_GCN(item_embedding_dim,
-                                                                     [item_embedding_dim],
-                                                                     item_embedding_dim)])
+                                                          [item_embedding_dim],
+                                                          item_embedding_dim)])
 
         self.masked_self_attention = MaskedSelfAttention(input_dim=item_embedding_dim,
                                                          output_dim=item_embedding_dim)
