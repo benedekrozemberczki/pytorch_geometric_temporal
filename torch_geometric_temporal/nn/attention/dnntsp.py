@@ -164,12 +164,12 @@ class DNNTSP(nn.Module):
         nodes_output = self.stacked_gcn(graph, nodes_feature, edges_weight)
 
         # self-attention in time dimension, (n_1+n_2+..., T_max,  item_embed_dim)
-        nodes_output = self.MaskedSelfAttention(nodes_output)
+        nodes_output = self.masked_self_attention(nodes_output)
         # aggregate node features in temporal dimension, (n_1+n_2+..., item_embed_dim)
         nodes_output = self.aggregate_nodes_temporal_feature(graph, lengths, nodes_output)
 
         # (batch_size, items_total, item_embed_dim)
-        nodes_output = self.GlobalGatedUpdater(graph, nodes, nodes_output)
+        nodes_output = self.global_gated_updater(graph, nodes, nodes_output)
 
         # (batch_size, items_total)
         output = self.fc_output(nodes_output).squeeze(dim=-1)
