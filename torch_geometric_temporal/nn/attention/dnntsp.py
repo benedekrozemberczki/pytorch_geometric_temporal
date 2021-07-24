@@ -24,9 +24,9 @@ class MaskedSelfAttention(nn.Module):
         else:
             raise ValueError(f"wrong value for aggregate {attention_aggregate}")
 
-        self.Wq = nn.Linear(input_dim, n_heads * self.dq, bias=False)
-        self.Wk = nn.Linear(input_dim, n_heads * self.dk, bias=False)
-        self.Wv = nn.Linear(input_dim, n_heads * self.dv, bias=False)
+        self.Wq = nn.Linear(input_dim, n_heads * self.dq * output_dim, bias=False)
+        self.Wk = nn.Linear(input_dim, n_heads * self.dk * output_dim, bias=False)
+        self.Wv = nn.Linear(input_dim, n_heads * self.dv * output_dim, bias=False)
 
     def forward(self, input_tensor):
         """
@@ -75,13 +75,13 @@ class GlobalGatedUpdater(nn.Module):
         self.item_embedding = item_embedding
         self.alpha = nn.Parameter(torch.rand(items_total, 1), requires_grad=True)
 
-    def forward(self, nodes, nodes_output):
+    def forward(self, nodes_output):
         """
         :param nodes:
         :param nodes_output:
         :return:
         """
-        items_embedding = self.item_embedding(torch.tensor([i for i in range(self.items_total)]).to(nodes.device))
+        items_embedding = self.item_embedding(torch.tensor([i for i in range(self.items_total)]).to(nodes_output.device))
         alpha = torch.sigmoid(self.alpha)
         embed = (1 - alpha) * items_embedding.clone() + alpha * nodes_output
         return embed
@@ -165,13 +165,13 @@ class DNNTSP(nn.Module):
 
         self.aggregate_nodes_temporal_feature = AggregateTemporalNodeFeatures(item_embed_dim=item_embedding_dim)
 
-        self.global_gated_update = GlobalGatedUpdater(items_total=items_total,
+        self.global_gated_updater = GlobalGatedUpdater(items_total=items_total,
                                                       item_embedding=self.item_embedding)
 
         self.fully_connected = nn.Linear(item_embedding_dim, 1)
 
     def forward(self, node_features: torch.Tensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor,
-                lengths: torch.Tensor, nodes: torch.Tensor, users_frequency: torch.Tensor):
+                lengths: torch.Tensor):
         """
         :param graph:
         :param nodes_feature:
@@ -181,10 +181,9 @@ class DNNTSP(nn.Module):
         :param users_frequency:
         :return:
         """
-        nodes_output = self.stacked_gcn(nodes_features, edges_weight)
+        nodes_output = self.stacked_gcn(node_features, edge_index, edges_weight)
         nodes_output = self.masked_self_attention(nodes_output)
-        nodes_output = self.aggregate_nodes_temporal_feature(graph, lengths, nodes_output)
-        nodes_output = self.global_gated_updater(graph, nodes, nodes_output)
-        output = self.fully_connected(nodes_output).squeeze(dim=-1)
-        return output
+        nodes_output = self.aggregate_nodes_temporal_feature(lengths, nodes_output)
+        nodes_output = self.global_gated_updater(nodes_output)
+        return nodes_output
  
