@@ -39,7 +39,7 @@ class MaskedSelfAttention(nn.Module):
         Q = self.Wq(input_tensor)
         K = self.Wk(input_tensor)
         V = self.Wv(input_tensor)
-        print(Q.shape)
+
         Q = Q.reshape(input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dq).transpose(1, 2)
         K = K.reshape(input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dk).permute(0, 2, 3, 1)
         V = V.reshape(input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dv).transpose(1, 2)
