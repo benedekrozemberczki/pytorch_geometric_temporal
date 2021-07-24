@@ -5,7 +5,7 @@ import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.utils import barabasi_albert_graph
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric_temporal.nn.attention import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention, AAGCN, GraphAAGCN
+from torch_geometric_temporal.nn.attention import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention, AAGCN, GraphAAGCN. DNNTSP
 from torch_geometric_temporal.nn.attention import GMAN, SpatioTemporalAttention, SpatioTemporalEmbedding
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
@@ -427,3 +427,23 @@ def test_tsagcn():
     assert H_adaptive.shape == (batch_size, out_channels, math.ceil(sequence_length/stride), number_of_nodes)
     assert H_non_adaptive.shape == (batch_size, out_channels, math.ceil(sequence_length/stride), number_of_nodes)
     assert A.shape == (3, number_of_nodes, number_of_nodes)
+    
+    
+    
+    
+def test_dnntsp():
+
+
+    model = DNNTSP(items_total=100, item_embedding_dim=16, n_heads=4)
+
+    g = nx.watts_strogatz_graph(1000, 10, 0.4)
+
+    edges = torch.LongTensor(np.array([[edge[0], edge[1]] for edge in g.edges()])).T
+
+    edge_weight = torch.FloatTensor(np.random.uniform(0, 1 ,(5000, )))
+
+    node_features = torch.FloatTensor(np.random.uniform(0, 1, (1000, 16)))
+
+    z = model(node_features, edges, edge_weight)
+   
+    assert z.shape == (10, 100, 16)

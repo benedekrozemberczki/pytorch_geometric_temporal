@@ -89,6 +89,12 @@ Temporal Graph Attention Layers
     :members:
     :undoc-members:
     :exclude-members: UnitGCN, UnitTCN, bn_init, conv_init, conv_branch_init, GraphAAGCN
+    
+    
+.. automodule:: torch_geometric_temporal.nn.attention.dnntsp
+    :members:
+    :undoc-members:
+    :exclude-members: WeightedGCNBlock, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention
 
 
 Auxiliary Graph Convolutional Layers
