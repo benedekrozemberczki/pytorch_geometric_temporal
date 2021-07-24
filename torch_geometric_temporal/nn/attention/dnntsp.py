@@ -180,8 +180,7 @@ class DNNTSP(nn.Module):
         self.global_gated_updater = GlobalGatedUpdater(items_total=items_total,
                                                        item_embedding=self.item_embedding)
 
-    def forward(self, node_features: torch.Tensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor,
-                lengths: torch.Tensor):
+    def forward(self, node_features: torch.FloatTensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor):
         """
         :param graph:
         :param nodes_feature:
