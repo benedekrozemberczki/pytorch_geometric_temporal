@@ -8,7 +8,7 @@ from torch_geometric.nn import GCNConv
 
 class MaskedSelfAttention(nn.Module):
 
-    def __init__(self, input_dim, output_dim, n_heads=4, attention_aggregate="concat"):
+    def __init__(self, input_dim, output_dim, n_heads, attention_aggregate="concat"):
         super(MaskedSelfAttention, self).__init__()
 
         self.attention_aggregate = attention_aggregate
@@ -96,7 +96,6 @@ class AggregateTemporalNodeFeatures(nn.Module):
         super(AggregateTemporalNodeFeatures, self).__init__()
 
         self.Wq = nn.Linear(item_embed_dim, 1, bias=False)
-        self.node_count = node_count
 
     def forward(self, lengths, nodes_output):
         """
@@ -145,7 +144,7 @@ class WeightedGCNBlock(nn.Module):
 class DNNTSP(nn.Module):
 
 
-    def __init__(self, items_total, item_embedding_dim):
+    def __init__(self, items_total, item_embedding_dim, n_heads):
         """
         :param items_total:
         :param item_embedding_dim:
@@ -158,12 +157,11 @@ class DNNTSP(nn.Module):
 
         self.item_embedding_dim = item_embedding_dim
         self.items_total = items_total
-        self.stacked_gcn = WeightedGCNBlock([weighted_GCN(item_embedding_dim,
-                                                          [item_embedding_dim],
-                                                          item_embedding_dim)])
+        self.stacked_gcn = WeightedGCNBlock(item_embedding_dim, [item_embedding_dim], item_embedding_dim)
 
         self.masked_self_attention = MaskedSelfAttention(input_dim=item_embedding_dim,
-                                                         output_dim=item_embedding_dim)
+                                                         output_dim=item_embedding_dim,
+                                                         n_heads=n_heads)
 
         self.aggregate_nodes_temporal_feature = AggregateTemporalNodeFeatures(item_embed_dim=item_embedding_dim)
 
@@ -183,7 +181,7 @@ class DNNTSP(nn.Module):
         :param users_frequency:
         :return:
         """
-        nodes_output = self.stacked_gcn(nodes_feature, edges_weight)
+        nodes_output = self.stacked_gcn(nodes_features, edges_weight)
         nodes_output = self.masked_self_attention(nodes_output)
         nodes_output = self.aggregate_nodes_temporal_feature(graph, lengths, nodes_output)
         nodes_output = self.global_gated_updater(graph, nodes, nodes_output)
