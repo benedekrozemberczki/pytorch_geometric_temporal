@@ -5,7 +5,7 @@ import networkx as nx
 from torch_geometric.data import Data
 from torch_geometric.utils import barabasi_albert_graph
 from torch_geometric.transforms import LaplacianLambdaMax
-from torch_geometric_temporal.nn.attention import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention, AAGCN, GraphAAGCN. DNNTSP
+from torch_geometric_temporal.nn.attention import TemporalConv, STConv, ASTGCN, MSTGCN, MTGNN, ChebConvAttention, AAGCN, GraphAAGCN, DNNTSP
 from torch_geometric_temporal.nn.attention import GMAN, SpatioTemporalAttention, SpatioTemporalEmbedding
 
 def create_mock_data(number_of_nodes, edge_per_node, in_channels):
