@@ -28,12 +28,6 @@ class MaskedSelfAttention(nn.Module):
         self.Wv = nn.Linear(input_dim, n_heads * self.dv, bias=False)
 
     def forward(self, input_tensor):
-        """
-        Args:
-            input_tensor:
-        Returns:
-            output:
-        """
         seq_length = input_tensor.shape[1]
 
         Q = self.Wq(input_tensor)
@@ -75,13 +69,7 @@ class GlobalGatedUpdater(nn.Module):
         self.alpha = nn.Parameter(torch.rand(items_total, 1), requires_grad=True)
 
     def forward(self, nodes_output):
-        """
-        :param graph: batched graphs, with the total number of nodes is `node_num`,
-                        including `batch_size` disconnected subgraphs
-        :param nodes: tensor (n_1+n_2+..., )
-        :param nodes_output: the output of self-attention model in time dimension, (n_1+n_2+..., F)
-        :return:
-        """
+
         batch_size = nodes_output.shape[0] // self.items_total
         id = 0
         num_nodes = self.items_total
@@ -101,19 +89,13 @@ class GlobalGatedUpdater(nn.Module):
 class AggregateTemporalNodeFeatures(nn.Module):
 
     def __init__(self, item_embed_dim):
-        """
-        :param item_embed_dim:
-        """
+
         super(AggregateTemporalNodeFeatures, self).__init__()
 
         self.Wq = nn.Linear(item_embed_dim, item_embed_dim, bias=False)
 
     def forward(self, nodes_output):
-        """
-        :param lengths:
-        :param nodes_output:
-        :return:
-        """
+
         aggregated_features = []
         for l in range(nodes_output.shape[0]):
             output_node_features = nodes_output[l, :, :]
@@ -156,12 +138,7 @@ class DNNTSP(nn.Module):
 
 
     def __init__(self, items_total: int, item_embedding_dim: int, n_heads: int):
-        """
-        :param items_total:
-        :param item_embedding_dim:
-        :param n_heads:
-        :param attention_aggregate:
-        """
+
         super(DNNTSP, self).__init__()
 
         self.item_embedding = nn.Embedding(items_total, item_embedding_dim)
