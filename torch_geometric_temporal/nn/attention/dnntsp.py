@@ -168,8 +168,6 @@ class DNNTSP(nn.Module):
         self.global_gated_updater = GlobalGatedUpdater(items_total=items_total,
                                                       item_embedding=self.item_embedding)
 
-        self.fully_connected = nn.Linear(item_embedding_dim, 1)
-
     def forward(self, node_features: torch.Tensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor,
                 lengths: torch.Tensor):
         """
