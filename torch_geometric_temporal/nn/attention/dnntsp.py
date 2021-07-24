@@ -73,8 +73,6 @@ class GlobalGatedUpdater(nn.Module):
         super(GlobalGatedUpdater, self).__init__()
         self.items_total = items_total
         self.item_embedding = item_embedding
-
-        # alpha -> the weight for updating
         self.alpha = nn.Parameter(torch.rand(items_total, 1), requires_grad=True)
 
     def forward(self, nodes_output):
