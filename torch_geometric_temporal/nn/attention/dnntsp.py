@@ -156,7 +156,7 @@ class WeightedGCNBlock(nn.Module):
 class DNNTSP(nn.Module):
 
 
-    def __init__(self, items_total, item_embedding_dim, n_heads):
+    def __init__(self, items_total: int, item_embedding_dim: int, n_heads: int):
         """
         :param items_total:
         :param item_embedding_dim:
@@ -181,15 +181,7 @@ class DNNTSP(nn.Module):
                                                        item_embedding=self.item_embedding)
 
     def forward(self, node_features: torch.FloatTensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor):
-        """
-        :param graph:
-        :param nodes_feature:
-        :param edges_weight:
-        :param lengths:
-        :param nodes:
-        :param users_frequency:
-        :return:
-        """
+
         nodes_output = self.stacked_gcn(node_features, edge_index, edges_weight)
         nodes_output = nodes_output.view(-1, self.items_total, self.item_embedding_dim)
         nodes_output = self.masked_self_attention(nodes_output)
