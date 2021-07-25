@@ -121,12 +121,6 @@ class WeightedGCNBlock(nn.Module):
         self.gcns, self.relus, self.bns = gcns, relus, bns
 
     def forward(self, node_features: torch.FloatTensor, edge_index: torch.LongTensor, edges_weight: torch.LongTensor):
-        """
-        :param graph:
-        :param node_features:
-        :param edges_weight:
-        :return:
-        """
         h = node_features
         for gcn, relu, bn in zip(self.gcns, self.relus, self.bns):
             h = gcn(h, edge_index, edges_weight)
@@ -135,7 +129,17 @@ class WeightedGCNBlock(nn.Module):
         return h
 
 class DNNTSP(nn.Module):
+    r"""An implementation of the Deep Neural Network for Temporal Set Prediction.
+    For details see: `"Predicting Temporal Sets with Deep Neural Networks" <https://dl.acm.org/doi/abs/10.1145/3394486.3403152>`_
 
+    Args:
+        in_channels (int): NUmber of input features.
+        out_channels (int): Number of output features.
+        K (int): Filter size :math:`K`.
+        bias (bool, optional): If set to :obj:`False`, the layer 
+            will not learn an additive bias (default :obj:`True`)
+
+    """
 
     def __init__(self, items_total: int, item_embedding_dim: int, n_heads: int):
 
@@ -156,12 +160,22 @@ class DNNTSP(nn.Module):
         self.global_gated_updater = GlobalGatedUpdater(items_total=items_total,
                                                        item_embedding=self.item_embedding)
 
-    def forward(self, node_features: torch.FloatTensor, edge_index: torch.LongTensor, edges_weight: torch.FloatTensor):
+    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None):
+        r"""Making a forward pass. If edge weights are not present the forward pass
+        defaults to an unweighted graph.
 
-        nodes_output = self.stacked_gcn(node_features, edge_index, edges_weight)
-        nodes_output = nodes_output.view(-1, self.items_total, self.item_embedding_dim)
-        nodes_output = self.masked_self_attention(nodes_output)
-        nodes_output = self.aggregate_nodes_temporal_feature(nodes_output)
-        nodes_output = self.global_gated_updater(nodes_output)
-        return nodes_output
+        Arg types:
+            * **X** (PyTorch Float Tensor) - Node features.
+            * **edge_index** (PyTorch Long Tensor) - Graph edge indices.
+            * **edge_weight** (PyTorch Long Tensor, optional) - Edge weight vector.
+
+        Return types:
+            * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
+        """
+        H = self.stacked_gcn(X, edge_index, edge_weight)
+        H = H.view(-1, self.items_total, self.item_embedding_dim)
+        H = self.masked_self_attention(H)
+        H = self.aggregate_nodes_temporal_feature(H)
+        H = self.global_gated_updater(H)
+        return H
  
