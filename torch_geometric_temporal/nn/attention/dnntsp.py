@@ -133,22 +133,18 @@ class DNNTSP(nn.Module):
     For details see: `"Predicting Temporal Sets with Deep Neural Networks" <https://dl.acm.org/doi/abs/10.1145/3394486.3403152>`_
 
     Args:
-        in_channels (int): NUmber of input features.
-        out_channels (int): Number of output features.
-        K (int): Filter size :math:`K`.
-        bias (bool, optional): If set to :obj:`False`, the layer 
-            will not learn an additive bias (default :obj:`True`)
-
+        items_total (int): Total number of items in the sets. Cardinality of the union.
+        item_embedding_dim (int): Item embedding dimensions.
+        n_heads (int): Number of attention heads.
     """
 
     def __init__(self, items_total: int, item_embedding_dim: int, n_heads: int):
 
         super(DNNTSP, self).__init__()
-
         self.item_embedding = nn.Embedding(items_total, item_embedding_dim)
-
         self.item_embedding_dim = item_embedding_dim
         self.items_total = items_total
+        
         self.stacked_gcn = WeightedGCNBlock(item_embedding_dim, [item_embedding_dim], item_embedding_dim)
 
         self.masked_self_attention = MaskedSelfAttention(input_dim=item_embedding_dim,
