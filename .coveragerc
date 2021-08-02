@@ -8,5 +8,3 @@ exclude_lines =
     register_parameter
     warn
     pass
-
-

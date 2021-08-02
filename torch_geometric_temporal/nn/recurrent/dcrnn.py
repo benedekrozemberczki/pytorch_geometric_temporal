@@ -95,7 +95,7 @@ class DCRNN(torch.nn.Module):
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
 
     Args:
-        in_channels (int): NUmber of input features.
+        in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         K (int): Filter size :math:`K`.
         bias (bool, optional): If set to :obj:`False`, the layer 

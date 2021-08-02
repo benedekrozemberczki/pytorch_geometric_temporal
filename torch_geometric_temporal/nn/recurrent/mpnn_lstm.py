@@ -9,8 +9,8 @@ class MPNNLSTM(nn.Module):
 
     Args:
         in_channels (int): Number of input features.
-        out_channels (int): Number of output features.
         hidden_size (int): Dimension of hidden representations.
+        out_channels (int): Number of output features.
         num_nodes (int): Number of nodes in the network.
         window (int): Number of past samples included in the input.
         dropout (float): Dropout rate.

@@ -33,6 +33,8 @@ External Resources - Architectures
 
 * Lei Shi, Yifan Zhang, Jian Cheng, Hanqing Lu: **Two-Stream Adaptive Graph Convolutional Networks for Skeleton-Based Action Recognition** `Paper <https://arxiv.org/abs/1805.07694>`_, `Code <https://github.com/lshiwjx/2s-AGCN>`_
 
+* Le Yu, Leilei Sun, Bowen Du, Chuanren Liu, Hui Xiong, Weifeng Lv: **Predicting Temporal Sets with Deep Neural Networks** `Paper <https://dl.acm.org/doi/abs/10.1145/3394486.3403152>`_, `Code <https://github.com/yule-BUAA/DNNTSP>`_
+
 External Resources - Datasets
 =============================
 

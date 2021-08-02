@@ -88,8 +88,8 @@ class AGCRN(nn.Module):
         r"""Making a forward pass.
         Arg types:
             * **X** (PyTorch Float Tensor) - Node feature matrix.
-            * **H** (PyTorch Float Tensor) - Node hidden state matrix. Default is None.
             * **E** (PyTorch Float Tensor) - Node embedding matrix.
+            * **H** (PyTorch Float Tensor) - Node hidden state matrix. Default is None.
         Return types:
             * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """       
