@@ -4,8 +4,8 @@ from torch_geometric.nn import GCNConv
 
 class A3TGCN(torch.nn.Module):
     r"""An implementation of the Temporal Graph Convolutional Gated Recurrent Cell.
-    For details see this paper: `"T-GCN: A Temporal Graph ConvolutionalNetwork for
-    Traffic Prediction." <https://arxiv.org/abs/1811.05320>`_
+    For details see this paper: `"A3T-GCN: Attention Temporal Graph Convolutional 
+    Network for Traffic Forecasting." <https://arxiv.org/abs/1811.05320>`_
 
     Args:
         in_channels (int): Number of input features.
