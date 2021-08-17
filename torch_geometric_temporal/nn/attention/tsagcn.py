@@ -6,12 +6,13 @@ from torch.autograd import Variable
 from torch_geometric.utils.to_dense_adj import to_dense_adj
 import torch.nn.functional as F
 
+
 class GraphAAGCN:
     r"""
-    Defining the Graph for the Two-Stream Adaptive Graph Convolutional Network. 
-    It's composed of the normalized inward-links, outward-links and 
-    self-links between the nodes as originally defined in the 
-    `authors repo  <https://github.com/lshiwjx/2s-AGCN/blob/master/graph/tools.py>` 
+    Defining the Graph for the Two-Stream Adaptive Graph Convolutional Network.
+    It's composed of the normalized inward-links, outward-links and
+    self-links between the nodes as originally defined in the
+    `authors repo  <https://github.com/lshiwjx/2s-AGCN/blob/master/graph/tools.py>`
     resulting in the shape of (3, num_nodes, num_nodes).
     Args:
         edge_index (Tensor array): Edge indices
@@ -19,7 +20,8 @@ class GraphAAGCN:
     Return types:
             * **A** (PyTorch Float Tensor) - Three layer normalized adjacency matrix
     """
-    def __init__(self, edge_index:list, num_nodes:int):
+
+    def __init__(self, edge_index: list, num_nodes: int):
         self.num_nodes = num_nodes
         self.edge_index = edge_index
         self.A = self.get_spatial_graph(self.num_nodes)
@@ -27,17 +29,18 @@ class GraphAAGCN:
     def get_spatial_graph(self, num_nodes):
         self_mat = torch.eye(num_nodes)
         inward_mat = torch.squeeze(to_dense_adj(self.edge_index))
-        inward_mat_norm = F.normalize(inward_mat,dim=0, p=1)
-        outward_mat = inward_mat.transpose(0,1)
-        outward_mat_norm = F.normalize(outward_mat,dim=0, p=1)
+        inward_mat_norm = F.normalize(inward_mat, dim=0, p=1)
+        outward_mat = inward_mat.transpose(0, 1)
+        outward_mat_norm = F.normalize(outward_mat, dim=0, p=1)
         adj_mat = torch.stack((self_mat, inward_mat_norm, outward_mat_norm))
         return adj_mat
 
+
 class UnitTCN(nn.Module):
     r"""
-    Temporal Convolutional Block applied to nodes in the Two-Stream Adaptive Graph 
-    Convolutional Network as originally implemented in the 
-    `Github Repo <https://github.com/lshiwjx/2s-AGCN>`. For implementational details 
+    Temporal Convolutional Block applied to nodes in the Two-Stream Adaptive Graph
+    Convolutional Network as originally implemented in the
+    `Github Repo <https://github.com/lshiwjx/2s-AGCN>`. For implementational details
     see https://arxiv.org/abs/1805.07694
     Args:
         in_channels (int): Number of input features.
@@ -45,11 +48,19 @@ class UnitTCN(nn.Module):
         kernel_size (int): Convolutional kernel size. (default: :obj:`9`)
         stride (int): Temporal Convolutional kernel stride. (default: :obj:`1`)
     """
-    def __init__(self, in_channels:int, out_channels:int, kernel_size: int=9, stride: int=1):
+
+    def __init__(
+        self, in_channels: int, out_channels: int, kernel_size: int = 9, stride: int = 1
+    ):
         super(UnitTCN, self).__init__()
         pad = int((kernel_size - 1) / 2)
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=(kernel_size, 1), 
-                                padding=(pad, 0), stride=(stride, 1))
+        self.conv = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=(kernel_size, 1),
+            padding=(pad, 0),
+            stride=(stride, 1),
+        )
 
         self.bn = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU(inplace=True)
@@ -61,7 +72,7 @@ class UnitTCN(nn.Module):
         nn.init.constant_(bn.bias, 0)
 
     def _conv_init(self, conv):
-        nn.init.kaiming_normal_(conv.weight, mode='fan_out')
+        nn.init.kaiming_normal_(conv.weight, mode="fan_out")
         nn.init.constant_(conv.bias, 0)
 
     def forward(self, x):
@@ -71,7 +82,7 @@ class UnitTCN(nn.Module):
 
 class UnitGCN(nn.Module):
     r"""
-    Graph Convolutional Block applied to nodes in the Two-Stream Adaptive Graph Convolutional 
+    Graph Convolutional Block applied to nodes in the Two-Stream Adaptive Graph Convolutional
     Network as originally implemented in the `Github Repo <https://github.com/lshiwjx/2s-AGCN>`.
     For implementational details see https://arxiv.org/abs/1805.07694.
     Temporal attention, spatial attention and channel-wise attention will be applied.
@@ -80,14 +91,23 @@ class UnitGCN(nn.Module):
         out_channels (int): Number of output features.
         A (Tensor array): Adaptive Graph.
         coff_embedding (int, optional): Coefficient Embeddings. (default: :int:`4`)
-        num_subset (int, optional): Subsets for adaptive graphs, see 
-        :math:`\mathbf{A}, \mathbf{B}, \mathbf{C}` in https://arxiv.org/abs/1805.07694 
+        num_subset (int, optional): Subsets for adaptive graphs, see
+        :math:`\mathbf{A}, \mathbf{B}, \mathbf{C}` in https://arxiv.org/abs/1805.07694
         for details. (default: :int:`3`)
         adaptive (bool, optional): Apply Adaptive Graph Convolutions. (default: :obj:`True`)
         attention (bool, optional): Apply Attention. (default: :obj:`True`)
     """
-    def __init__(self, in_channels:int, out_channels:int, A:torch.FloatTensor, coff_embedding:int=4, 
-                num_subset:int=3, adaptive: bool=True, attention: bool=True):
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        A: torch.FloatTensor,
+        coff_embedding: int = 4,
+        num_subset: int = 3,
+        adaptive: bool = True,
+        attention: bool = True,
+    ):
         super(UnitGCN, self).__init__()
         self.inter_c = out_channels // coff_embedding
         self.out_c = out_channels
@@ -97,7 +117,7 @@ class UnitGCN(nn.Module):
         self.num_jpts = A.shape[-1]
         self.attention = attention
         self.adaptive = adaptive
-        
+
         self.conv_d = nn.ModuleList()
 
         for i in range(self.num_subset):
@@ -113,8 +133,7 @@ class UnitGCN(nn.Module):
 
         if in_channels != out_channels:
             self.down = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, 1),
-                nn.BatchNorm2d(out_channels)
+                nn.Conv2d(in_channels, out_channels, 1), nn.BatchNorm2d(out_channels)
             )
         else:
             self.down = lambda x: x
@@ -132,7 +151,7 @@ class UnitGCN(nn.Module):
         nn.init.constant_(bn.bias, 0)
 
     def _conv_init(self, conv):
-        nn.init.kaiming_normal_(conv.weight, mode='fan_out')
+        nn.init.kaiming_normal_(conv.weight, mode="fan_out")
         nn.init.constant_(conv.bias, 0)
 
     def _conv_branch_init(self, conv, branches):
@@ -140,7 +159,7 @@ class UnitGCN(nn.Module):
         n = weight.size(0)
         k1 = weight.size(1)
         k2 = weight.size(2)
-        nn.init.normal_(weight, 0, math.sqrt(2. / (n * k1 * k2 * branches)))
+        nn.init.normal_(weight, 0, math.sqrt(2.0 / (n * k1 * k2 * branches)))
         nn.init.constant_(conv.bias, 0)
 
     def _init_conv_bn(self):
@@ -153,7 +172,7 @@ class UnitGCN(nn.Module):
 
         for i in range(self.num_subset):
             self._conv_branch_init(self.conv_d[i], self.num_subset)
-    
+
     def _init_attention_layers(self):
         # temporal attention
         self.conv_ta = nn.Conv1d(self.out_c, 1, 9, padding=4)
@@ -209,7 +228,12 @@ class UnitGCN(nn.Module):
 
         A = self.PA
         for i in range(self.num_subset):
-            A1 = self.conv_a[i](x).permute(0, 3, 1, 2).contiguous().view(N, V, self.inter_c * T)
+            A1 = (
+                self.conv_a[i](x)
+                .permute(0, 3, 1, 2)
+                .contiguous()
+                .view(N, V, self.inter_c * T)
+            )
             A2 = self.conv_b[i](x).view(N, self.inter_c * T, V)
             A1 = self.tan(torch.matmul(A1, A2) / A1.size(-1))  # N V V
             A1 = A[i] + A1 * self.alpha
@@ -218,7 +242,7 @@ class UnitGCN(nn.Module):
             y = z + y if y is not None else z
 
         return y
-        
+
     def _non_adaptive_forward(self, x, y):
         N, C, T, V = x.size()
         for i in range(self.num_subset):
@@ -228,7 +252,6 @@ class UnitGCN(nn.Module):
             y = z + y if y is not None else z
         return y
 
-
     def forward(self, x):
         N, C, T, V = x.size()
 
@@ -236,7 +259,7 @@ class UnitGCN(nn.Module):
         if self.adaptive:
             y = self._adaptive_forward(x, y)
         else:
-            y = self._non_adaptive_forward(x,y)
+            y = self._non_adaptive_forward(x, y)
         y = self.bn(y)
         y += self.down(x)
         y = self.relu(y)
@@ -248,10 +271,10 @@ class UnitGCN(nn.Module):
 class AAGCN(nn.Module):
     r"""Two-Stream Adaptive Graph Convolutional Network.
 
-    For details see this paper: `"Two-Stream Adaptive Graph Convolutional Networks for 
+    For details see this paper: `"Two-Stream Adaptive Graph Convolutional Networks for
     Skeleton-Based Action Recognition." <https://arxiv.org/abs/1805.07694>`_.
     This implementation is based on the authors Github Repo https://github.com/lshiwjx/2s-AGCN.
-    It's used by the author for classifying actions from sequences of 3D body joint coordinates. 
+    It's used by the author for classifying actions from sequences of 3D body joint coordinates.
 
     Args:
         in_channels (int): Number of input features.
@@ -261,12 +284,21 @@ class AAGCN(nn.Module):
         stride (int, optional): Time strides during temporal convolution. (default: :obj:`1`)
         residual (bool, optional): Applying residual connection. (default: :obj:`True`)
         adaptive (bool, optional): Adaptive node connection weights. (default: :obj:`True`)
-        attention (bool, optional): Applying spatial-temporal-channel-attention. 
+        attention (bool, optional): Applying spatial-temporal-channel-attention.
         (default: :obj:`True`)
     """
-    def __init__(self, in_channels:int, out_channels:int, 
-                edge_index:torch.LongTensor, num_nodes:int, stride:int=1, 
-                residual:bool=True, adaptive:bool=True, attention:bool=True):
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        edge_index: torch.LongTensor,
+        num_nodes: int,
+        stride: int = 1,
+        residual: bool = True,
+        adaptive: bool = True,
+        attention: bool = True,
+    ):
         super(AAGCN, self).__init__()
         self.edge_index = edge_index
         self.num_nodes = num_nodes
@@ -274,8 +306,9 @@ class AAGCN(nn.Module):
         self.graph = GraphAAGCN(self.edge_index, self.num_nodes)
         self.A = self.graph.A
 
-        self.gcn1 = UnitGCN(in_channels, out_channels, self.A, 
-                            adaptive=adaptive, attention=attention)
+        self.gcn1 = UnitGCN(
+            in_channels, out_channels, self.A, adaptive=adaptive, attention=attention
+        )
         self.tcn1 = UnitTCN(out_channels, out_channels, stride=stride)
         self.relu = nn.ReLU(inplace=True)
         self.attention = attention
@@ -287,20 +320,21 @@ class AAGCN(nn.Module):
             self.residual = lambda x: x
 
         else:
-            self.residual = UnitTCN(in_channels, out_channels, kernel_size=1, stride=stride)
+            self.residual = UnitTCN(
+                in_channels, out_channels, kernel_size=1, stride=stride
+            )
 
     def forward(self, x):
         """
         Making a forward pass.
-        
+
         Arg types:
-            * **X** (PyTorch FloatTensor) - Node features for T time periods, 
+            * **X** (PyTorch FloatTensor) - Node features for T time periods,
             with shape (B, F_in, T_in, N_nodes).
 
         Return types:
-            * **X** (PyTorch FloatTensor)* - Sequence of node features, 
+            * **X** (PyTorch FloatTensor)* - Sequence of node features,
             with shape (B, out_channels, T_in//stride, N_nodes).
         """
         y = self.relu(self.tcn1(self.gcn1(x)) + self.residual(x))
         return y
-

@@ -6,7 +6,7 @@ from torch_geometric.nn import TopKPooling
 
 class EvolveGCNH(torch.nn.Module):
     r"""An implementation of the Evolving Graph Convolutional Hidden Layer.
-    For details see this paper: `"EvolveGCN: Evolving Graph Convolutional 
+    For details see this paper: `"EvolveGCN: Evolving Graph Convolutional
     Networks for Dynamic Graph." <https://arxiv.org/abs/1902.10191>`_
 
     Args:
@@ -26,8 +26,16 @@ class EvolveGCNH(torch.nn.Module):
         add_self_loops (bool, optional): If set to :obj:`False`, will not add
             self-loops to the input graph. (default: :obj:`True`)
     """
-    def __init__(self, num_of_nodes: int, in_channels: int, improved: bool=False,
-                 cached: bool=False, normalize: bool=True, add_self_loops: bool=True):
+
+    def __init__(
+        self,
+        num_of_nodes: int,
+        in_channels: int,
+        improved: bool = False,
+        cached: bool = False,
+        normalize: bool = True,
+        add_self_loops: bool = True,
+    ):
         super(EvolveGCNH, self).__init__()
 
         self.num_of_nodes = num_of_nodes
@@ -38,28 +46,32 @@ class EvolveGCNH(torch.nn.Module):
         self.add_self_loops = add_self_loops
         self._create_layers()
 
-
     def _create_layers(self):
 
         self.ratio = self.in_channels / self.num_of_nodes
 
         self.pooling_layer = TopKPooling(self.in_channels, self.ratio)
 
-        self.recurrent_layer = GRU(input_size = self.in_channels,
-                                   hidden_size = self.in_channels,
-                                   num_layers = 1)
+        self.recurrent_layer = GRU(
+            input_size=self.in_channels, hidden_size=self.in_channels, num_layers=1
+        )
 
+        self.conv_layer = GCNConv(
+            in_channels=self.in_channels,
+            out_channels=self.in_channels,
+            improved=self.improved,
+            cached=self.cached,
+            normalize=self.normalize,
+            add_self_loops=self.add_self_loops,
+            bias=False,
+        )
 
-        self.conv_layer = GCNConv(in_channels = self.in_channels,
-                                  out_channels = self.in_channels,
-                                  improved = self.improved,
-                                  cached = self.cached,
-                                  normalize = self.normalize,
-                                  add_self_loops = self.add_self_loops,
-                                  bias = False)
-
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, 
-                edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
+    def forward(
+        self,
+        X: torch.FloatTensor,
+        edge_index: torch.LongTensor,
+        edge_weight: torch.FloatTensor = None,
+    ) -> torch.FloatTensor:
         """
         Making a forward pass.
 

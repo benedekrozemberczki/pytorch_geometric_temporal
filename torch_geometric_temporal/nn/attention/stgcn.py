@@ -4,10 +4,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import ChebConv
 
+
 class TemporalConv(nn.Module):
     r"""Temporal convolution block applied to nodes in the STGCN Layer
     For details see: `"Spatio-Temporal Graph Convolutional Networks:
-    A Deep Learning Framework for Traffic Forecasting." 
+    A Deep Learning Framework for Traffic Forecasting."
     <https://arxiv.org/abs/1709.04875>`_ Based off the temporal convolution
      introduced in "Convolutional Sequence to Sequence Learning"  <https://arxiv.org/abs/1709.04875>`_
 
@@ -16,7 +17,8 @@ class TemporalConv(nn.Module):
         out_channels (int): Number of output features.
         kernel_size (int): Convolutional kernel size.
     """
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int=3):
+
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int = 3):
         super(TemporalConv, self).__init__()
         self.conv_1 = nn.Conv2d(in_channels, out_channels, (1, kernel_size))
         self.conv_2 = nn.Conv2d(in_channels, out_channels, (1, kernel_size))
@@ -24,13 +26,13 @@ class TemporalConv(nn.Module):
 
     def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """Forward pass through temporal convolution block.
-        
+
         Arg types:
-            * **X** (torch.FloatTensor) -  Input data of shape 
+            * **X** (torch.FloatTensor) -  Input data of shape
                 (batch_size, input_time_steps, num_nodes, in_channels).
 
         Return types:
-            * **H** (torch.FloatTensor) - Output data of shape 
+            * **H** (torch.FloatTensor) - Output data of shape
                 (batch_size, in_channels, num_nodes, input_time_steps).
         """
         X = X.permute(0, 3, 2, 1)
@@ -41,21 +43,22 @@ class TemporalConv(nn.Module):
         H = H.permute(0, 3, 2, 1)
         return H
 
+
 class STConv(nn.Module):
-    r"""Spatio-temporal convolution block using ChebConv Graph Convolutions. 
+    r"""Spatio-temporal convolution block using ChebConv Graph Convolutions.
     For details see: `"Spatio-Temporal Graph Convolutional Networks:
-    A Deep Learning Framework for Traffic Forecasting" 
+    A Deep Learning Framework for Traffic Forecasting"
     <https://arxiv.org/abs/1709.04875>`_
 
-    NB. The ST-Conv block contains two temporal convolutions (TemporalConv) 
-    with kernel size k. Hence for an input sequence of length m, 
+    NB. The ST-Conv block contains two temporal convolutions (TemporalConv)
+    with kernel size k. Hence for an input sequence of length m,
     the output sequence will be length m-2(k-1).
 
     Args:
         in_channels (int): Number of input features.
         hidden_channels (int): Number of hidden units output by graph convolution block
         out_channels (int): Number of output features.
-        kernel_size (int): Size of the kernel considered. 
+        kernel_size (int): Size of the kernel considered.
         K (int): Chebyshev filter size :math:`K`.
         normalization (str, optional): The normalization scheme for the graph
             Laplacian (default: :obj:`"sym"`):
@@ -81,9 +84,18 @@ class STConv(nn.Module):
             an additive bias. (default: :obj:`True`)
 
     """
-    def __init__(self, num_nodes: int, in_channels: int, hidden_channels: int, 
-                out_channels: int, kernel_size: int, K: int,
-                normalization: str="sym", bias: bool=True):
+
+    def __init__(
+        self,
+        num_nodes: int,
+        in_channels: int,
+        hidden_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        K: int,
+        normalization: str = "sym",
+        bias: bool = True,
+    ):
         super(STConv, self).__init__()
         self.num_nodes = num_nodes
         self.in_channels = in_channels
@@ -94,33 +106,43 @@ class STConv(nn.Module):
         self.normalization = normalization
         self.bias = bias
 
-        self._temporal_conv1 = TemporalConv(in_channels=in_channels, 
-                                            out_channels=hidden_channels, 
-                                            kernel_size=kernel_size)
-                                        
-        self._graph_conv = ChebConv(in_channels=hidden_channels,
-                                   out_channels=hidden_channels,
-                                   K=K,
-                                   normalization=normalization,
-                                   bias=bias)
-                                
-        self._temporal_conv2 = TemporalConv(in_channels=hidden_channels, 
-                                            out_channels=out_channels, 
-                                            kernel_size=kernel_size)
-                                        
+        self._temporal_conv1 = TemporalConv(
+            in_channels=in_channels,
+            out_channels=hidden_channels,
+            kernel_size=kernel_size,
+        )
+
+        self._graph_conv = ChebConv(
+            in_channels=hidden_channels,
+            out_channels=hidden_channels,
+            K=K,
+            normalization=normalization,
+            bias=bias,
+        )
+
+        self._temporal_conv2 = TemporalConv(
+            in_channels=hidden_channels,
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+        )
+
         self._batch_norm = nn.BatchNorm2d(num_nodes)
-        
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor,
-                edge_weight: torch.FloatTensor=None) -> torch.FloatTensor:
-                
+
+    def forward(
+        self,
+        X: torch.FloatTensor,
+        edge_index: torch.LongTensor,
+        edge_weight: torch.FloatTensor = None,
+    ) -> torch.FloatTensor:
+
         r"""Forward pass. If edge weights are not present the forward pass
-        defaults to an unweighted graph. 
+        defaults to an unweighted graph.
 
         Arg types:
             * **X** (PyTorch FloatTensor) - Sequence of node features of shape (Batch size X Input time steps X Num nodes X In channels).
             * **edge_index** (PyTorch LongTensor) - Graph edge indices.
             * **edge_weight** (PyTorch LongTensor, optional)- Edge weight vector.
-        
+
         Return types:
             * **T** (PyTorch FloatTensor) - Sequence of node features.
         """

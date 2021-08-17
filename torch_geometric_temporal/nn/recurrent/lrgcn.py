@@ -15,8 +15,10 @@ class LRGCN(torch.nn.Module):
         num_relations (int): Number of relations.
         num_bases (int): Number of bases.
     """
-    def __init__(self, in_channels: int, out_channels: int,
-                 num_relations: int, num_bases: int):
+
+    def __init__(
+        self, in_channels: int, out_channels: int, num_relations: int, num_bases: int
+    ):
         super(LRGCN, self).__init__()
 
         self.in_channels = in_channels
@@ -25,58 +27,69 @@ class LRGCN(torch.nn.Module):
         self.num_bases = num_bases
         self._create_layers()
 
-
     def _create_input_gate_layers(self):
 
-        self.conv_x_i = RGCNConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
+        self.conv_x_i = RGCNConv(
+            in_channels=self.in_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
-        self.conv_h_i = RGCNConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
-
+        self.conv_h_i = RGCNConv(
+            in_channels=self.out_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
     def _create_forget_gate_layers(self):
 
-        self.conv_x_f = RGCNConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
+        self.conv_x_f = RGCNConv(
+            in_channels=self.in_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
-        self.conv_h_f = RGCNConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
-
+        self.conv_h_f = RGCNConv(
+            in_channels=self.out_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
     def _create_cell_state_layers(self):
 
-        self.conv_x_c = RGCNConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
+        self.conv_x_c = RGCNConv(
+            in_channels=self.in_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
-        self.conv_h_c = RGCNConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
-
+        self.conv_h_c = RGCNConv(
+            in_channels=self.out_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
     def _create_output_gate_layers(self):
 
-        self.conv_x_o = RGCNConv(in_channels=self.in_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
+        self.conv_x_o = RGCNConv(
+            in_channels=self.in_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
-        self.conv_h_o = RGCNConv(in_channels=self.out_channels,
-                                 out_channels=self.out_channels,
-                                 num_relations=self.num_relations,
-                                 num_bases=self.num_bases)
-
+        self.conv_h_o = RGCNConv(
+            in_channels=self.out_channels,
+            out_channels=self.out_channels,
+            num_relations=self.num_relations,
+            num_bases=self.num_bases,
+        )
 
     def _create_layers(self):
         self._create_input_gate_layers()
@@ -84,18 +97,15 @@ class LRGCN(torch.nn.Module):
         self._create_cell_state_layers()
         self._create_output_gate_layers()
 
-
     def _set_hidden_state(self, X, H):
         if H is None:
             H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return H
 
-
     def _set_cell_state(self, X, C):
         if C is None:
             C = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return C
-
 
     def _calculate_input_gate(self, X, edge_index, edge_type, H, C):
         I = self.conv_x_i(X, edge_index, edge_type)
@@ -103,21 +113,18 @@ class LRGCN(torch.nn.Module):
         I = torch.sigmoid(I)
         return I
 
-
     def _calculate_forget_gate(self, X, edge_index, edge_type, H, C):
         F = self.conv_x_f(X, edge_index, edge_type)
         F = F + self.conv_h_f(H, edge_index, edge_type)
         F = torch.sigmoid(F)
         return F
 
-
     def _calculate_cell_state(self, X, edge_index, edge_type, H, C, I, F):
         T = self.conv_x_c(X, edge_index, edge_type)
         T = T + self.conv_h_c(H, edge_index, edge_type)
         T = torch.tanh(T)
-        C = F*C + I*T
+        C = F * C + I * T
         return C
-
 
     def _calculate_output_gate(self, X, edge_index, edge_type, H, C):
         O = self.conv_x_o(X, edge_index, edge_type)
@@ -125,16 +132,20 @@ class LRGCN(torch.nn.Module):
         O = torch.sigmoid(O)
         return O
 
-
     def _calculate_hidden_state(self, O, C):
         H = O * torch.tanh(C)
         return H
 
-
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_type: torch.LongTensor,
-                H: torch.FloatTensor=None, C: torch.FloatTensor=None) -> torch.FloatTensor:
+    def forward(
+        self,
+        X: torch.FloatTensor,
+        edge_index: torch.LongTensor,
+        edge_type: torch.LongTensor,
+        H: torch.FloatTensor = None,
+        C: torch.FloatTensor = None,
+    ) -> torch.FloatTensor:
         """
-        Making a forward pass. If the hidden state and cell state matrices are 
+        Making a forward pass. If the hidden state and cell state matrices are
         not present when the forward pass is called these are initialized with zeros.
 
         Arg types:

@@ -11,21 +11,27 @@ Targets = List[Union[np.ndarray, None]]
 
 
 class DynamicGraphStaticSignal(object):
-    r""" A data iterator object to contain a dynamic graph with a
+    r"""A data iterator object to contain a dynamic graph with a
     changing edge set and weights . The node labels
     (target) are also dynamic. The iterator returns a single discrete temporal
-    snapshot for a time period (e.g. day or week). This single snapshot is a 
+    snapshot for a time period (e.g. day or week). This single snapshot is a
     Pytorch Geometric Data object. Between two temporal snapshots the edges,
     edge weights and target matrices might change.
- 
+
     Args:
         edge_indices (List of Numpy arrays): List of edge index tensors.
         edge_weights (List of Numpy arrays): List of edge weight tensors.
         feature (Numpy array): Node feature tensor.
         targets (List of Numpy arrays): List of node label (target) tensors.
     """
-    def __init__(self, edge_indices: Edge_Indices, edge_weights: Edge_Weights,
-                 feature: Feature, targets: Targets):
+
+    def __init__(
+        self,
+        edge_indices: Edge_Indices,
+        edge_weights: Edge_Weights,
+        feature: Feature,
+        targets: Targets,
+    ):
         self.edge_indices = edge_indices
         self.edge_weights = edge_weights
         self.feature = feature
@@ -34,8 +40,12 @@ class DynamicGraphStaticSignal(object):
         self._set_snapshot_count()
 
     def _check_temporal_consistency(self):
-        assert len(self.edge_indices) == len(self.edge_weights), "Temporal dimension inconsistency."
-        assert len(self.targets) == len(self.edge_indices), "Temporal dimension inconsistency."
+        assert len(self.edge_indices) == len(
+            self.edge_weights
+        ), "Temporal dimension inconsistency."
+        assert len(self.targets) == len(
+            self.edge_indices
+        ), "Temporal dimension inconsistency."
 
     def _set_snapshot_count(self):
         self.snapshot_count = len(self.targets)
@@ -52,39 +62,36 @@ class DynamicGraphStaticSignal(object):
         else:
             return torch.FloatTensor(self.edge_weights[time_index])
 
-    def _get_feature(self): 
+    def _get_feature(self):
         if self.feature is None:
             return self.feature
-        else:       
+        else:
             return torch.FloatTensor(self.feature)
 
     def _get_target(self, time_index: int):
         if self.targets[time_index] is None:
             return self.targets[time_index]
         else:
-            if self.targets[time_index].dtype.kind == 'i':
+            if self.targets[time_index].dtype.kind == "i":
                 return torch.LongTensor(self.targets[time_index])
-            elif self.targets[time_index].dtype.kind == 'f':
+            elif self.targets[time_index].dtype.kind == "f":
                 return torch.FloatTensor(self.targets[time_index])
-                
+
     def __len__(self):
         return len(self.targets)
-                
+
     def __get_item__(self, time_index: int):
         x = self._get_feature()
         edge_index = self._get_edge_index(time_index)
         edge_weight = self._get_edge_weight(time_index)
         y = self._get_target(time_index)
 
-        snapshot = Data(x = x,
-                        edge_index = edge_index,
-                        edge_attr = edge_weight,
-                        y = y)
+        snapshot = Data(x=x, edge_index=edge_index, edge_attr=edge_weight, y=y)
         return snapshot
 
     def __next__(self):
         if self.t < len(self.targets):
-            snapshot = self. __get_item__(self.t)
+            snapshot = self.__get_item__(self.t)
             self.t = self.t + 1
             return snapshot
         else:

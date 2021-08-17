@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 class Conv2D(nn.Module):
     r"""An implementation of the 2D-convolution block.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -21,14 +21,26 @@ class Conv2D(nn.Module):
         bn_decay (float, optional): Batch normalization momentum, default is None.
     """
 
-    def __init__(self, input_dims: int, output_dims: int, kernel_size: Union[tuple, list], 
-                stride: Union[tuple, list]=(1, 1), use_bias: bool=True, 
-                activation: Optional[Callable[[torch.FloatTensor], torch.FloatTensor]]=F.relu,
-                bn_decay: Optional[float]=None):
+    def __init__(
+        self,
+        input_dims: int,
+        output_dims: int,
+        kernel_size: Union[tuple, list],
+        stride: Union[tuple, list] = (1, 1),
+        use_bias: bool = True,
+        activation: Optional[Callable[[torch.FloatTensor], torch.FloatTensor]] = F.relu,
+        bn_decay: Optional[float] = None,
+    ):
         super(Conv2D, self).__init__()
         self._activation = activation
-        self._conv2d = nn.Conv2d(input_dims, output_dims, kernel_size, stride=stride,
-                               padding=0, bias=use_bias)
+        self._conv2d = nn.Conv2d(
+            input_dims,
+            output_dims,
+            kernel_size,
+            stride=stride,
+            padding=0,
+            bias=use_bias,
+        )
         self._batch_norm = nn.BatchNorm2d(output_dims, momentum=bn_decay)
         torch.nn.init.xavier_uniform_(self._conv2d.weight)
 
@@ -55,7 +67,7 @@ class Conv2D(nn.Module):
 
 class FullyConnected(nn.Module):
     r"""An implementation of the fully-connected layer.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -66,20 +78,36 @@ class FullyConnected(nn.Module):
         use_bias (bool, optional): Whether to use bias, default is True.
     """
 
-    def __init__(self, input_dims: Union[int, list], units: Union[int, list], 
-                activations: Union[Callable[[torch.FloatTensor], torch.FloatTensor], list],
-                bn_decay: float, use_bias: bool=True):
+    def __init__(
+        self,
+        input_dims: Union[int, list],
+        units: Union[int, list],
+        activations: Union[Callable[[torch.FloatTensor], torch.FloatTensor], list],
+        bn_decay: float,
+        use_bias: bool = True,
+    ):
         super(FullyConnected, self).__init__()
         if isinstance(units, int):
             units = [units]
             input_dims = [input_dims]
             activations = [activations]
         assert type(units) == list
-        self._conv2ds = nn.ModuleList([Conv2D(
-            input_dims=input_dim, output_dims=num_unit, kernel_size=[1, 1],
-            stride=[1, 1], use_bias=use_bias, activation=activation,
-            bn_decay=bn_decay) for input_dim, num_unit, activation in
-            zip(input_dims, units, activations)])
+        self._conv2ds = nn.ModuleList(
+            [
+                Conv2D(
+                    input_dims=input_dim,
+                    output_dims=num_unit,
+                    kernel_size=[1, 1],
+                    stride=[1, 1],
+                    use_bias=use_bias,
+                    activation=activation,
+                    bn_decay=bn_decay,
+                )
+                for input_dim, num_unit, activation in zip(
+                    input_dims, units, activations
+                )
+            ]
+        )
 
     def forward(self, X: torch.FloatTensor) -> torch.FloatTensor:
         """
@@ -98,7 +126,7 @@ class FullyConnected(nn.Module):
 
 class SpatioTemporalEmbedding(nn.Module):
     r"""An implementation of the spatial-temporal embedding block.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -108,17 +136,29 @@ class SpatioTemporalEmbedding(nn.Module):
         use_bias (bool, optional): Whether to use bias in Fully Connected layers, default is True.
     """
 
-    def __init__(self, D: int, bn_decay: float, steps_per_day: int, use_bias: bool=True):
+    def __init__(
+        self, D: int, bn_decay: float, steps_per_day: int, use_bias: bool = True
+    ):
         super(SpatioTemporalEmbedding, self).__init__()
         self._fully_connected_se = FullyConnected(
-            input_dims=[D, D], units=[D, D], activations=[F.relu, None],
-            bn_decay=bn_decay, use_bias=use_bias)
+            input_dims=[D, D],
+            units=[D, D],
+            activations=[F.relu, None],
+            bn_decay=bn_decay,
+            use_bias=use_bias,
+        )
 
         self._fully_connected_te = FullyConnected(
-            input_dims=[steps_per_day+7, D], units=[D, D], activations=[F.relu, None],
-            bn_decay=bn_decay, use_bias=use_bias)
+            input_dims=[steps_per_day + 7, D],
+            units=[D, D],
+            activations=[F.relu, None],
+            bn_decay=bn_decay,
+            use_bias=use_bias,
+        )
 
-    def forward(self, SE: torch.FloatTensor, TE: torch.FloatTensor, T: int) -> torch.FloatTensor:
+    def forward(
+        self, SE: torch.FloatTensor, TE: torch.FloatTensor, T: int
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of the spatial-temporal embedding.
 
@@ -147,7 +187,7 @@ class SpatioTemporalEmbedding(nn.Module):
 
 class SpatialAttention(nn.Module):
     r"""An implementation of the spatial attention mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -161,16 +201,22 @@ class SpatialAttention(nn.Module):
         D = K * d
         self._d = d
         self._K = K
-        self._fully_connected_q = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected_k = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected_v = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected = FullyConnected(input_dims=D, units=D, activations=F.relu,
-                                               bn_decay=bn_decay)
+        self._fully_connected_q = FullyConnected(
+            input_dims=2 * D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected_k = FullyConnected(
+            input_dims=2 * D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected_v = FullyConnected(
+            input_dims=2 * D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected = FullyConnected(
+            input_dims=D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
 
-    def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(
+        self, X: torch.FloatTensor, STE: torch.FloatTensor
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of the spatial attention mechanism.
 
@@ -190,7 +236,7 @@ class SpatialAttention(nn.Module):
         key = torch.cat(torch.split(key, self._K, dim=-1), dim=0)
         value = torch.cat(torch.split(value, self._K, dim=-1), dim=0)
         attention = torch.matmul(query, key.transpose(2, 3))
-        attention /= (self._d ** 0.5)
+        attention /= self._d ** 0.5
         attention = F.softmax(attention, dim=-1)
         X = torch.matmul(attention, value)
         X = torch.cat(torch.split(X, batch_size, dim=0), dim=-1)
@@ -201,7 +247,7 @@ class SpatialAttention(nn.Module):
 
 class TemporalAttention(nn.Module):
     r"""An implementation of the temporal attention mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -217,16 +263,22 @@ class TemporalAttention(nn.Module):
         self._d = d
         self._K = K
         self._mask = mask
-        self._fully_connected_q = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected_k = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected_v = FullyConnected(input_dims=2 * D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected = FullyConnected(input_dims=D, units=D, activations=F.relu,
-                                               bn_decay=bn_decay)
+        self._fully_connected_q = FullyConnected(
+            input_dims=2 * D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected_k = FullyConnected(
+            input_dims=2 * D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected_v = FullyConnected(
+            input_dims=2 * D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected = FullyConnected(
+            input_dims=D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
 
-    def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(
+        self, X: torch.FloatTensor, STE: torch.FloatTensor
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of the temporal attention mechanism.
 
@@ -249,7 +301,7 @@ class TemporalAttention(nn.Module):
         key = key.permute(0, 2, 3, 1)
         value = value.permute(0, 2, 1, 3)
         attention = torch.matmul(query, key)
-        attention /= (self._d ** 0.5)
+        attention /= self._d ** 0.5
         if self._mask:
             batch_size = X.shape[0]
             num_step = X.shape[1]
@@ -259,7 +311,7 @@ class TemporalAttention(nn.Module):
             mask = torch.unsqueeze(torch.unsqueeze(mask, dim=0), dim=0)
             mask = mask.repeat(self._K * batch_size, num_nodes, 1, 1)
             mask = mask.to(torch.bool)
-            condition = torch.FloatTensor([-2 ** 15 + 1]).to(X.device)
+            condition = torch.FloatTensor([-(2 ** 15) + 1]).to(X.device)
             attention = torch.where(mask, attention, condition)
         attention = F.softmax(attention, dim=-1)
         X = torch.matmul(attention, value)
@@ -272,7 +324,7 @@ class TemporalAttention(nn.Module):
 
 class GatedFusion(nn.Module):
     r"""An implementation of the gated fusion mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -282,14 +334,22 @@ class GatedFusion(nn.Module):
 
     def __init__(self, D: int, bn_decay: float):
         super(GatedFusion, self).__init__()
-        self._fully_connected_xs = FullyConnected(input_dims=D, units=D, activations=None,
-                                                  bn_decay=bn_decay, use_bias=False)
-        self._fully_connected_xt = FullyConnected(input_dims=D, units=D, activations=None,
-                                                  bn_decay=bn_decay, use_bias=True)
-        self._fully_connected_h = FullyConnected(input_dims=[D, D], units=[D, D], activations=[F.relu, None],
-                                                 bn_decay=bn_decay)
+        self._fully_connected_xs = FullyConnected(
+            input_dims=D, units=D, activations=None, bn_decay=bn_decay, use_bias=False
+        )
+        self._fully_connected_xt = FullyConnected(
+            input_dims=D, units=D, activations=None, bn_decay=bn_decay, use_bias=True
+        )
+        self._fully_connected_h = FullyConnected(
+            input_dims=[D, D],
+            units=[D, D],
+            activations=[F.relu, None],
+            bn_decay=bn_decay,
+        )
 
-    def forward(self, HS: torch.FloatTensor, HT: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(
+        self, HS: torch.FloatTensor, HT: torch.FloatTensor
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of the gated fusion mechanism.
 
@@ -310,8 +370,8 @@ class GatedFusion(nn.Module):
 
 
 class SpatioTemporalAttention(nn.Module):
-    r"""An implementation of the spatial-temporal attention block, with spatial attention and temporal attention 
-    followed by gated fusion. For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    r"""An implementation of the spatial-temporal attention block, with spatial attention and temporal attention
+    followed by gated fusion. For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -327,7 +387,9 @@ class SpatioTemporalAttention(nn.Module):
         self._temporal_attention = TemporalAttention(K, d, bn_decay, mask=mask)
         self._gated_fusion = GatedFusion(K * d, bn_decay)
 
-    def forward(self, X: torch.FloatTensor, STE: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(
+        self, X: torch.FloatTensor, STE: torch.FloatTensor
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of the spatial-temporal attention block.
 
@@ -348,7 +410,7 @@ class SpatioTemporalAttention(nn.Module):
 
 class TransformAttention(nn.Module):
     r"""An implementation of the tranform attention mechanism.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -362,24 +424,33 @@ class TransformAttention(nn.Module):
         D = K * d
         self._K = K
         self._d = d
-        self._fully_connected_q = FullyConnected(input_dims=D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected_k = FullyConnected(input_dims=D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected_v = FullyConnected(input_dims=D, units=D, activations=F.relu,
-                                                 bn_decay=bn_decay)
-        self._fully_connected = FullyConnected(input_dims=D, units=D, activations=F.relu,
-                                               bn_decay=bn_decay)
+        self._fully_connected_q = FullyConnected(
+            input_dims=D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected_k = FullyConnected(
+            input_dims=D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected_v = FullyConnected(
+            input_dims=D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
+        self._fully_connected = FullyConnected(
+            input_dims=D, units=D, activations=F.relu, bn_decay=bn_decay
+        )
 
-    def forward(self, X: torch.FloatTensor, STE_his: torch.FloatTensor, STE_pred: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(
+        self,
+        X: torch.FloatTensor,
+        STE_his: torch.FloatTensor,
+        STE_pred: torch.FloatTensor,
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of the transform attention layer.
 
         Arg types:
             * **X** (PyTorch Float Tensor) - Input sequence, with shape (batch_size, num_his, num_nodes, K*d).
-            * **STE_his** (Pytorch Float Tensor) - Spatial-temporal embedding for history, 
+            * **STE_his** (Pytorch Float Tensor) - Spatial-temporal embedding for history,
             with shape (batch_size, num_his, num_nodes, K*d).
-            * **STE_pred** (Pytorch Float Tensor) - Spatial-temporal embedding for prediction, 
+            * **STE_pred** (Pytorch Float Tensor) - Spatial-temporal embedding for prediction,
             with shape (batch_size, num_pred, num_nodes, K*d).
 
         Return types:
@@ -396,7 +467,7 @@ class TransformAttention(nn.Module):
         key = key.permute(0, 2, 3, 1)
         value = value.permute(0, 2, 1, 3)
         attention = torch.matmul(query, key)
-        attention /= (self._d ** 0.5)
+        attention /= self._d ** 0.5
         attention = F.softmax(attention, dim=-1)
         X = torch.matmul(attention, value)
         X = X.permute(0, 2, 1, 3)
@@ -408,7 +479,7 @@ class TransformAttention(nn.Module):
 
 class GMAN(nn.Module):
     r"""An implementation of GMAN.
-    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction." 
+    For details see this paper: `"GMAN: A Graph Multi-Attention Network for Traffic Prediction."
     <https://arxiv.org/pdf/1911.08415.pdf>`_
 
     Args:
@@ -422,23 +493,47 @@ class GMAN(nn.Module):
         mask (bool): Whether to mask attention score in temporal attention.
     """
 
-    def __init__(self, L: int, K: int, d: int, num_his: int, bn_decay: float, steps_per_day: int, use_bias: bool, mask: bool):
+    def __init__(
+        self,
+        L: int,
+        K: int,
+        d: int,
+        num_his: int,
+        bn_decay: float,
+        steps_per_day: int,
+        use_bias: bool,
+        mask: bool,
+    ):
         super(GMAN, self).__init__()
         D = K * d
         self._num_his = num_his
         self._steps_per_day = steps_per_day
-        self._st_embedding = SpatioTemporalEmbedding(D, bn_decay, steps_per_day, use_bias)
+        self._st_embedding = SpatioTemporalEmbedding(
+            D, bn_decay, steps_per_day, use_bias
+        )
         self._st_att_block1 = nn.ModuleList(
-            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)]
+        )
         self._st_att_block2 = nn.ModuleList(
-            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)])
+            [SpatioTemporalAttention(K, d, bn_decay, mask) for _ in range(L)]
+        )
         self._transform_attention = TransformAttention(K, d, bn_decay)
-        self._fully_connected_1 = FullyConnected(input_dims=[1, D], units=[D, D], activations=[F.relu, None],
-                                                 bn_decay=bn_decay)
-        self._fully_connected_2 = FullyConnected(input_dims=[D, D], units=[D, 1], activations=[F.relu, None],
-                                                 bn_decay=bn_decay)
+        self._fully_connected_1 = FullyConnected(
+            input_dims=[1, D],
+            units=[D, D],
+            activations=[F.relu, None],
+            bn_decay=bn_decay,
+        )
+        self._fully_connected_2 = FullyConnected(
+            input_dims=[D, D],
+            units=[D, 1],
+            activations=[F.relu, None],
+            bn_decay=bn_decay,
+        )
 
-    def forward(self, X: torch.FloatTensor, SE: torch.FloatTensor, TE: torch.FloatTensor) -> torch.FloatTensor:
+    def forward(
+        self, X: torch.FloatTensor, SE: torch.FloatTensor, TE: torch.FloatTensor
+    ) -> torch.FloatTensor:
         """
         Making a forward pass of GMAN.
 
@@ -453,8 +548,8 @@ class GMAN(nn.Module):
         X = torch.unsqueeze(X, -1)
         X = self._fully_connected_1(X)
         STE = self._st_embedding(SE, TE, self._steps_per_day)
-        STE_his = STE[:, :self._num_his]
-        STE_pred = STE[:, self._num_his:]
+        STE_his = STE[:, : self._num_his]
+        STE_pred = STE[:, self._num_his :]
         for net in self._st_att_block1:
             X = net(X, STE_his)
         X = self._transform_attention(X, STE_his, STE_pred)

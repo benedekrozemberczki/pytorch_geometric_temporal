@@ -5,8 +5,8 @@ from typing import List
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 
-class MaskedSelfAttention(nn.Module):
 
+class MaskedSelfAttention(nn.Module):
     def __init__(self, input_dim, output_dim, n_heads, attention_aggregate="mean"):
         super(MaskedSelfAttention, self).__init__()
 
@@ -34,14 +34,23 @@ class MaskedSelfAttention(nn.Module):
         K = self.Wk(input_tensor)
         V = self.Wv(input_tensor)
 
-        Q = Q.reshape(input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dq).transpose(1, 2)
-        K = K.reshape(input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dk).permute(0, 2, 3, 1)
-        V = V.reshape(input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dv).transpose(1, 2)
+        Q = Q.reshape(
+            input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dq
+        ).transpose(1, 2)
+        K = K.reshape(
+            input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dk
+        ).permute(0, 2, 3, 1)
+        V = V.reshape(
+            input_tensor.shape[0], input_tensor.shape[1], self.n_heads, self.dv
+        ).transpose(1, 2)
 
         attention_score = Q.matmul(K) / np.sqrt(self.per_head_dim)
 
-        attention_mask = torch.zeros(seq_length, seq_length).masked_fill(
-            torch.tril(torch.ones(seq_length, seq_length)) == 0, -np.inf).to(input_tensor.device)
+        attention_mask = (
+            torch.zeros(seq_length, seq_length)
+            .masked_fill(torch.tril(torch.ones(seq_length, seq_length)) == 0, -np.inf)
+            .to(input_tensor.device)
+        )
 
         attention_score = attention_score + attention_mask
 
@@ -50,8 +59,9 @@ class MaskedSelfAttention(nn.Module):
         multi_head_result = attention_score.matmul(V)
 
         if self.attention_aggregate == "concat":
-            output = multi_head_result.transpose(1, 2).reshape(input_tensor.shape[0],
-                                                               seq_length, self.n_heads * self.per_head_dim)
+            output = multi_head_result.transpose(1, 2).reshape(
+                input_tensor.shape[0], seq_length, self.n_heads * self.per_head_dim
+            )
         elif self.attention_aggregate == "mean":
             output = multi_head_result.transpose(1, 2).mean(dim=2)
         else:
@@ -61,7 +71,6 @@ class MaskedSelfAttention(nn.Module):
 
 
 class GlobalGatedUpdater(nn.Module):
-
     def __init__(self, items_total, item_embedding):
         super(GlobalGatedUpdater, self).__init__()
         self.items_total = items_total
@@ -73,10 +82,12 @@ class GlobalGatedUpdater(nn.Module):
         batch_size = nodes_output.shape[0] // self.items_total
         id = 0
         num_nodes = self.items_total
-        items_embedding = self.item_embedding(torch.tensor([i for i in range(self.items_total)]).to(nodes_output.device))
+        items_embedding = self.item_embedding(
+            torch.tensor([i for i in range(self.items_total)]).to(nodes_output.device)
+        )
         batch_embedding = []
         for _ in range(batch_size):
-            output_node_features = nodes_output[id:id + num_nodes, :]
+            output_node_features = nodes_output[id : id + num_nodes, :]
             embed = (1 - self.alpha) * items_embedding
 
             embed = embed + self.alpha * output_node_features
@@ -87,7 +98,6 @@ class GlobalGatedUpdater(nn.Module):
 
 
 class AggregateTemporalNodeFeatures(nn.Module):
-
     def __init__(self, item_embed_dim):
 
         super(AggregateTemporalNodeFeatures, self).__init__()
@@ -105,6 +115,7 @@ class AggregateTemporalNodeFeatures(nn.Module):
         print(aggregated_features.shape)
         return aggregated_features
 
+
 class WeightedGCNBlock(nn.Module):
     def __init__(self, in_features: int, hidden_sizes: List[int], out_features: int):
         super(WeightedGCNBlock, self).__init__()
@@ -120,13 +131,19 @@ class WeightedGCNBlock(nn.Module):
         bns.append(nn.BatchNorm1d(out_features))
         self.gcns, self.relus, self.bns = gcns, relus, bns
 
-    def forward(self, node_features: torch.FloatTensor, edge_index: torch.LongTensor, edges_weight: torch.LongTensor):
+    def forward(
+        self,
+        node_features: torch.FloatTensor,
+        edge_index: torch.LongTensor,
+        edges_weight: torch.LongTensor,
+    ):
         h = node_features
         for gcn, relu, bn in zip(self.gcns, self.relus, self.bns):
             h = gcn(h, edge_index, edges_weight)
             h = bn(h.transpose(1, -1)).transpose(1, -1)
             h = relu(h)
         return h
+
 
 class DNNTSP(nn.Module):
     r"""An implementation of the Deep Neural Network for Temporal Set Prediction.
@@ -144,19 +161,29 @@ class DNNTSP(nn.Module):
         self.item_embedding = nn.Embedding(items_total, item_embedding_dim)
         self.item_embedding_dim = item_embedding_dim
         self.items_total = items_total
-        
-        self.stacked_gcn = WeightedGCNBlock(item_embedding_dim, [item_embedding_dim], item_embedding_dim)
 
-        self.masked_self_attention = MaskedSelfAttention(input_dim=item_embedding_dim,
-                                                         output_dim=item_embedding_dim,
-                                                         n_heads=n_heads)
+        self.stacked_gcn = WeightedGCNBlock(
+            item_embedding_dim, [item_embedding_dim], item_embedding_dim
+        )
 
-        self.aggregate_nodes_temporal_feature = AggregateTemporalNodeFeatures(item_embed_dim=item_embedding_dim)
+        self.masked_self_attention = MaskedSelfAttention(
+            input_dim=item_embedding_dim, output_dim=item_embedding_dim, n_heads=n_heads
+        )
 
-        self.global_gated_updater = GlobalGatedUpdater(items_total=items_total,
-                                                       item_embedding=self.item_embedding)
+        self.aggregate_nodes_temporal_feature = AggregateTemporalNodeFeatures(
+            item_embed_dim=item_embedding_dim
+        )
 
-    def forward(self, X: torch.FloatTensor, edge_index: torch.LongTensor, edge_weight: torch.FloatTensor=None):
+        self.global_gated_updater = GlobalGatedUpdater(
+            items_total=items_total, item_embedding=self.item_embedding
+        )
+
+    def forward(
+        self,
+        X: torch.FloatTensor,
+        edge_index: torch.LongTensor,
+        edge_weight: torch.FloatTensor = None,
+    ):
         r"""Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph.
 
@@ -174,4 +201,3 @@ class DNNTSP(nn.Module):
         H = self.aggregate_nodes_temporal_feature(H)
         H = self.global_gated_updater(H)
         return H
- 

@@ -2,9 +2,10 @@ import torch
 from .temporalgcn import TGCN
 from torch_geometric.nn import GCNConv
 
+
 class A3TGCN(torch.nn.Module):
     r"""An implementation of the Attention Temporal Graph Convolutional Cell.
-    For details see this paper: `"A3T-GCN: Attention Temporal Graph Convolutional 
+    For details see this paper: `"A3T-GCN: Attention Temporal Graph Convolutional
     Network for Traffic Forecasting." <https://arxiv.org/abs/1811.05320>`_
 
     Args:
@@ -15,8 +16,16 @@ class A3TGCN(torch.nn.Module):
         cached (bool): Caching the message weights (default :obj:`False`).
         add_self_loops (bool): Adding self-loops for smoothing (default :obj:`True`).
     """
-    def __init__(self, in_channels: int, out_channels: int, periods: int,
-                 improved: bool=False, cached: bool=False, add_self_loops: bool=True):
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        periods: int,
+        improved: bool = False,
+        cached: bool = False,
+        add_self_loops: bool = True,
+    ):
         super(A3TGCN, self).__init__()
 
         self.in_channels = in_channels
@@ -27,21 +36,24 @@ class A3TGCN(torch.nn.Module):
         self.add_self_loops = add_self_loops
         self._setup_layers()
 
-
     def _setup_layers(self):
-        self._base_tgcn = TGCN(in_channels = self.in_channels,
-                              out_channels = self.out_channels,
-                              improved = self.improved,
-                              cached = self.cached,
-                              add_self_loops = self.add_self_loops)
+        self._base_tgcn = TGCN(
+            in_channels=self.in_channels,
+            out_channels=self.out_channels,
+            improved=self.improved,
+            cached=self.cached,
+            add_self_loops=self.add_self_loops,
+        )
         self._attention = torch.empty(self.periods)
         torch.nn.init.uniform_(self._attention)
 
-
-    def forward(self, X: torch.FloatTensor,
-                edge_index: torch.LongTensor,
-                edge_weight: torch.FloatTensor=None,
-                H: torch.FloatTensor=None) -> torch.FloatTensor:
+    def forward(
+        self,
+        X: torch.FloatTensor,
+        edge_index: torch.LongTensor,
+        edge_weight: torch.FloatTensor = None,
+        H: torch.FloatTensor = None,
+    ) -> torch.FloatTensor:
         """
         Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. If the hidden state matrix is not present
@@ -59,5 +71,7 @@ class A3TGCN(torch.nn.Module):
         H_accum = 0
         probs = torch.nn.functional.softmax(self._attention, dim=0)
         for period in range(self.periods):
-            H_accum = H_accum + probs[period]*self._base_tgcn(X[:, :, period], edge_index, edge_weight, H)
+            H_accum = H_accum + probs[period] * self._base_tgcn(
+                X[:, :, period], edge_index, edge_weight, H
+            )
         return H_accum
