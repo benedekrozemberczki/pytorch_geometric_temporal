@@ -69,8 +69,7 @@ class EvolveGCNH(torch.nn.Module):
             improved=self.improved,
             cached=self.cached,
             normalize=self.normalize,
-            add_self_loops=self.add_self_loops,
-            bias=False,
+            add_self_loops=self.add_self_loops
         )
 
     def forward(

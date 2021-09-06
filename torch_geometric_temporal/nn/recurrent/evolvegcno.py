@@ -103,8 +103,6 @@ class GCNConv_Fixed_W(MessagePassing):
         normalize (bool, optional): Whether to add self-loops and compute
             symmetric normalization coefficients on the fly.
             (default: :obj:`True`)
-        bias (bool, optional): If set to :obj:`False`, the layer will not learn
-            an additive bias. (default: :obj:`True`)
         **kwargs (optional): Additional arguments of
             :class:`torch_geometric.nn.conv.MessagePassing`.
     """
@@ -115,7 +113,7 @@ class GCNConv_Fixed_W(MessagePassing):
     def __init__(self, in_channels: int, out_channels: int,
                  improved: bool = False, cached: bool = False,
                  add_self_loops: bool = True, normalize: bool = True,
-                 bias: bool = True, **kwargs):
+                **kwargs):
 
         kwargs.setdefault('aggr', 'add')
         super(GCNConv_Fixed_W, self).__init__(**kwargs)
@@ -130,15 +128,9 @@ class GCNConv_Fixed_W(MessagePassing):
         self._cached_edge_index = None
         self._cached_adj_t = None
 
-        if bias:
-            self.bias = Parameter(torch.Tensor(out_channels))
-        else:
-            self.register_parameter('bias', None)
-
         self.reset_parameters()
 
     def reset_parameters(self):
-        zeros(self.bias)
         self._cached_edge_index = None
         self._cached_adj_t = None
 
@@ -174,9 +166,6 @@ class GCNConv_Fixed_W(MessagePassing):
         # propagate_type: (x: Tensor, edge_weight: OptTensor)
         out = self.propagate(edge_index, x=x, edge_weight=edge_weight,
                              size=None)
-
-        if self.bias is not None:
-            out += self.bias
 
         return out
 
@@ -255,8 +244,7 @@ class EvolveGCNO(torch.nn.Module):
             improved=self.improved,
             cached=self.cached,
             normalize=self.normalize,
-            add_self_loops=self.add_self_loops,
-            bias=False,
+            add_self_loops=self.add_self_loops
         )
 
     def forward(
