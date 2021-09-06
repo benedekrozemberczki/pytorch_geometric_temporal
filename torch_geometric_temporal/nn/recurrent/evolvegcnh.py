@@ -1,6 +1,5 @@
 import torch
 from torch.nn import GRU
-from torch_geometric.nn import GCNConv
 from torch_geometric.nn import TopKPooling
 
 from torch_geometric.nn.recurrent.evolvegcno import glorot, GCNConv_Fixed_W
@@ -64,7 +63,7 @@ class EvolveGCNH(torch.nn.Module):
             input_size=self.in_channels, hidden_size=self.in_channels, num_layers=1
         )
 
-        self.conv_layer = GCNConv(
+        self.conv_layer = GCNConv_Fixed_W(
             in_channels=self.in_channels,
             out_channels=self.in_channels,
             improved=self.improved,
