@@ -112,6 +112,34 @@ def test_dynamic_graph_static_signal_typing():
         assert snapshot.y is None
 
 
+def test_static_graph_temporal_signal_additional_attrs():
+    dataset = StaticGraphTemporalSignal(None, None, [None], [None],
+                                        optional1=[np.array([1])], optional2=[np.array([2])])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.optional1.shape == (1,)
+        assert snapshot.optional2.shape == (1,)
+
+
+def test_dynamic_graph_static_signal_additional_attrs():
+    dataset = DynamicGraphStaticSignal([None], [None], None, [None],
+                                       optional1=[np.array([1])], optional2=[np.array([2])])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.optional1.shape == (1,)
+        assert snapshot.optional2.shape == (1,)
+
+
+def test_dynamic_graph_temporal_signal_additional_attrs():
+    dataset = DynamicGraphTemporalSignal([None], [None], [None], [None],
+                                         optional1=[np.array([1])], optional2=[np.array([2])])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.optional1.shape == (1,)
+        assert snapshot.optional2.shape == (1,)
+
+
+
 def test_chickenpox():
     loader = ChickenpoxDatasetLoader()
     dataset = loader.get_dataset()
