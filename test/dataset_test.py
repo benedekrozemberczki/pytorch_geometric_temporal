@@ -178,8 +178,8 @@ def test_windmilllarge():
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:
-            assert snapshot.edge_index.shape == (2, 97032)
-            assert snapshot.edge_attr.shape == (97032,)
+            assert snapshot.edge_index.shape == (2, 101761)
+            assert snapshot.edge_attr.shape == (101761,)
             assert snapshot.x.shape == (312, 8)
             assert snapshot.y.shape == (312,)
 
