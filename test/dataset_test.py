@@ -180,8 +180,8 @@ def test_windmilllarge():
         for snapshot in dataset:
             assert snapshot.edge_index.shape == (2, 101761)
             assert snapshot.edge_attr.shape == (101761,)
-            assert snapshot.x.shape == (312, 8)
-            assert snapshot.y.shape == (312,)
+            assert snapshot.x.shape == (319, 8)
+            assert snapshot.y.shape == (319,)
 
 
 def test_windmillsmall():
