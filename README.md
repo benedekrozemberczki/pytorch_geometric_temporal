@@ -106,7 +106,7 @@ In detail, the following temporal graph neural networks were implemented.
 * **[GConvLSTM](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.gconv_lstm.GConvLSTM)** from Seo *et al.*: [Structured Sequence Modeling with Graph  Convolutional Recurrent Networks](https://arxiv.org/abs/1612.07659) (ICONIP 2018)
 
 <details>
-<summary><b>Expand to see all implemented overlapping community detection methods...</b></summary>
+<summary><b>Expand to see all implemented recurrent graph convolutional layers...</b></summary>
 
 
 * **[GC-LSTM](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.gc_lstm.GCLSTM)** from Chen *et al.*: [GC-LSTM: Graph Convolution Embedded LSTM for Dynamic Link Prediction](https://arxiv.org/abs/1812.04206) (CoRR 2018)
@@ -129,7 +129,7 @@ In detail, the following temporal graph neural networks were implemented.
 
 </details>
   
-**Temporal Graph Convolutions**
+**Attention Aggregated Temporal Graph Convolutions**
 
 * **[STGCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.attention.stgcn.STConv)** from Yu *et al.*: [Spatio-Temporal Graph Convolutional Networks: A Deep Learning Framework for Traffic Forecasting](https://arxiv.org/abs/1709.04875) (IJCAI 2018)
 
@@ -139,7 +139,7 @@ In detail, the following temporal graph neural networks were implemented.
   
 
 <details>
-<summary><b>Expand to see all implemented overlapping community detection methods...</b></summary>
+<summary><b>Expand to see all implemented attention aggregated graph convolutional layers...</b></summary>
 
 
 * **[GMAN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.attention.gman.GMAN)** from Zheng *et al.*: [GMAN: A Graph Multi-Attention Network for Traffic Prediction](https://arxiv.org/pdf/1911.08415.pdf) (AAAI 2020)
@@ -162,7 +162,7 @@ In detail, the following temporal graph neural networks were implemented.
 
 
 <details>
-<summary><b>Expand to see all implemented overlapping community detection methods...</b></summary>
+<summary><b>Expand to see all auxiliary graph convolution layers...</b></summary>
   
 * **[AVWGCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.agcrn.AVWGCN)** from Bai *et al.*: [Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting](https://arxiv.org/abs/2007.02842) (NeurIPS 2020)
 
