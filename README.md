@@ -58,6 +58,7 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
                title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
                year = {2021},
                booktitle={Proceedings of the 30th ACM International Conference on Information and Knowledge Management},
+               pages = {4564–4573},
 }
 ```
 
@@ -147,8 +148,7 @@ In detail, the following temporal graph neural networks were implemented.
 
 * **[ChebConvAttention](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.attention.astgcn.ChebConvAttention)** from Guo *et al.*: [Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow Forecasting](https://ojs.aaai.org/index.php/AAAI/article/view/3881) (AAAI 2019)
 
-* **[AVWGCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.agcrn.AVWGCN)** from Bai *et al.*: [Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting](https://arxiv.org/abs/2007.02842) (NeurIPS 2020)booktitle = {Proceedings of the 30th ACM International Conference on Information & Knowledge Management},
-pages = {4564–4573},
+* **[AVWGCN](https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/root.html#torch_geometric_temporal.nn.recurrent.agcrn.AVWGCN)** from Bai *et al.*: [Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting](https://arxiv.org/abs/2007.02842) (NeurIPS 2020)
   
 --------------------------------------------------------------------------------
 
