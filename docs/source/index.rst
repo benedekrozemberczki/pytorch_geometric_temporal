@@ -15,6 +15,7 @@ The package interfaces well with `Pytorch Lightning <https://pytorch-lightning.r
                     title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
                     year = {2021},
                     booktitle={Proceedings of the 30th ACM International Conference on Information and Knowledge Management},
+                    pages = {4564–4573},
     }
 
 .. toctree::
