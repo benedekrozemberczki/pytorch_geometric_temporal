@@ -112,6 +112,34 @@ def test_dynamic_graph_static_signal_typing():
         assert snapshot.y is None
 
 
+def test_static_graph_temporal_signal_additional_attrs():
+    dataset = StaticGraphTemporalSignal(None, None, [None], [None],
+                                        optional1=[np.array([1])], optional2=[np.array([2])])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.optional1.shape == (1,)
+        assert snapshot.optional2.shape == (1,)
+
+
+def test_dynamic_graph_static_signal_additional_attrs():
+    dataset = DynamicGraphStaticSignal([None], [None], None, [None],
+                                       optional1=[np.array([1])], optional2=[np.array([2])])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.optional1.shape == (1,)
+        assert snapshot.optional2.shape == (1,)
+
+
+def test_dynamic_graph_temporal_signal_additional_attrs():
+    dataset = DynamicGraphTemporalSignal([None], [None], [None], [None],
+                                         optional1=[np.array([1])], optional2=[np.array([2])])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.optional1.shape == (1,)
+        assert snapshot.optional2.shape == (1,)
+
+
+
 def test_chickenpox():
     loader = ChickenpoxDatasetLoader()
     dataset = loader.get_dataset()
@@ -139,10 +167,10 @@ def test_wiki():
     dataset = loader.get_dataset()
     for epoch in range(1):
         for snapshot in dataset:
-            snapshot.edge_index.shape == (2, 27079)
-            snapshot.edge_attr.shape == (27079,)
-            snapshot.x.shape == (1068, 8)
-            snapshot.y.shape == (1068,)
+            assert snapshot.edge_index.shape == (2, 27079)
+            assert snapshot.edge_attr.shape == (27079,)
+            assert snapshot.x.shape == (1068, 8)
+            assert snapshot.y.shape == (1068,)
 
 
 def test_windmilllarge():
@@ -150,10 +178,10 @@ def test_windmilllarge():
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:
-            snapshot.edge_index.shape == (2, 97032)
-            snapshot.edge_attr.shape == (97032,)
-            snapshot.x.shape == (312, 8)
-            snapshot.y.shape == (312,)
+            assert snapshot.edge_index.shape == (2, 101761)
+            assert snapshot.edge_attr.shape == (101761,)
+            assert snapshot.x.shape == (319, 8)
+            assert snapshot.y.shape == (319,)
 
 
 def test_windmillsmall():
@@ -161,10 +189,10 @@ def test_windmillsmall():
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:
-            snapshot.edge_index.shape == (2, 121)
-            snapshot.edge_attr.shape == (121,)
-            snapshot.x.shape == (11, 8)
-            snapshot.y.shape == (11,)
+            assert snapshot.edge_index.shape == (2, 121)
+            assert snapshot.edge_attr.shape == (121,)
+            assert snapshot.x.shape == (11, 8)
+            assert snapshot.y.shape == (11,)
 
 
 def test_windmillmedium():
@@ -172,10 +200,10 @@ def test_windmillmedium():
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:
-            snapshot.edge_index.shape == (2, 676)
-            snapshot.edge_attr.shape == (676,)
-            snapshot.x.shape == (26, 8)
-            snapshot.y.shape == (26,)
+            assert snapshot.edge_index.shape == (2, 676)
+            assert snapshot.edge_attr.shape == (676,)
+            assert snapshot.x.shape == (26, 8)
+            assert snapshot.y.shape == (26,)
 
 
 def test_covid():
@@ -183,10 +211,10 @@ def test_covid():
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:
-            snapshot.edge_index.shape[0] == 2
-            snapshot.edge_attr.shape[0] == snapshot.edge_index.shape[1]
-            snapshot.x.shape == (129, 8)
-            snapshot.y.shape == (129,)
+            assert snapshot.edge_index.shape[0] == 2
+            assert snapshot.edge_attr.shape[0] == snapshot.edge_index.shape[1]
+            assert snapshot.x.shape == (129, 8)
+            assert snapshot.y.shape == (129,)
 
 
 def test_montevideobus():

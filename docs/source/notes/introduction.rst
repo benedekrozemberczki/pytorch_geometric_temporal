@@ -15,6 +15,7 @@ If you find *PyTorch Geometric Temporal* useful in your research, please conside
                     title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
                     year = {2021},
                     booktitle={Proceedings of the 30th ACM International Conference on Information and Knowledge Management},
+                    pages = {4564–4573},
     }
 
 We briefly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples.
