@@ -6,7 +6,7 @@ from torch_geometric.nn import GCNConv
 class A3TGCN(torch.nn.Module):
     r"""An implementation of the Attention Temporal Graph Convolutional Cell.
     For details see this paper: `"A3T-GCN: Attention Temporal Graph Convolutional
-    Network for Traffic Forecasting." <https://arxiv.org/abs/1811.05320>`_
+    Network for Traffic Forecasting." <https://arxiv.org/abs/2006.11583>`_
 
     Args:
         in_channels (int): Number of input features.
