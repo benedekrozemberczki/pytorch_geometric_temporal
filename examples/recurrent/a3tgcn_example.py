@@ -14,18 +14,18 @@ dataset = loader.get_dataset()
 train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.2)
 
 class RecurrentGCN(torch.nn.Module):
-    def __init__(self, node_features):
+    def __init__(self, node_features, periods):
         super(RecurrentGCN, self).__init__()
-        self.recurrent = A3TGCN(node_features, 32, 1)
+        self.recurrent = A3TGCN(node_features, 32, periods)
         self.linear = torch.nn.Linear(32, 1)
 
     def forward(self, x, edge_index, edge_weight):
-        h = self.recurrent(x.view(x.shape[0],x.shape[1],1), edge_index, edge_weight)
+        h = self.recurrent(x.view(x.shape[0], 1, x.shape[1]), edge_index, edge_weight)
         h = F.relu(h)
         h = self.linear(h)
         return h
         
-model = RecurrentGCN(node_features = 4)
+model = RecurrentGCN(node_features = 1, periods = 4)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
