@@ -184,6 +184,6 @@ class EvolveGCNO(torch.nn.Module):
             self.weight = self.initial_weight.data
         W = self.weight[None, :, :]
         _, W = self.recurrent_layer(W, W)
-        X = self.conv_layer(W.squeeze(), X, edge_index, edge_weight)
+        X = self.conv_layer(W.squeeze(dim=0), X, edge_index, edge_weight)
     
         return X
