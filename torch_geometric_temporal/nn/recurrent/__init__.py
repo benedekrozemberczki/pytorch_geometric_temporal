@@ -7,6 +7,8 @@ from .evolvegcnh import EvolveGCNH
 from .evolvegcno import EvolveGCNO
 from .dcrnn import DCRNN
 from .temporalgcn import TGCN
+from .temporalgcn import TGCN2
 from .attentiontemporalgcn import A3TGCN
+from .attentiontemporalgcn import A3TGCN2
 from .mpnn_lstm import MPNNLSTM
 from .agcrn import AGCRN
