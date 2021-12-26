@@ -23,6 +23,8 @@ def create_mock_data(number_of_nodes, edge_per_node, in_channels):
     return X, edge_index
 
 
+
+
 def create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, periods):
     """
     Creating a mock stacked feature matrix and edge index.
@@ -34,6 +36,17 @@ def create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, peri
     )
     return X, edge_index
 
+
+def create_mock_attention_batch_data(number_of_nodes, edge_per_node, in_channels, periods, batch_size):
+    """
+    Creating a mock stacked feature matrix and edge index.
+    """
+    graph = nx.watts_strogatz_graph(number_of_nodes, edge_per_node, 0.5)
+    edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
+    X = torch.FloatTensor(
+        np.random.uniform(-1, 1, (batch_size, number_of_nodes, in_channels, periods))
+    )
+    return X, edge_index
 
 def create_mock_states(number_of_nodes, out_channels):
     """
@@ -189,6 +202,43 @@ def test_tgcn_layer():
 
 
 def test_a3tgcn_layer():
+    """
+    Testing the A3TGCN Layer.
+    """
+    number_of_nodes = 100
+    edge_per_node = 10
+    in_channels = 64
+    out_channels = 16
+    periods = 7
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    X, edge_index = create_mock_attention_data(
+        number_of_nodes, edge_per_node, in_channels, periods
+    )
+    X = X.to(device)
+    edge_index = edge_index.to(device)
+    edge_weight = create_mock_edge_weight(edge_index).to(device)
+
+    layer = A3TGCN(
+        in_channels=in_channels, out_channels=out_channels, periods=periods
+    ).to(device)
+
+    H = layer(X, edge_index)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+    H = layer(X, edge_index, edge_weight, H)
+
+    assert H.shape == (number_of_nodes, out_channels)
+
+
+
+
+def test_a3tgcn2_layer():
     """
     Testing the A3TGCN Layer.
     """

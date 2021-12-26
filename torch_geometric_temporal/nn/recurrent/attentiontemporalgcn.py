@@ -46,7 +46,7 @@ class A3TGCN(torch.nn.Module):
             add_self_loops=self.add_self_loops,
         )
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self._attention = nn.Parameter(torch.empty(self.periods, device=device))
+        self._attention = torch.nn.Parameter(torch.empty(self.periods, device=device))
         torch.nn.init.uniform_(self._attention)
 
     def forward(
