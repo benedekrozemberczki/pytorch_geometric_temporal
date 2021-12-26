@@ -94,8 +94,15 @@ class A3TGCN2(torch.nn.Module):
         add_self_loops (bool): Adding self-loops for smoothing (default :obj:`True`).
     """
 
-    def __init__( self, in_channels: int,  out_channels: int,  periods: int, batch_size:int, improved: bool = False,
-                 cached: bool = False, add_self_loops: bool = True):
+    def __init__(
+        self,
+        in_channels: int, 
+        out_channels: int,  
+        periods: int, 
+        batch_size:int, 
+        improved: bool = False,
+        cached: bool = False,
+        add_self_loops: bool = True):
         super(A3TGCN2, self).__init__()
 
         self.in_channels = in_channels  # 2
@@ -108,14 +115,25 @@ class A3TGCN2(torch.nn.Module):
         self._setup_layers()
 
     def _setup_layers(self):
-        self._base_tgcn = TGCN2(in_channels=self.in_channels, out_channels=self.out_channels,  batch_size=self.batch_size,
-                               improved=self.improved,cached=self.cached, add_self_loops=self.add_self_loops)
+        self._base_tgcn = TGCN2(
+            in_channels=self.in_channels,
+            out_channels=self.out_channels,  
+            batch_size=self.batch_size,
+            improved=self.improved,
+            cached=self.cached, 
+            add_self_loops=self.add_self_loops)
+
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self._attention = torch.nn.Parameter(torch.empty(self.periods, device=device))
         torch.nn.init.uniform_(self._attention)
 
-    def forward( self, X: torch.FloatTensor,edge_index: torch.LongTensor, edge_weight: torch.FloatTensor = None,
-                H: torch.FloatTensor = None) -> torch.FloatTensor:
+    def forward( 
+        self, 
+        X: torch.FloatTensor,
+        edge_index: torch.LongTensor, 
+        edge_weight: torch.FloatTensor = None,
+        H: torch.FloatTensor = None
+    ) -> torch.FloatTensor:
         """
         Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. If the hidden state matrix is not present

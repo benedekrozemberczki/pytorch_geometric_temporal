@@ -8,6 +8,7 @@ from torch_geometric_temporal.nn.recurrent import (
     EvolveGCNO,
     TGCN,
     A3TGCN,
+    A3TGCN2,
     MPNNLSTM,
 )
 

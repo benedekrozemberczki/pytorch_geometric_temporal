@@ -7,7 +7,7 @@ install_requires = [
     "torch_scatter",
     "torch_cluster",
     "torch_spline_conv",
-    "torch_geometric",
+    "torch_geometric==1.7.0",
     "numpy",
     "scipy",
     "tqdm",
