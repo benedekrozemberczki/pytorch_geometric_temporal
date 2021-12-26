@@ -37,9 +37,10 @@ def create_mock_attention_data(number_of_nodes, edge_per_node, in_channels, peri
     return X, edge_index
 
 
+
 def create_mock_attention_batch_data(number_of_nodes, edge_per_node, in_channels, periods, batch_size):
     """
-    Creating a mock stacked feature matrix and edge index.
+    Creating a mock stacked feature matrix in batches and edge index.
     """
     graph = nx.watts_strogatz_graph(number_of_nodes, edge_per_node, 0.5)
     edge_index = torch.LongTensor(np.array([edge for edge in graph.edges()]).T)
@@ -47,6 +48,7 @@ def create_mock_attention_batch_data(number_of_nodes, edge_per_node, in_channels
         np.random.uniform(-1, 1, (batch_size, number_of_nodes, in_channels, periods))
     )
     return X, edge_index
+
 
 def create_mock_states(number_of_nodes, out_channels):
     """
@@ -236,42 +238,40 @@ def test_a3tgcn_layer():
     assert H.shape == (number_of_nodes, out_channels)
 
 
-
-
 def test_a3tgcn2_layer():
     """
-    Testing the A3TGCN Layer.
+    Testing the A3TGCN2 Layer by adding a batch index.
     """
     number_of_nodes = 100
     edge_per_node = 10
     in_channels = 64
     out_channels = 16
     periods = 7
-
+    batch_size = 8
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    X, edge_index = create_mock_attention_data(
-        number_of_nodes, edge_per_node, in_channels, periods
+    X, edge_index = create_mock_attention_batch_data(
+        number_of_nodes, edge_per_node, in_channels, periods, batch_size
     )
     X = X.to(device)
     edge_index = edge_index.to(device)
     edge_weight = create_mock_edge_weight(edge_index).to(device)
 
-    layer = A3TGCN(
-        in_channels=in_channels, out_channels=out_channels, periods=periods
+    layer = A3TGCN2(
+        in_channels=in_channels, out_channels=out_channels, periods=periods, batch_size=batch_size
     ).to(device)
 
     H = layer(X, edge_index)
 
-    assert H.shape == (number_of_nodes, out_channels)
+    assert H.shape == (batch_size, number_of_nodes, out_channels)
 
     H = layer(X, edge_index, edge_weight)
 
-    assert H.shape == (number_of_nodes, out_channels)
+    assert H.shape == (batch_size, number_of_nodes, out_channels)
 
     H = layer(X, edge_index, edge_weight, H)
 
-    assert H.shape == (number_of_nodes, out_channels)
-
+    assert H.shape == (batch_size, number_of_nodes, out_channels)
+    
 
 def test_dcrnn_layer():
     """
