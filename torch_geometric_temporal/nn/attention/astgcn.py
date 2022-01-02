@@ -196,12 +196,11 @@ class ChebConvAttention(MessagePassing):
             self._normalization,
         )
 
-
 class SpatialAttention(nn.Module):
-    r"""An implementation of the Spatial Attention Module. For details see this paper:
+    r"""An implementation of the Spatial Attention Module (i.e compute spatial attention scores). For details see this paper:
     `"Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow
     Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
-
+    
     Args:
         in_channels (int): Number of input features.
         num_of_vertices (int): Number of vertices in the graph.
@@ -211,11 +210,12 @@ class SpatialAttention(nn.Module):
     def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
         super(SpatialAttention, self).__init__()
 
-        self._W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))
-        self._W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps))
-        self._W3 = nn.Parameter(torch.FloatTensor(in_channels))
-        self._bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices))
-        self._Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices))
+        self._W1 = nn.Parameter(torch.FloatTensor(num_of_timesteps))  #for example (12)
+        self._W2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_timesteps)) #for example (1, 12)
+        self._W3 = nn.Parameter(torch.FloatTensor(in_channels)) #for example (1)
+        self._bs = nn.Parameter(torch.FloatTensor(1, num_of_vertices, num_of_vertices)) #for example (1,307, 307)
+        self._Vs = nn.Parameter(torch.FloatTensor(num_of_vertices, num_of_vertices)) #for example (307, 307)
+
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -235,19 +235,35 @@ class SpatialAttention(nn.Module):
         Return types:
             * **S** (PyTorch FloatTensor) - Spatial attention score matrices, with shape (B, N_nodes, N_nodes).
         """
-
+        # lhs = left hand side embedding;
+        # to calculcate it : 
+        # multiply with W1 (B, N, F_in, T)(T) -> (B,N,F_in)
+        # multiply with W2 (B,N,F_in)(F_in,T)->(B,N,T)
+        # for example (32, 307, 1, 12) * (12) -> (32, 307, 1) * (1, 12) -> (32, 307, 12) 
         LHS = torch.matmul(torch.matmul(X, self._W1), self._W2)
+        
+        # rhs = right hand side embedding
+        # to calculcate it : 
+        # mutliple W3 with X (F)(B,N,F,T)->(B, N, T) 
+        # transpose  (B, N, T)  -> (B, T, N)
+        # for example (1)(32, 307, 1, 12) -> (32, 307, 12) -transpose-> (32, 12, 307)
         RHS = torch.matmul(self._W3, X).transpose(-1, -2)
+        
+        # Then, we multiply LHS with RHS : 
+        # (B,N,T)(B,T, N)->(B,N,N)
+        # for example (32, 307, 12) * (32, 12, 307) -> (32, 307, 307) 
+        # Then multiply Vs(N,N) with the output
+        # (N,N)(B, N, N)->(B,N,N) (32, 307, 307)
+        # for example (307, 307) *  (32, 307, 307) ->   (32, 307, 307)
         S = torch.matmul(self._Vs, torch.sigmoid(torch.matmul(LHS, RHS) + self._bs))
         S = F.softmax(S, dim=1)
-        return S
-
+        return S # (B,N,N) for example (32, 307, 307)
 
 class TemporalAttention(nn.Module):
-    r"""An implementation of the Temporal Attention Module. For details see this paper:
+    r"""An implementation of the Temporal Attention Module( i.e. compute temporal attention scores). For details see this paper:
     `"Attention Based Spatial-Temporal Graph Convolutional Networks for Traffic Flow
     Forecasting." <https://ojs.aaai.org/index.php/AAAI/article/view/3881>`_
-
+    
     Args:
         in_channels (int): Number of input features.
         num_of_vertices (int): Number of vertices in the graph.
@@ -257,13 +273,14 @@ class TemporalAttention(nn.Module):
     def __init__(self, in_channels: int, num_of_vertices: int, num_of_timesteps: int):
         super(TemporalAttention, self).__init__()
 
-        self._U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))
-        self._U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices))
-        self._U3 = nn.Parameter(torch.FloatTensor(in_channels))
+        self._U1 = nn.Parameter(torch.FloatTensor(num_of_vertices))  # for example 307
+        self._U2 = nn.Parameter(torch.FloatTensor(in_channels, num_of_vertices)) #for example (1, 307)
+        self._U3 = nn.Parameter(torch.FloatTensor(in_channels))  # for example (1)
         self._be = nn.Parameter(
             torch.FloatTensor(1, num_of_timesteps, num_of_timesteps)
-        )
-        self._Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))
+        ) # for example (1,12,12)
+        self._Ve = nn.Parameter(torch.FloatTensor(num_of_timesteps, num_of_timesteps))  #for example (12, 12)
+
         self._reset_parameters()
 
     def _reset_parameters(self):
@@ -283,12 +300,30 @@ class TemporalAttention(nn.Module):
         Return types:
             * **E** (PyTorch FloatTensor) - Temporal attention score matrices, with shape (B, T_in, T_in).
         """
-        LHS = torch.matmul(torch.matmul(X.permute(0, 3, 2, 1), self._U1), self._U2)
-        RHS = torch.matmul(self._U3, X)
+        # lhs = left hand side embedding;
+        # to calculcate it : 
+        # permute x:(B, N, F_in, T) -> (B, T, F_in, N)  
+        # multiply with U1 (B, T, F_in, N)(N) -> (B,T,F_in)
+        # multiply with U2 (B,T,F_in)(F_in,N)->(B,T,N)
+        # for example (32, 307, 1, 12) -premute-> (32, 12, 1, 307) * (307) -> (32, 12, 1) * (1, 307) -> (32, 12, 307) 
+        LHS = torch.matmul(torch.matmul(X.permute(0, 3, 2, 1), self._U1), self._U2) # (32, 12, 307) 
+        
+        
+        #rhs = right hand side embedding
+        # to calculcate it : 
+        # mutliple U3 with X (F)(B,N,F,T)->(B, N, T)
+        # for example (1)(32, 307, 1, 12) -> (32, 307, 12)
+        RHS = torch.matmul(self._U3, X) # (32, 307, 12)
+        
+        # Them we multiply LHS with RHS : 
+        # (B,T,N)(B,N,T)->(B,T,T)
+        # for example (32, 12, 307) * (32, 307, 12) -> (32, 12, 12) 
+        # Then multiply Ve(T,T) with the output
+        # (T,T)(B, T, T)->(B,T,T)
+        # for example (12, 12) *  (32, 12, 12) ->   (32, 12, 12)
         E = torch.matmul(self._Ve, torch.sigmoid(torch.matmul(LHS, RHS) + self._be))
-        E = F.softmax(E, dim=1)
+        E = F.softmax(E, dim=1) #  (B, T, T)  for example (32, 12, 12)
         return E
-
 
 class ASTGCNBlock(nn.Module):
     r"""An implementation of the Attention Based Spatial-Temporal Graph Convolutional Block.
