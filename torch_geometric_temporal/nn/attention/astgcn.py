@@ -45,7 +45,6 @@ class ChebConvAttention(MessagePassing):
         **kwargs (optional): Additional arguments of
             :class:`torch_geometric.nn.conv.MessagePassing`.
     """
-    
 
     def __init__(
         self,
@@ -65,7 +64,7 @@ class ChebConvAttention(MessagePassing):
         self._in_channels = in_channels
         self._out_channels = out_channels
         self._normalization = normalization
-        self._weight = Parameter(torch.Tensor(K, in_channels, out_channels)) # in the paper(self.Theta) for example  [3, 1, 64]
+        self._weight = Parameter(torch.Tensor(K, in_channels, out_channels)) 
 
         if bias:
             self._bias = Parameter(torch.Tensor(out_channels))
@@ -198,8 +197,6 @@ class ChebConvAttention(MessagePassing):
             self._weight.size(0),
             self._normalization,
         )
-    
-        return out 
 
 class SpatialAttention(nn.Module):
     r"""An implementation of the Spatial Attention Module (i.e compute spatial attention scores). For details see this paper:
