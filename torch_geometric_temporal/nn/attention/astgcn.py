@@ -610,4 +610,4 @@ class ASTGCN(nn.Module):
         # (b,c_out*T,N)->(b,N,T)
         X = X[:, :, :, -1] # (b,c_out*T,N) for example (32, 12, 307)
         X = X.permute(0, 2, 1) # (b,T,N)-> (b,N,T)
-        return X (b,N,T) #for exmaple (32, 307,12)
+        return X #(b,N,T) for exmaple (32, 307,12)
