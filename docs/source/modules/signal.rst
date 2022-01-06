@@ -19,6 +19,13 @@ Temporal Signal Iterators
     :members:
     :undoc-members:
 
+Heterogeneous Temporal Signal Iterators
+-------------------------
+
+.. automodule:: torch_geometric_temporal.signal.static_hetero_graph_temporal_signal
+    :members:
+    :undoc-members:
+
 Temporal Signal Batch Iterators
 -------------------------------
     
