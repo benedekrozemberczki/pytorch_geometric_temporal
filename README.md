@@ -176,7 +176,7 @@ pip install torch-geometric
 pip install torch-geometric-temporal
 ```
 
-where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu111` depending on your PyTorch installation.
+where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu113` depending on your PyTorch installation.
 
 |             | `cpu` | `cu102` | `cu111` |
 |-------------|-------|---------|---------|
