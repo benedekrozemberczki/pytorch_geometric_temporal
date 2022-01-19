@@ -5,8 +5,6 @@ install_requires = [
     "torch",
     "torch_sparse",
     "torch_scatter",
-    "torch_cluster",
-    "torch_spline_conv",
     "torch_geometric",
     "numpy",
     "scipy",
