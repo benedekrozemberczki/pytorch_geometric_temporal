@@ -9,6 +9,8 @@ from torch_geometric_temporal.signal import StaticGraphTemporalSignalBatch
 from torch_geometric_temporal.signal import DynamicGraphTemporalSignalBatch
 from torch_geometric_temporal.signal import DynamicGraphStaticSignalBatch
 
+from torch_geometric_temporal.signal import StaticHeteroGraphTemporalSignalBatch
+
 
 def get_edge_array(node_count, node_start):
     edges = []
@@ -83,6 +85,17 @@ def test_static_graph_temporal_signal_batch():
         assert snapshot.batch is None
 
 
+def test_static_hetero_graph_temporal_signal_batch():
+    dataset = StaticHeteroGraphTemporalSignalBatch(
+        None, None, [None, None], [None, None], None
+    )
+    for snapshot in dataset:
+        assert len(snapshot.node_types) == 0
+        assert len(snapshot.node_stores) == 0
+        assert len(snapshot.edge_types) == 0
+        assert len(snapshot.edge_stores) == 0
+
+
 def test_dynamic_graph_temporal_signal_batch():
     dataset = DynamicGraphTemporalSignalBatch(
         [None, None], [None, None], [None, None], [None, None], [None, None]
@@ -105,6 +118,18 @@ def test_static_graph_temporal_signal_typing_batch():
         assert snapshot.x.shape == (1,)
         assert snapshot.y.shape == (1,)
         assert snapshot.batch is None
+
+
+def test_static_hetero_graph_temporal_signal_typing_batch():
+    dataset = StaticHeteroGraphTemporalSignalBatch(
+        None, None, [{'author': np.array([1])}], [{'author': np.array([2])}], None
+    )
+    for snapshot in dataset:
+        assert snapshot.node_types[0] == 'author'
+        assert snapshot.node_stores[0]['x'].shape == (1,)
+        assert snapshot.node_stores[0]['y'].shape == (1,)
+        assert 'batch' not in list(dict(snapshot.node_stores[0]).keys())
+        assert len(snapshot.edge_types) == 0
 
 
 def test_dynamic_graph_static_signal_typing_batch():
@@ -133,6 +158,16 @@ def test_static_graph_temporal_signal_batch_additional_attrs():
     for snapshot in dataset:
         assert snapshot.optional1.shape == (1,)
         assert snapshot.optional2.shape == (1,)
+
+
+def test_static_hetero_graph_temporal_signal_batch_additional_attrs():
+    dataset = StaticHeteroGraphTemporalSignalBatch(None, None, [None], [None], None,
+                                                   optional1=[{'author': np.array([1])}],
+                                                   optional2=[{'author': np.array([2])}])
+    assert dataset.additional_feature_keys == ["optional1", "optional2"]
+    for snapshot in dataset:
+        assert snapshot.node_stores[0]['optional1'].shape == (1,)
+        assert snapshot.node_stores[0]['optional2'].shape == (1,)
 
 
 def test_dynamic_graph_static_signal_batch_additional_attrs():
