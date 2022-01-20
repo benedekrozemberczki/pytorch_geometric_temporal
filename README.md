@@ -165,91 +165,24 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 
 Binaries are provided for Python version <= 3.9.
 
-**PyTorch 1.9.0**
+**PyTorch 1.10.0**
 
-To install the binaries for PyTorch 1.9.0, simply run
+To install the binaries for PyTorch 1.10.0, simply run
 
 ```sh
-pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
-pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
-pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
-pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.9.0+${CUDA}.html
+pip install torch-scatter -f https://data.pyg.org/whl/torch-1.10.0+${CUDA}.html
+pip install torch-sparse -f https://data.pyg.org/whl/torch-1.10.0+${CUDA}.html
 pip install torch-geometric
 pip install torch-geometric-temporal
 ```
 
-where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu111` depending on your PyTorch installation.
+where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu113` depending on your PyTorch installation.
 
-|             | `cpu` | `cu102` | `cu111` |
+|             | `cpu` | `cu102` | `cu113` |
 |-------------|-------|---------|---------|
 | **Linux**   | ✅    | ✅      | ✅      |
 | **Windows** | ✅    | ✅      | ✅      |
 | **macOS**   | ✅    |         |         |
-
-**PyTorch 1.8.0**
-
-To install the binaries for PyTorch 1.8.0, simply run
-
-```sh
-$ pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-1.8.0+${CUDA}.html
-$ pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.8.0+${CUDA}.html
-$ pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.8.0+${CUDA}.html
-$ pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.8.0+${CUDA}.html
-$ pip install torch-geometric
-$ pip install torch-geometric-temporal
-```
-
-where `${CUDA}` should be replaced by either `cpu`, `cu101`, `cu102`, or `cu111` depending on your PyTorch installation.
-
-|             | `cpu` | `cu101` | `cu102` | `cu111` |
-|-------------|-------|---------|---------|---------|
-| **Linux**   | ✅    | ✅      | ✅      | ✅      |
-| **Windows** | ✅    | ✅      | ✅      | ✅      |
-| **macOS**   | ✅    |         |         |         |
-
-**PyTorch 1.7.0**
-
-To install the binaries for PyTorch 1.7.0, simply run
-
-```sh
-$ pip install torch-scatter==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.7.0.html
-$ pip install torch-sparse==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.7.0.html
-$ pip install torch-cluster==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.7.0.html
-$ pip install torch-spline-conv==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.7.0.html
-$ pip install torch-geometric
-$ pip install torch-geometric-temporal
-```
-
-where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101`, `cu102` or `cu110` depending on your PyTorch installation.
-
-|             | `cpu` | `cu92` | `cu101` | `cu102` | `cu110` |
-|-------------|-------|--------|---------|---------|---------|
-| **Linux**   | ✅    | ✅     | ✅     | ✅      | ✅     |
-| **Windows** | ✅    | ❌     | ✅     | ✅      | ✅     |
-| **macOS**   | ✅    |        |         |         |         |
-
---------------------------------------------------------------------------------
-
-**PyTorch 1.6.0**
-
-To install the binaries for PyTorch 1.6.0, simply run
-
-```sh
-$ pip install torch-scatter==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
-$ pip install torch-sparse==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
-$ pip install torch-cluster==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
-$ pip install torch-spline-conv==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.6.0.html
-$ pip install torch-geometric
-$ pip install torch-geometric-temporal
-```
-
-where `${CUDA}` should be replaced by either `cpu`, `cu92`, `cu101` or `cu102` depending on your PyTorch installation.
-
-|             | `cpu` | `cu92` | `cu101` | `cu102` |
-|-------------|-------|--------|---------|---------|
-| **Linux**   | ✅    | ✅    | ✅     | ✅      |
-| **Windows** | ✅    | ❌    | ✅     | ✅      |
-| **macOS**   | ✅    |        |         |         |
 
 --------------------------------------------------------------------------------
 
