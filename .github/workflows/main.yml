@@ -32,12 +32,9 @@ jobs:
         run: |
          conda install -y scipy
          pip install codecov
-         pip install torch==1.7.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-         pip install torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
-         pip install torch-scatter==2.0.7 -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
-         pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
-         pip install torch-cluster -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
-         pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
+         pip install torch==1.10.1+cpu torchvision==0.11.2+cpu torchaudio==0.10.1+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+         pip install torch-scatter -f https://data.pyg.org/whl/torch-1.10.0+cpu.html
+         pip install torch-sparse -f https://data.pyg.org/whl/torch-1.10.0+cpu.html
          pip install torch-geometric
          pip install codecov
          pip install sphinx sphinx_rtd_theme
