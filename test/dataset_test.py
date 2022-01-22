@@ -653,7 +653,7 @@ def test_train_test_split_dynamic_graph_static_signal():
             assert getattr(snapshot, "optional2").shape == (100, 32)
 
 
-def test_discrete_train_test_split_dynamic():
+def test_discrete_train_test_split_dynamic_graph_static_signal():
 
     snapshot_count = 250
     n_count = 100
