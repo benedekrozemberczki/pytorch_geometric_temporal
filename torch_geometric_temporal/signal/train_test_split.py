@@ -40,6 +40,7 @@ def temporal_signal_split(
             data_iterator.edge_weight,
             data_iterator.features[0:train_snapshots],
             data_iterator.targets[0:train_snapshots],
+            **{key: getattr(data_iterator, key)[0:train_snapshots] for key in data_iterator.additional_feature_keys}
         )
 
         test_iterator = StaticGraphTemporalSignal(
@@ -47,6 +48,7 @@ def temporal_signal_split(
             data_iterator.edge_weight,
             data_iterator.features[train_snapshots:],
             data_iterator.targets[train_snapshots:],
+            **{key: getattr(data_iterator, key)[train_snapshots:] for key in data_iterator.additional_feature_keys}
         )
 
     elif type(data_iterator) == DynamicGraphTemporalSignal:
@@ -55,6 +57,7 @@ def temporal_signal_split(
             data_iterator.edge_weights[0:train_snapshots],
             data_iterator.features[0:train_snapshots],
             data_iterator.targets[0:train_snapshots],
+            **{key: getattr(data_iterator, key)[0:train_snapshots] for key in data_iterator.additional_feature_keys}
         )
 
         test_iterator = DynamicGraphTemporalSignal(
@@ -62,6 +65,7 @@ def temporal_signal_split(
             data_iterator.edge_weights[train_snapshots:],
             data_iterator.features[train_snapshots:],
             data_iterator.targets[train_snapshots:],
+            **{key: getattr(data_iterator, key)[train_snapshots:] for key in data_iterator.additional_feature_keys}
         )
 
     elif type(data_iterator) == DynamicGraphStaticSignal:
@@ -70,6 +74,7 @@ def temporal_signal_split(
             data_iterator.edge_weights[0:train_snapshots],
             data_iterator.feature,
             data_iterator.targets[0:train_snapshots],
+            **{key: getattr(data_iterator, key)[0:train_snapshots] for key in data_iterator.additional_feature_keys}
         )
 
         test_iterator = DynamicGraphStaticSignal(
@@ -77,6 +82,7 @@ def temporal_signal_split(
             data_iterator.edge_weights[train_snapshots:],
             data_iterator.feature,
             data_iterator.targets[train_snapshots:],
+            **{key: getattr(data_iterator, key)[train_snapshots:] for key in data_iterator.additional_feature_keys}
         )
 
     if type(data_iterator) == StaticGraphTemporalSignalBatch:
@@ -86,6 +92,7 @@ def temporal_signal_split(
             data_iterator.features[0:train_snapshots],
             data_iterator.targets[0:train_snapshots],
             data_iterator.batches,
+            **{key: getattr(data_iterator, key)[0:train_snapshots] for key in data_iterator.additional_feature_keys}
         )
 
         test_iterator = StaticGraphTemporalSignalBatch(
@@ -94,6 +101,7 @@ def temporal_signal_split(
             data_iterator.features[train_snapshots:],
             data_iterator.targets[train_snapshots:],
             data_iterator.batches,
+            **{key: getattr(data_iterator, key)[train_snapshots:] for key in data_iterator.additional_feature_keys}
         )
 
     elif type(data_iterator) == DynamicGraphTemporalSignalBatch:
@@ -103,6 +111,7 @@ def temporal_signal_split(
             data_iterator.features[0:train_snapshots],
             data_iterator.targets[0:train_snapshots],
             data_iterator.batches[0:train_snapshots],
+            **{key: getattr(data_iterator, key)[0:train_snapshots] for key in data_iterator.additional_feature_keys}
         )
 
         test_iterator = DynamicGraphTemporalSignalBatch(
@@ -111,6 +120,7 @@ def temporal_signal_split(
             data_iterator.features[train_snapshots:],
             data_iterator.targets[train_snapshots:],
             data_iterator.batches[train_snapshots:],
+            **{key: getattr(data_iterator, key)[train_snapshots:] for key in data_iterator.additional_feature_keys}
         )
 
     elif type(data_iterator) == DynamicGraphStaticSignalBatch:
@@ -120,6 +130,7 @@ def temporal_signal_split(
             data_iterator.feature,
             data_iterator.targets[0:train_snapshots],
             data_iterator.batches[0:train_snapshots:],
+            **{key: getattr(data_iterator, key)[0:train_snapshots] for key in data_iterator.additional_feature_keys}
         )
 
         test_iterator = DynamicGraphStaticSignalBatch(
@@ -128,5 +139,6 @@ def temporal_signal_split(
             data_iterator.feature,
             data_iterator.targets[train_snapshots:],
             data_iterator.batches[train_snapshots:],
+            **{key: getattr(data_iterator, key)[train_snapshots:] for key in data_iterator.additional_feature_keys}            
         )
     return train_iterator, test_iterator
