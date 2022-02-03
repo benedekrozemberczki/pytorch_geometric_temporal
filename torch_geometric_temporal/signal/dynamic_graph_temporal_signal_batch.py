@@ -119,7 +119,7 @@ class DynamicGraphTemporalSignalBatch(object):
         }
         return additional_features
 
-    def __get_item__(self, time_index: int):
+    def __getitem__(self, time_index: int):
         x = self._get_feature(time_index)
         edge_index = self._get_edge_index(time_index)
         edge_weight = self._get_edge_weight(time_index)
@@ -133,7 +133,7 @@ class DynamicGraphTemporalSignalBatch(object):
 
     def __next__(self):
         if self.t < len(self.features):
-            snapshot = self.__get_item__(self.t)
+            snapshot = self[self.t]
             self.t = self.t + 1
             return snapshot
         else:

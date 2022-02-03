@@ -105,7 +105,7 @@ class DynamicGraphStaticSignal(object):
     def __len__(self):
         return len(self.targets)
 
-    def __get_item__(self, time_index: int):
+    def __getitem__(self, time_index: int):
         x = self._get_feature()
         edge_index = self._get_edge_index(time_index)
         edge_weight = self._get_edge_weight(time_index)
@@ -118,7 +118,7 @@ class DynamicGraphStaticSignal(object):
 
     def __next__(self):
         if self.t < len(self.targets):
-            snapshot = self.__get_item__(self.t)
+            snapshot = self[self.t]
             self.t = self.t + 1
             return snapshot
         else:
