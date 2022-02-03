@@ -56,6 +56,10 @@ Heterogeneous Temporal Signal Batch Iterators
     :members:
     :undoc-members:
 
+.. automodule:: torch_geometric_temporal.signal.dynamic_hetero_graph_temporal_signal_batch
+    :members:
+    :undoc-members:
+
 .. automodule:: torch_geometric_temporal.signal.dynamic_hetero_graph_static_signal_batch
     :members:
     :undoc-members:

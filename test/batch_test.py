@@ -10,6 +10,7 @@ from torch_geometric_temporal.signal import DynamicGraphTemporalSignalBatch
 from torch_geometric_temporal.signal import DynamicGraphStaticSignalBatch
 
 from torch_geometric_temporal.signal import StaticHeteroGraphTemporalSignalBatch
+from torch_geometric_temporal.signal import DynamicHeteroGraphTemporalSignalBatch
 from torch_geometric_temporal.signal import DynamicHeteroGraphStaticSignalBatch
 
 
@@ -108,6 +109,17 @@ def test_dynamic_hetero_graph_static_signal_batch():
         assert len(snapshot.edge_stores) == 0
 
 
+def test_dynamic_hetero_graph_temporal_signal_batch():
+    dataset = DynamicHeteroGraphTemporalSignalBatch(
+        [None, None], [None, None], [None, None], [None, None], [None, None]
+    )
+    for snapshot in dataset:
+        assert len(snapshot.node_types) == 0
+        assert len(snapshot.node_stores) == 0
+        assert len(snapshot.edge_types) == 0
+        assert len(snapshot.edge_stores) == 0
+
+
 def test_dynamic_graph_temporal_signal_batch():
     dataset = DynamicGraphTemporalSignalBatch(
         [None, None], [None, None], [None, None], [None, None], [None, None]
@@ -147,6 +159,18 @@ def test_static_hetero_graph_temporal_signal_typing_batch():
 def test_dynamic_hetero_graph_static_signal_typing_batch():
     dataset = DynamicHeteroGraphStaticSignalBatch(
         [None], [None], {'author': np.array([1])}, [{'author': np.array([2])}], [None]
+    )
+    for snapshot in dataset:
+        assert snapshot.node_types[0] == 'author'
+        assert snapshot.node_stores[0]['x'].shape == (1,)
+        assert snapshot.node_stores[0]['y'].shape == (1,)
+        assert 'batch' not in list(dict(snapshot.node_stores[0]).keys())
+        assert len(snapshot.edge_types) == 0
+
+
+def test_dynamic_hetero_graph_temporal_signal_typing_batch():
+    dataset = DynamicHeteroGraphTemporalSignalBatch(
+        [None], [None], [{'author': np.array([1])}], [{'author': np.array([2])}], [None]
     )
     for snapshot in dataset:
         assert snapshot.node_types[0] == 'author'
@@ -208,6 +232,18 @@ def test_dynamic_hetero_graph_static_signal_batch_additional_attrs():
         assert "optional3" not in list(dict(snapshot.node_stores[0]).keys())
 
 
+def test_dynamic_hetero_graph_temporal_signal_batch_additional_attrs():
+    dataset = DynamicHeteroGraphTemporalSignalBatch([None], [None], [None], [None], [None],
+                                                    optional1=[{'author': np.array([1])}],
+                                                    optional2=[{'author': np.array([2])}],
+                                                    optional3=[None])
+    assert dataset.additional_feature_keys == ["optional1", "optional2", "optional3"]
+    for snapshot in dataset:
+        assert snapshot.node_stores[0]['optional1'].shape == (1,)
+        assert snapshot.node_stores[0]['optional2'].shape == (1,)
+        assert "optional3" not in list(dict(snapshot.node_stores[0]).keys())
+
+
 def test_dynamic_graph_static_signal_batch_additional_attrs():
     dataset = DynamicGraphStaticSignalBatch([None], [None], None, [None], [None],
                                              optional1=[np.array([1])], optional2=[np.array([2])])
@@ -245,6 +281,19 @@ def test_dynamic_hetero_graph_static_signal_batch_edges():
         assert snapshot.edge_stores[0]['edge_index'].shape[0] == snapshot.edge_stores[0]['edge_attr'].shape[0]
 
 
+def test_dynamic_hetero_graph_temporal_signal_batch_edges():
+    dataset = DynamicHeteroGraphTemporalSignalBatch([{("author", "writes", "paper"): np.array([[0, 1], [1, 0]])}],
+                                                    [{("author", "writes", "paper"): np.array([[0.1], [0.1]])}],
+                                                    [{"author": np.array([[0], [0]]),
+                                                      "paper": np.array([[0], [0], [0]])}],
+                                                    [None],
+                                                    [None])
+    for snapshot in dataset:
+        assert snapshot.edge_stores[0]['edge_index'].shape == (2, 2)
+        assert snapshot.edge_stores[0]['edge_attr'].shape == (2, 1)
+        assert snapshot.edge_stores[0]['edge_index'].shape[0] == snapshot.edge_stores[0]['edge_attr'].shape[0]
+
+
 def test_static_hetero_graph_temporal_signal_batch_assigned():
     dataset = StaticHeteroGraphTemporalSignalBatch(
         None, None, [{'author': np.array([1])}], [{'author': np.array([2])}], {'author': np.array([1])}
@@ -260,6 +309,18 @@ def test_static_hetero_graph_temporal_signal_batch_assigned():
 def test_dynamic_hetero_graph_static_signal_batch_assigned():
     dataset = DynamicHeteroGraphStaticSignalBatch(
         [None], [None], {'author': np.array([1])}, [{'author': np.array([2])}], [{'author': np.array([1])}]
+    )
+    for snapshot in dataset:
+        assert snapshot.node_types[0] == 'author'
+        assert snapshot.node_stores[0]['x'].shape == (1,)
+        assert snapshot.node_stores[0]['y'].shape == (1,)
+        assert snapshot.node_stores[0]['batch'].shape == (1,)
+        assert len(snapshot.edge_types) == 0
+
+
+def test_dynamic_hetero_graph_temporal_signal_batch_assigned():
+    dataset = DynamicHeteroGraphTemporalSignalBatch(
+        [None], [None], [{'author': np.array([1])}], [{'author': np.array([2])}], [{'author': np.array([1])}]
     )
     for snapshot in dataset:
         assert snapshot.node_types[0] == 'author'
