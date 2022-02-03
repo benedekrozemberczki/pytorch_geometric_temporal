@@ -162,7 +162,7 @@ class StaticHeteroGraphTemporalSignal(object):
         }
         return additional_features
 
-    def __get_item__(self, time_index: int):
+    def __getitem__(self, time_index: int):
         x_dict = self._get_features(time_index)
         edge_index_dict = self._get_edge_index()
         edge_weight_dict = self._get_edge_weight()
@@ -191,7 +191,7 @@ class StaticHeteroGraphTemporalSignal(object):
 
     def __next__(self):
         if self.t < len(self.feature_dicts):
-            snapshot = self.__get_item__(self.t)
+            snapshot = self[self.t]
             self.t = self.t + 1
             return snapshot
         else:
