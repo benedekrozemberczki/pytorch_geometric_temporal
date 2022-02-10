@@ -10,7 +10,7 @@ class TGCN(torch.nn.Module):
     Args:
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
-        improved (bool): Stronger self loops. Default is True.
+        improved (bool): Stronger self loops. Default is False.
         cached (bool): Caching the message weights. Default is False.
         add_self_loops (bool): Adding self-loops for smoothing. Default is True.
     """
@@ -139,7 +139,7 @@ class TGCN2(torch.nn.Module):
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
         batch_size (int): Size of the batch.
-        improved (bool): Stronger self loops. Default is True.
+        improved (bool): Stronger self loops. Default is False.
         cached (bool): Caching the message weights. Default is False.
         add_self_loops (bool): Adding self-loops for smoothing. Default is True.
     """
