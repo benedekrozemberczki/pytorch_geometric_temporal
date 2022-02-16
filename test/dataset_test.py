@@ -51,6 +51,26 @@ def generate_signal(snapshot_count, n_count, feature_count, additional_features_
     return edge_indices, edge_weights, features
 
 
+def generate_heterogeneous_signal(snapshot_count, n_count, feature_count, *additional_features_keys):
+    edge_index_dicts = [{('author', 'writes', 'paper'): get_edge_array(n_count)} for _ in range(snapshot_count)]
+    edge_weight_dicts = [{('author', 'writes', 'paper'): np.ones(edge_index_dicts[t][('author', 'writes', 'paper')].shape[1])}
+                         for t in range(snapshot_count)]
+    feature_dicts = [{'author': np.random.uniform(0, 1, (n_count, feature_count)),
+                      'paper': np.random.uniform(0, 1, (n_count, feature_count))} for _ in range(snapshot_count)]
+
+    target_dicts = [{'author': np.random.uniform(0, 10, (n_count,)),
+                     'paper': np.random.uniform(0, 10, (n_count,))} for _ in range(snapshot_count)]
+
+    if additional_features_keys:
+        additional_features = {
+            key: [{'author': np.random.uniform(0, 1, (n_count, feature_count)),
+                   'paper': np.random.uniform(0, 1, (n_count, feature_count))} for _ in range(snapshot_count)]
+            for key in additional_features_keys}
+        return edge_index_dicts, edge_weight_dicts, feature_dicts, target_dicts, additional_features
+
+    return edge_index_dicts, edge_weight_dicts, feature_dicts, target_dicts
+
+
 def test_dynamic_graph_temporal_signal_real():
 
     snapshot_count = 250
@@ -824,3 +844,150 @@ def test_discrete_train_test_split_dynamic_graph_static_signal():
             assert snapshot.y.shape == (100,)
             assert getattr(snapshot, "optional1").shape == (100, 32)
             assert getattr(snapshot, "optional2").shape == (100, 32)
+
+
+def test_train_test_split_dynamic_hetero_graph_temporal_signal():
+
+    snapshot_count = 250
+    n_count = 100
+    feature_count = 32
+
+    edge_index_dicts, edge_weight_dicts, feature_dicts, target_dicts, additional_feature_dicts = generate_heterogeneous_signal(
+        snapshot_count, n_count, feature_count, "optional1", "optional2"
+    )
+
+    dataset = DynamicHeteroGraphTemporalSignal(
+        edge_index_dicts, edge_weight_dicts, feature_dicts, target_dicts, **additional_feature_dicts
+    )
+
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
+
+    for epoch in range(2):
+        for snapshot in test_dataset:
+            assert len(snapshot.node_types) == 2
+            assert snapshot.node_types[0] == 'author'
+            assert snapshot.node_types[1] == 'paper'
+            assert snapshot.node_stores[0]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[0]['y'].shape == (n_count,)
+            assert snapshot.node_stores[1]['y'].shape == (n_count,)
+            assert len(snapshot.edge_types) == 1
+            assert snapshot.edge_types[0] == ('author', 'writes', 'paper')
+            assert snapshot.edge_stores[0].edge_index.shape[0] == 2
+            assert snapshot.edge_stores[0].edge_index.shape[1] == snapshot.edge_stores[0].edge_attr.shape[0]
+            assert snapshot.node_stores[1]['optional1'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['optional2'].shape == (n_count, feature_count)
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert len(snapshot.node_types) == 2
+            assert snapshot.node_types[0] == 'author'
+            assert snapshot.node_types[1] == 'paper'
+            assert snapshot.node_stores[0]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[0]['y'].shape == (n_count,)
+            assert snapshot.node_stores[1]['y'].shape == (n_count,)
+            assert len(snapshot.edge_types) == 1
+            assert snapshot.edge_types[0] == ('author', 'writes', 'paper')
+            assert snapshot.edge_stores[0].edge_index.shape[0] == 2
+            assert snapshot.edge_stores[0].edge_index.shape[1] == snapshot.edge_stores[0].edge_attr.shape[0]
+            assert snapshot.node_stores[1]['optional1'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['optional2'].shape == (n_count, feature_count)
+
+
+def test_train_test_split_static_hetero_graph_temporal_signal():
+
+    snapshot_count = 250
+    n_count = 100
+    feature_count = 32
+
+    edge_index_dicts, edge_weight_dicts, feature_dicts, target_dicts, additional_feature_dicts = generate_heterogeneous_signal(
+        snapshot_count, n_count, feature_count, "optional1", "optional2"
+    )
+
+    dataset = StaticHeteroGraphTemporalSignal(
+        edge_index_dicts[0], edge_weight_dicts[0], feature_dicts, target_dicts, **additional_feature_dicts
+    )
+
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
+
+    for epoch in range(2):
+        for snapshot in test_dataset:
+            assert len(snapshot.node_types) == 2
+            assert snapshot.node_types[0] == 'author'
+            assert snapshot.node_types[1] == 'paper'
+            assert snapshot.node_stores[0]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[0]['y'].shape == (n_count,)
+            assert snapshot.node_stores[1]['y'].shape == (n_count,)
+            assert len(snapshot.edge_types) == 1
+            assert snapshot.edge_types[0] == ('author', 'writes', 'paper')
+            assert snapshot.edge_stores[0].edge_index.shape[0] == 2
+            assert snapshot.edge_stores[0].edge_index.shape[1] == snapshot.edge_stores[0].edge_attr.shape[0]
+            assert snapshot.node_stores[1]['optional1'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['optional2'].shape == (n_count, feature_count)
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert len(snapshot.node_types) == 2
+            assert snapshot.node_types[0] == 'author'
+            assert snapshot.node_types[1] == 'paper'
+            assert snapshot.node_stores[0]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[0]['y'].shape == (n_count,)
+            assert snapshot.node_stores[1]['y'].shape == (n_count,)
+            assert len(snapshot.edge_types) == 1
+            assert snapshot.edge_types[0] == ('author', 'writes', 'paper')
+            assert snapshot.edge_stores[0].edge_index.shape[0] == 2
+            assert snapshot.edge_stores[0].edge_index.shape[1] == snapshot.edge_stores[0].edge_attr.shape[0]
+            assert snapshot.node_stores[1]['optional1'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['optional2'].shape == (n_count, feature_count)
+
+
+def test_train_test_split_dynamic_hetero_graph_static_signal():
+
+    snapshot_count = 250
+    n_count = 100
+    feature_count = 32
+
+    edge_index_dicts, edge_weight_dicts, feature_dicts, target_dicts, additional_feature_dicts = generate_heterogeneous_signal(
+        snapshot_count, n_count, feature_count, "optional1", "optional2"
+    )
+
+    dataset = DynamicHeteroGraphStaticSignal(
+        edge_index_dicts, edge_weight_dicts, feature_dicts[0], target_dicts,  **additional_feature_dicts
+    )
+
+    train_dataset, test_dataset = temporal_signal_split(dataset, 0.8)
+
+    for epoch in range(2):
+        for snapshot in test_dataset:
+            assert len(snapshot.node_types) == 2
+            assert snapshot.node_types[0] == 'author'
+            assert snapshot.node_types[1] == 'paper'
+            assert snapshot.node_stores[0]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[0]['y'].shape == (n_count,)
+            assert snapshot.node_stores[1]['y'].shape == (n_count,)
+            assert len(snapshot.edge_types) == 1
+            assert snapshot.edge_types[0] == ('author', 'writes', 'paper')
+            assert snapshot.edge_stores[0].edge_index.shape[0] == 2
+            assert snapshot.edge_stores[0].edge_index.shape[1] == snapshot.edge_stores[0].edge_attr.shape[0]
+            assert snapshot.node_stores[1]['optional1'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['optional2'].shape == (n_count, feature_count)
+
+    for epoch in range(2):
+        for snapshot in train_dataset:
+            assert len(snapshot.node_types) == 2
+            assert snapshot.node_types[0] == 'author'
+            assert snapshot.node_types[1] == 'paper'
+            assert snapshot.node_stores[0]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['x'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[0]['y'].shape == (n_count,)
+            assert snapshot.node_stores[1]['y'].shape == (n_count,)
+            assert len(snapshot.edge_types) == 1
+            assert snapshot.edge_types[0] == ('author', 'writes', 'paper')
+            assert snapshot.edge_stores[0].edge_index.shape[0] == 2
+            assert snapshot.edge_stores[0].edge_index.shape[1] == snapshot.edge_stores[0].edge_attr.shape[0]
+            assert snapshot.node_stores[1]['optional1'].shape == (n_count, feature_count)
+            assert snapshot.node_stores[1]['optional2'].shape == (n_count, feature_count)
