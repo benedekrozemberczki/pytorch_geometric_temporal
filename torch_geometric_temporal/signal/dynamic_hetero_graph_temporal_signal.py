@@ -21,15 +21,15 @@ class DynamicHeteroGraphTemporalSignal(object):
 
     Args:
         edge_index_dicts (List of dictionaries where keys=Tuples and values=Numpy arrays):
-        List of relation type tuples and their edge index tensors.
+         List of relation type tuples and their edge index tensors.
         edge_weight_dicts (List of dictionaries where keys=Tuples and values=Numpy arrays):
-        List of relation type tuples and their edge weight tensors.
+         List of relation type tuples and their edge weight tensors.
         feature_dicts (List of dictionaries where keys=Strings and values=Numpy arrays): List of node
-        types and their feature tensors.
+         types and their feature tensors.
         target_dicts (List of dictionaries where keys=Strings and values=Numpy arrays): List of node
-        types and their label (target) tensors.
+         types and their label (target) tensors.
         **kwargs (optional List of dictionaries where keys=Strings and values=Numpy arrays): List
-        of node types and their additional attributes.
+         of node types and their additional attributes.
     """
 
     def __init__(
