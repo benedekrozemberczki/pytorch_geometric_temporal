@@ -124,3 +124,12 @@ Auxiliary Graph Convolutional Layers
     :members:
     :undoc-members:
     :exclude-members: bn_init, conv_init, conv_branch_init, GraphAAGCN, AAGCN
+
+
+Heterogeneous Graph Convolutional Layers
+--------------
+
+.. automodule:: torch_geometric_temporal.nn.hetero.heterogclstm
+    :members:
+    :undoc-members:
+    :exclude-members: HeteroGCLSTM
