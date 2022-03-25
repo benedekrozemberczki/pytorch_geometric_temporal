@@ -12,6 +12,7 @@ install_requires = [
     "scipy",
     "tqdm",
     "six",
+    "networkx",
 ]
 
 setup_requires = ["pytest-runner"]
