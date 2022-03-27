@@ -12,11 +12,12 @@ install_requires = [
     "scipy",
     "tqdm",
     "six",
+    "networkx",
 ]
 
 setup_requires = ["pytest-runner"]
 
-tests_require = ["pytest", "pytest-cov", "mock", "unittest"]
+tests_require = ["pytest", "pytest-cov", "mock", "unittest", "networkx"]
 
 
 
