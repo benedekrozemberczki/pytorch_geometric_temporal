@@ -126,7 +126,7 @@ class HeteroGCLSTM(torch.nn.Module):
         t_dict = {node_type: T + self.conv_c(h_dict, edge_index_dict)[node_type] for node_type, T in t_dict.items()}
         t_dict = {node_type: T + self.b_c[node_type] for node_type, T in t_dict.items()}
         t_dict = {node_type: torch.tanh(T) for node_type, T in t_dict.items()}
-        c_dict = {node_type: f_dict[node_type] * C * i_dict[node_type] * t_dict[node_type] for node_type, C in c_dict.items()}
+        c_dict = {node_type: f_dict[node_type] * C + i_dict[node_type] * t_dict[node_type] for node_type, C in c_dict.items()}
         return c_dict
 
     def _calculate_output_gate(self, x_dict, edge_index_dict, h_dict, c_dict):

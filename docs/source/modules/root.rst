@@ -132,4 +132,3 @@ Heterogeneous Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.hetero.heterogclstm
     :members:
     :undoc-members:
-    :exclude-members: HeteroGCLSTM
