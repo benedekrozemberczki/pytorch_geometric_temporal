@@ -133,31 +133,31 @@ class GCLSTM(torch.nn.Module):
             C = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return C
 
-    def _calculate_input_gate(self, X, edge_index, edge_weight, H, C):
+    def _calculate_input_gate(self, X, edge_index, edge_weight, H, C, lambda_max):
         I = torch.matmul(X, self.W_i)
-        I = I + self.conv_i(H, edge_index, edge_weight)
+        I = I + self.conv_i(H, edge_index, edge_weight, lambda_max=lambda_max)
         I = I + self.b_i
         I = torch.sigmoid(I)
         return I
 
-    def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C):
+    def _calculate_forget_gate(self, X, edge_index, edge_weight, H, C, lambda_max):
         F = torch.matmul(X, self.W_f)
-        F = F + self.conv_f(H, edge_index, edge_weight)
+        F = F + self.conv_f(H, edge_index, edge_weight, lambda_max=lambda_max)
         F = F + self.b_f
         F = torch.sigmoid(F)
         return F
 
-    def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F):
+    def _calculate_cell_state(self, X, edge_index, edge_weight, H, C, I, F, lambda_max):
         T = torch.matmul(X, self.W_c)
-        T = T + self.conv_c(H, edge_index, edge_weight)
+        T = T + self.conv_c(H, edge_index, edge_weight, lambda_max=lambda_max)
         T = T + self.b_c
         T = torch.tanh(T)
         C = F * C + I * T
         return C
 
-    def _calculate_output_gate(self, X, edge_index, edge_weight, H, C):
+    def _calculate_output_gate(self, X, edge_index, edge_weight, H, C, lambda_max):
         O = torch.matmul(X, self.W_o)
-        O = O + self.conv_o(H, edge_index, edge_weight)
+        O = O + self.conv_o(H, edge_index, edge_weight, lambda_max=lambda_max)
         O = O + self.b_o
         O = torch.sigmoid(O)
         return O
@@ -173,6 +173,7 @@ class GCLSTM(torch.nn.Module):
         edge_weight: torch.FloatTensor = None,
         H: torch.FloatTensor = None,
         C: torch.FloatTensor = None,
+        lambda_max: torch.Tensor = None,
     ) -> torch.FloatTensor:
         """
         Making a forward pass. If edge weights are not present the forward pass
@@ -186,6 +187,7 @@ class GCLSTM(torch.nn.Module):
             * **edge_weight** *(PyTorch Long Tensor, optional)* - Edge weight vector.
             * **H** *(PyTorch Float Tensor, optional)* - Hidden state matrix for all nodes.
             * **C** *(PyTorch Float Tensor, optional)* - Cell state matrix for all nodes.
+            * **lambda_max** *(PyTorch Tensor, optional but mandatory if normalization is not sym)* - Largest eigenvalue of Laplacian.
 
         Return types:
             * **H** *(PyTorch Float Tensor)* - Hidden state matrix for all nodes.
@@ -193,9 +195,9 @@ class GCLSTM(torch.nn.Module):
         """
         H = self._set_hidden_state(X, H)
         C = self._set_cell_state(X, C)
-        I = self._calculate_input_gate(X, edge_index, edge_weight, H, C)
-        F = self._calculate_forget_gate(X, edge_index, edge_weight, H, C)
-        C = self._calculate_cell_state(X, edge_index, edge_weight, H, C, I, F)
-        O = self._calculate_output_gate(X, edge_index, edge_weight, H, C)
+        I = self._calculate_input_gate(X, edge_index, edge_weight, H, C, lambda_max)
+        F = self._calculate_forget_gate(X, edge_index, edge_weight, H, C, lambda_max)
+        C = self._calculate_cell_state(X, edge_index, edge_weight, H, C, I, F, lambda_max)
+        O = self._calculate_output_gate(X, edge_index, edge_weight, H, C, lambda_max)
         H = self._calculate_hidden_state(O, C)
         return H, C
