@@ -150,7 +150,6 @@ def test_mpnn_lstm_layer():
     edge_per_node = 10
     in_channels = 64
     hidden_size = 32
-    out_channels = 16
     window = 1
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -162,7 +161,6 @@ def test_mpnn_lstm_layer():
     layer = MPNNLSTM(
         in_channels=in_channels,
         hidden_size=hidden_size,
-        out_channels=out_channels,
         num_nodes=number_of_nodes,
         window=window,
         dropout=0.5,
