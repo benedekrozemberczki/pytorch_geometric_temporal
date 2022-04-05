@@ -11,7 +11,6 @@ class MPNNLSTM(nn.Module):
     Args:
         in_channels (int): Number of input features.
         hidden_size (int): Dimension of hidden representations.
-        out_channels (int): Number of output features.
         num_nodes (int): Number of nodes in the network.
         window (int): Number of past samples included in the input.
         dropout (float): Dropout rate.
@@ -21,7 +20,6 @@ class MPNNLSTM(nn.Module):
         self,
         in_channels: int,
         hidden_size: int,
-        out_channels: int,
         num_nodes: int,
         window: int,
         dropout: float,
@@ -33,7 +31,6 @@ class MPNNLSTM(nn.Module):
         self.hidden_size = hidden_size
         self.dropout = dropout
         self.in_channels = in_channels
-        self.out_channels = out_channels
 
         self._create_parameters_and_layers()
 
@@ -101,8 +98,8 @@ class MPNNLSTM(nn.Module):
         X = torch.transpose(X, 0, 1)
         X = X.contiguous().view(self.window, -1, X.size(3))
 
-        X, (H_1, C_1) = self._recurrent_1(X)
-        X, (H_2, C_2) = self._recurrent_2(X)
+        X, (H_1, _) = self._recurrent_1(X)
+        X, (H_2, _) = self._recurrent_2(X)
 
         H = torch.cat([H_1[0, :, :], H_2[0, :, :], S], dim=1)
         return H
