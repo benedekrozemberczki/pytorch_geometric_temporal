@@ -126,35 +126,45 @@ class DynamicHeteroGraphStaticSignalBatch(object):
         }
         return additional_features
 
-    def __getitem__(self, time_index: int):
-        x_dict = self._get_feature()
-        edge_index_dict = self._get_edge_index(time_index)
-        edge_weight_dict = self._get_edge_weight(time_index)
-        batch_dict = self._get_batch_index(time_index)
-        y_dict = self._get_target(time_index)
-        additional_features = self._get_additional_features(time_index)
+    def __getitem__(self, time_index: Union[int, slice]):
+        if isinstance(time_index, slice):
+            snapshot = DynamicHeteroGraphStaticSignalBatch(
+                self.edge_index_dicts[time_index],
+                self.edge_weight_dicts[time_index],
+                self.feature_dict,
+                self.target_dicts[time_index],
+                self.batch_dicts[time_index],
+                **{key: getattr(self, key)[time_index] for key in self.additional_feature_keys}
+            )
+        else:
+            x_dict = self._get_feature()
+            edge_index_dict = self._get_edge_index(time_index)
+            edge_weight_dict = self._get_edge_weight(time_index)
+            batch_dict = self._get_batch_index(time_index)
+            y_dict = self._get_target(time_index)
+            additional_features = self._get_additional_features(time_index)
 
-        snapshot = Batch.from_data_list([HeteroData()])
-        if x_dict:
-            for key, value in x_dict.items():
-                snapshot[key].x = value
-        if edge_index_dict:
-            for key, value in edge_index_dict.items():
-                snapshot[key].edge_index = value
-        if edge_weight_dict:
-            for key, value in edge_weight_dict.items():
-                snapshot[key].edge_attr = value
-        if y_dict:
-            for key, value in y_dict.items():
-                snapshot[key].y = value
-        if batch_dict:
-            for key, value in batch_dict.items():
-                snapshot[key].batch = value
-        if additional_features:
-            for feature_name, feature_dict in additional_features.items():
-                if feature_dict:
-                    for key, value in feature_dict.items():
-                        snapshot[key][feature_name] = value
+            snapshot = Batch.from_data_list([HeteroData()])
+            if x_dict:
+                for key, value in x_dict.items():
+                    snapshot[key].x = value
+            if edge_index_dict:
+                for key, value in edge_index_dict.items():
+                    snapshot[key].edge_index = value
+            if edge_weight_dict:
+                for key, value in edge_weight_dict.items():
+                    snapshot[key].edge_attr = value
+            if y_dict:
+                for key, value in y_dict.items():
+                    snapshot[key].y = value
+            if batch_dict:
+                for key, value in batch_dict.items():
+                    snapshot[key].batch = value
+            if additional_features:
+                for feature_name, feature_dict in additional_features.items():
+                    if feature_dict:
+                        for key, value in feature_dict.items():
+                            snapshot[key][feature_name] = value
         return snapshot
 
     def __next__(self):
