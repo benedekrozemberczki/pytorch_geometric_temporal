@@ -100,15 +100,24 @@ class StaticGraphTemporalSignal(object):
         }
         return additional_features
 
-    def __getitem__(self, time_index: int):
-        x = self._get_features(time_index)
-        edge_index = self._get_edge_index()
-        edge_weight = self._get_edge_weight()
-        y = self._get_target(time_index)
-        additional_features = self._get_additional_features(time_index)
+    def __getitem__(self, time_index: Union[int, slice]):
+        if isinstance(time_index, slice):
+            snapshot = StaticGraphTemporalSignal(
+                self.edge_index,
+                self.edge_weight,
+                self.features[time_index],
+                self.targets[time_index],
+                **{key: getattr(self, key)[time_index] for key in self.additional_feature_keys}
+            )
+        else:
+            x = self._get_features(time_index)
+            edge_index = self._get_edge_index()
+            edge_weight = self._get_edge_weight()
+            y = self._get_target(time_index)
+            additional_features = self._get_additional_features(time_index)
 
-        snapshot = Data(x=x, edge_index=edge_index, edge_attr=edge_weight,
-                        y=y, **additional_features)
+            snapshot = Data(x=x, edge_index=edge_index, edge_attr=edge_weight,
+                            y=y, **additional_features)
         return snapshot
 
     def __next__(self):
