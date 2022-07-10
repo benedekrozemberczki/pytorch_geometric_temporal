@@ -2,7 +2,7 @@ import torch
 from torch.nn import Parameter
 from torch_geometric.nn import HeteroConv, SAGEConv
 from torch_geometric.nn.inits import glorot
-
+import torch.nn as nn
 
 class HeteroGCLSTM(torch.nn.Module):
     r"""An implementation similar to the Integrated Graph Convolutional Long Short Term
@@ -38,40 +38,40 @@ class HeteroGCLSTM(torch.nn.Module):
                                                       out_channels=self.out_channels,
                                                       bias=self.bias) for edge_type in self.metadata[1]})
 
-        self.W_i = {node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
-                    for node_type, in_channels in self.in_channels_dict.items()}
-        self.b_i = {node_type: Parameter(torch.Tensor(1, self.out_channels))
-                    for node_type in self.in_channels_dict}
+        self.W_i = nn.ParameterDict({node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
+                    for node_type, in_channels in self.in_channels_dict.items()})
+        self.b_i = nn.ParameterDict({node_type: Parameter(torch.Tensor(1, self.out_channels))
+                    for node_type in self.in_channels_dict})
 
     def _create_forget_gate_parameters_and_layers(self):
         self.conv_f = HeteroConv({edge_type: SAGEConv(in_channels=(-1, -1),
                                                       out_channels=self.out_channels,
                                                       bias=self.bias) for edge_type in self.metadata[1]})
 
-        self.W_f = {node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
-                    for node_type, in_channels in self.in_channels_dict.items()}
-        self.b_f = {node_type: Parameter(torch.Tensor(1, self.out_channels))
-                    for node_type in self.in_channels_dict}
+        self.W_f = nn.ParameterDict({node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
+                    for node_type, in_channels in self.in_channels_dict.items()})
+        self.b_f = nn.ParameterDict({node_type: Parameter(torch.Tensor(1, self.out_channels))
+                    for node_type in self.in_channels_dict})
 
     def _create_cell_state_parameters_and_layers(self):
         self.conv_c = HeteroConv({edge_type: SAGEConv(in_channels=(-1, -1),
                                                       out_channels=self.out_channels,
                                                       bias=self.bias) for edge_type in self.metadata[1]})
 
-        self.W_c = {node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
-                    for node_type, in_channels in self.in_channels_dict.items()}
-        self.b_c = {node_type: Parameter(torch.Tensor(1, self.out_channels))
-                    for node_type in self.in_channels_dict}
+        self.W_c = nn.ParameterDict({node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
+                    for node_type, in_channels in self.in_channels_dict.items()})
+        self.b_c = nn.ParameterDict({node_type: Parameter(torch.Tensor(1, self.out_channels))
+                    for node_type in self.in_channels_dict})
 
     def _create_output_gate_parameters_and_layers(self):
         self.conv_o = HeteroConv({edge_type: SAGEConv(in_channels=(-1, -1),
                                                       out_channels=self.out_channels,
                                                       bias=self.bias) for edge_type in self.metadata[1]})
 
-        self.W_o = {node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
-                    for node_type, in_channels in self.in_channels_dict.items()}
-        self.b_o = {node_type: Parameter(torch.Tensor(1, self.out_channels))
-                    for node_type in self.in_channels_dict}
+        self.W_o = nn.ParameterDict({node_type: Parameter(torch.Tensor(in_channels, self.out_channels))
+                    for node_type, in_channels in self.in_channels_dict.items()})
+        self.b_o = nn.ParameterDict({node_type: Parameter(torch.Tensor(1, self.out_channels))
+                    for node_type in self.in_channels_dict})
 
     def _create_parameters_and_layers(self):
         self._create_input_gate_parameters_and_layers()
