@@ -14,12 +14,7 @@ install_requires = [
     "six",
     "networkx",
 ]
-
-setup_requires = ["pytest-runner"]
-
 tests_require = ["pytest", "pytest-cov", "mock", "unittest", "networkx"]
-
-
 
 keywords = [
     "machine-learning",
@@ -55,8 +50,9 @@ setup(
     download_url="https://github.com/benedekrozemberczki/pytorch_geometric_temporal/archive/v0.53.0.tar.gz",
     keywords=keywords,
     install_requires=install_requires,
-    setup_requires=setup_requires,
-    tests_require=tests_require,
+    extras_require={
+        "test": tests_require,
+    },    
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 3 - Alpha",
