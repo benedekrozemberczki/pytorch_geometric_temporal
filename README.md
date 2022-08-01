@@ -189,7 +189,7 @@ where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu113` dependin
 **Running tests**
 
 ```
-$ pytest test
+$ python -m pytest test
 ```
 --------------------------------------------------------------------------------
 
