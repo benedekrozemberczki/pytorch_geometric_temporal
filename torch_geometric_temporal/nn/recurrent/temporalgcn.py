@@ -138,12 +138,14 @@ class TGCN2(torch.nn.Module):
     Args:
         in_channels (int): Number of input features.
         out_channels (int): Number of output features.
+        batch_size (int): Size of the batch.
         improved (bool): Stronger self loops. Default is False.
         cached (bool): Caching the message weights. Default is False.
         add_self_loops (bool): Adding self-loops for smoothing. Default is True.
     """
 
     def __init__(self, in_channels: int, out_channels: int, 
+                 batch_size: int,  # this entry is unnecessary, kept only for backward compatibility
                  improved: bool = False, cached: bool = False, 
                  add_self_loops: bool = True):
         super(TGCN2, self).__init__()
@@ -153,7 +155,7 @@ class TGCN2(torch.nn.Module):
         self.improved = improved
         self.cached = cached
         self.add_self_loops = add_self_loops
-        # self.batch_size = batch_size  # not needed
+        self.batch_size = batch_size  # not needed
         self._create_parameters_and_layers()
 
     def _create_update_gate_parameters_and_layers(self):
