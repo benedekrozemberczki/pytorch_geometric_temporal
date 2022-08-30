@@ -13,7 +13,7 @@ install_requires = [
     "six",
     "networkx",
 ]
-tests_require = ["pytest", "pytest-cov", "mock", "tqdm"]
+tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
 
 keywords = [
     "machine-learning",
