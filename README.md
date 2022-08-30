@@ -163,26 +163,15 @@ If you notice anything unexpected, please open an [issue](https://benedekrozembe
 
 **Installation**
 
-Binaries are provided for Python version <= 3.9.
-
-**PyTorch 1.10.0**
-
-To install the binaries for PyTorch 1.10.0, simply run
+First install [pytorch][pytorch-install] and [pytorch-geometric][pyg-install]
+and then run
 
 ```sh
-pip install torch-scatter -f https://data.pyg.org/whl/torch-1.10.0+${CUDA}.html
-pip install torch-sparse -f https://data.pyg.org/whl/torch-1.10.0+${CUDA}.html
-pip install torch-geometric
 pip install torch-geometric-temporal
 ```
 
-where `${CUDA}` should be replaced by either `cpu`, `cu102`, or `cu113` depending on your PyTorch installation.
-
-|             | `cpu` | `cu102` | `cu113` |
-|-------------|-------|---------|---------|
-| **Linux**   | ✅    | ✅      | ✅      |
-| **Windows** | ✅    | ✅      | ✅      |
-| **macOS**   | ✅    |         |         |
+[pytorch-install]: https://pytorch.org/get-started/locally/
+[pyg-install]: https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html
 
 --------------------------------------------------------------------------------
 
