@@ -10,11 +10,10 @@ install_requires = [
     "torch_geometric",
     "numpy",
     "scipy",
-    "tqdm",
     "six",
     "networkx",
 ]
-tests_require = ["pytest", "pytest-cov", "mock", "networkx"]
+tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
 
 keywords = [
     "machine-learning",

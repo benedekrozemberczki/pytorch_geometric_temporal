@@ -1,4 +1,8 @@
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+except ImportError:
+    def tqdm(iterable):
+        return iterable
 
 import torch
 import torch.nn.functional as F
