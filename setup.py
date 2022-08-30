@@ -8,7 +8,6 @@ install_requires = [
     "torch_sparse",
     "torch_geometric",
     "numpy",
-    "scipy",
     "six",
     "networkx",
 ]
