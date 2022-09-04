@@ -144,7 +144,9 @@ class TGCN2(torch.nn.Module):
         add_self_loops (bool): Adding self-loops for smoothing. Default is True.
     """
 
-    def __init__(self, in_channels: int, out_channels: int, batch_size: int, improved: bool = False, cached: bool = False, 
+    def __init__(self, in_channels: int, out_channels: int, 
+                 batch_size: int,  # this entry is unnecessary, kept only for backward compatibility
+                 improved: bool = False, cached: bool = False, 
                  add_self_loops: bool = True):
         super(TGCN2, self).__init__()
 
@@ -153,7 +155,7 @@ class TGCN2(torch.nn.Module):
         self.improved = improved
         self.cached = cached
         self.add_self_loops = add_self_loops
-        self.batch_size = batch_size
+        self.batch_size = batch_size  # not needed
         self._create_parameters_and_layers()
 
     def _create_update_gate_parameters_and_layers(self):
@@ -178,7 +180,8 @@ class TGCN2(torch.nn.Module):
 
     def _set_hidden_state(self, X, H):
         if H is None:
-            H = torch.zeros(self.batch_size,X.shape[1], self.out_channels).to(X.device) #(b, 207, 32)
+            # can infer batch_size from X.shape, because X is [B, N, F]
+            H = torch.zeros(X.shape[0], X.shape[1], self.out_channels).to(X.device) #(b, 207, 32)
         return H
 
     def _calculate_update_gate(self, X, edge_index, edge_weight, H):
