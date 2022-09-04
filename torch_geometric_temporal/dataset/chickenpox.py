@@ -1,7 +1,6 @@
-import io
 import json
+import urllib
 import numpy as np
-from six.moves import urllib
 from ..signal import StaticGraphTemporalSignal
 
 

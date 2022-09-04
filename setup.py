@@ -9,7 +9,6 @@ install_requires = [
     "torch_scatter",
     "torch_geometric",
     "numpy",
-    "six",
     "networkx",
 ]
 tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
