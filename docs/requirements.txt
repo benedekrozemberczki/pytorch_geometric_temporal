@@ -1,11 +1,11 @@
 networkx
 numpy
 https://download.pytorch.org/whl/cpu/torch-1.10.0%2Bcpu-cp37-cp37m-linux_x86_64.whl
-https://s3.eu-central-1.amazonaws.com/pytorch-geometric.com/whl/torch-1.5.0/torch_scatter-latest%2Bcpu-cp37-cp37m-linux_x86_64.whl
-https://s3.eu-central-1.amazonaws.com/pytorch-geometric.com/whl/torch-1.5.0/torch_sparse-latest%2Bcpu-cp37-cp37m-linux_x86_64.whl
-https://s3.eu-central-1.amazonaws.com/pytorch-geometric.com/whl/torch-1.5.0/torch_cluster-latest%2Bcpu-cp37-cp37m-linux_x86_64.whl
-https://s3.eu-central-1.amazonaws.com/pytorch-geometric.com/whl/torch-1.5.0/torch_spline_conv-latest%2Bcpu-cp37-cp37m-linux_x86_64.whl
-torch_geometric<1.7.0
+https://data.pyg.org/whl/torch-1.10.0%2Bcpu/torch_scatter-2.0.9-cp37-cp37m-linux_x86_64.whl
+https://data.pyg.org/whl/torch-1.10.0%2Bcpu/torch_sparse-0.6.12-cp37-cp37m-linux_x86_64.whl
+https://data.pyg.org/whl/torch-1.10.0%2Bcpu/torch_cluster-1.6.0-cp37-cp37m-linux_x86_64.whl
+https://data.pyg.org/whl/torch-1.10.0%2Bcpu/torch_spline_conv-1.2.1-cp37-cp37m-linux_x86_64.whl
+torch_geometric==1.10.0
 sphinx==4.0.2
 sphinx_rtd_theme==0.5.2
 six
