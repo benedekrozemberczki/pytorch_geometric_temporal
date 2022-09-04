@@ -9,7 +9,6 @@ install_requires = [
     "torch_scatter",
     "torch_geometric",
     "numpy",
-    "scipy",
     "six",
     "networkx",
 ]
