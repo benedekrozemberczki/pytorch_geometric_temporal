@@ -1,7 +1,6 @@
-from typing import List
 import json
+import urllib
 import numpy as np
-from six.moves import urllib
 from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 
 

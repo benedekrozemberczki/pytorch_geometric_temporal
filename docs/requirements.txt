@@ -8,4 +8,3 @@ https://data.pyg.org/whl/torch-1.10.0%2Bcpu/torch_spline_conv-1.2.1-cp37-cp37m-l
 torch_geometric
 sphinx==4.0.2
 sphinx_rtd_theme==0.5.2
-six
