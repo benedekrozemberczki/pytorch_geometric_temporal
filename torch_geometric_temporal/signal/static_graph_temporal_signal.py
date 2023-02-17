@@ -1,14 +1,14 @@
 import torch
 import numpy as np
-from typing import List, Union
+from typing import Sequence, Union
 from torch_geometric.data import Data
 
 
 Edge_Index = Union[np.ndarray, None]
 Edge_Weight = Union[np.ndarray, None]
-Node_Features = List[Union[np.ndarray, None]]
-Targets = List[Union[np.ndarray, None]]
-Additional_Features = List[np.ndarray]
+Node_Features = Sequence[Union[np.ndarray, None]]
+Targets = Sequence[Union[np.ndarray, None]]
+Additional_Features = Sequence[np.ndarray]
 
 
 class StaticGraphTemporalSignal(object):
@@ -23,9 +23,9 @@ class StaticGraphTemporalSignal(object):
     Args:
         edge_index (Numpy array): Index tensor of edges.
         edge_weight (Numpy array): Edge weight tensor.
-        features (List of Numpy arrays): List of node feature tensors.
-        targets (List of Numpy arrays): List of node label (target) tensors.
-        **kwargs (optional List of Numpy arrays): List of additional attributes.
+        features (Sequence of Numpy arrays): Sequence of node feature tensors.
+        targets (Sequence of Numpy arrays): Sequence of node label (target) tensors.
+        **kwargs (optional Sequence of Numpy arrays): Sequence of additional attributes.
     """
 
     def __init__(

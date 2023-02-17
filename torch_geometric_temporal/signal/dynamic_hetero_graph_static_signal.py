@@ -1,14 +1,14 @@
 import torch
 import numpy as np
-from typing import List, Dict, Union, Tuple
+from typing import Sequence, Dict, Union, Tuple
 from torch_geometric.data import HeteroData
 
 
-Edge_Indices = List[Union[Dict[Tuple[str, str, str], np.ndarray], None]]
-Edge_Weights = List[Union[Dict[Tuple[str, str, str], np.ndarray], None]]
+Edge_Indices = Sequence[Union[Dict[Tuple[str, str, str], np.ndarray], None]]
+Edge_Weights = Sequence[Union[Dict[Tuple[str, str, str], np.ndarray], None]]
 Node_Feature = Union[Dict[str, np.ndarray], None]
-Targets = List[Union[Dict[str, np.ndarray], None]]
-Additional_Features = List[Union[Dict[str, np.ndarray], None]]
+Targets = Sequence[Union[Dict[str, np.ndarray], None]]
+Additional_Features = Sequence[Union[Dict[str, np.ndarray], None]]
 
 
 class DynamicHeteroGraphStaticSignal(object):
@@ -20,15 +20,15 @@ class DynamicHeteroGraphStaticSignal(object):
     edge weights, target matrices and optionally passed attributes might change.
 
     Args:
-        edge_index_dicts (List of dictionaries where keys=Tuples and values=Numpy arrays):
-         List of relation type tuples and their edge index tensors.
-        edge_weight_dicts (List of dictionaries where keys=Tuples and values=Numpy arrays):
-         List of relation type tuples and their edge weight tensors.
+        edge_index_dicts (Sequence of dictionaries where keys=Tuples and values=Numpy arrays):
+         Sequence of relation type tuples and their edge index tensors.
+        edge_weight_dicts (Sequence of dictionaries where keys=Tuples and values=Numpy arrays):
+         Sequence of relation type tuples and their edge weight tensors.
         feature_dict (Dictionary of keys=Strings and values=Numpy arrays): Node type tuples
          and their node feature tensor.
-        target_dicts (List of dictionaries where keys=Strings and values=Numpy arrays):
-         List of node types and their label (target) tensors.
-        **kwargs (optional List of dictionaries where keys=Strings and values=Numpy arrays): List
+        target_dicts (Sequence of dictionaries where keys=Strings and values=Numpy arrays):
+         Sequence of node types and their label (target) tensors.
+        **kwargs (optional Sequence of dictionaries where keys=Strings and values=Numpy arrays): Sequence
          of node types and their additional attributes.
     """
 
