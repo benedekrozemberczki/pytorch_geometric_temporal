@@ -1,15 +1,15 @@
 import torch
 import numpy as np
-from typing import List, Union
+from typing import Sequence, Union
 from torch_geometric.data import Batch
 
 
-Edge_Indices = List[Union[np.ndarray, None]]
-Edge_Weights = List[Union[np.ndarray, None]]
+Edge_Indices = Sequence[Union[np.ndarray, None]]
+Edge_Weights = Sequence[Union[np.ndarray, None]]
 Node_Feature = Union[np.ndarray, None]
-Targets = List[Union[np.ndarray, None]]
-Batches = List[Union[np.ndarray, None]]
-Additional_Features = List[np.ndarray]
+Targets = Sequence[Union[np.ndarray, None]]
+Batches = Sequence[Union[np.ndarray, None]]
+Additional_Features = Sequence[np.ndarray]
 
 
 class DynamicGraphStaticSignalBatch(object):
@@ -22,12 +22,12 @@ class DynamicGraphStaticSignalBatch(object):
     attributes might change.
 
     Args:
-        edge_indices (List of Numpy arrays): List of edge index tensors.
-        edge_weights (List of Numpy arrays): List of edge weight tensors.
+        edge_indices (Sequence of Numpy arrays): Sequence of edge index tensors.
+        edge_weights (Sequence of Numpy arrays): Sequence of edge weight tensors.
         feature (Numpy array): Node feature tensor.
-        targets (List of Numpy arrays): List of node label (target) tensors.
-        batches (List of Numpy arrays): List of batch index tensors.
-        **kwargs (optional List of Numpy arrays): List of additional attributes.
+        targets (Sequence of Numpy arrays): Sequence of node label (target) tensors.
+        batches (Sequence of Numpy arrays): Sequence of batch index tensors.
+        **kwargs (optional Sequence of Numpy arrays): Sequence of additional attributes.
     """
 
     def __init__(

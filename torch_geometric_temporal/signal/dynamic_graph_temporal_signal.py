@@ -1,14 +1,14 @@
 import torch
 import numpy as np
-from typing import List, Union
+from typing import Sequence, Union
 from torch_geometric.data import Data
 
 
-Edge_Indices = List[Union[np.ndarray, None]]
-Edge_Weights = List[Union[np.ndarray, None]]
-Node_Features = List[Union[np.ndarray, None]]
-Targets = List[Union[np.ndarray, None]]
-Additional_Features = List[np.ndarray]
+Edge_Indices = Sequence[Union[np.ndarray, None]]
+Edge_Weights = Sequence[Union[np.ndarray, None]]
+Node_Features = Sequence[Union[np.ndarray, None]]
+Targets = Sequence[Union[np.ndarray, None]]
+Additional_Features = Sequence[np.ndarray]
 
 
 class DynamicGraphTemporalSignal(object):
@@ -20,11 +20,11 @@ class DynamicGraphTemporalSignal(object):
     edge weights, target matrices and optionally passed attributes might change.
 
     Args:
-        edge_indices (List of Numpy arrays): List of edge index tensors.
-        edge_weights (List of Numpy arrays): List of edge weight tensors.
-        features (List of Numpy arrays): List of node feature tensors.
-        targets (List of Numpy arrays): List of node label (target) tensors.
-        **kwargs (optional List of Numpy arrays): List of additional attributes.
+        edge_indices (Sequence of Numpy arrays): Sequence of edge index tensors.
+        edge_weights (Sequence of Numpy arrays): Sequence of edge weight tensors.
+        features (Sequence of Numpy arrays): Sequence of node feature tensors.
+        targets (Sequence of Numpy arrays): Sequence of node label (target) tensors.
+        **kwargs (optional Sequence of Numpy arrays): Sequence of additional attributes.
     """
 
     def __init__(

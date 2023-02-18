@@ -1,14 +1,14 @@
 import torch
 import numpy as np
-from typing import List, Dict, Union, Tuple
+from typing import Sequence, Dict, Union, Tuple
 from torch_geometric.data import HeteroData
 
 
 Edge_Index = Union[Dict[Tuple[str, str, str], np.ndarray], None]
 Edge_Weight = Union[Dict[Tuple[str, str, str], np.ndarray], None]
-Node_Features = List[Union[Dict[str, np.ndarray], None]]
-Targets = List[Union[Dict[str, np.ndarray], None]]
-Additional_Features = List[Union[Dict[str, np.ndarray], None]]
+Node_Features = Sequence[Union[Dict[str, np.ndarray], None]]
+Targets = Sequence[Union[Dict[str, np.ndarray], None]]
+Additional_Features = Sequence[Union[Dict[str, np.ndarray], None]]
 
 
 class StaticHeteroGraphTemporalSignal(object):
@@ -80,11 +80,11 @@ class StaticHeteroGraphTemporalSignal(object):
          and their edge index tensors.
         edge_weight_dict (Dictionary of keys=Tuples and values=Numpy arrays): Relation type tuples
          and their edge weight tensors.
-        feature_dicts (List of dictionaries where keys=Strings and values=Numpy arrays): List of node
+        feature_dicts (Sequence of dictionaries where keys=Strings and values=Numpy arrays): Sequence of node
          types and their feature tensors.
-        target_dicts (List of dictionaries where keys=Strings and values=Numpy arrays): List of node
+        target_dicts (Sequence of dictionaries where keys=Strings and values=Numpy arrays): Sequence of node
          types and their label (target) tensors.
-        **kwargs (optional List of dictionaries where keys=Strings and values=Numpy arrays): List
+        **kwargs (optional Sequence of dictionaries where keys=Strings and values=Numpy arrays): Sequence
          of node types and their additional attributes.
     """
 
