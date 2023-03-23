@@ -138,13 +138,16 @@ class EvolveGCNO(torch.nn.Module):
         self.cached = cached
         self.normalize = normalize
         self.add_self_loops = add_self_loops
+        self.initial_weight = torch.nn.Parameter(torch.Tensor(1, in_channels, in_channels))
         self.weight = None
-        self.initial_weight = torch.nn.Parameter(torch.Tensor(in_channels, in_channels))
         self._create_layers()
         self.reset_parameters()
     
     def reset_parameters(self):
         glorot(self.initial_weight)
+
+    def reinitialize_weight(self):
+        self.weight = None
 
     def _create_layers(self):
 
@@ -181,9 +184,8 @@ class EvolveGCNO(torch.nn.Module):
         """
         
         if self.weight is None:
-            self.weight = self.initial_weight.data
-        W = self.weight[None, :, :]
-        _, W = self.recurrent_layer(W, W)
-        X = self.conv_layer(W.squeeze(dim=0), X, edge_index, edge_weight)
-    
+            _, self.weight = self.recurrent_layer(self.initial_weight, self.initial_weight)
+        else:
+            _, self.weight = self.recurrent_layer(self.weight, self.weight)
+        X = self.conv_layer(self.weight.squeeze(dim=0), X, edge_index, edge_weight)
         return X
