@@ -145,6 +145,7 @@ In the next steps we will define the **recurrent graph neural network** architec
 .. code-block:: python
 
     import torch
+    torch.manual_seed(1)
     import torch.nn.functional as F
     from torch_geometric_temporal.nn.recurrent import DCRNN
 
@@ -194,7 +195,7 @@ Using the holdout we will evaluate the performance of the trained recurrent grap
     cost = cost / (time+1)
     cost = cost.item()
     print("MSE: {:.4f}".format(cost))
-    >>> MSE: 0.7302
+    >>> MSE: 0.7418
     
 Web Traffic Prediction
 ----------------------
@@ -218,6 +219,7 @@ In the next steps we will define the **recurrent graph neural network** architec
 .. code-block:: python
 
     import torch
+    torch.manual_seed(1)
     import torch.nn.functional as F
     from torch_geometric_temporal.nn.recurrent import GConvGRU
 
@@ -265,4 +267,4 @@ Using the holdout traffic data we will evaluate the performance of the trained r
     cost = cost / (time+1)
     cost = cost.item()
     print("MSE: {:.4f}".format(cost))
-    >>> MSE: 0.5114
+    >>> MSE: 0.5264
