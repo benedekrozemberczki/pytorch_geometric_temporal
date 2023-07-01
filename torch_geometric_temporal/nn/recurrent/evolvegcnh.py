@@ -46,12 +46,15 @@ class EvolveGCNH(torch.nn.Module):
         self.normalize = normalize
         self.add_self_loops = add_self_loops
         self.weight = None
-        self.initial_weight = torch.nn.Parameter(torch.Tensor(in_channels, in_channels))
+        self.initial_weight = torch.nn.Parameter(torch.Tensor(1, in_channels, in_channels))
         self._create_layers()
         self.reset_parameters()
     
     def reset_parameters(self):
         glorot(self.initial_weight)
+
+    def reinitialize_weight(self):
+        self.weight = None
 
     def _create_layers(self):
 
@@ -92,8 +95,8 @@ class EvolveGCNH(torch.nn.Module):
         X_tilde = self.pooling_layer(X, edge_index)
         X_tilde = X_tilde[0][None, :, :]
         if self.weight is None:
-            self.weight = self.initial_weight.data
-        W = self.weight[None, :, :]
-        X_tilde, W = self.recurrent_layer(X_tilde, W)
-        X = self.conv_layer(W.squeeze(dim=0), X, edge_index, edge_weight)
+            _, self.weight = self.recurrent_layer(X_tilde, self.initial_weight)
+        else:
+            _, self.weight = self.recurrent_layer(X_tilde, self.weight)
+        X = self.conv_layer(self.weight.squeeze(dim=0), X, edge_index, edge_weight)
         return X
