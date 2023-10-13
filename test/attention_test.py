@@ -557,9 +557,9 @@ def test_mtgnn():
     num_sub = int(num_nodes / num_split)
     for j in range(num_split):
         if j != num_split - 1:
-            id = perm[j * num_sub : (j + 1) * num_sub]
+            id = perm[j * num_sub: (j + 1) * num_sub]
         else:
-            id = perm[j * num_sub :]
+            id = perm[j * num_sub:]
         tx = trainx[:, :, id, :]
         output = model(tx, A_tilde, idx=id)
         output = output.transpose(1, 3)
@@ -652,9 +652,9 @@ def test_mtgnn():
     trainx = trainx.transpose(1, 3)
     for j in range(num_split):
         if j != num_split - 1:
-            id = perm[j * num_sub : (j + 1) * num_sub]
+            id = perm[j * num_sub: (j + 1) * num_sub]
         else:
-            id = perm[j * num_sub :]
+            id = perm[j * num_sub:]
         tx = trainx[:, :, id, :]
         output = model(tx, A_tilde, idx=id)
         output = output.transpose(1, 3)
@@ -690,6 +690,7 @@ def test_tsagcn():
     # (bs, seq, nodes, f_in) -> (bs, f_in, seq, nodes)
     # also be sure to pass in a contiguous tensor (the created in create_mock_batch() is not!)
     batch = batch.permute(0, 3, 1, 2).contiguous()
+    edge_index = edge_index.to(device)
 
     stride = 2
     aagcn_adaptive = AAGCN(
@@ -744,3 +745,5 @@ def test_dnntsp():
     z = model(node_features, edges, edge_weight)
 
     assert z.shape == (10, 100, 16)
+
+test_tsagcn()
