@@ -745,5 +745,3 @@ def test_dnntsp():
     z = model(node_features, edges, edge_weight)
 
     assert z.shape == (10, 100, 16)
-
-test_tsagcn()
