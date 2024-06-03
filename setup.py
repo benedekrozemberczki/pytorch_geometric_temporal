@@ -4,7 +4,6 @@ install_requires = [
     "decorator==4.4.2",
     "torch",
     "cython",
-    "pandas<=1.3.5",
     "torch_sparse",
     "torch_scatter",
     "torch_geometric",
@@ -49,7 +48,7 @@ setup(
     install_requires=install_requires,
     extras_require={
         "test": tests_require,
-    },    
+    },
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 3 - Alpha",
