@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import torch
 from torch.nn import Parameter
 from torch_geometric.nn import ChebConv
@@ -174,7 +176,7 @@ class GCLSTM(torch.nn.Module):
         H: torch.FloatTensor = None,
         C: torch.FloatTensor = None,
         lambda_max: torch.Tensor = None,
-    ) -> torch.FloatTensor:
+    ) -> Tuple[torch.FloatTensor, torch.FloatTensor]:
         """
         Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph. If the hidden state and cell state
