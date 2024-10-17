@@ -1,5 +1,6 @@
 import json
-import urllib
+import ssl
+import urllib.request
 import numpy as np
 from ..signal import StaticGraphTemporalSignal
 
@@ -19,7 +20,8 @@ class WikiMathsDatasetLoader(object):
 
     def _read_web_data(self):
         url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/wikivital_mathematics.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+        context = ssl._create_unverified_context()
+        self._dataset = json.loads(urllib.request.urlopen(url, context=context).read())
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T

@@ -1,5 +1,6 @@
 import json
-import urllib
+import ssl
+import urllib.request
 import numpy as np
 from ..signal import DynamicGraphTemporalSignal
 
@@ -78,7 +79,8 @@ class TwitterTennisDatasetLoader(object):
             "https://raw.githubusercontent.com/ferencberes/pytorch_geometric_temporal/developer/dataset/"
             + fname
         )
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+        context = ssl._create_unverified_context()
+        self._dataset = json.loads(urllib.request.urlopen(url, context=context).read())
         # with open("/home/fberes/git/pytorch_geometric_temporal/dataset/"+fname) as f:
         #    self._dataset = json.load(f)
 
