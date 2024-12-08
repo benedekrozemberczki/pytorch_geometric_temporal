@@ -10,3 +10,18 @@ from .encovid import EnglandCovidDatasetLoader
 from .twitter_tennis import TwitterTennisDatasetLoader
 from .montevideo_bus import MontevideoBusDatasetLoader
 from .mtm import MTMDatasetLoader
+
+DATALOADERS = [
+    ChickenpoxDatasetLoader,
+    PedalMeDatasetLoader,
+    METRLADatasetLoader,
+    PemsBayDatasetLoader,
+    WikiMathsDatasetLoader,
+    WindmillOutputLargeDatasetLoader,
+    WindmillOutputMediumDatasetLoader,
+    WindmillOutputSmallDatasetLoader,
+    EnglandCovidDatasetLoader,
+    TwitterTennisDatasetLoader,
+    MontevideoBusDatasetLoader,
+    MTMDatasetLoader,
+]

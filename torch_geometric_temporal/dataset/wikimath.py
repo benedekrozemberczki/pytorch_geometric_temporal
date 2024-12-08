@@ -1,10 +1,9 @@
-import json
-import urllib
 import numpy as np
 from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class WikiMathsDatasetLoader(object):
+class WikiMathsDatasetLoader(AbstractDataLoader):
     """A dataset of vital mathematics articles from Wikipedia. We made it
     public during the development of PyTorch Geometric Temporal. The
     underlying graph is static - vertices are Wikipedia pages and edges are
@@ -14,12 +13,9 @@ class WikiMathsDatasetLoader(object):
     between March 16th 2019 and March 15th 2021 which results in 731 periods.
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/wikivital_mathematics.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+    def __init__(self, datadir=None):
+        super(WikiMathsDatasetLoader, self).__init__("wikivital_mathematics.json", datadir)
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T

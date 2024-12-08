@@ -1,7 +1,6 @@
-import json
-import urllib
 import numpy as np
 from ..signal import DynamicGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
 def transform_degree(x, cutoff=4):
@@ -30,7 +29,7 @@ def encode_features(X, log_degree_cutoff=4):
     return np.concatenate((A, B), axis=1)
 
 
-class TwitterTennisDatasetLoader(object):
+class TwitterTennisDatasetLoader(AbstractDataLoader):
     """
     Twitter mention graphs related to major tennis tournaments from 2017.
     Nodes are Twitter accounts and edges are mentions between them.
@@ -54,7 +53,7 @@ class TwitterTennisDatasetLoader(object):
     """
 
     def __init__(
-        self, event_id="rg17", N=None, feature_mode="encoded", target_offset=1
+        self, datadir:str="./data", event_id="rg17", N=None, feature_mode="encoded", target_offset=1
     ):
         self.N = N
         self.target_offset = target_offset
@@ -70,17 +69,11 @@ class TwitterTennisDatasetLoader(object):
             raise ValueError(
                 "Choose feature_mode from values [None, 'diagonal', 'encoded']."
             )
-        self._read_web_data()
-
-    def _read_web_data(self):
-        fname = "twitter_tennis_%s.json" % self.event_id
-        url = (
-            "https://raw.githubusercontent.com/ferencberes/pytorch_geometric_temporal/developer/dataset/"
-            + fname
+        
+        super(TwitterTennisDatasetLoader, self).__init__(
+            "twitter_tennis_%s.json" % self.event_id, datadir
         )
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
-        # with open("/home/fberes/git/pytorch_geometric_temporal/dataset/"+fname) as f:
-        #    self._dataset = json.load(f)
+        self._dataset = self._load()
 
     def _get_edges(self):
         edge_indices = []

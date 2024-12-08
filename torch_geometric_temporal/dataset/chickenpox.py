@@ -1,10 +1,9 @@
-import json
-import urllib
 import numpy as np
 from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class ChickenpoxDatasetLoader(object):
+class ChickenpoxDatasetLoader(AbstractDataLoader):
     """A dataset of county level chicken pox cases in Hungary between 2004
     and 2014. We made it public during the development of PyTorch Geometric
     Temporal. The underlying graph is static - vertices are counties and
@@ -14,12 +13,9 @@ class ChickenpoxDatasetLoader(object):
     than 500 snapshots (weeks).
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/chickenpox.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+    def __init__(self, datadir=None):
+        super(ChickenpoxDatasetLoader, self).__init__("chickenpox.json", datadir)
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T

@@ -1,10 +1,12 @@
 import json
 import urllib
 import numpy as np
+import os
 from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class PedalMeDatasetLoader(object):
+class PedalMeDatasetLoader(AbstractDataLoader):
     """A dataset of PedalMe Bicycle deliver orders in London between 2020
     and 2021. We made it public during the development of PyTorch Geometric
     Temporal. The underlying graph is static - vertices are localities and
@@ -13,12 +15,9 @@ class PedalMeDatasetLoader(object):
     deliveries the upcoming week. Our dataset consist of more than 30 snapshots (weeks).
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/pedalme_london.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+    def __init__(self, datadir=None):
+        super(PedalMeDatasetLoader, self).__init__("pedalme_london.json", datadir)
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T
