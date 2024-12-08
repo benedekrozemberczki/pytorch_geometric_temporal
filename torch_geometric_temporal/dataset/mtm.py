@@ -1,10 +1,9 @@
-import json
-import urllib
 import numpy as np
-from torch_geometric_temporal.signal import StaticGraphTemporalSignal
+from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class MTMDatasetLoader:
+class MTMDatasetLoader(AbstractDataLoader):
     """
     A dataset of `Methods-Time Measurement-1 <https://en.wikipedia.org/wiki/Methods-time_measurement>`_
     (MTM-1) motions, signalled as consecutive video frames of 21 3D hand keypoints, acquired via
@@ -17,12 +16,9 @@ class MTMDatasetLoader:
     returned in shape :obj:`(3, 21, T)`, the target is returned one-hot-encoded in shape :obj:`(T, 6)`.
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/mtm_1.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+    def __init__(self, datadir=None):
+        super(MTMDatasetLoader, self).__init__("mtm_1.json", datadir)
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T

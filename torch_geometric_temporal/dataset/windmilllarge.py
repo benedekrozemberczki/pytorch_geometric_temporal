@@ -1,22 +1,21 @@
-import json
-import urllib
 import numpy as np
 from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class WindmillOutputLargeDatasetLoader(object):
+class WindmillOutputLargeDatasetLoader(AbstractDataLoader):
     """Hourly energy output of windmills from a European country
     for more than 2 years. Vertices represent 319 windmills and
     weighted edges describe the strength of relationships. The target
     variable allows for regression tasks.
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://graphmining.ai/temporal_datasets/windmill_output.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read().decode())
+    def __init__(self, datadir=None):
+        super(WindmillOutputLargeDatasetLoader, self).__init__(
+            "windmill_output.json", datadir
+        )
+        self._set_src_prefix("https://graphmining.ai/temporal_datasets/")
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T

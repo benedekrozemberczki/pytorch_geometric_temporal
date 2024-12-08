@@ -1,5 +1,6 @@
 import os
-import urllib
+import ssl
+import urllib.request
 import zipfile
 import numpy as np
 import torch
@@ -19,39 +20,40 @@ class METRLADatasetLoader(object):
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
     """
 
-    def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data")):
+    def __init__(self, datadir=os.path.join(os.getcwd(), "data")):
         super(METRLADatasetLoader, self).__init__()
-        self.raw_data_dir = raw_data_dir
-        self._read_web_data()
+        self.datadir = os.path.join(datadir, "metrla")
+        self._load()
 
     def _download_url(self, url, save_path):  # pragma: no cover
+        ssl._create_default_https_context = ssl._create_unverified_context
         with urllib.request.urlopen(url) as dl_file:
             with open(save_path, "wb") as out_file:
                 out_file.write(dl_file.read())
 
-    def _read_web_data(self):
+    def _load(self):
         url = "https://graphmining.ai/temporal_datasets/METR-LA.zip"
 
         # Check if zip file is in data folder from working directory, otherwise download
         if not os.path.isfile(
-            os.path.join(self.raw_data_dir, "METR-LA.zip")
+            os.path.join(self.datadir, "METR-LA.zip")
         ):  # pragma: no cover
-            if not os.path.exists(self.raw_data_dir):
-                os.makedirs(self.raw_data_dir)
-            self._download_url(url, os.path.join(self.raw_data_dir, "METR-LA.zip"))
+            if not os.path.exists(self.datadir):
+                os.makedirs(self.datadir)
+            self._download_url(url, os.path.join(self.datadir, "METR-LA.zip"))
 
         if not os.path.isfile(
-            os.path.join(self.raw_data_dir, "adj_mat.npy")
+            os.path.join(self.datadir, "adj_mat.npy")
         ) or not os.path.isfile(
-            os.path.join(self.raw_data_dir, "node_values.npy")
+            os.path.join(self.datadir, "node_values.npy")
         ):  # pragma: no cover
             with zipfile.ZipFile(
-                os.path.join(self.raw_data_dir, "METR-LA.zip"), "r"
+                os.path.join(self.datadir, "METR-LA.zip"), "r"
             ) as zip_fh:
-                zip_fh.extractall(self.raw_data_dir)
+                zip_fh.extractall(self.datadir)
 
-        A = np.load(os.path.join(self.raw_data_dir, "adj_mat.npy"))
-        X = np.load(os.path.join(self.raw_data_dir, "node_values.npy")).transpose(
+        A = np.load(os.path.join(self.datadir, "adj_mat.npy"))
+        X = np.load(os.path.join(self.datadir, "node_values.npy")).transpose(
             (1, 2, 0)
         )
         X = X.astype(np.float32)

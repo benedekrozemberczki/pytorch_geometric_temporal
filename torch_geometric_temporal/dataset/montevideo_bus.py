@@ -1,11 +1,10 @@
 from typing import List
-import json
-import urllib
 import numpy as np
-from torch_geometric_temporal.signal import StaticGraphTemporalSignal
+from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class MontevideoBusDatasetLoader(object):
+class MontevideoBusDatasetLoader(AbstractDataLoader):
     """A dataset of inflow passenger at bus stop level from Montevideo city.
     This dataset comprises hourly inflow passenger data at bus stop level for 11 bus lines during
     October 2020 from Montevideo city (Uruguay). The bus lines selected are the ones that carry
@@ -17,12 +16,9 @@ class MontevideoBusDatasetLoader(object):
     from the government of Uruguay (https://catalogodatos.gub.uy/).
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/montevideo_bus.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+    def __init__(self, datadir=None):
+        super(MontevideoBusDatasetLoader, self).__init__("montevideo_bus.json", datadir)
+        self._dataset = self._load()
 
     def _get_node_ids(self):
         return [node.get('bus_stop') for node in self._dataset["nodes"]]

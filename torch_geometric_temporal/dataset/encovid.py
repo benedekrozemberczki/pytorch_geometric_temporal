@@ -1,10 +1,9 @@
-import json
-import urllib
 import numpy as np
 from ..signal import DynamicGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class EnglandCovidDatasetLoader(object):
+class EnglandCovidDatasetLoader(AbstractDataLoader):
     """A dataset of mobility and history of reported cases of COVID-19
     in England NUTS3 regions, from 3 March to 12 of May. The dataset is
     segmented in days and the graph is directed and weighted. The graph
@@ -16,12 +15,9 @@ class EnglandCovidDatasetLoader(object):
     `"Transfer Graph Neural Networks for Pandemic Forecasting." <https://arxiv.org/abs/2009.08388>`_
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/england_covid.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+    def __init__(self, datadir=None):
+        super(EnglandCovidDatasetLoader, self).__init__("england_covid.json", datadir)
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = []
@@ -38,10 +34,9 @@ class EnglandCovidDatasetLoader(object):
             )
 
     def _get_targets_and_features(self):
-
         stacked_target = np.array(self._dataset["y"])
         standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / (
-            np.std(stacked_target, axis=0) + 10 ** -10
+            np.std(stacked_target, axis=0) + 10**-10
         )
         self.features = [
             standardized_target[i : i + self.lags, :].T

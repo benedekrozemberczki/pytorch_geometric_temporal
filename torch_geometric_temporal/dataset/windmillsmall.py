@@ -2,21 +2,22 @@ import json
 import urllib
 import numpy as np
 from ..signal import StaticGraphTemporalSignal
+from .base import AbstractDataLoader
 
 
-class WindmillOutputSmallDatasetLoader(object):
+class WindmillOutputSmallDatasetLoader(AbstractDataLoader):
     """Hourly energy output of windmills from a European country
     for more than 2 years. Vertices represent 11 windmills and
     weighted edges describe the strength of relationships. The target
     variable allows for regression tasks.
     """
 
-    def __init__(self):
-        self._read_web_data()
-
-    def _read_web_data(self):
-        url = "https://graphmining.ai/temporal_datasets/windmill_output_small.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read().decode())
+    def __init__(self, datadir=None):
+        super(WindmillOutputSmallDatasetLoader, self).__init__(
+            "windmill_output_small.json", datadir
+        )
+        self._set_src_prefix("https://graphmining.ai/temporal_datasets/")
+        self._dataset = self._load()
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T
@@ -27,7 +28,7 @@ class WindmillOutputSmallDatasetLoader(object):
     def _get_targets_and_features(self):
         stacked_target = np.stack(self._dataset["block"])
         standardized_target = (stacked_target - np.mean(stacked_target, axis=0)) / (
-            np.std(stacked_target, axis=0) + 10 ** -10
+            np.std(stacked_target, axis=0) + 10**-10
         )
         self.features = [
             standardized_target[i : i + self.lags, :].T
