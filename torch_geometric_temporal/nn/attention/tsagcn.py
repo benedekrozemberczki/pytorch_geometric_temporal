@@ -3,7 +3,10 @@ import torch
 import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
-from torch_geometric.utils.to_dense_adj import to_dense_adj
+try:
+    from torch_geometric.utils.to_dense_adj import to_dense_adj
+except ImportError:
+    from torch_geometric.utils import to_dense_adj
 import torch.nn.functional as F
 
 
@@ -27,7 +30,7 @@ class GraphAAGCN:
         self.A = self.get_spatial_graph(self.num_nodes)
 
     def get_spatial_graph(self, num_nodes):
-        self_mat = torch.eye(num_nodes)
+        self_mat = torch.eye(num_nodes, device=self.edge_index.device)
         inward_mat = torch.squeeze(to_dense_adj(self.edge_index))
         inward_mat_norm = F.normalize(inward_mat, dim=0, p=1)
         outward_mat = inward_mat.transpose(0, 1)
