@@ -1,6 +1,7 @@
 from typing import List
 import json
-import urllib
+import ssl
+import urllib.request
 import numpy as np
 from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 
@@ -22,7 +23,8 @@ class MontevideoBusDatasetLoader(object):
 
     def _read_web_data(self):
         url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/montevideo_bus.json"
-        self._dataset = json.loads(urllib.request.urlopen(url).read())
+        context = ssl._create_unverified_context()
+        self._dataset = json.loads(urllib.request.urlopen(url, context=context).read())
 
     def _get_node_ids(self):
         return [node.get('bus_stop') for node in self._dataset["nodes"]]
