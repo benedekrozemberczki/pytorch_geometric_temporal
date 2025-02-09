@@ -37,7 +37,7 @@ keywords = [
 setup(
     name="torch_geometric_temporal",
     packages=find_packages(),
-    version="0.54.0",
+    version="0.55.0",
     license="MIT",
     description="A Temporal Extension Library for PyTorch Geometric.",
     author="Benedek Rozemberczki",
