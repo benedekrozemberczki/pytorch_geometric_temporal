@@ -25,7 +25,8 @@ class METRLADatasetLoader(object):
         self._read_web_data()
 
     def _download_url(self, url, save_path):  # pragma: no cover
-        with urllib.request.urlopen(url) as dl_file:
+        import ssl
+        with urllib.request.urlopen(url, context=ssl.SSLContext()) as dl_file:
             with open(save_path, "wb") as out_file:
                 out_file.write(dl_file.read())
 
