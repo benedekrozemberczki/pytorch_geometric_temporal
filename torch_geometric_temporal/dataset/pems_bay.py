@@ -1,5 +1,6 @@
 import os
-import urllib
+import ssl
+import urllib.request
 import zipfile
 import numpy as np
 import torch
@@ -25,7 +26,8 @@ class PemsBayDatasetLoader(object):
         self._read_web_data()
 
     def _download_url(self, url, save_path):  # pragma: no cover
-        with urllib.request.urlopen(url) as dl_file:
+        context = ssl._create_unverified_context()
+        with urllib.request.urlopen(url, context=context) as dl_file:
             with open(save_path, "wb") as out_file:
                 out_file.write(dl_file.read())
 
