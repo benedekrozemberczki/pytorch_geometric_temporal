@@ -23,11 +23,11 @@ class RecurrentGCN(torch.nn.Module):
         self.recurrent = EvolveGCNO(node_features)
         self.linear = torch.nn.Linear(node_features, 1)
 
-    def forward(self, x, edge_index, edge_weight):
-        h = self.recurrent(x, edge_index, edge_weight)
+    def forward(self, x, edge_index, edge_weight, w):
+        h, w = self.recurrent(x, edge_index, edge_weight, w)
         h = F.relu(h)
         h = self.linear(h)
-        return h
+        return h, w
         
 model = RecurrentGCN(node_features = 4)
 for param in model.parameters():
@@ -39,8 +39,9 @@ model.train()
 
 for epoch in tqdm(range(200)):
     cost = 0
+    w = None
     for time, snapshot in enumerate(train_dataset):
-        y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+        y_hat, w = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr, w)
         cost = cost + torch.mean((y_hat-snapshot.y)**2)
     cost = cost / (time+1)
     cost.backward(retain_graph=True)
@@ -51,8 +52,8 @@ model.eval()
 cost = 0
 for time, snapshot in enumerate(test_dataset):
     if time == 0:
-        model.recurrent.weight = None
-    y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+        w = None
+    y_hat, w = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr, w)
     cost = cost + torch.mean((y_hat-snapshot.y)**2)
 cost = cost / (time+1)
 cost = cost.item()
