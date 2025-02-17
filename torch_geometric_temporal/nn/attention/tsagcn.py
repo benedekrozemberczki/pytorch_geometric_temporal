@@ -237,7 +237,7 @@ class UnitGCN(nn.Module):
                 .contiguous()
                 .view(N, V, self.inter_c * T)
             )
-            A2 = self.conv_b[i](x).view(N, self.inter_c * T, V)
+            A2 = self.conv_b[i](x).reshape(N, self.inter_c * T, V)
             A1 = self.tan(torch.matmul(A1, A2) / A1.size(-1))  # N V V
             A1 = A[i] + A1 * self.alpha
             A2 = x.view(N, C * T, V)
