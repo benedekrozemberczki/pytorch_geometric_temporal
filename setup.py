@@ -8,14 +8,10 @@ install_requires = [
     "torch_scatter",
     "torch_geometric",
     "numpy",
-    "networkx"
-    ],
-extras_require = {
-    "test": ["pytest", "pytest-cov", "mock", "networkx", "tqdm"],
-    "index":['dask', "pandas"]
-}
-
-
+    "networkx",
+]
+tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
+index_require = ['dask', "pandas"]
 keywords = [
     "machine-learning",
     "deep-learning",
@@ -52,6 +48,7 @@ setup(
     install_requires=install_requires,
     extras_require={
         "test": tests_require,
+        "index": index_require
     },
     python_requires=">=3.6",
     classifiers=[
