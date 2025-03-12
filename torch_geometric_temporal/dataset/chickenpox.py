@@ -2,8 +2,10 @@ import json
 import ssl
 import urllib.request
 import numpy as np
-from ..signal import StaticGraphTemporalSignal
+from torch.utils.data import DataLoader
 
+from ..signal import StaticGraphTemporalSignal
+from ..signal import IndexDataset
 
 class ChickenpoxDatasetLoader(object):
     """A dataset of county level chicken pox cases in Hungary between 2004
@@ -59,3 +61,64 @@ class ChickenpoxDatasetLoader(object):
             self._edges, self._edge_weights, self.features, self.targets
         )
         return dataset
+    
+    def get_index_dataset(self, lags=4, batch_size=4, shuffle=False, allGPU=-1, dask_batching=False, ratio=(0.7, 0.1, 0.2)):
+        """
+        Returns torch dataloaders using index batching for Chickenpox Hungary dataset.
+
+        Args:
+            lags (int, optional): The number of time lags. Defaults to 4.
+            batch_size (int, optional): Batch size. Defaults to 4.
+            shuffle (bool, optional): If the data should be shuffled. Defaults to False.
+            allGPU (int, optional): GPU device ID for performing preprocessing in GPU memory. 
+                                    If -1, computation is done on CPU. Defaults to -1.
+            ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
+            dask_batching (bool): Should dask batching be used
+
+        Returns:
+            Tuple[
+                DataLoader,  # Dataloader for the training set
+                DataLoader,  # Dataloader for the validation set
+                DataLoader,  # Dataloader for the test set
+                np.ndarray,  # Edge indices (shape: [2, num_edges])
+                np.ndarray   # Edge weights (shape: [num_edges])
+            ]
+        """
+        
+        if dask_batching:
+            raise NotImplementedError("Currently dask batching is not implemented for the Chickenpox dataset")
+
+        data = np.array(self._dataset["FX"])
+        edges = np.array(self._dataset["edges"]).T
+        edge_weights = np.ones(edges.shape[1])
+        num_samples = data.shape[0]
+        
+        if allGPU != -1:
+            data = torch.tensor(data, dtype=torch.float).to(f"cuda:{allGPU}")
+            data = data.unsqueeze(-1)
+        else:
+            data = np.expand_dims(data, axis=-1)
+
+
+        x_i = np.arange(num_samples - (2 * lags - 1))
+        
+        num_samples = x_i.shape[0]
+        num_train = round(num_samples * ratio[0])
+        num_test = round(num_samples * ratio[2])
+        num_val = num_samples - num_train - num_test
+
+        x_train = x_i[:num_train]
+        x_val = x_i[num_train: num_train + num_val]
+        x_test = x_i[-num_test:]
+
+        train_dataset = IndexDataset(x_train,data,lags,gpu=allGPU, lazy=dask_batching)
+        val_dataset = IndexDataset(x_val,data,lags,gpu=allGPU, lazy=dask_batching)
+        test_dataset = IndexDataset(x_test,data,lags,gpu=allGPU,lazy=dask_batching)
+        
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
+
+
+        return train_dataloader, val_dataloader, test_dataloader, edges, edge_weights
+

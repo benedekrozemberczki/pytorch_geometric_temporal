@@ -8,9 +8,13 @@ install_requires = [
     "torch_scatter",
     "torch_geometric",
     "numpy",
-    "networkx",
-]
-tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
+    "networkx"
+    ],
+extras_require = {
+    "test": ["pytest", "pytest-cov", "mock", "networkx", "tqdm"],
+    "index":['dask', "pandas"]
+}
+
 
 keywords = [
     "machine-learning",
