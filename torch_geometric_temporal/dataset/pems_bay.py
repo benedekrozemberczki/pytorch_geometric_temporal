@@ -5,8 +5,8 @@ import zipfile
 import numpy as np
 import torch
 from torch_geometric.utils import dense_to_sparse
-from ..signal import StaticGraphTemporalSignal
-
+from ..signal import StaticGraphTemporalSignal,IndexDataset
+from torch.utils.data import DataLoader
 
 class PemsBayDatasetLoader(object):
     """A traffic forecasting dataset as described in Diffusion Convolution Layer Paper.
@@ -20,10 +20,13 @@ class PemsBayDatasetLoader(object):
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
     """
 
-    def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data")):
+    def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data"),index=False):
         super(PemsBayDatasetLoader, self).__init__()
+        self.index = index
         self.raw_data_dir = raw_data_dir
-        self._read_web_data()
+
+        if not self.index:
+            self._read_web_data()
 
     def _download_url(self, url, save_path):  # pragma: no cover
         context = ssl._create_unverified_context()
@@ -51,7 +54,7 @@ class PemsBayDatasetLoader(object):
                 os.path.join(self.raw_data_dir, "PEMS-BAY.zip"), "r"
             ) as zip_fh:
                 zip_fh.extractall(self.raw_data_dir)
-
+    
         A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
         X = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose(
             (1, 2, 0)
@@ -115,3 +118,100 @@ class PemsBayDatasetLoader(object):
             self.edges, self.edge_weights, self.features, self.targets
         )
         return dataset
+    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, dask_batching=False, ratio=(0.7, 0.1, 0.2)):
+        """
+        Returns torch dataloaders using index batching for Chickenpox Hungary dataset.
+
+        Args:
+            lags (int, optional): The number of time lags. Defaults to 12.
+            batch_size (int, optional): Batch size. Defaults to 64.
+            shuffle (bool, optional): If the data should be shuffled. Defaults to False.
+            allGPU (int, optional): GPU device ID for performing preprocessing in GPU memory. 
+                                    If -1, computation is done on CPU. Defaults to -1.
+            ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
+            dask_batching (bool): Should dask batching be used
+
+        Returns:
+            Tuple[
+                DataLoader,  # Dataloader for the training set
+                DataLoader,  # Dataloader for the validation set
+                DataLoader,  # Dataloader for the test set
+                np.ndarray,  # Edge indices (shape: [2, num_edges])
+                np.ndarray,   # Edge weights (shape: [num_edges])
+                np.ndarray,   # Means
+                np.ndarray,   # Stds
+            ]
+        """
+
+        url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
+
+        # Check if zip file is in data folder from working directory, otherwise download
+        if not os.path.isfile(
+            os.path.join(self.raw_data_dir, "PEMS-BAY.zip")
+        ):  # pragma: no cover
+            if not os.path.exists(self.raw_data_dir):
+                os.makedirs(self.raw_data_dir)
+            self._download_url(url, os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))
+
+        if not os.path.isfile(
+            os.path.join(self.raw_data_dir, "pems_adj_mat.npy")
+        ) or not os.path.isfile(
+            os.path.join(self.raw_data_dir, "pems_node_values.npy")
+        ):  # pragma: no cover
+            with zipfile.ZipFile(
+                os.path.join(self.raw_data_dir, "PEMS-BAY.zip"), "r"
+            ) as zip_fh:
+                zip_fh.extractall(self.raw_data_dir)
+        
+        # adj matrix setup
+        A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
+        edge_indices, values = dense_to_sparse(torch.from_numpy(A))
+        edges = edge_indices.numpy()
+        edge_weights = values.numpy()
+
+        # setup data
+        data = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose((1, 2, 0))
+        
+        if allGPU != -1:
+            data = torch.tensor(data,dtype=torch.float).to(f"cuda:{allGPU}")
+            means = torch.mean(data, dim=(0, 2), keepdim=True)
+            data = data - means
+
+            stds = torch.std(data, dim=(0, 2), keepdim=True)
+            data = data / stds
+            data = data.permute(2, 0, 1)
+
+            means.squeeze_()
+            stds.squeeze_()
+        
+        else:
+            # Normalise as in DCRNN paper (via Z-Score Method)
+            means = np.mean(data, axis=(0, 2))
+            data = data - means.reshape(1, -1, 1)
+            stds = np.std(data, axis=(0, 2))
+            data = data / stds.reshape(1, -1, 1)
+            data = data.transpose((2, 0, 1))
+        
+        
+        num_samples = data.shape[0]
+        x_i = np.arange(num_samples - (2 * lags - 1))
+        num_samples = x_i.shape[0]
+        num_train = round(num_samples * ratio[0])
+        num_test = round(num_samples * ratio[2])
+        num_val = num_samples - num_train - num_test
+
+        x_train = x_i[:num_train]
+        x_val = x_i[num_train: num_train + num_val]
+        x_test = x_i[-num_test:]
+
+
+        train_dataset = IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        val_dataset = IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        test_dataset = IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
+        
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+        val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
+
+
+        return train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds
