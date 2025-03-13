@@ -3,9 +3,10 @@ import ssl
 import urllib.request
 import numpy as np
 from torch.utils.data import DataLoader
+import torch
 
-from ..signal import StaticGraphTemporalSignal
-from ..signal import IndexDataset
+from ..signal import StaticGraphTemporalSignal,IndexDataset
+
 
 class ChickenpoxDatasetLoader(object):
     """A dataset of county level chicken pox cases in Hungary between 2004
@@ -17,7 +18,7 @@ class ChickenpoxDatasetLoader(object):
     than 500 snapshots (weeks).
     """
 
-    def __init__(self):
+    def __init__(self, index=False):
         self._read_web_data()
 
     def _read_web_data(self):
@@ -111,9 +112,9 @@ class ChickenpoxDatasetLoader(object):
         x_val = x_i[num_train: num_train + num_val]
         x_test = x_i[-num_test:]
 
-        train_dataset = IndexDataset(x_train,data,lags,gpu=allGPU, lazy=dask_batching)
-        val_dataset = IndexDataset(x_val,data,lags,gpu=allGPU, lazy=dask_batching)
-        test_dataset = IndexDataset(x_test,data,lags,gpu=allGPU,lazy=dask_batching)
+        train_dataset = IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        val_dataset = IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        test_dataset = IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
         
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
         val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
