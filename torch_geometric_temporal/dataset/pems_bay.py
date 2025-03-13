@@ -24,9 +24,7 @@ class PemsBayDatasetLoader(object):
         super(PemsBayDatasetLoader, self).__init__()
         self.index = index
         self.raw_data_dir = raw_data_dir
-
-        if not self.index:
-            self._read_web_data()
+        self._read_web_data()
 
     def _download_url(self, url, save_path):  # pragma: no cover
         context = ssl._create_unverified_context()
@@ -34,7 +32,7 @@ class PemsBayDatasetLoader(object):
             with open(save_path, "wb") as out_file:
                 out_file.write(dl_file.read())
 
-    def _read_web_data(self):
+    def _read_web_data(self):            
         url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
 
         # Check if zip file is in data folder from working directory, otherwise download
@@ -54,21 +52,22 @@ class PemsBayDatasetLoader(object):
                 os.path.join(self.raw_data_dir, "PEMS-BAY.zip"), "r"
             ) as zip_fh:
                 zip_fh.extractall(self.raw_data_dir)
-    
-        A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
-        X = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose(
-            (1, 2, 0)
-        )
-        X = X.astype(np.float32)
+        
+        if not self.index:
+            A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
+            X = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose(
+                (1, 2, 0)
+            )
+            X = X.astype(np.float32)
 
-        # Normalise as in DCRNN paper (via Z-Score Method)
-        means = np.mean(X, axis=(0, 2))
-        X = X - means.reshape(1, -1, 1)
-        stds = np.std(X, axis=(0, 2))
-        X = X / stds.reshape(1, -1, 1)
+            # Normalise as in DCRNN paper (via Z-Score Method)
+            means = np.mean(X, axis=(0, 2))
+            X = X - means.reshape(1, -1, 1)
+            stds = np.std(X, axis=(0, 2))
+            X = X / stds.reshape(1, -1, 1)
 
-        self.A = torch.from_numpy(A)
-        self.X = torch.from_numpy(X)
+            self.A = torch.from_numpy(A)
+            self.X = torch.from_numpy(X)
 
     def _get_edges_and_weights(self):
         edge_indices, values = dense_to_sparse(self.A)
@@ -143,26 +142,6 @@ class PemsBayDatasetLoader(object):
             ]
         """
 
-        url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
-
-        # Check if zip file is in data folder from working directory, otherwise download
-        if not os.path.isfile(
-            os.path.join(self.raw_data_dir, "PEMS-BAY.zip")
-        ):  # pragma: no cover
-            if not os.path.exists(self.raw_data_dir):
-                os.makedirs(self.raw_data_dir)
-            self._download_url(url, os.path.join(self.raw_data_dir, "PEMS-BAY.zip"))
-
-        if not os.path.isfile(
-            os.path.join(self.raw_data_dir, "pems_adj_mat.npy")
-        ) or not os.path.isfile(
-            os.path.join(self.raw_data_dir, "pems_node_values.npy")
-        ):  # pragma: no cover
-            with zipfile.ZipFile(
-                os.path.join(self.raw_data_dir, "PEMS-BAY.zip"), "r"
-            ) as zip_fh:
-                zip_fh.extractall(self.raw_data_dir)
-        
         # adj matrix setup
         A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
         edge_indices, values = dense_to_sparse(torch.from_numpy(A))
