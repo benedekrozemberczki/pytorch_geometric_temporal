@@ -12,20 +12,18 @@ import pandas as pd
 import pickle
 
 class PemsDatasetLoader(object):
-    """A traffic forecasting dataset as described in Diffusion Convolution Layer Paper.
+    """
+    A traffic forecasting dataset for the entirety of California. This traffic dataset is collected by California 
+    Transportation Agencies (CalTrans) Performance Measurement System (PeMS). 
 
-    This traffic dataset is collected by California Transportation Agencies (CalTrans)
-    Performance Measurement System (PeMS). It is represented by a network of 325 traffic sensors
-    in the Bay Area with 6 months of traffic readings ranging from Jan 1st 2017 to May 31th 2017
-    in 5 minute intervals.
-
-    For details see: `"Diffusion Convolutional Recurrent Neural Network:
-    Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
+    For details see: `"Graph-partitioning-based diffusion convolutional 
+    recurrent neural network for large-scale traffic forecasting" 
+    <https://arxiv.org/abs/1909.11197>`_
     """
 
     def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data"),index=False):
         if not index:
-            NotImplementedError("The PeMS dataset does not support batching with the index-method")
+            NotImplementedError("The PeMS dataset does not support batching without  the index-method")
 
 
         super(PemsDatasetLoader, self).__init__()
@@ -41,7 +39,6 @@ class PemsDatasetLoader(object):
 
     def _read_web_data(self):  
         PeMS_file_links = {
-            "pems_cali_distances.csv": "https://anl.app.box.com/shared/static/cfnc6wryh4yrp58qfc5z7tyxbbpj4gek",
             "pems_cali_adj_mat.pkl" : "https://anl.app.box.com/shared/static/4143x1repqa1u26aiz7o2rvw3vpcu0wp",
             "pems_cali_speed.h5": "https://anl.app.box.com/shared/static/7hfhtie02iufy75ac1d8g8530majwci0"
         }          
