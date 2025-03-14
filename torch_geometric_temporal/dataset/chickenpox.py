@@ -2,8 +2,8 @@ import json
 import ssl
 import urllib.request
 import numpy as np
-from torch.utils.data import DataLoader
 import torch
+from torch.utils.data import DataLoader
 
 from ..signal import StaticGraphTemporalSignal,IndexDataset
 
