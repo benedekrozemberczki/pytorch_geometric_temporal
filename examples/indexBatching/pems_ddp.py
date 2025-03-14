@@ -52,7 +52,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, loader=None):
+def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, loader=None, start_time=None):
 
     worker_rank = int(dist.get_rank())
     gpu = worker_rank % 4   
@@ -166,6 +166,8 @@ def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, lo
 
             min_t = min(min_t, train_loss)
             min_v = min(min_v, val_loss)
+    if worker_rank == 0:
+        print(f"Runtime: {round(t2 - start_time,2)}; Best Train MSE: {min_t}; Best Validation MSE: {min_v}", flush=True)
 
 def main():
     args = parse_arguments()
@@ -195,6 +197,7 @@ def main():
 
     futures = dispatch.run(client, train,
                             args=args, debug=debug, epochs=epochs, batch_size=batch_size,allGPU=allGPU,loader=loader,
+                            start_time=t1,
                             backend="gloo")
     
     key = uuid.uuid4().hex
