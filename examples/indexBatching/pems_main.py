@@ -142,6 +142,7 @@ def main():
     batch_size = args.batch_size
     epochs = args.epochs
 
+    t1 = time.time()
     loader = PemsDatasetLoader(index=True)
     if allGPU:
         train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds = loader.get_index_dataset(allGPU=0)
@@ -155,7 +156,8 @@ def main():
 
         
     t_min, v_min = train(train_dataloader, val_dataloader, means, stds, edges, edge_weights, epochs, 12,11160,2, allGPU=allGPU, debug=debug)
-    train_t2 = time.time()
+    t2 = time.time()
+    print(f"Runtime: {round(t2 - t1,2)}; Best Train MSE: {t_min}; Best Validation MSE: {v_min}")
     
 if __name__ == "__main__":
     main()
