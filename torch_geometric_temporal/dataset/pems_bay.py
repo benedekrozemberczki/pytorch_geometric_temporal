@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from torch_geometric.utils import dense_to_sparse
 from ..signal import StaticGraphTemporalSignal,IndexDataset
+from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
 
 class PemsBayDatasetLoader(object):
@@ -117,7 +118,8 @@ class PemsBayDatasetLoader(object):
             self.edges, self.edge_weights, self.features, self.targets
         )
         return dataset
-    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2),dask_batching=False):
+    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2), 
+                          world_size=-1, ddp_rank=-1, dask_batching=False):
         """
         Returns torch dataloaders using index batching for PeMSBay dataset.
 
@@ -127,6 +129,8 @@ class PemsBayDatasetLoader(object):
             shuffle (bool, optional): If the data should be shuffled. Defaults to False.
             allGPU (int, optional): GPU device ID for performing preprocessing in GPU memory. 
                                     If -1, computation is done on CPU. Defaults to -1.
+            world_size (int, optional): The number of workers if DDP is being used. Defaults to -1.
+            ddp_rank (int, optional): The DDP rank of the worker if DDP is being used. Defaults to -1.
             ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
 
         Returns:
@@ -188,9 +192,19 @@ class PemsBayDatasetLoader(object):
         val_dataset = IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
         test_dataset = IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
         
-        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-        val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
-        test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
+        if ddp_rank != -1:
+            train_sampler = DistributedSampler(train_dataset,  num_replicas=world_size, rank=ddp_rank, shuffle=shuffle)
+            train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
+            
+            val_sampler = DistributedSampler(val_dataset, num_replicas=world_size, rank=ddp_rank, shuffle=shuffle)                  
+            val_dataloader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
+            
+            test_sampler = DistributedSampler(test_dataset, num_replicas=world_size, rank=ddp_rank, shuffle=shuffle)                  
+            test_dataloader = DataLoader(test_dataset, batch_size=batch_size, sampler=test_sampler)
+        else:
+            train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
+            val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
+            test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=shuffle)
 
 
         return train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds

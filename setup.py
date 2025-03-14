@@ -12,6 +12,8 @@ install_requires = [
 ]
 tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
 index_require = ['dask', "pandas", "tables"]
+ddp_require = ["dask[distributed]", "dask_pytorch_ddp", "pandas", "tables"]
+
 keywords = [
     "machine-learning",
     "deep-learning",
@@ -48,7 +50,8 @@ setup(
     install_requires=install_requires,
     extras_require={
         "test": tests_require,
-        "index": index_require
+        "index": index_require,
+        "ddp": ddp_require
     },
     python_requires=">=3.6",
     classifiers=[
