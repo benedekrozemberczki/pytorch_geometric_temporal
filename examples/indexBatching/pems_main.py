@@ -119,11 +119,6 @@ def train(train_dataloader, val_dataloader, mean, std, edges, edge_weights, epoc
 
         min_t = min(min_t, train_loss)
         min_v = min(min_v, val_loss)
-
-    with open("per_epoch_stats.csv", mode="w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["epoch","runtime","t_mae", "v_mae"])
-        writer.writerows(stats)
     
     return min_t, min_v
 
