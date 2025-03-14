@@ -11,7 +11,7 @@ install_requires = [
     "networkx",
 ]
 tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
-index_require = ['dask', "pandas"]
+index_require = ['dask', "pandas", "tables"]
 keywords = [
     "machine-learning",
     "deep-learning",
