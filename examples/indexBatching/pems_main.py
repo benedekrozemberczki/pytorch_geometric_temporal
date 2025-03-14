@@ -140,9 +140,9 @@ def main():
     t1 = time.time()
     loader = PemsDatasetLoader(index=True)
     if allGPU:
-        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds = loader.get_index_dataset(allGPU=0)
+        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds = loader.get_index_dataset(allGPU=0, batch_size=batch_size)
     else:
-        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds = loader.get_index_dataset()
+        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds = loader.get_index_dataset(batch_size=batch_size)
     
 
     sensor_ids, sensor_id_to_ind, adj_mx = load_graph_data("data/pems_cali_adj_mat.pkl")

@@ -134,9 +134,9 @@ def main():
     t1 = time.time()
     loader = ChickenpoxDatasetLoader()
     if allGPU == True:
-        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights = loader.get_index_dataset(allGPU=0)
+        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights = loader.get_index_dataset(allGPU=0,batch_size=batch_size)
     else:
-        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights = loader.get_index_dataset()
+        train_dataloader, val_dataloader, test_dataloader, edges, edge_weights = loader.get_index_dataset(batch_size=batch_size)
     
     t_min, v_min = train(train_dataloader, val_dataloader, edges, edge_weights, epochs, 4,20,1, allGPU=allGPU, debug=debug)
     t2 = time.time()
