@@ -1,8 +1,6 @@
 
 from torch_geometric_temporal.nn.recurrent import BatchedDCRNN as DCRNN
 from torch_geometric_temporal.dataset import ChickenpoxDatasetLoader
-
-import torch.nn as nn
 import torch.optim as optim
 
 import argparse
