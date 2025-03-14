@@ -63,7 +63,7 @@ class ChickenpoxDatasetLoader(object):
         )
         return dataset
     
-    def get_index_dataset(self, lags=4, batch_size=4, shuffle=False, allGPU=-1, dask_batching=False, ratio=(0.7, 0.1, 0.2)):
+    def get_index_dataset(self, lags=4, batch_size=4, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2)):
         """
         Returns torch dataloaders using index batching for Chickenpox Hungary dataset.
 
@@ -74,7 +74,6 @@ class ChickenpoxDatasetLoader(object):
             allGPU (int, optional): GPU device ID for performing preprocessing in GPU memory. 
                                     If -1, computation is done on CPU. Defaults to -1.
             ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
-            dask_batching (bool): Should dask batching be used
 
         Returns:
             Tuple[
@@ -86,9 +85,7 @@ class ChickenpoxDatasetLoader(object):
             ]
         """
         
-        if dask_batching:
-            raise NotImplementedError("Currently dask batching is not implemented for the Chickenpox dataset")
-
+        
         data = np.array(self._dataset["FX"])
         edges = torch.tensor(self._dataset["edges"],dtype=torch.int64).T
         edge_weights = torch.ones(edges.shape[1],dtype=torch.float)

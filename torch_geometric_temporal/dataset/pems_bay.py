@@ -117,7 +117,7 @@ class PemsBayDatasetLoader(object):
             self.edges, self.edge_weights, self.features, self.targets
         )
         return dataset
-    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, dask_batching=False, ratio=(0.7, 0.1, 0.2)):
+    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2)):
         """
         Returns torch dataloaders using index batching for Chickenpox Hungary dataset.
 
@@ -128,7 +128,6 @@ class PemsBayDatasetLoader(object):
             allGPU (int, optional): GPU device ID for performing preprocessing in GPU memory. 
                                     If -1, computation is done on CPU. Defaults to -1.
             ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
-            dask_batching (bool): Should dask batching be used
 
         Returns:
             Tuple[
