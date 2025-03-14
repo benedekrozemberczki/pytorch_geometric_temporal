@@ -1,17 +1,14 @@
-import time 
-import csv
-
 from torch_geometric_temporal.nn.recurrent import BatchedDCRNN as DCRNN
 from torch_geometric_temporal.dataset import PemsDatasetLoader
 
-from torch.utils.data import DataLoader, TensorDataset
 import torch.nn as nn
 import torch.optim as optim
-import argparse
 
-from utils import *
-import threading
+import argparse
+import csv
 import os
+import time 
+from utils import *
 
 
 def parse_arguments():
