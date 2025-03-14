@@ -119,7 +119,7 @@ class PemsBayDatasetLoader(object):
         return dataset
     def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2),dask_batching=False):
         """
-        Returns torch dataloaders using index batching for Chickenpox Hungary dataset.
+        Returns torch dataloaders using index batching for PeMSBay dataset.
 
         Args:
             lags (int, optional): The number of time lags. Defaults to 12.
