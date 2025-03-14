@@ -5,7 +5,7 @@ import uuid
 import os
 
 from torch_geometric_temporal.nn.recurrent import BatchedDCRNN as DCRNN
-from torch_geometric_temporal.dataset import PemsBayDatasetLoader,PemsDatasetLoader
+from torch_geometric_temporal.dataset import PemsBayDatasetLoader,PemsAllLADatasetLoader,PemsDatasetLoader
 from utils import *
 
 import torch
@@ -177,14 +177,16 @@ def main():
     epochs = args.epochs
     npar = args.npar
 
-    if args.dataset.lower() not in ["pems-bay","pems"]:
-        raise ValueError("Invalid argument for --dataset. --dataset must be 'pems-bay' or 'pems'")
+    if args.dataset.lower() not in ["pems-bay","pemsallla", "pems"]:
+        raise ValueError("Invalid argument for --dataset. --dataset must be 'pems-bay', 'pemsAllLA', or 'pems'")
   
     t1 = time.time() 
     
     # force the datasets to download before launching dask cluster
     if args.dataset.lower() == "pems-bay":
         loader = PemsBayDatasetLoader(index=True)
+    if args.dataset.lower() == "pemsallla":
+        loader = PemsAllLADatasetLoader(index=True)
     if args.dataset.lower() == "pems":
         loader = PemsDatasetLoader(index=True)
     
