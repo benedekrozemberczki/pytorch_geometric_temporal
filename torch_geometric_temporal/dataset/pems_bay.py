@@ -135,18 +135,16 @@ class PemsBayDatasetLoader(object):
                 DataLoader,  # Dataloader for the training set
                 DataLoader,  # Dataloader for the validation set
                 DataLoader,  # Dataloader for the test set
-                np.ndarray,  # Edge indices (shape: [2, num_edges])
-                np.ndarray,   # Edge weights (shape: [num_edges])
-                np.ndarray,   # Means
-                np.ndarray,   # Stds
+                torch.tensor,  # Edge indices (shape: [2, num_edges])
+                torch.tensor,   # Edge weights (shape: [num_edges])
+                torch.tensor,   # Means
+                torch.tensor,   # Stds
             ]
         """
 
         # adj matrix setup
         A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
-        edge_indices, values = dense_to_sparse(torch.from_numpy(A))
-        edges = edge_indices.numpy()
-        edge_weights = values.numpy()
+        edges, edge_weights = dense_to_sparse(torch.from_numpy(A))
 
         # setup data
         data = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose((1, 2, 0))
@@ -170,6 +168,9 @@ class PemsBayDatasetLoader(object):
             stds = np.std(data, axis=(0, 2))
             data = data / stds.reshape(1, -1, 1)
             data = data.transpose((2, 0, 1))
+
+            means = torch.tensor(means,dtype=torch.float)
+            stds = torch.tensor(stds,dtype=torch.float)
         
         
         num_samples = data.shape[0]

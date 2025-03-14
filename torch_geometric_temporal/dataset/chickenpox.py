@@ -81,8 +81,8 @@ class ChickenpoxDatasetLoader(object):
                 DataLoader,  # Dataloader for the training set
                 DataLoader,  # Dataloader for the validation set
                 DataLoader,  # Dataloader for the test set
-                np.ndarray,  # Edge indices (shape: [2, num_edges])
-                np.ndarray   # Edge weights (shape: [num_edges])
+                torch.tensor,  # Edge indices (shape: [2, num_edges])
+                torch.tensor   # Edge weights (shape: [num_edges])
             ]
         """
         
@@ -90,8 +90,8 @@ class ChickenpoxDatasetLoader(object):
             raise NotImplementedError("Currently dask batching is not implemented for the Chickenpox dataset")
 
         data = np.array(self._dataset["FX"])
-        edges = np.array(self._dataset["edges"]).T
-        edge_weights = np.ones(edges.shape[1])
+        edges = torch.tensor(self._dataset["edges"],dtype=torch.int64).T
+        edge_weights = torch.ones(edges.shape[1],dtype=torch.float)
         num_samples = data.shape[0]
         
         if allGPU != -1:
