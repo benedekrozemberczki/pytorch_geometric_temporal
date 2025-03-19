@@ -23,7 +23,7 @@ class ChickenpoxDatasetLoader(object):
         self.index = index
 
         if index == True:
-            from ..signal import IndexDataset
+            from ..signal.index_dataset import IndexDataset
             self.IndexDataset = IndexDataset 
 
     def _read_web_data(self):

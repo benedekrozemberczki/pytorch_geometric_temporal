@@ -19,7 +19,7 @@ class WindmillOutputLargeDatasetLoader(object):
         self.index = index
 
         if index:
-            from ..signal import IndexDataset
+            from ..signal.index_dataset import IndexDataset
             self.IndexDataset = IndexDataset 
 
 

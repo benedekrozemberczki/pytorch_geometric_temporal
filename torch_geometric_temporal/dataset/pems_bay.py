@@ -28,7 +28,7 @@ class PemsBayDatasetLoader(object):
         self._read_web_data()
         
         if index:
-            from ..signal import IndexDataset
+            from ..signal.index_dataset import IndexDataset
             self.IndexDataset = IndexDataset 
 
     def _download_url(self, url, save_path):  # pragma: no cover

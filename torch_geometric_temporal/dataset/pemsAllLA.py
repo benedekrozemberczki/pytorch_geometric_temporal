@@ -5,7 +5,7 @@ from tqdm import tqdm
 import numpy as np
 import torch
 from torch_geometric.utils import dense_to_sparse
-from ..signal import StaticGraphTemporalSignal,IndexDataset
+from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
 import pandas as pd
@@ -25,7 +25,9 @@ class PemsAllLADatasetLoader(object):
         
         if not index:
             NotImplementedError("The PeMSAllLA dataset does not support batching without the index-method")
-
+        else:
+            from ..signal.index_dataset import IndexDataset
+            self.IndexDataset = IndexDataset
 
         super(PemsAllLADatasetLoader, self).__init__()
         self.index = index
@@ -151,9 +153,9 @@ class PemsAllLADatasetLoader(object):
         x_val = x_i[num_train: num_train + num_val]
         x_test = x_i[-num_test:]
 
-        train_dataset = IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
-        val_dataset = IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
-        test_dataset = IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
+        train_dataset = self.IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        val_dataset = self.IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        test_dataset = self.IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
 
         if ddp_rank != -1:
             train_sampler = DistributedSampler(train_dataset,  num_replicas=world_size, rank=ddp_rank, shuffle=shuffle)
