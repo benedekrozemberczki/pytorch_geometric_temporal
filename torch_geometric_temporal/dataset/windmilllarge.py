@@ -16,9 +16,12 @@ class WindmillOutputLargeDatasetLoader(object):
 
     def __init__(self, index=False):
         self._read_web_data()
+        self.index = index
 
         if index:
             from ..signal import IndexDataset
+            self.IndexDataset = IndexDataset 
+
 
     def _read_web_data(self):
         url = "https://graphmining.ai/temporal_datasets/windmill_output.json"
@@ -87,7 +90,8 @@ class WindmillOutputLargeDatasetLoader(object):
                 torch.tensor,   # Stds
             ]
         """
-
+        if not self.index:
+            raise ValueError("get_index_dataset requires 'index=True' in the constructor.")
         # adj matrix setup
         edges = torch.tensor(self._dataset["edges"], dtype=torch.int64).T
         edge_weights = torch.tensor(self._dataset["weights"], dtype=torch.float)
@@ -121,9 +125,9 @@ class WindmillOutputLargeDatasetLoader(object):
         x_val = x_i[num_train: num_train + num_val]
         x_test = x_i[-num_test:]
 
-        train_dataset = IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
-        val_dataset = IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
-        test_dataset = IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
+        train_dataset = self.IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        val_dataset = self.IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        test_dataset = self.IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
         
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
         val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)

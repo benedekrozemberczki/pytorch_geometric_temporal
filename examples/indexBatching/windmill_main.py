@@ -138,7 +138,7 @@ def main():
     epochs = args.epochs
     
     t1 = time.time()
-    loader = WindmillOutputLargeDatasetLoader()
+    loader = WindmillOutputLargeDatasetLoader(index=True)
     if allGPU == True:
         train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, mean, std = loader.get_index_dataset(allGPU=0, batch_size=batch_size)
     else:

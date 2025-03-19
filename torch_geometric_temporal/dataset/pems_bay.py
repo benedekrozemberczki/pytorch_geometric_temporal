@@ -29,6 +29,7 @@ class PemsBayDatasetLoader(object):
         
         if index:
             from ..signal import IndexDataset
+            self.IndexDataset = IndexDataset 
 
     def _download_url(self, url, save_path):  # pragma: no cover
         context = ssl._create_unverified_context()
@@ -148,6 +149,9 @@ class PemsBayDatasetLoader(object):
             ]
         """
 
+        if not self.index:
+            raise ValueError("get_index_dataset requires 'index=True' in the constructor.")
+            
         # adj matrix setup
         A = np.load(os.path.join(self.raw_data_dir, "pems_adj_mat.npy"))
         edges, edge_weights = dense_to_sparse(torch.from_numpy(A))
@@ -191,9 +195,9 @@ class PemsBayDatasetLoader(object):
         x_test = x_i[-num_test:]
 
 
-        train_dataset = IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
-        val_dataset = IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
-        test_dataset = IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
+        train_dataset = self.IndexDataset(x_train,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        val_dataset = self.IndexDataset(x_val,data,lags,gpu=not (allGPU == -1), lazy=dask_batching)
+        test_dataset = self.IndexDataset(x_test,data,lags,gpu=not (allGPU == -1),lazy=dask_batching)
         
         if ddp_rank != -1:
             train_sampler = DistributedSampler(train_dataset,  num_replicas=world_size, rank=ddp_rank, shuffle=shuffle)
