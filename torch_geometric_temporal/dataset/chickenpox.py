@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from ..signal import StaticGraphTemporalSignal,IndexDataset
+from ..signal import StaticGraphTemporalSignal
 
 
 class ChickenpoxDatasetLoader(object):
@@ -20,6 +20,9 @@ class ChickenpoxDatasetLoader(object):
 
     def __init__(self, index=False):
         self._read_web_data()
+        
+        if index:
+            from ..signal import IndexDataset
 
     def _read_web_data(self):
         url = "https://raw.githubusercontent.com/benedekrozemberczki/pytorch_geometric_temporal/master/dataset/chickenpox.json"

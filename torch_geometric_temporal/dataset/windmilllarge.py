@@ -2,7 +2,7 @@ import json
 import ssl
 import urllib.request
 import numpy as np
-from ..signal import StaticGraphTemporalSignal,IndexDataset
+from ..signal import StaticGraphTemporalSignal
 import torch
 from torch.utils.data import DataLoader
 
@@ -16,6 +16,9 @@ class WindmillOutputLargeDatasetLoader(object):
 
     def __init__(self, index=False):
         self._read_web_data()
+
+        if index:
+            from ..signal import IndexDataset
 
     def _read_web_data(self):
         url = "https://graphmining.ai/temporal_datasets/windmill_output.json"

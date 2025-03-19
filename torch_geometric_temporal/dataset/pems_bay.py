@@ -5,7 +5,7 @@ import zipfile
 import numpy as np
 import torch
 from torch_geometric.utils import dense_to_sparse
-from ..signal import StaticGraphTemporalSignal,IndexDataset
+from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
 
@@ -26,6 +26,9 @@ class PemsBayDatasetLoader(object):
         self.index = index
         self.raw_data_dir = raw_data_dir
         self._read_web_data()
+        
+        if index:
+            from ..signal import IndexDataset
 
     def _download_url(self, url, save_path):  # pragma: no cover
         context = ssl._create_unverified_context()
