@@ -8,7 +8,6 @@ from torch_geometric.utils import dense_to_sparse
 from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
-import pandas as pd
 import pickle
 
 class PemsDatasetLoader(object):
