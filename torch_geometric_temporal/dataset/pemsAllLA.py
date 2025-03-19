@@ -8,7 +8,6 @@ from torch_geometric.utils import dense_to_sparse
 from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
-import pandas as pd
 import pickle
 
 class PemsAllLADatasetLoader(object):
@@ -27,6 +26,9 @@ class PemsAllLADatasetLoader(object):
             NotImplementedError("The PeMSAllLA dataset does not support batching without the index-method")
         else:
             from ..signal.index_dataset import IndexDataset
+            import pandas as pd
+
+            self.pd = pd
             self.IndexDataset = IndexDataset
 
         super(PemsAllLADatasetLoader, self).__init__()
@@ -100,7 +102,7 @@ class PemsAllLADatasetLoader(object):
         edges, edge_weights = dense_to_sparse(torch.from_numpy(adj_mx))
     
         # setup data
-        df = pd.read_hdf(os.path.join(self.raw_data_dir, "pems_AllLA_speed.h5"), "df")
+        df = self.pd.read_hdf(os.path.join(self.raw_data_dir, "pems_AllLA_speed.h5"), "df")
         num_samples, num_nodes = df.shape
         
 

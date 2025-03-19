@@ -27,7 +27,10 @@ class PemsDatasetLoader(object):
 
         else:
             from ..signal.index_dataset import IndexDataset
-            self.IndexDataset = IndexDataset 
+            import pandas as pd
+
+            self.IndexDataset = IndexDataset
+            self.pd = pd 
 
         super(PemsDatasetLoader, self).__init__()
         self.index = index
@@ -100,7 +103,7 @@ class PemsDatasetLoader(object):
         edges, edge_weights = dense_to_sparse(torch.from_numpy(adj_mx))
     
         # setup data
-        df = pd.read_hdf(os.path.join(self.raw_data_dir, "pems_cali_speed.h5"), "df")
+        df = self.pd.read_hdf(os.path.join(self.raw_data_dir, "pems_cali_speed.h5"), "df")
         num_samples, num_nodes = df.shape
         
 
