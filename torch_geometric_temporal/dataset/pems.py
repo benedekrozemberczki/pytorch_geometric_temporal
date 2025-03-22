@@ -9,6 +9,7 @@ from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
 import pickle
+from typing import Tuple
 
 class PemsDatasetLoader(object):
     """
@@ -22,7 +23,7 @@ class PemsDatasetLoader(object):
 
     def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data"),index=False):
         if not index:
-            NotImplementedError("The PeMS dataset does not support batching without  the index-method")
+            NotImplementedError("The PeMS dataset does not support batching without the index-method")
 
         else:
             from ..signal.index_dataset import IndexDataset
@@ -35,12 +36,6 @@ class PemsDatasetLoader(object):
         self.index = index
         self.raw_data_dir = raw_data_dir
         self._read_web_data()
-
-    def _download_url(self, url, save_path):  # pragma: no cover
-        context = ssl._create_unverified_context()
-        with urllib.request.urlopen(url, context=context) as dl_file:
-            with open(save_path, "wb") as out_file:
-                out_file.write(dl_file.read())
 
     def _read_web_data(self):  
         PeMS_file_links = {
@@ -66,10 +61,11 @@ class PemsDatasetLoader(object):
                     for chunk in response.iter_content(chunk_size=33554432):
                         file.write(chunk)
                         progress_bar.update(len(chunk))
-         
-    
-    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2), 
-                          world_size=-1, ddp_rank=-1, dask_batching=False):
+                 
+    def get_index_dataset(self, lags: int = 12, batch_size: int = 64, shuffle: bool = False, allGPU: int = -1, 
+                        ratio: Tuple[float, float, float] = (0.7, 0.1, 0.2), world_size: int =-1, ddp_rank: int = -1, 
+                        dask_batching: bool = False) -> Tuple[DataLoader, DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+
         """
         Returns torch dataloaders using index batching for PeMS dataset.
 

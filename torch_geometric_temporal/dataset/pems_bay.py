@@ -8,6 +8,7 @@ from torch_geometric.utils import dense_to_sparse
 from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
+from typing import Tuple
 
 class PemsBayDatasetLoader(object):
     """A traffic forecasting dataset as described in Diffusion Convolution Layer Paper.
@@ -122,8 +123,11 @@ class PemsBayDatasetLoader(object):
             self.edges, self.edge_weights, self.features, self.targets
         )
         return dataset
-    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2), 
-                          world_size=-1, ddp_rank=-1, dask_batching=False):
+    
+    def get_index_dataset(self, lags: int = 12, batch_size: int = 64, shuffle: bool = False, allGPU: int = -1, 
+                          ratio: Tuple[float, float, float] = (0.7, 0.1, 0.2), world_size: int =-1, ddp_rank: int = -1, 
+                          dask_batching: bool = False) -> Tuple[DataLoader, DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    
         """
         Returns torch dataloaders using index batching for PeMSBay dataset.
 

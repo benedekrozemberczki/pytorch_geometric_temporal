@@ -9,6 +9,7 @@ from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
 import pickle
+from typing import Tuple
 
 class PemsAllLADatasetLoader(object):
     """
@@ -36,12 +37,6 @@ class PemsAllLADatasetLoader(object):
         self.raw_data_dir = raw_data_dir
         self._read_web_data()
 
-    def _download_url(self, url, save_path):  # pragma: no cover
-        context = ssl._create_unverified_context()
-        with urllib.request.urlopen(url, context=context) as dl_file:
-            with open(save_path, "wb") as out_file:
-                out_file.write(dl_file.read())
-
     def _read_web_data(self):  
         PeMS_file_links = {
                 "pems_AllLA_adj_mat.pkl": "https://anl.app.box.com/shared/static/9qc2lc1147xzh8kmq3j4fuo4buiksxua",
@@ -68,8 +63,9 @@ class PemsAllLADatasetLoader(object):
                         progress_bar.update(len(chunk))
          
     
-    def get_index_dataset(self, lags=12, batch_size=64, shuffle=False, allGPU=-1, ratio=(0.7, 0.1, 0.2), 
-                          world_size=-1, ddp_rank=-1, dask_batching=False):
+    def get_index_dataset(self, lags: int = 12, batch_size: int = 64, shuffle: bool = False, allGPU: int = -1, 
+                          ratio: Tuple[float, float, float] = (0.7, 0.1, 0.2), world_size: int =-1, ddp_rank: int = -1, 
+                          dask_batching: bool = False) -> Tuple[DataLoader, DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Returns torch dataloaders using index batching for PeMS dataset.
 
