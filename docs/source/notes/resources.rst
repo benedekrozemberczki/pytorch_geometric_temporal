@@ -43,3 +43,6 @@ External Resources - Datasets
 * Ferenc Béres, Róbert Pálovics, Anna Oláh, András A. Benczúr: **Temporal Walk Based Centrality Metric for Graph Streams** `Paper <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6214300/>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
 
 * Ferenc Béres, Domokos M. Kelen, Róbert Pálovics, András A. Benczúr : **Node Embeddings in Dynamic Graphs** `Paper <https://appliednetsci.springeropen.com/articles/10.1007/s41109-019-0169-5>`_, `Dataset <https://github.com/ferencberes/twittertennis>`_ 
+
+* Mallick, Tanwi and Balaprakash, Prasanna and Rask, Eric and Macfarlane, Jane: **Graph-partitioning-based diffusion convolutional recurrent neural network for large-scale traffic forecasting** `Paper <https://arxiv.org/abs/1909.11197>`_, `Dataset <https://github.com/tanwimallick/graph_partition_based_DCRNN/>`_ 
+
