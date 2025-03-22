@@ -64,9 +64,19 @@ Heterogeneous Temporal Signal Batch Iterators
     :members:
     :undoc-members:
 
-Temporal Signal Train-Test Split
+Temporal Signal Index-Batching Iterators
 --------------------------------
 
+
+.. automodule:: torch_geometric_temporal.signal.index_dataset
+    :members:
+    :undoc-members:
+
+Temporal Signal Train-Test Split
+--------------------------------
 .. automodule:: torch_geometric_temporal.signal.temporal_signal_split
     :members:
     :undoc-members:
+
+
+

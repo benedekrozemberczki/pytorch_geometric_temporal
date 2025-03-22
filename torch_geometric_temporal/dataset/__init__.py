@@ -10,3 +10,6 @@ from .encovid import EnglandCovidDatasetLoader
 from .twitter_tennis import TwitterTennisDatasetLoader
 from .montevideo_bus import MontevideoBusDatasetLoader
 from .mtm import MTMDatasetLoader
+
+from .pemsAllLA import PemsAllLADatasetLoader
+from .pems import PemsDatasetLoader
