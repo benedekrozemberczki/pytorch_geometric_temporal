@@ -19,6 +19,12 @@ class PemsDatasetLoader(object):
     For details see: `"Graph-partitioning-based diffusion convolutional 
     recurrent neural network for large-scale traffic forecasting" 
     <https://arxiv.org/abs/1909.11197>`_
+
+    Args:
+        raw_data_dir (string, optional): The directory to download the PeMS files to. 
+            Defaults to "data/".
+        index (bool, optional): If True, initializes the dataloader to use index-based batching.
+            Defaults to False.
     """
 
     def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data"),index=False):
@@ -81,15 +87,16 @@ class PemsDatasetLoader(object):
             
 
         Returns:
-            Tuple[
-                DataLoader,  # Dataloader for the training set
-                DataLoader,  # Dataloader for the validation set
-                DataLoader,  # Dataloader for the test set
-                torch.tensor,  # Edge indices (shape: [2, num_edges])
-                torch.tensor,   # Edge weights (shape: [num_edges])
-                torch.tensor,   # Means
-                torch.tensor,   # Stds
-            ]
+        Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]: 
+        
+        A 7-tuple containing:
+            - **train_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the training set.
+            - **val_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the validation set.
+            - **test_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the test set.
+            - **edges** (*torch.Tensor*): The graph edges as a 2D matrix, shape `[2, num_edges]`.
+            - **edge_weights** (*torch.Tensor*): Each graph edge's weight, shape `[num_edges]`.
+            - **means** (*torch.Tensor*): The means of each feature dimension.
+            - **stds** (*torch.Tensor*): The standard deviations of each feature dimension.
         """
 
         # adj matrix setup

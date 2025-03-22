@@ -20,9 +20,15 @@ class PemsBayDatasetLoader(object):
 
     For details see: `"Diffusion Convolutional Recurrent Neural Network:
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
+
+    Args:
+        raw_data_dir (string, optional): The directory to download the PeMS-Bay files to. 
+            Defaults to "data/".
+        index (bool, optional): If True, initializes the dataloader to use index-based batching.
+            Defaults to False.
     """
 
-    def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data"),index=False):
+    def __init__(self, raw_data_dir: str =os.path.join(os.getcwd(), "data"),index: bool = False):
         super(PemsBayDatasetLoader, self).__init__()
         self.index = index
         self.raw_data_dir = raw_data_dir
@@ -141,17 +147,21 @@ class PemsBayDatasetLoader(object):
             ddp_rank (int, optional): The DDP rank of the worker if DDP is being used. Defaults to -1.
             ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
 
+        
         Returns:
-            Tuple[
-                DataLoader,  # Dataloader for the training set
-                DataLoader,  # Dataloader for the validation set
-                DataLoader,  # Dataloader for the test set
-                torch.tensor,  # Edge indices (shape: [2, num_edges])
-                torch.tensor,   # Edge weights (shape: [num_edges])
-                torch.tensor,   # Means
-                torch.tensor,   # Stds
-            ]
+            Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]: 
+            
+            A 7-tuple containing:
+                - **train_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the training set.
+                - **val_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the validation set.
+                - **test_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the test set.
+                - **edges** (*torch.Tensor*): The graph edges as a 2D matrix, shape `[2, num_edges]`.
+                - **edge_weights** (*torch.Tensor*): Each graph edge's weight, shape `[num_edges]`.
+                - **means** (*torch.Tensor*): The means of each feature dimension.
+                - **stds** (*torch.Tensor*): The standard deviations of each feature dimension.
         """
+
+
 
         if not self.index:
             raise ValueError("get_index_dataset requires 'index=True' in the constructor.")

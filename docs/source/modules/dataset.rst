@@ -39,6 +39,14 @@ Datasets
     :members:
     :undoc-members:
 
+.. automodule:: torch_geometric_temporal.dataset.pemsAllLA
+    :members:
+    :undoc-members:
+
+.. automodule:: torch_geometric_temporal.dataset.pems
+    :members:
+    :undoc-members:
+
 .. automodule:: torch_geometric_temporal.dataset.encovid
     :members:
     :undoc-members:

@@ -12,6 +12,10 @@ class WindmillOutputLargeDatasetLoader(object):
     for more than 2 years. Vertices represent 319 windmills and
     weighted edges describe the strength of relationships. The target
     variable allows for regression tasks.
+
+    Args:
+        index (bool, optional): If True, initializes the dataloader to use index-based batching.
+            Defaults to False.
     """
 
     def __init__(self, index=False):
@@ -80,15 +84,16 @@ class WindmillOutputLargeDatasetLoader(object):
             ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
 
         Returns:
-            Tuple[
-                DataLoader,  # Dataloader for the training set
-                DataLoader,  # Dataloader for the validation set
-                DataLoader,  # Dataloader for the test set
-                torch.tensor,  # Edge indices (shape: [2, num_edges])
-                torch.tensor   # Edge weights (shape: [num_edges])
-                torch.tensor,   # Means
-                torch.tensor,   # Stds
-            ]
+            Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]: 
+            
+            A 7-tuple containing:
+                - **train_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the training set.
+                - **val_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the validation set.
+                - **test_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the test set.
+                - **edges** (*torch.Tensor*): The graph edges as a 2D matrix, shape `[2, num_edges]`.
+                - **edge_weights** (*torch.Tensor*): Each graph edge's weight, shape `[num_edges]`.
+                - **means** (*torch.Tensor*): The means of each feature dimension.
+                - **stds** (*torch.Tensor*): The standard deviations of each feature dimension.
         """
         if not self.index:
             raise ValueError("get_index_dataset requires 'index=True' in the constructor.")

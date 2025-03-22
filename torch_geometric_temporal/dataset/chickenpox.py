@@ -16,8 +16,11 @@ class ChickenpoxDatasetLoader(object):
     chickenpox cases (we included 4 lags). The target is the weekly number of
     cases for the upcoming week (signed integers). Our dataset consist of more
     than 500 snapshots (weeks).
-    """
 
+    Args:
+        index (bool, optional): If True, initializes the dataloader to use index-based batching.
+            Defaults to False.
+    """
     def __init__(self, index=False):
         self._read_web_data()
         self.index = index
@@ -81,17 +84,19 @@ class ChickenpoxDatasetLoader(object):
             ratio (tuple of float, optional): The desired train, validation, and test split ratios, respectively.
 
         Returns:
-            Tuple[
-                DataLoader,  # Dataloader for the training set
-                DataLoader,  # Dataloader for the validation set
-                DataLoader,  # Dataloader for the test set
-                torch.tensor,  # Edge indices (shape: [2, num_edges])
-                torch.tensor   # Edge weights (shape: [num_edges])
-            ]
+            Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.Tensor, torch.Tensor]: 
+            
+            A 5-tuple containing:
+                - **train_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the training set.
+                - **val_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the validation set.
+                - **test_dataLoader** (*torch.utils.data.DataLoader*): Dataloader for the test set.
+                - **edges** (*torch.Tensor*): The graph edges as a 2D matrix, shape `[2, num_edges]`.
+                - **edge_weights** (*torch.Tensor*): Each graph edge's weight, shape `[num_edges]`.
         """
         
         if not self.index:
             raise ValueError("get_index_dataset requires 'index=True' in the constructor.")
+        
         data = np.array(self._dataset["FX"])
         edges = torch.tensor(self._dataset["edges"],dtype=torch.int64).T
         edge_weights = torch.ones(edges.shape[1],dtype=torch.float)
