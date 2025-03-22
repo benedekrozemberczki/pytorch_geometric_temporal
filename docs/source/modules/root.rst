@@ -50,8 +50,8 @@ Recurrent Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
     :undoc-members:
-    :exclude-members: DConv
-    
+    :exclude-members: DConv,BatchedDConv
+
 .. automodule:: torch_geometric_temporal.nn.recurrent.agcrn
     :members:
     :undoc-members:
@@ -108,8 +108,8 @@ Auxiliary Graph Convolutional Layers
 .. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
     :undoc-members:
-    :exclude-members: DCRNN
-    
+    :exclude-members: DCRNN, BatchedDCRNN
+
 .. automodule:: torch_geometric_temporal.nn.attention.astgcn
     :members:
     :undoc-members:

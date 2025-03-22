@@ -218,11 +218,9 @@ class DCRNN(torch.nn.Module):
         H = self._calculate_hidden_state(Z, H, H_tilde)
         return H
 
-"""
-Extension to DCRNN that enables batching and seq-to-seq prediction
-"""
+
 class BatchedDConv(MessagePassing):
-    r"""An implementation of the Diffusion Convolution Layer.
+    r"""Implementation of the  Diffusion Convolution Layer that enables batching and seq-to-seq prediction
     For details see: `"Diffusion Convolutional Recurrent Neural Network:
     Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
 
@@ -330,7 +328,20 @@ class BatchedDConv(MessagePassing):
 
 
 class BatchedDCRNN(torch.nn.Module):
+    """
+    Implementation of the  Diffusion Convolutional Recurrent Neural Network that enables batching and seq-to-seq prediction.
+    The input data is expected to be of shape `(batch_size, seq_length, num_nodes, num_features)`.
+    For details see: `"Diffusion Convolutional Recurrent Neural Network:
+    Data-Driven Traffic Forecasting" <https://arxiv.org/abs/1707.01926>`_
 
+    Args:
+        in_channels (int): Number of input features.
+        out_channels (int): Number of output features.
+        K (int): Filter size :math:`K`.
+        bias (bool, optional): If set to :obj:`False`, the layer
+            will not learn an additive bias (default :obj:`True`)
+
+    """
     def __init__(self, in_channels: int, out_channels: int, K: int, bias: bool = True):
         super(BatchedDCRNN, self).__init__()
 
