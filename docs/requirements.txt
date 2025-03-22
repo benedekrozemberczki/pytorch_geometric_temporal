@@ -1,5 +1,6 @@
-torch==2.3.0
-numpy==1.26.4
+
+torch
+numpy
 git+https://github.com/pyg-team/pyg_sphinx_theme.git
-scipy==1.13.1
+scipy
 networkx
