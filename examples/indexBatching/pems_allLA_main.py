@@ -139,11 +139,6 @@ def main():
     else:
         train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, means, stds = loader.get_index_dataset(batch_size=batch_size)
     
-
-    sensor_ids, sensor_id_to_ind, adj_mx = load_graph_data("data/pems_cali_adj_mat.pkl")
-    edge_index, edge_weight = adjacency_to_edge_index(adj_mx)
-    
-
         
     t_min, v_min = train(train_dataloader, val_dataloader, means, stds, edges, edge_weights, epochs, 12,11160,2, allGPU=allGPU, debug=debug)
     t2 = time.time()
