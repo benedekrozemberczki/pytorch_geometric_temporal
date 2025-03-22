@@ -30,3 +30,22 @@ To check your current package version just simply run:
 
         $ pip freeze | grep torch-geometric-temporal
 
+**Index-Batching**
+
+The package was recently updated to include index-batching, a new method of batching that improves 
+memory efficiency without any impact on accuracy. To install the needed packages for index-batching,
+run the following command:
+
+    .. code-block:: none
+
+        $ pip install torch-geometric-temporal[index]
+
+**Distributed Data Parallel**
+
+Alongside index-batching, PGT was recently updated with features to support distributed data parallel training.
+To install the needed packages, run the following: 
+
+    .. code-block:: none
+
+        $ pip install torch-geometric-temporal[ddp]
+
