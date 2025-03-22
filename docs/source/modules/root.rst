@@ -110,12 +110,6 @@ Auxiliary Graph Convolutional Layers
     :undoc-members:
     :exclude-members: DCRNN, BatchedDCRNN
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.BatchedDCRNN
-    :members:
-    :undoc-members:
-    :exclude-members: BatchedDCRNN
-
-
 .. automodule:: torch_geometric_temporal.nn.attention.astgcn
     :members:
     :undoc-members:

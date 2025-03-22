@@ -141,9 +141,12 @@ For example, the following is a sample training loop with PeMS-Bay and DCRNN:
 
 
 .. code-block:: python
+
     model = BatchedDCRNN(2, 2, K=3)
+    model = DDP(model)
+
     loader = PemsBayDatasetLoader(index=True)
-    train_dataloader, _, _, edges, edge_weights, means, stds = loader.get_index_dataset(batch_size=batch_size)
+    train_dataloader, _, _, edges, edge_weights, means, stds = loader.get_index_dataset(world_size=world_size, ddp_rank=worker_rank, batch_size=batch_size)
     for batch in train_dataloader:
         X_batch, y_batch = batch
 
@@ -157,6 +160,7 @@ For example, the following is a sample training loop with PeMS-Bay and DCRNN:
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
 
 Index-batching uses a sequence-to-sequence batch format, 
 where the data is of shape `(batch_size, seq_length, num_graph_nodes, num_features)`.
