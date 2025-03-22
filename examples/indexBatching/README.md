@@ -1,6 +1,6 @@
 ## PyTorch Geometric Temporal - Index
 
-Index-batching is a technique that reduces the memory cost of training ST-GNNs with spatiotemporal data with no impact on accurary, enabling greater scalability and training on the full PeMS dataset without graph partioning for the first time. Leveraging the reduced memory footprint, this techique also enables GPU-index-batching - a technique that performs preprocessing entirely in GPU memory and utilizes a single CPU-to-GPU mem-copy in place of batch-level CPU-to-GPU transfers throughout training. We implemented GPU-index-batching and index-batching for the following existing datasets and added two new datasts (highlighted in bold) to PyTorch Geometric Temporal (PGT): 
+Index-batching is a technique that reduces the memory cost of training ST-GNNs with spatiotemporal data with no impact on accurary, enabling greater scalability and training on the full PeMS dataset without graph partioning for the first time. Leveraging the reduced memory footprint, this techique also enables GPU-index-batching - a technique that performs preprocessing entirely in GPU memory and utilizes a single CPU-to-GPU mem-copy in place of batch-level CPU-to-GPU transfers throughout training. We implemented GPU-index-batching and index-batching for the following existing datasets and added two new datasets (highlighted in bold) to PyTorch Geometric Temporal (PGT): 
 
 * PeMs-Bay
 * WindmillLarge
