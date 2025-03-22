@@ -64,7 +64,7 @@ Heterogeneous Temporal Signal Batch Iterators
     :members:
     :undoc-members:
 
-Temporal Signal Index-batching Iterators
+Temporal Signal Index-Batching Iterators
 --------------------------------
 
 
