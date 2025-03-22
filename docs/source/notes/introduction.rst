@@ -88,7 +88,8 @@ We also integrated existing datasets for performance evaluation:
 - `Metr LA Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.metr_la.METRLADatasetLoader>`_
 - `England COVID 19. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.encovid.EnglandCovidDatasetLoader>`_
 - `Twitter Tennis. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.twitter_tennis.TwitterTennisDatasetLoader>`_
-
+- `PeMS-All-LA Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pemsAllLA.PemsAllLADatasetLoader>`_
+- `PeMS Dataset. <https://pytorch-geometric-temporal.readthedocs.io/en/latest/modules/dataset.html#torch_geometric_temporal.data.dataset.pems.PemsDatasetLoader>`_
 
 The Hungarian Chickenpox Dataset can be loaded by the following code snippet. The ``dataset`` returned by the public ``get_dataset`` method is a ``StaticGraphTemporalSignal`` object. 
 
@@ -116,6 +117,91 @@ We provide functions to create temporal splits of the data iterators. These func
     dataset = loader.get_dataset()
 
     train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.8)
+
+Index-Batching & DDP
+=============
+Index-batching is a technique that reduces the memory cost of training ST-GNNs with spatiotemporal 
+data with no impact on accuracy, enabling greater scalability and training on the full PeMS dataset 
+without graph partioning for the first time. Leveraging the reduced memory footprint, 
+this technique also enables GPU-index-batching - a technique that performs preprocessing 
+entirely in GPU memory and utilizes a single CPU-to-GPU mem-copy in place of 
+batch-level CPU-to-GPU transfers throughout training. We implemented GPU-index-batching and 
+index-batching for the following existing datasets and added two new datasets (highlighted in bold) 
+to PyTorch Geometric Temporal (PGT): 
+
+* PeMs-Bay
+* WindmillLarge
+* HungaryChickenpox
+* **PeMSAllLA**
+* **PeMS**
+
+Utilizing index-batching requires minimal modifications to the existing PGT workflow. Simply initialize the 
+DatasetLoader object with the flag `index=True` and then call `loader.get_index_dataset()`
+For example, the following is a sample training loop with PeMS-Bay and DCRNN:
+
+
+.. code-block:: python
+    model = BatchedDCRNN(2, 2, K=3)
+    loader = PemsBayDatasetLoader(index=True)
+    train_dataloader, _, _, edges, edge_weights, means, stds = loader.get_index_dataset(batch_size=batch_size)
+    for batch in train_dataloader:
+        X_batch, y_batch = batch
+
+        # Forward pass
+        outputs = model(X_batch, edges, edge_weights) 
+        
+        # Calculate loss 
+        loss = masked_mae_loss((outputs * std) + mean, (y_batch * std) + mean)
+
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+Index-batching uses a sequence-to-sequence batch format, 
+where the data is of shape `(batch_size, seq_length, num_graph_nodes, num_features)`.
+In the future, we hope to integrate index-batching into all existing PGT datasets. Examples
+can be found in the `PGT Github repository <https://github.com/benedekrozemberczki/pytorch_geometric_temporal/examples/indexBatching>`_.    
+
+
+Distributed Data Parallel Training
+---------------------------
+Using `Dask-DDP <https://github.com/saturncloud/dask-pytorch-ddp>`_, PGT now supports distributed data parallel (DDP) training with the following datasets:
+
+* PeMs-Bay  
+* PeMSAllLA
+* PeMS
+
+DDP training requires minimal modifications to the existing training loop.
+For example, to modify the index-batching training loop to utilize DDP, we 1) pass `world_size` and 
+`ddp_rank` to the `get_index_dataset` method and 2) wrap the model in the PyTorch DDP wrapper (note that a Dask cluster must be initialized).
+
+
+.. code-block:: python
+
+    model = BatchedDCRNN(2, 2, K=3)
+    model = DDP(model)
+
+    loader = PemsBayDatasetLoader(index=True)
+    train_dataloader, _, _, edges, edge_weights, means, stds = loader.get_index_dataset(world_size=world_size, ddp_rank=worker_rank, batch_size=batch_size)
+    for batch in train_dataloader:
+        X_batch, y_batch = batch
+
+        # Forward pass
+        outputs = model(X_batch, edges, edge_weights) 
+        
+        # Calculate loss 
+        loss = masked_mae_loss((outputs * std) + mean, (y_batch * std) + mean)
+
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+
+A simple script (and further instructions) for multi-GPU/multi-node DDP and Dask initialization are available within the 
+`PGT Github repository <https://github.com/benedekrozemberczki/pytorch_geometric_temporal/examples/indexBatching>`_.
+
 
 
 
