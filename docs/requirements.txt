@@ -1,6 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.0+cpu
-numpy>2.0
-git+https://github.com/pyg-team/pyg_sphinx_theme.git
-scipy
-networkx
+sphinx>=7.0
+sphinx-rtd-theme
+sphinx-autoapi
+Jinja2>=3.0
