@@ -1,5 +1,4 @@
-torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
-numpy>=1.19.5
+torch==2.2.0+cpu
 git+https://github.com/pyg-team/pyg_sphinx_theme.git
 scipy
 networkx
