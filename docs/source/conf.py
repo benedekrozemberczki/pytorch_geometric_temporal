@@ -8,7 +8,7 @@ import inspect
 
 
 extensions = [
-    'sphinx.ext.autodoc',
+    # 'sphinx.ext.autodoc',
     'autoapi.extension',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -22,6 +22,7 @@ extensions = [
 source_suffix = '.rst'
 master_doc = 'index'
 
+autoapi_python_use_implicit_namespaces = False
 # autoapi_ignore = ["*temporal.signal*", "*temporal.nn*", "*temporal.datasets*"]
 
 author = 'Benedek Rozemberczki'

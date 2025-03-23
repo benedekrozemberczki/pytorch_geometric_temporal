@@ -29,7 +29,7 @@ The package interfaces well with `Pytorch Lightning <https://pytorch-lightning.r
 
 .. toctree::
    :glob:
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Package Reference
 
    modules/root
