@@ -1,6 +1,3 @@
-
-torch
-numpy
-git+https://github.com/pyg-team/pyg_sphinx_theme.git
-scipy
-networkx
+sphinx
+sphinx-rtd-theme
+sphinx-autoapi
