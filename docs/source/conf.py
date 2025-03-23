@@ -11,7 +11,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'sphinx_rtd_theme',
+    'sphinx_rtd_theme'
 ]
 
 source_suffix = '.rst'
@@ -22,7 +22,6 @@ project = 'PyTorch Geometric Temporal'
 copyright = '{}, {}'.format(datetime.datetime.now().year, author)
 
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 doctest_default_flags = doctest.NORMALIZE_WHITESPACE
 intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
