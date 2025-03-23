@@ -8,7 +8,6 @@ import inspect
 
 
 extensions = [
-    # 'sphinx.ext.autodoc',
     'autoapi.extension',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -23,7 +22,6 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 autoapi_python_use_implicit_namespaces = False
-# autoapi_ignore = ["*temporal.signal*", "*temporal.nn*", "*temporal.datasets*"]
 
 author = 'Benedek Rozemberczki'
 project = 'PyTorch Geometric Temporal'
@@ -45,10 +43,10 @@ html_theme_options = {
 
 html_logo = '_static/img/text_logo.jpg'
 html_static_path = ['_static']
-# html_context = {'css_files': ['_static/css/custom.css']}
 
 add_module_names = False
 autoapi_generate_api_docs = False
+
 # --- AutoAPI config ---
 autoapi_type = 'python'
-autoapi_dirs = ['../../torch_geometric_temporal/']  # Adjust this to the relative path of your source code
+autoapi_dirs = ['../../torch_geometric_temporal/']
