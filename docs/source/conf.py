@@ -3,7 +3,7 @@ import sphinx_rtd_theme
 import doctest
 
 extensions = [
-    # 'sphinx.ext.autodoc',
+    'sphinx.ext.autodoc',
     'autoapi.extension',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
