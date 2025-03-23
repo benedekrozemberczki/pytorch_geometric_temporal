@@ -46,7 +46,7 @@ add_module_names = False
 autoapi_generate_api_docs = False
 # --- AutoAPI config ---
 autoapi_type = 'python'
-autoapi_dirs = ['../../torch_geometric_temporal']  # Adjust this to the relative path of your source code
+autoapi_dirs = ['../../torch_geometric_temporal/']  # Adjust this to the relative path of your source code
 # # autoapi_keep_files = True  # Optional: keeps intermediate .rst files
 # autoapi_options = [
 #     'members',
