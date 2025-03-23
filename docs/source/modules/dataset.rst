@@ -7,59 +7,73 @@ PyTorch Geometric Temporal Dataset
 Datasets
 -----------------------
 
-.. automodule:: torch_geometric_temporal.dataset.chickenpox
+.. autoapimodule:: torch_geometric_temporal.dataset.chickenpox
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal( 
     
-.. automodule:: torch_geometric_temporal.dataset.pedalme
+.. autoapimodule:: torch_geometric_temporal.dataset.pedalme
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
     
-.. automodule:: torch_geometric_temporal.dataset.wikimath
+.. autoapimodule:: torch_geometric_temporal.dataset.wikimath
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
     
-.. automodule:: torch_geometric_temporal.dataset.windmilllarge
+.. autoapimodule:: torch_geometric_temporal.dataset.windmilllarge
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
     
-.. automodule:: torch_geometric_temporal.dataset.windmillmedium
+.. autoapimodule:: torch_geometric_temporal.dataset.windmillmedium
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
         
-.. automodule:: torch_geometric_temporal.dataset.windmillsmall
+.. autoapimodule:: torch_geometric_temporal.dataset.windmillsmall
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
         
-.. automodule:: torch_geometric_temporal.dataset.metr_la
+.. autoapimodule:: torch_geometric_temporal.dataset.metr_la
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
     
-.. automodule:: torch_geometric_temporal.dataset.pems_bay
+.. autoapimodule:: torch_geometric_temporal.dataset.pems_bay
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
 
-.. automodule:: torch_geometric_temporal.dataset.pemsAllLA
+.. autoapimodule:: torch_geometric_temporal.dataset.pemsAllLA
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
 
-.. automodule:: torch_geometric_temporal.dataset.pems
+.. autoapimodule:: torch_geometric_temporal.dataset.pems
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
 
-.. automodule:: torch_geometric_temporal.dataset.encovid
+.. autoapimodule:: torch_geometric_temporal.dataset.encovid
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
 
-.. automodule:: torch_geometric_temporal.dataset.montevideo_bus
+.. autoapimodule:: torch_geometric_temporal.dataset.montevideo_bus
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
 
-.. automodule:: torch_geometric_temporal.dataset.twitter_tennis
+.. autoapimodule:: torch_geometric_temporal.dataset.twitter_tennis
     :members:
     :undoc-members:
-    :exclude-members: transform_degree, transform_transitivity, encode_features, onehot_encoding
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(
+    :exclude-members:  transform_degree, transform_transitivity, encode_features, onehot_encoding
 
-.. automodule:: torch_geometric_temporal.dataset.mtm
+.. autoapimodule:: torch_geometric_temporal.dataset.mtm
     :members:
     :undoc-members:
+    :exclude-members: index,additional_feature_keys,edge_index,edge_weight,features,targets, raw_data_dir, edge_indicies, edge_weights, StaticGraphTemporalSignal, DynamicGraphTemporalSignal(

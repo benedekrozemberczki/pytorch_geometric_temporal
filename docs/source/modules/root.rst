@@ -4,131 +4,94 @@ PyTorch Geometric Temporal
 .. contents:: Contents
     :local:
 
+
+    .. :exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta   
 Recurrent Graph Convolutional Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
+	:members:
+	:exclude-members: TemporalAttention, SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.gconv_lstm
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.gconv_lstm
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.gc_lstm
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.gc_lstm
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.lrgcn
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.lrgcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.dygrae
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.dygrae
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.evolvegcnh
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.evolvegcnh
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.evolvegcno
-    :members:
-    :undoc-members:
-    
-.. automodule:: torch_geometric_temporal.nn.recurrent.temporalgcn
-    :members:
-    :undoc-members:
-    
-.. automodule:: torch_geometric_temporal.nn.recurrent.attentiontemporalgcn
-    :members:
-    :undoc-members:
-    
-.. automodule:: torch_geometric_temporal.nn.recurrent.mpnn_lstm
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.evolvegcno
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
-    :members:
-    :undoc-members:
-    :exclude-members: DConv,BatchedDConv
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.temporalgcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.recurrent.agcrn
-    :members:
-    :undoc-members:
-    :exclude-members: AVWGCN
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.attentiontemporalgcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
+
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.mpnn_lstm
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, BatchedDCRNN, GCLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, AGCRN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
+
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.dcrnn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, AVWGCN, TGCN2, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, GCNConv_Fixed_W, AGCRN, EvolveGCNH, TGCN, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
+
+.. autoapimodule:: torch_geometric_temporal.nn.recurrent.agcrn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, DyGrEncoder, A3TGCN2, TGCN2, BatchedDCRNN, GCLSTM, MPNNLSTM, EvolveGCNO, LRGCN, GConvLSTM, GConvGRU, BatchedDConv, GCNConv_Fixed_W, DCRNN, EvolveGCNH, TGCN, DConv, A3TGCN, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
 Temporal Graph Attention Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.attention.stgcn
-    :members:
-    :undoc-members:
-    :exclude-members: TemporalConv
+.. autoapimodule:: torch_geometric_temporal.nn.attention.stgcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, GatedFusion, UnitTCN, UnitGCN, Linear, MTGNNLayer, MSTGCN, GraphConstructor, GMAN, DNNTSP, AggregateTemporalNodeFeatures, ASTGCN, TransformAttention, LayerNormalization, GraphAAGCN, SpatioTemporalEmbedding, MSTGCNBlock, Conv2D, AAGCN, MTGNN, MixProp, ASTGCNBlock, TemporalAttention, DilatedInception, SpatialAttention, MaskedSelfAttention, GlobalGatedUpdater, SpatioTemporalAttention, ChebConvAttention, FullyConnected, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.attention.astgcn
-    :members:
-    :undoc-members:
-    :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ChebConvAttention
-    
-.. automodule:: torch_geometric_temporal.nn.attention.mstgcn
-    :members:
-    :undoc-members:
-    :exclude-members: MSTGCNBlock
+.. autoapimodule:: torch_geometric_temporal.nn.attention.astgcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, GatedFusion, UnitTCN, UnitGCN, Linear, MTGNNLayer, MSTGCN, GraphConstructor, TemporalConv, GMAN, DNNTSP, AggregateTemporalNodeFeatures, TransformAttention, LayerNormalization, GraphAAGCN, SpatioTemporalEmbedding, MSTGCNBlock, Conv2D, AAGCN, MTGNN, MixProp, DilatedInception, MaskedSelfAttention, GlobalGatedUpdater, STConv, SpatioTemporalAttention, FullyConnected, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.attention.gman
-    :members:
-    :undoc-members:
-    :exclude-members: Conv2D, FullyConnected, SpatioTemporalEmbedding, SpatialAttention, TemporalAttention, GatedFusion, SpatioTemporalAttentionBlock, TransformAttention
-    
-.. automodule:: torch_geometric_temporal.nn.attention.mtgnn
-    :members:
-    :undoc-members:
-    :exclude-members: Linear, MixProp, DilatedInception, LayerNormalization, MTGNNLayer
+.. autoapimodule:: torch_geometric_temporal.nn.attention.mstgcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, GatedFusion, UnitTCN, UnitGCN, Linear, MTGNNLayer, GraphConstructor, TemporalConv, GMAN, DNNTSP, AggregateTemporalNodeFeatures, ASTGCN, TransformAttention, LayerNormalization, GraphAAGCN, SpatioTemporalEmbedding, Conv2D, AAGCN, MTGNN, MixProp, ASTGCNBlock, TemporalAttention, DilatedInception, SpatialAttention, MaskedSelfAttention, GlobalGatedUpdater, STConv, SpatioTemporalAttention, ChebConvAttention, FullyConnected, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.attention.tsagcn
-    :members:
-    :undoc-members:
-    :exclude-members: UnitGCN, UnitTCN, bn_init, conv_init, conv_branch_init, GraphAAGCN
-    
-    
-.. automodule:: torch_geometric_temporal.nn.attention.dnntsp
-    :members:
-    :undoc-members:
-    :exclude-members: WeightedGCNBlock, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention
+.. autoapimodule:: torch_geometric_temporal.nn.attention.gman
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, UnitTCN, UnitGCN, Linear, MTGNNLayer, MSTGCN, GraphConstructor, TemporalConv, DNNTSP, AggregateTemporalNodeFeatures, ASTGCN, LayerNormalization, GraphAAGCN, MSTGCNBlock, AAGCN, MTGNN, MixProp, ASTGCNBlock, DilatedInception, MaskedSelfAttention, GlobalGatedUpdater, STConv, ChebConvAttention, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
+.. autoapimodule:: torch_geometric_temporal.nn.attention.mtgnn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, GatedFusion, UnitTCN, UnitGCN, MSTGCN, TemporalConv, GMAN, DNNTSP, AggregateTemporalNodeFeatures, ASTGCN, TransformAttention, GraphAAGCN, SpatioTemporalEmbedding, MSTGCNBlock, Conv2D, AAGCN, ASTGCNBlock, TemporalAttention, SpatialAttention, MaskedSelfAttention, GlobalGatedUpdater, STConv, SpatioTemporalAttention, ChebConvAttention, FullyConnected, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-Auxiliary Graph Convolutional Layers
---------------
+.. autoapimodule:: torch_geometric_temporal.nn.attention.tsagcn
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, GatedFusion, Linear, MTGNNLayer, MSTGCN, GraphConstructor, TemporalConv, GMAN, DNNTSP, AggregateTemporalNodeFeatures, ASTGCN, TransformAttention, LayerNormalization, SpatioTemporalEmbedding, MSTGCNBlock, Conv2D, MTGNN, MixProp, ASTGCNBlock, TemporalAttention, DilatedInception, SpatialAttention, MaskedSelfAttention, GlobalGatedUpdater, STConv, SpatioTemporalAttention, ChebConvAttention, FullyConnected, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
-.. automodule:: torch_geometric_temporal.nn.attention.stgcn
-    :members:
-    :undoc-members:
-    :exclude-members: STConv
-
-.. automodule:: torch_geometric_temporal.nn.recurrent.dcrnn
-    :members:
-    :undoc-members:
-    :exclude-members: DCRNN, BatchedDCRNN
-
-.. automodule:: torch_geometric_temporal.nn.attention.astgcn
-    :members:
-    :undoc-members:
-    :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ASTGCN
-    
-.. automodule:: torch_geometric_temporal.nn.recurrent.agcrn
-    :members:
-    :undoc-members:
-    :exclude-members: AGCRN
-
-.. automodule:: torch_geometric_temporal.nn.attention.tsagcn
-    :members:
-    :undoc-members:
-    :exclude-members: bn_init, conv_init, conv_branch_init, GraphAAGCN, AAGCN
+.. autoapimodule:: torch_geometric_temporal.nn.attention.dnntsp
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, GatedFusion, UnitTCN, UnitGCN, Linear, MTGNNLayer, MSTGCN, GraphConstructor, TemporalConv, GMAN, ASTGCN, TransformAttention, LayerNormalization, GraphAAGCN, SpatioTemporalEmbedding, MSTGCNBlock, Conv2D, AAGCN, MTGNN, MixProp, ASTGCNBlock, TemporalAttention, DilatedInception, SpatialAttention, STConv, SpatioTemporalAttention, ChebConvAttention, FullyConnected, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
 
 
 Heterogeneous Graph Convolutional Layers
 --------------
 
-.. automodule:: torch_geometric_temporal.nn.hetero.heterogclstm
-    :members:
-    :undoc-members:
+.. autoapimodule:: torch_geometric_temporal.nn.hetero.heterogclstm
+	:members:
+	:exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, , K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta
