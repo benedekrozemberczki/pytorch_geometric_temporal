@@ -3,7 +3,7 @@ import sphinx_rtd_theme
 import doctest
 
 extensions = [
-    'sphinx.ext.autodoc',
+    # 'sphinx.ext.autodoc',
     'autoapi.extension',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -18,14 +18,14 @@ source_suffix = '.rst'
 master_doc = 'index'
 # autoapi_ignore = ["*"]
 
-autoapi_ignore = ["*temporal.signal*", "*temporal.nn*", "*temporal.datasets*"]
+# autoapi_ignore = ["*temporal.signal*", "*temporal.nn*", "*temporal.datasets*"]
 
 author = 'Benedek Rozemberczki'
 project = 'PyTorch Geometric Temporal'
 copyright = '{}, {}'.format(datetime.datetime.now().year, author)
 
 html_theme = 'sphinx_rtd_theme'
-autoapi_add_toctree_entry = False
+autoapi_add_toctree_entry = True
 
 doctest_default_flags = doctest.NORMALIZE_WHITESPACE
 intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
@@ -43,14 +43,14 @@ html_static_path = ['_static']
 # html_context = {'css_files': ['_static/css/custom.css']}
 
 add_module_names = False
-# autoapi_generate_api_docs = False
+autoapi_generate_api_docs = False
 # --- AutoAPI config ---
 autoapi_type = 'python'
 autoapi_dirs = ['../../torch_geometric_temporal']  # Adjust this to the relative path of your source code
-autoapi_keep_files = True  # Optional: keeps intermediate .rst files
-autoapi_options = [
-    'members',
-]
+# # autoapi_keep_files = True  # Optional: keeps intermediate .rst files
+# autoapi_options = [
+#     'members',
+# ]
 
 # Optional filtering (like the original skip list)
 # You can use custom templates or post-process the .rst files to exclude members like __init__, etc.
