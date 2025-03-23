@@ -4,97 +4,91 @@ PyTorch Geometric Temporal
 .. contents:: Contents
     :local:
 
+
+    .. :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 Recurrent Graph Convolutional Layers
 --------------
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.gconv_gru
-    :members:
-    :undoc-members:
-
+    :members: 
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.gconv_lstm
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
+
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.gc_lstm
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
+
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.lrgcn
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.dygrae
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.evolvegcnh
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.evolvegcno
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.temporalgcn
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.attentiontemporalgcn
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.mpnn_lstm
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
-    :undoc-members:
-    :exclude-members: DConv,BatchedDConv
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.agcrn
     :members:
-    :undoc-members:
-    :exclude-members: AVWGCN
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 Temporal Graph Attention Layers
 --------------
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.stgcn
     :members:
-    :undoc-members:
-    :exclude-members: TemporalConv
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.astgcn
     :members:
-    :undoc-members:
-    :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ChebConvAttention
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
 .. autoapimodule:: torch_geometric_temporal.nn.attention.mstgcn
     :members:
-    :undoc-members:
-    :exclude-members: MSTGCNBlock
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.gman
     :members:
-    :undoc-members:
-    :exclude-members: Conv2D, FullyConnected, SpatioTemporalEmbedding, SpatialAttention, TemporalAttention, GatedFusion, SpatioTemporalAttentionBlock, TransformAttention
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
 .. autoapimodule:: torch_geometric_temporal.nn.attention.mtgnn
     :members:
-    :undoc-members:
-    :exclude-members: Linear, MixProp, DilatedInception, LayerNormalization, MTGNNLayer
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.tsagcn
     :members:
-    :undoc-members:
-    :exclude-members: UnitGCN, UnitTCN, bn_init, conv_init, conv_branch_init, GraphAAGCN
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
     
 .. autoapimodule:: torch_geometric_temporal.nn.attention.dnntsp
     :members:
-    :undoc-members:
-    :exclude-members: WeightedGCNBlock, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 
 Auxiliary Graph Convolutional Layers
@@ -102,28 +96,23 @@ Auxiliary Graph Convolutional Layers
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.stgcn
     :members:
-    :undoc-members:
-    :exclude-members: STConv
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.dcrnn
     :members:
-    :undoc-members:
-    :exclude-members: DCRNN, BatchedDCRNN
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.astgcn
     :members:
-    :undoc-members:
-    :exclude-members:  SpatialAttention, ASTGCNBlock, TemporalAttention, ASTGCN
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
     
 .. autoapimodule:: torch_geometric_temporal.nn.recurrent.agcrn
     :members:
-    :undoc-members:
-    :exclude-members: AGCRN
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 .. autoapimodule:: torch_geometric_temporal.nn.attention.tsagcn
     :members:
-    :undoc-members:
-    :exclude-members: bn_init, conv_init, conv_branch_init, GraphAAGCN, AAGCN
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
 
 
 Heterogeneous Graph Convolutional Layers
@@ -131,4 +120,4 @@ Heterogeneous Graph Convolutional Layers
 
 .. autoapimodule:: torch_geometric_temporal.nn.hetero.heterogclstm
     :members:
-    :undoc-members:
+    :exclude-members: K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels,   
