@@ -4,8 +4,6 @@ PyTorch Geometric Temporal
 .. contents:: Contents
     :local:
 
-
-    .. :exclude-members: SpatialAttention, TemporalAttention, Conv2D, FullyConnected, Linear, GraphConstructor, DilatedInception, FullyConnected, Conv2D, LayerNormalization, AggregateTemporalNodeFeatures, GlobalGatedUpdater, MaskedSelfAttention, WeightedGCNBlock, K, bias, in_channels, out_channels, normalization, num_bases, num_relations, conv_aggr, conv_num_layers, conv_out_channels, lstm_num_layers, lstm_out_channels, add_self_loops, cached, improved, initial_weight, normalize, num_of_nodes, reinitialize_weight, reset_parameters, weight, batch_size, periods, dropout, hidden_size, num_nodes, window, number_of_nodes, bias_pool, weights_pool, hidden_channels, A, attention, edge_index, gcn1, graph, relu, tcn1, kernel_size, conv_1, conv_2, conv_3, nb_time_filter, adaptive, bn, conv_d, in_c, inter_c, num_jpts, num_subset, out_c, sigmoid, soft, tan, conv, embedding_dimensions, Wq, global_gated_updater, item_embedding, item_embedding_dim, items_total, masked_self_attention, stacked_gcn, in_channels_dict, meta   
 Recurrent Graph Convolutional Layers
 --------------
 
