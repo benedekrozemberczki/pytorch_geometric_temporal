@@ -56,8 +56,9 @@ def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, lo
 
     worker_rank = int(dist.get_rank())
     gpu = worker_rank % 4   
-    device = f"cuda:{gpu}"
-    torch.cuda.set_device(device)
+    device = torch.device(f"cuda:{gpu}" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available(): torch.cuda.set_device(device)
+    
     world_size = dist.get_world_size()
 
     
@@ -78,7 +79,10 @@ def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, lo
         
     # Initialize model
     model = DCRNN(2, 2, K=3).to(device)
-    model = DDP(model, gradient_as_bucket_view=True, device_ids=[device], output_device=[device])
+    if torch.cuda.is_available():
+        model = DDP(model, gradient_as_bucket_view=True, device_ids=[device], output_device=[device])
+    else:
+        model = DDP(model, gradient_as_bucket_view=True)
 
     # Define optimizer and loss function
     optimizer = optim.Adam(model.parameters(), lr=0.001)
