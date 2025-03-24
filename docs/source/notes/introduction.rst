@@ -165,7 +165,7 @@ For example, the following is a sample training loop with PeMS-Bay and DCRNN:
 Index-batching uses a sequence-to-sequence batch format, 
 where the data is of shape `(batch_size, seq_length, num_graph_nodes, num_features)`.
 In the future, we hope to integrate index-batching into all existing PGT datasets. Examples
-can be found in the `PGT Github repository <https://github.com/benedekrozemberczki/pytorch_geometric_temporal/examples/indexBatching>`_.    
+can be found in the `PGT Github repository <https://github.com/benedekrozemberczki/pytorch_geometric_temporal/tree/master/examples/indexBatching>`_.    
 
 
 Distributed Data Parallel Training
@@ -204,7 +204,7 @@ For example, to modify the index-batching training loop to utilize DDP, we 1) pa
 
 
 A simple script (and further instructions) for multi-GPU/multi-node DDP and Dask initialization are available within the 
-`PGT Github repository <https://github.com/benedekrozemberczki/pytorch_geometric_temporal/examples/indexBatching>`_.
+`PGT Github repository <https://github.com/benedekrozemberczki/pytorch_geometric_temporal/tree/master/examples/indexBatching>`_.
 
 
 
