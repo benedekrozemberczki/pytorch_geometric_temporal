@@ -1,5 +1,4 @@
-https://download.pytorch.org/whl/cpu/torch-1.13.0%2Bcpu-cp39-cp39-linux_x86_64.whl
-numpy>=1.19.5
-git+https://github.com/pyg-team/pyg_sphinx_theme.git
-scipy
-networkx
+sphinx==7.0
+sphinx-rtd-theme
+sphinx-autoapi
+Jinja2>=3.0
