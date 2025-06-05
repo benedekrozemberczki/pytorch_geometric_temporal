@@ -352,6 +352,23 @@ class BatchedDCRNN(torch.nn.Module):
 
         self._create_parameters_and_layers()
 
+        self._cached_batch_size = None
+        self._cached_edge_index = None
+        self._cached_edge_weight = None
+
+
+        self._cached_expanded_edge_index = None
+        self._cached_expanded_edge_weight = None
+
+    def _replicate_edge_index(self, edge_index, batch_size, num_nodes):
+        edge_index = edge_index.clone()  # clone once to avoid modifying original
+        repeated = []
+        for i in range(batch_size):
+            offset = i * num_nodes
+            repeated.append(edge_index + offset)
+        return torch.cat(repeated, dim=1)
+
+
     def _create_update_gate_parameters_and_layers(self):
         self.conv_x_z = BatchedDConv(
             in_channels=self.in_channels + self.out_channels,
@@ -425,15 +442,27 @@ class BatchedDCRNN(torch.nn.Module):
         
         batch_size, seq_length, num_nodes, num_features = X.size()
         hidden_state = torch.zeros(batch_size, num_nodes, self.out_channels).to(X.device)
-        
+
+        if self._cached_edge_index == None or self._cached_batch_size != batch_size \
+        or not torch.equal(self._cached_edge_index, edge_index) or not torch.equal(self._cached_edge_weight, edge_weight):
+ 
+            # cache for future comparision to check freshness 
+            self._cached_batch_size = batch_size
+            self._cached_edge_index = edge_index
+            self._cached_edge_weight = edge_weight
+
+            # cache
+            self._cached_expanded_edge_index = self._replicate_edge_index(edge_index, batch_size, num_nodes)
+            self._cached_expanded_edge_weight = edge_weight.repeat(batch_size)
+
         outputs = []
         for t in range(seq_length):
             x_t = X[:, t, :, :].reshape(batch_size * num_nodes, num_features)
             
             H = hidden_state.reshape(batch_size * num_nodes, self.out_channels)
-            Z = self._calculate_update_gate(x_t, edge_index, edge_weight, H)
-            R = self._calculate_reset_gate(x_t, edge_index, edge_weight, H)
-            H_tilde = self._calculate_candidate_state(x_t, edge_index, edge_weight, H, R)
+            Z = self._calculate_update_gate(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H)
+            R = self._calculate_reset_gate(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H)
+            H_tilde = self._calculate_candidate_state(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H, R)
             H = self._calculate_hidden_state(Z, H, H_tilde)
           
             hidden_state = H.reshape(batch_size, num_nodes, self.out_channels)
