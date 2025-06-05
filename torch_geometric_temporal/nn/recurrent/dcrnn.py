@@ -260,6 +260,7 @@ class BatchedDConv(MessagePassing):
         X: torch.FloatTensor,
         edge_index: torch.LongTensor,
         edge_weight: torch.FloatTensor,
+        cached_idx = False
     ) -> torch.FloatTensor:
         r"""Making a forward pass. If edge weights are not present the forward pass
         defaults to an unweighted graph.
@@ -272,26 +273,22 @@ class BatchedDConv(MessagePassing):
         Return types:
             * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """
-        
-        row, col = edge_index
-        deg_out = torch.zeros(X.size(0), device=X.device).scatter_add_(0, row, edge_weight)
-        deg_in = torch.zeros(X.size(0), device=X.device).scatter_add_(0, col, edge_weight)
-        
 
-        deg_out_inv = torch.reciprocal(deg_out)
-        deg_in_inv = torch.reciprocal(deg_in)
-        row, col = edge_index
-        norm_out = deg_out_inv[row]
-        norm_in = deg_in_inv[row]
+        if not cached_idx:
+            row, col = edge_index
+            deg_out = torch.zeros(X.size(0), device=X.device).scatter_add_(0, row, edge_weight)
+            deg_in = torch.zeros(X.size(0), device=X.device).scatter_add_(0, col, edge_weight)
+            
+            deg_out_inv = torch.reciprocal(deg_out)
+            deg_in_inv = torch.reciprocal(deg_in)
+            row, col = edge_index
+            self._cached_norm_out = deg_out_inv[row]
+            self._cached_norm_in = deg_in_inv[row]
 
-        # reverse_edge_index = edge_index.flip(0)
-        reverse_edge_index = torch.stack([col, row], dim=0)
-        sort_idx = reverse_edge_index[0] * X.size(0) + reverse_edge_index[1]
-        reverse_edge_index  = reverse_edge_index[:, sort_idx.argsort()]
+            reverse_edge_index = torch.stack([col, row], dim=0)
+            sort_idx = reverse_edge_index[0] * X.size(0) + reverse_edge_index[1]
+            self._cached_reverse_edge_index = reverse_edge_index  = reverse_edge_index[:, sort_idx.argsort()]
 
-        
-        batch_size = X.size(0)
-        
 
         Tx_0 = X
         Tx_1 = X
@@ -300,8 +297,8 @@ class BatchedDConv(MessagePassing):
         )
     
         if self.weight.size(1) > 1:
-            Tx_1_o = self.propagate(edge_index, x=X, norm=norm_out, size=None)
-            Tx_1_i = self.propagate(reverse_edge_index, x=X, norm=norm_in, size=None)
+            Tx_1_o = self.propagate(edge_index, x=X, norm=self._cached_norm_out, size=None)
+            Tx_1_i = self.propagate(self._cached_reverse_edge_index, x=X, norm=self._cached_norm_in, size=None)
             H = (
                 H
                 + torch.matmul(Tx_1_o, (self.weight[0])[1])
@@ -309,10 +306,10 @@ class BatchedDConv(MessagePassing):
             )
 
         for k in range(2, self.weight.size(1)):
-            Tx_2_o = self.propagate(edge_index, x=Tx_1_o, norm=norm_out, size=None)
+            Tx_2_o = self.propagate(edge_index, x=Tx_1_o, norm=self._cached_norm_out, size=None)
             Tx_2_o = 2.0 * Tx_2_o - Tx_0
             Tx_2_i = self.propagate(
-                reverse_edge_index, x=Tx_1_i, norm=norm_in, size=None
+                self._cached_reverse_edge_index, x=Tx_1_i, norm=self._cached_norm_in, size=None
             )
             Tx_2_i = 2.0 * Tx_2_i - Tx_0
             H = (
@@ -361,6 +358,8 @@ class BatchedDCRNN(torch.nn.Module):
         self._cached_expanded_edge_index = None
         self._cached_expanded_edge_weight = None
 
+        self._cached_idx = False
+
     def _replicate_edge_index(self, edge_index, batch_size, num_nodes):
         edge_index = edge_index.clone()  # clone once to avoid modifying original
         repeated = []
@@ -404,22 +403,22 @@ class BatchedDCRNN(torch.nn.Module):
             H = torch.zeros(X.shape[0], self.out_channels).to(X.device)
         return H
 
-    def _calculate_update_gate(self, X, edge_index, edge_weight, H):
+    def _calculate_update_gate(self, X, edge_index, edge_weight, H, cached):
         
         Z = torch.cat([X, H], dim=1)
-        Z = self.conv_x_z(Z, edge_index, edge_weight)
+        Z = self.conv_x_z(Z, edge_index, edge_weight, cached_idx = cached)
         Z = torch.sigmoid(Z)
         return Z
 
-    def _calculate_reset_gate(self, X, edge_index, edge_weight, H):
+    def _calculate_reset_gate(self, X, edge_index, edge_weight, H, cached):
         R = torch.cat([X, H], dim=1)
-        R = self.conv_x_r(R, edge_index, edge_weight)
+        R = self.conv_x_r(R, edge_index, edge_weight, cached_idx = cached)
         R = torch.sigmoid(R)
         return R
 
-    def _calculate_candidate_state(self, X, edge_index, edge_weight, H, R):
+    def _calculate_candidate_state(self, X, edge_index, edge_weight, H, R, cached):
         H_tilde = torch.cat([X, H * R], dim=1)
-        H_tilde = self.conv_x_h(H_tilde, edge_index, edge_weight)
+        H_tilde = self.conv_x_h(H_tilde, edge_index, edge_weight, cached_idx = cached)
         H_tilde = torch.tanh(H_tilde)
         return H_tilde
 
@@ -456,14 +455,18 @@ class BatchedDCRNN(torch.nn.Module):
             self._cached_expanded_edge_index = self._replicate_edge_index(edge_index, batch_size, num_nodes)
             self._cached_expanded_edge_weight = edge_weight.repeat(batch_size)
 
+            self._cached_idx = False
+        else:
+            self._cached_idx = True
+
         outputs = []
         for t in range(seq_length):
             x_t = X[:, t, :, :].reshape(batch_size * num_nodes, num_features)
             
             H = hidden_state.reshape(batch_size * num_nodes, self.out_channels)
-            Z = self._calculate_update_gate(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H)
-            R = self._calculate_reset_gate(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H)
-            H_tilde = self._calculate_candidate_state(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H, R)
+            Z = self._calculate_update_gate(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H, self._cached_idx)
+            R = self._calculate_reset_gate(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H, self._cached_idx)
+            H_tilde = self._calculate_candidate_state(x_t, self._cached_expanded_edge_index, self._cached_expanded_edge_weight, H, R, self._cached_idx)
             H = self._calculate_hidden_state(Z, H, H_tilde)
           
             hidden_state = H.reshape(batch_size, num_nodes, self.out_channels)
