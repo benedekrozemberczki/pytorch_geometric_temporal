@@ -272,16 +272,11 @@ class BatchedDConv(MessagePassing):
         Return types:
             * **H** (PyTorch Float Tensor) - Hidden state matrix for all nodes.
         """
-        adj_mat = to_dense_adj(edge_index, edge_attr=edge_weight)
-        adj_mat = adj_mat.reshape(adj_mat.size(1), adj_mat.size(2))
-        deg_out = torch.matmul(
-            adj_mat, torch.ones(size=(adj_mat.size(0), 1)).to(X.device)
-        )
-        deg_out = deg_out.flatten()
-        deg_in = torch.matmul(
-            torch.ones(size=(1, adj_mat.size(0))).to(X.device), adj_mat
-        )
-        deg_in = deg_in.flatten()
+        
+        row, col = edge_index
+        deg_out = torch.zeros(X.size(0), device=X.device).scatter_add_(0, row, edge_weight)
+        deg_in = torch.zeros(X.size(0), device=X.device).scatter_add_(0, col, edge_weight)
+        
 
         deg_out_inv = torch.reciprocal(deg_out)
         deg_in_inv = torch.reciprocal(deg_in)
@@ -289,8 +284,14 @@ class BatchedDConv(MessagePassing):
         norm_out = deg_out_inv[row]
         norm_in = deg_in_inv[row]
 
-        reverse_edge_index = adj_mat.transpose(0, 1)
-        reverse_edge_index, vv = dense_to_sparse(reverse_edge_index)
+        # reverse_edge_index = edge_index.flip(0)
+        reverse_edge_index = torch.stack([col, row], dim=0)
+        sort_idx = reverse_edge_index[0] * X.size(0) + reverse_edge_index[1]
+        reverse_edge_index  = reverse_edge_index[:, sort_idx.argsort()]
+
+        
+        batch_size = X.size(0)
+        
 
         Tx_0 = X
         Tx_1 = X
