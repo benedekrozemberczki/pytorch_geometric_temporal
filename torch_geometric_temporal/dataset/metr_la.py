@@ -132,7 +132,7 @@ class METRLADatasetLoader(object):
                           ratio: Tuple[float, float, float] = (0.7, 0.1, 0.2), world_size: int =-1, ddp_rank: int = -1, 
                           dask_batching: bool = False) -> Tuple[DataLoader, DataLoader, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
-        Returns torch dataloaders using index batching for PeMS dataset.
+        Returns torch dataloaders using index batching for Metr-LA dataset.
 
         Args:
             lags (int, optional): The number of time lags. Defaults to 12.
