@@ -130,6 +130,7 @@ index-batching for the following existing datasets and added two new datasets (h
 to PyTorch Geometric Temporal (PGT): 
 
 * PeMs-Bay
+* Metr-LA
 * WindmillLarge
 * HungaryChickenpox
 * **PeMSAllLA**
