@@ -44,8 +44,8 @@ plt.plot(sensor_labels)
 from torch_geometric_temporal.signal import temporal_signal_split
 train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.8)
 
-print("Number of train buckets: ", len(train_dataset))
-print("Number of test buckets: ", len(test_dataset))
+print("Number of train buckets: ", len(list(train_dataset)))
+print("Number of test buckets: ", len(lust(test_dataset)))
 
 
 # Creating Dataloaders
