@@ -30,7 +30,7 @@ from torch_geometric_temporal.dataset import METRLADatasetLoader
 loader = METRLADatasetLoader()
 dataset = loader.get_dataset(num_timesteps_in=12, num_timesteps_out=12)
 print("Dataset type:  ", dataset)
-print("Number of samples / sequences: ",  len(dataset))
+print("Number of samples / sequences: ",  len(list(dataset)))
 
 
 # Visualize traffic over time
