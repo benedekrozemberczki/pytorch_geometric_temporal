@@ -30,7 +30,7 @@ from torch_geometric_temporal.dataset import METRLADatasetLoader
 loader = METRLADatasetLoader()
 dataset = loader.get_dataset(num_timesteps_in=12, num_timesteps_out=12)
 print("Dataset type:  ", dataset)
-print("Number of samples / sequences: ",  len(set(dataset)))
+print("Number of samples / sequences: ",  len(dataset))
 
 
 # Visualize traffic over time
@@ -44,8 +44,8 @@ plt.plot(sensor_labels)
 from torch_geometric_temporal.signal import temporal_signal_split
 train_dataset, test_dataset = temporal_signal_split(dataset, train_ratio=0.8)
 
-print("Number of train buckets: ", len(set(train_dataset)))
-print("Number of test buckets: ", len(set(test_dataset)))
+print("Number of train buckets: ", len(train_dataset))
+print("Number of test buckets: ", len(test_dataset))
 
 
 # Creating Dataloaders
@@ -113,7 +113,7 @@ for var_name in optimizer.state_dict():
 
 for snapshot in train_dataset:
     static_edge_index = snapshot.edge_index.to(DEVICE)
-    break;
+    break
 
 
 
