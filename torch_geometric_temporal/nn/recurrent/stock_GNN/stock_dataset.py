@@ -232,7 +232,8 @@ class StockDataModule(pl.LightningDataModule):
         common_stocks = sorted(list(common_stocks))
         print(f"  公共股票数量: {len(common_stocks)}")
         
-        # 获取公共时间范围
+        # 获取公共时间范围 - 修改版本：按可用数据保留
+        print("4. 确定时间范围...")
         if self.use_factors and factor_data:
             # 如果使用因子数据，以因子数据的时间范围为准
             common_dates = None
@@ -249,13 +250,24 @@ class StockDataModule(pl.LightningDataModule):
             common_dates = sorted(list(common_dates))
             print(f"  因子数据时间范围: {min(common_dates)} 到 {max(common_dates)}")
             
-            # 确保价格数据和收益率数据涵盖这个时间范围
+            # 检查价格数据和收益率数据的可用性，但不强制要求完整覆盖
+            available_dates_by_source = {}
             for name, data in {**price_data, **return_data}.items():
                 if data is not None:
                     available_dates = set(data.index)
-                    if not set(common_dates).issubset(available_dates):
-                        missing_dates = set(common_dates) - available_dates
-                        print(f"  警告: {name} 缺少部分日期，数量: {len(missing_dates)}")
+                    overlap = set(common_dates).intersection(available_dates)
+                    available_dates_by_source[name] = overlap
+                    coverage = len(overlap) / len(common_dates) * 100
+                    print(f"  {name} 覆盖率: {coverage:.1f}% ({len(overlap)}/{len(common_dates)})")
+            
+            # 更新common_dates为所有数据源都有的日期
+            all_available_dates = set(common_dates)
+            for name, dates in available_dates_by_source.items():
+                all_available_dates = all_available_dates.intersection(dates)
+            
+            common_dates = sorted(list(all_available_dates))
+            print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
+            
         else:
             # 如果不使用因子数据，以价格数据的时间范围为准
             common_dates = None
@@ -266,8 +278,26 @@ class StockDataModule(pl.LightningDataModule):
                     else:
                         common_dates = common_dates.intersection(set(data.index))
             
-            common_dates = sorted(list(common_dates))
-            print(f"  价格数据时间范围: {min(common_dates)} 到 {max(common_dates)}")
+            if common_dates is None:
+                raise ValueError("价格数据没有公共时间")
+            
+            # 检查收益率数据的可用性
+            available_dates_by_source = {}
+            for name, data in return_data.items():
+                if data is not None:
+                    available_dates = set(data.index)
+                    overlap = set(common_dates).intersection(available_dates)
+                    available_dates_by_source[name] = overlap
+                    coverage = len(overlap) / len(common_dates) * 100
+                    print(f"  {name} 覆盖率: {coverage:.1f}% ({len(overlap)}/{len(common_dates)})")
+            
+            # 更新common_dates为所有数据源都有的日期
+            all_available_dates = set(common_dates)
+            for name, dates in available_dates_by_source.items():
+                all_available_dates = all_available_dates.intersection(dates)
+            
+            common_dates = sorted(list(all_available_dates))
+            print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
         
         # 构建特征矩阵
         print("5. 构建特征矩阵...")
@@ -277,19 +307,25 @@ class StockDataModule(pl.LightningDataModule):
         # 添加价格特征
         for name, data in price_data.items():
             if data is not None:
+                # 只保留common_dates和common_stocks的交集
                 aligned_data = data.reindex(index=common_dates, columns=common_stocks)
+                # 对于缺失值，先用前向填充，然后用0填充
                 aligned_data = aligned_data.fillna(method='ffill').fillna(0)
                 feature_list.append(aligned_data.values)  # [T, N]
                 feature_names.append(name)
+                print(f"  添加特征: {name}, 形状: {aligned_data.shape}")
         
         # 添加因子特征（如果使用）
         if self.use_factors:
             for name, data in factor_data.items():
                 if data is not None:
+                    # 只保留common_dates和common_stocks的交集
                     aligned_data = data.reindex(index=common_dates, columns=common_stocks)
+                    # 对于缺失值，先用前向填充，然后用0填充
                     aligned_data = aligned_data.fillna(method='ffill').fillna(0)
                     feature_list.append(aligned_data.values)  # [T, N]
                     feature_names.append(name)
+                    print(f"  添加特征: {name}, 形状: {aligned_data.shape}")
         
         # 构建目标矩阵
         print("6. 构建目标矩阵...")
@@ -297,9 +333,18 @@ class StockDataModule(pl.LightningDataModule):
         for horizon in self.prediction_horizons:
             return_key = f'returns_{horizon}d'
             if return_key in return_data and return_data[return_key] is not None:
+                # 只保留common_dates和common_stocks的交集
                 aligned_data = return_data[return_key].reindex(index=common_dates, columns=common_stocks)
+                # 目标值的缺失用0填充（表示无收益）
                 aligned_data = aligned_data.fillna(0)
                 target_list.append(aligned_data.values)  # [T, N]
+                print(f"  添加目标: {return_key}, 形状: {aligned_data.shape}")
+        
+        # 检查是否有有效数据
+        if len(feature_list) == 0:
+            raise ValueError("没有有效的特征数据")
+        if len(target_list) == 0:
+            raise ValueError("没有有效的目标数据")
         
         # 转换为张量
         # features: [T, F, N]
@@ -315,6 +360,16 @@ class StockDataModule(pl.LightningDataModule):
         print(f"  目标矩阵形状: {self.targets.shape}")
         print(f"  特征名称: {self.feature_names}")
         print(f"  预测期数: {self.prediction_horizons}")
+        
+        # 数据质量检查
+        print("7. 数据质量检查...")
+        feature_nan_count = torch.isnan(self.features).sum().item()
+        target_nan_count = torch.isnan(self.targets).sum().item()
+        print(f"  特征数据NaN数量: {feature_nan_count}")
+        print(f"  目标数据NaN数量: {target_nan_count}")
+        
+        if feature_nan_count > 0 or target_nan_count > 0:
+            print("  警告: 数据中仍有NaN值，可能影响训练")
     
     def _split_data(self):
         """按时间划分数据集"""
