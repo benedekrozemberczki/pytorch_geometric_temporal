@@ -87,19 +87,32 @@ class DynamicGraphLightning(pl.LightningModule):
         # TensorBoard logging: log similarity stats
         self.log('stats/sim_mean', sim.mean().item(), on_step=True, on_epoch=False)
         self.log('stats/sim_std', sim.std().item(), on_step=True, on_epoch=False)
-        # Top-k
-        topk_vals, topk_idx = sim.topk(self.k_nn + 1, dim=-1)  # 包含自己
-        # 去掉自环
-        node_idx = torch.arange(n, device=sim.device)[None, :, None]
-        node_idx_k1 = node_idx.view(1, n, 1).expand(b, n, self.k_nn+1)  # [b,n,k+1]
-
-        # 3) mask 去掉自循环 (i != i)
-        mask = topk_idx != node_idx_k1                         # [b,n,k+1]
-
-        # 4) 用同一个 mask 索引，留下 k 条真正的邻居边
-        edge_weight = topk_vals[mask].view(b, n, self.k_nn)    # [b, n, k]
-        edge_dst    = topk_idx[mask].view(b, n, self.k_nn)     # [b, n, k]
-        edge_src    = node_idx_k1[mask].view(b, n, self.k_nn)  # [b, n, k]
+        # 使用更稳定的Top-k选择方法
+        # 将自环设为很小的值，确保不会被选中
+        sim_masked = sim.clone()
+        # 将对角线（自环）设为很小的值
+        eye_mask = torch.eye(n, device=sim.device).bool().unsqueeze(0).expand(b, -1, -1)
+        sim_masked[eye_mask] = -1e9
+        
+        # 现在直接选择top-k，不需要+1
+        topk_vals, topk_idx = sim_masked.topk(self.k_nn, dim=-1, sorted=True)
+        
+        # 创建源节点索引
+        edge_src = torch.arange(n, device=sim.device).view(1, n, 1).expand(b, n, self.k_nn)
+        edge_dst = topk_idx  # [b, n, k]
+        edge_weight = topk_vals  # [b, n, k]
+        
+        # 调试信息
+        print(f"Debug: b={b}, n={n}, k_nn={self.k_nn}")
+        print(f"Debug: sim shape={sim.shape}")
+        print(f"Debug: topk_vals shape={topk_vals.shape}, topk_idx shape={topk_idx.shape}")
+        print(f"Debug: edge_weight shape={edge_weight.shape}")
+        print(f"Debug: edge_dst shape={edge_dst.shape}")
+        print(f"Debug: edge_src shape={edge_src.shape}")
+        print(f"Debug: expected total edges={b * n * self.k_nn}")
+        print(f"Debug: actual edge_weight size={edge_weight.numel()}")
+        print(f"Debug: actual edge_dst size={edge_dst.numel()}")
+        print(f"Debug: actual edge_src size={edge_src.numel()}")
 
         data_list = []
         for i in range(b):
