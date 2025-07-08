@@ -15,7 +15,7 @@ class StockDataset(Dataset):
                  features: torch.Tensor,  # [T, F, N] 或 [T, N, F]
                  targets: torch.Tensor,   # [T, N, future_periods]
                  sequence_length: int = 20,
-                 prediction_horizon: int = 1):
+                 prediction_horizon: int = 7):
         """
         Args:
             features: 特征数据 [时间, 特征数, 股票数]
@@ -47,7 +47,7 @@ class StockDataset(Dataset):
         """
         Returns:
             features: [sequence_length, feature_dim, n_stocks]
-            targets: [n_stocks, prediction_horizon]
+            targets: [prediction_horizon, n_stocks]
         """
         current_idx = self.valid_indices[idx]
         
@@ -56,8 +56,9 @@ class StockDataset(Dataset):
         end_idx = current_idx
         features = self.features[start_idx:end_idx]  # [L, F, N]
         
-        # 获取未来目标
-        targets = self.targets[current_idx]  # [N, future_periods]
+        # 获取未来 T 期的收益率
+        end_target_idx = current_idx + self.prediction_horizon
+        targets = self.targets[current_idx:end_target_idx]  # [T, N]
         
         return features, targets
 
@@ -391,22 +392,19 @@ class StockDataModule(pl.LightningDataModule):
         self.train_dataset = StockDataset(
             features=self.features[:train_end],
             targets=self.targets[:train_end],
-            sequence_length=self.sequence_length,
-            prediction_horizon=len(self.prediction_horizons)
+            sequence_length=self.sequence_length
         )
         
         self.val_dataset = StockDataset(
             features=self.features[train_end:val_end],
             targets=self.targets[train_end:val_end],
-            sequence_length=self.sequence_length,
-            prediction_horizon=len(self.prediction_horizons)
+            sequence_length=self.sequence_length
         )
         
         self.test_dataset = StockDataset(
             features=self.features[val_end:],
             targets=self.targets[val_end:],
-            sequence_length=self.sequence_length,
-            prediction_horizon=len(self.prediction_horizons)
+            sequence_length=self.sequence_length
         )
         
         print(f"训练样本数: {len(self.train_dataset)}")

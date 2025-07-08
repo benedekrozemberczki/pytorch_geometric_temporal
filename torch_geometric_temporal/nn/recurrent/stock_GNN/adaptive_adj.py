@@ -5,7 +5,7 @@ import pytorch_lightning as pl
 from torch import nn
 from torch_geometric.nn import GCNConv  # 或者 GATConv, GraphConv…
 from torch_geometric.data import Batch
-from torch_geometric_temporal.nn.recurrent.adp_adj_loss import AccumulativeGainLoss  # 假设你有这个自定义损失函数
+from torch_geometric_temporal.nn.recurrent.stock_GNN.adp_adj_loss import AccumulativeGainLoss  # 假设你有这个自定义损失函数
 from torch_geometric.data import Data, Batch
 from torch_geometric.utils import add_self_loops
 
@@ -31,7 +31,7 @@ class DynamicGraphLightning(pl.LightningModule):
         self.gnn1 = GCNConv(gru_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
         self.gnn2 = GCNConv(gnn_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
         # 3) 最后预测层
-        self.predictor = nn.Linear(gnn_hidden_dim, 1)  # 回归示例
+        self.predictor = nn.Linear(gnn_hidden_dim, 3)  # 回归示例
 
         self.k_nn = k_nn
         self.lr = lr
@@ -65,12 +65,15 @@ class DynamicGraphLightning(pl.LightningModule):
             # If input is [batch_size, num_nodes, feat_dim], add seq_len dimension
             b, n, f = x_seq.shape
             l = 1
-            x_seq = x_seq.unsqueeze(2)  # [batch_size, num_nodes, 1, feat_dim]
+            # x_seq = x_seq.unsqueeze(2)  # [batch_size, num_nodes, 1, feat_dim]
+            x_seq = x_seq.unsqueeze(1)  # [batch_size, 1, feat_dim, num_nodes]
         else:
-            b, n, l, f = x_seq.shape
+            # b, n, l, f = x_seq.shape
+            b, l, f, n = x_seq.shape  # [batch_size, seq_len, feat_dim, num_nodes]
         
         # Reshape for GRU: [seq_len, batch_size * num_nodes, feat_dim]
-        gru_in = x_seq.permute(2, 0, 1, 3).reshape(l, b * n, f)
+        # gru_in = x_seq.permute(2, 0, 1, 3).reshape(l, b * n, f)
+        gru_in = x_seq.permute(1, 0, 3, 2).reshape(l, b * n, f)  # [seq_len, batch_size * num_nodes, feat_dim]
         gru_out, _ = self.gru(gru_in)    # 输出: [seq_len, batch_size * num_nodes, gru_hidden_dim]
 
         h = gru_out[-1].view(b, n, -1)  # 取最后一个时间步的输出: [batch_size, num_nodes, gru_hidden_dim]
@@ -153,11 +156,14 @@ class DynamicGraphLightning(pl.LightningModule):
             # 每个图独立处理: [num_nodes_i, seq_len, node_feat_dim]
             if graph_seq.dim() == 2:
                 # 如果是 [num_nodes, feat_dim]，添加seq_len维度
-                n, f = graph_seq.shape
+                # n, f = graph_seq.shape
+                f, n = graph_seq.shape  # [num_nodes, feat_dim]
                 l = 1
-                graph_seq = graph_seq.unsqueeze(1)  # [num_nodes, 1, feat_dim]
+                # graph_seq = graph_seq.unsqueeze(1)  # [num_nodes, 1, feat_dim]
+                graph_seq = graph_seq.unsqueeze(0)  # [1, num_nodes, feat_dim]
             else:
-                n, l, f = graph_seq.shape
+                # n, l, f = graph_seq.shape
+                l, f, n = graph_seq.shape  # [seq_len, feat_dim, num_nodes]
             
             # TensorBoard logging for individual graphs
             if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
@@ -165,7 +171,8 @@ class DynamicGraphLightning(pl.LightningModule):
             
             # ——— 1. GRU 编码 ——————————————
             # Reshape for GRU: [seq_len, num_nodes, feat_dim]
-            gru_in = graph_seq.permute(1, 0, 2)  # [seq_len, num_nodes, feat_dim]
+            # gru_in = graph_seq.permute(1, 0, 2)  # [seq_len, num_nodes, feat_dim]
+            gru_in = graph_seq.permute(0, 2, 1)  # [seq_len, num_nodes, feat_dim]
             gru_out, _ = self.gru(gru_in)    # 输出: [seq_len, num_nodes, gru_hidden_dim]
             
             h = gru_out[-1]  # 取最后一个时间步: [num_nodes, gru_hidden_dim]
