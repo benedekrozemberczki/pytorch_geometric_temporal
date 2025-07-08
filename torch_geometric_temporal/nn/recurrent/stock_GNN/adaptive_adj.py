@@ -304,6 +304,24 @@ class DynamicGraphLightning(pl.LightningModule):
             self.logger.experiment.add_scalar('loss/val', loss.item(), self.global_step)
         self.log("val/loss", loss, on_step=False, on_epoch=True)
 
+
+    def test_step(self, batch, batch_idx):
+        x_t, y_t = batch
+        y_pred = self(x_t)
+        if isinstance(y_pred, list):
+            total_loss = 0.0
+            total_nodes = 0
+            for pred, target in zip(y_pred, y_t):
+                loss_i = self.loss_fn(pred.squeeze(-1), target.float())
+                total_loss += loss_i * pred.size(0)
+                total_nodes += pred.size(0)
+            loss = total_loss / total_nodes if total_nodes>0 else total_loss
+        else:
+            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
+        self.log("test/loss", loss, on_step=False, on_epoch=True)
+        return loss
+
+        
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)
 

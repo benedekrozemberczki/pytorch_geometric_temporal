@@ -74,7 +74,10 @@ class StockDataModule(pl.LightningDataModule):
                  val_ratio: float = 0.15,
                  test_ratio: float = 0.15,
                  batch_size: int = 32,
-                 num_workers: int = 4):
+                 num_workers: int = 4,
+                 normalize_features: bool = True,
+                 normalize_targets: bool = True,
+                 normalization_method: str = 'zscore'):
         """
         Args:
             data_dir: 数据目录
@@ -86,6 +89,9 @@ class StockDataModule(pl.LightningDataModule):
             test_ratio: 测试集比例
             batch_size: 批次大小
             num_workers: 数据加载进程数
+            normalize_features: 是否对特征进行标准化
+            normalize_targets: 是否对目标进行标准化
+            normalization_method: 标准化方法 ('zscore', 'minmax')
         """
         super().__init__()
         self.data_dir = data_dir
@@ -97,6 +103,9 @@ class StockDataModule(pl.LightningDataModule):
         self.test_ratio = test_ratio
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.normalize_features = normalize_features
+        self.normalize_targets = normalize_targets
+        self.normalization_method = normalization_method
         
         # 数据文件定义
         price_files = [
@@ -122,6 +131,10 @@ class StockDataModule(pl.LightningDataModule):
         self.feature_names = None
         self.stock_names = None
         self.date_index = None
+        
+        # 标准化统计信息
+        self.feature_stats = None  # 特征的均值和标准差
+        self.target_stats = None   # 目标的均值和标准差
         
         # 数据集
         self.train_dataset = None
@@ -347,11 +360,48 @@ class StockDataModule(pl.LightningDataModule):
         if len(target_list) == 0:
             raise ValueError("没有有效的目标数据")
         
-        # 转换为张量
-        # features: [T, F, N]
-        self.features = torch.tensor(np.stack(feature_list, axis=1), dtype=torch.float32)
-        # targets: [T, N, H] (H是预测期数)
-        self.targets = torch.tensor(np.stack(target_list, axis=2), dtype=torch.float32)
+        # 转换为张量前先进行标准化处理
+        print("7. 数据标准化...")
+        
+        # 7.1 特征标准化
+        if self.normalize_features:
+            print("  对特征进行标准化...")
+            # Stack features: [T, F, N]
+            features_array = np.stack(feature_list, axis=1)
+            
+            # 标准化处理
+            normalized_features, self.feature_stats = self._normalize_data(
+                features_array, fit=True
+            )
+            
+            print(f"  特征标准化完成: {self.normalization_method}")
+            print(f"  原始特征范围: [{features_array.min():.4f}, {features_array.max():.4f}]")
+            print(f"  标准化后范围: [{normalized_features.min():.4f}, {normalized_features.max():.4f}]")
+            
+            self.features = torch.tensor(normalized_features, dtype=torch.float32)
+        else:
+            # features: [T, F, N]
+            self.features = torch.tensor(np.stack(feature_list, axis=1), dtype=torch.float32)
+        
+        # 7.2 目标标准化
+        if self.normalize_targets:
+            print("  对目标进行标准化...")
+            # Stack targets: [T, N, H]
+            targets_array = np.stack(target_list, axis=2)
+            
+            # 标准化处理
+            normalized_targets, self.target_stats = self._normalize_data(
+                targets_array, fit=True
+            )
+            
+            print(f"  目标标准化完成: {self.normalization_method}")
+            print(f"  原始目标范围: [{targets_array.min():.4f}, {targets_array.max():.4f}]")
+            print(f"  标准化后范围: [{normalized_targets.min():.4f}, {normalized_targets.max():.4f}]")
+            
+            self.targets = torch.tensor(normalized_targets, dtype=torch.float32)
+        else:
+            # targets: [T, N, H] (H是预测期数)
+            self.targets = torch.tensor(np.stack(target_list, axis=2), dtype=torch.float32)
         
         self.feature_names = feature_names
         self.stock_names = common_stocks
@@ -363,7 +413,7 @@ class StockDataModule(pl.LightningDataModule):
         print(f"  预测期数: {self.prediction_horizons}")
         
         # 数据质量检查
-        print("7. 数据质量检查...")
+        print("8. 数据质量检查...")
         feature_nan_count = torch.isnan(self.features).sum().item()
         target_nan_count = torch.isnan(self.targets).sum().item()
         print(f"  特征数据NaN数量: {feature_nan_count}")
@@ -449,6 +499,84 @@ class StockDataModule(pl.LightningDataModule):
     def get_prediction_horizons(self):
         """获取预测期数"""
         return self.prediction_horizons
+    
+    def _normalize_data(self, data: np.ndarray, stats: Optional[Dict] = None, fit: bool = True) -> Tuple[np.ndarray, Dict]:
+        """
+        标准化数据
+        
+        Args:
+            data: 输入数据 [T, ...]
+            stats: 已有的统计信息 (用于验证/测试集)
+            fit: 是否计算统计信息 (True for training, False for val/test)
+            
+        Returns:
+            normalized_data: 标准化后的数据
+            stats: 统计信息字典
+        """
+        if self.normalization_method == 'zscore':
+            if fit or stats is None:
+                # 在时间维度上计算统计量，保持其他维度
+                mean = np.mean(data, axis=0, keepdims=True)
+                std = np.std(data, axis=0, keepdims=True)
+                std = np.where(std == 0, 1.0, std)  # 避免除零
+                stats = {'mean': mean, 'std': std}
+            else:
+                mean = stats['mean']
+                std = stats['std']
+            
+            normalized_data = (data - mean) / std
+            
+        elif self.normalization_method == 'minmax':
+            if fit or stats is None:
+                # 在时间维度上计算min和max
+                data_min = np.min(data, axis=0, keepdims=True)
+                data_max = np.max(data, axis=0, keepdims=True)
+                data_range = data_max - data_min
+                data_range = np.where(data_range == 0, 1.0, data_range)  # 避免除零
+                stats = {'min': data_min, 'max': data_max, 'range': data_range}
+            else:
+                data_min = stats['min']
+                data_range = stats['range']
+            
+            normalized_data = (data - data_min) / data_range
+            
+        else:
+            raise ValueError(f"不支持的标准化方法: {self.normalization_method}")
+        
+        return normalized_data, stats
+
+    def denormalize_targets(self, normalized_targets: torch.Tensor) -> torch.Tensor:
+        """
+        反标准化目标数据
+        
+        Args:
+            normalized_targets: 标准化的目标数据
+            
+        Returns:
+            原始尺度的目标数据
+        """
+        if not self.normalize_targets or self.target_stats is None:
+            return normalized_targets
+        
+        if self.normalization_method == 'zscore':
+            mean = torch.tensor(self.target_stats['mean'], dtype=torch.float32)
+            std = torch.tensor(self.target_stats['std'], dtype=torch.float32)
+            return normalized_targets * std + mean
+            
+        elif self.normalization_method == 'minmax':
+            data_min = torch.tensor(self.target_stats['min'], dtype=torch.float32)
+            data_range = torch.tensor(self.target_stats['range'], dtype=torch.float32)
+            return normalized_targets * data_range + data_min
+        
+        return normalized_targets
+
+    def get_normalization_stats(self):
+        """获取标准化统计信息"""
+        return {
+            'feature_stats': self.feature_stats,
+            'target_stats': self.target_stats,
+            'normalization_method': self.normalization_method
+        }
 
 # 使用示例
 def main():
@@ -460,7 +588,10 @@ def main():
         use_factors=False,
         sequence_length=20,
         prediction_horizons=[1, 5, 10],
-        batch_size=32
+        batch_size=32,
+        normalize_features=True,
+        normalize_targets=True,
+        normalization_method='zscore'
     )
     
     price_datamodule.prepare_data()
@@ -482,7 +613,10 @@ def main():
         use_factors=True,
         sequence_length=20,
         prediction_horizons=[1, 5, 10],
-        batch_size=32
+        batch_size=32,
+        normalize_features=True,
+        normalize_targets=True,
+        normalization_method='zscore'
     )
     
     factor_datamodule.prepare_data()
