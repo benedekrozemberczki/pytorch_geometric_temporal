@@ -30,8 +30,9 @@ class DynamicGraphLightning(pl.LightningModule):
         # 2) 用于图消息传递的 GNN 层
         self.gnn1 = GCNConv(gru_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
         self.gnn2 = GCNConv(gnn_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
-        # 3) 最后预测层
-        self.predictor = nn.Linear(gnn_hidden_dim, 3)  # 回归示例
+        # 3) 最后预测层（添加BatchNorm）
+        self.batch_norm = nn.BatchNorm1d(gnn_hidden_dim)
+        self.predictor = nn.Linear(gnn_hidden_dim, 32)  # 回归示例
 
         self.k_nn = k_nn
         self.lr = lr
@@ -141,8 +142,10 @@ class DynamicGraphLightning(pl.LightningModule):
         out2 = F.relu(self.gnn2(out1, e_idx, edge_weight=e_w)) #[b*n, feat_dim]
 
         # ——— 4. 预测输出 ——————————————
-        out = self.predictor(out2)  # [N_total, 1]
-        final_out = out.view(b, n, -1)  # [batch, num_nodes, 1]
+        # 应用 BatchNorm 然后预测
+        out2_normalized = self.batch_norm(out2)  # [N_total, gnn_hidden_dim]
+        out = self.predictor(out2_normalized)  # [N_total, 32]
+        final_out = out.view(b, n, -1)  # [batch, num_nodes, 32]
         # TensorBoard logging: log output stats
         self.log('stats/final_output_mean', final_out.mean().item(), on_step=True, on_epoch=False)
         self.log('stats/final_output_std', final_out.std().item(), on_step=True, on_epoch=False)
@@ -192,7 +195,8 @@ class DynamicGraphLightning(pl.LightningModule):
             k = min(self.k_nn, n - 1)
             if k <= 0:
                 # 如果图太小，直接用线性层处理
-                out = self.predictor(h)  # [num_nodes, 1]
+                h_normalized = self.batch_norm(h)  # 应用BatchNorm
+                out = self.predictor(h_normalized)  # [num_nodes, 32]
                 results.append(out)
                 continue
             
@@ -219,7 +223,8 @@ class DynamicGraphLightning(pl.LightningModule):
             
             if len(edge_sources) == 0:
                 # 如果没有边，直接用线性层
-                out = self.predictor(h)
+                h_normalized = self.batch_norm(h)  # 应用BatchNorm
+                out = self.predictor(h_normalized)
                 results.append(out)
                 continue
             
@@ -240,7 +245,9 @@ class DynamicGraphLightning(pl.LightningModule):
             out2 = F.relu(self.gnn2(out1, edge_index, edge_weight=edge_weight))
             
             # ——— 4. 预测输出 ——————————————
-            out = self.predictor(out2)  # [num_nodes, 1]
+            # 应用 BatchNorm 然后预测
+            out2_normalized = self.batch_norm(out2)  # [num_nodes, gnn_hidden_dim]
+            out = self.predictor(out2_normalized)  # [num_nodes, 32]
             
             # TensorBoard logging: log output stats for this graph
             self.log(f'graph_stats/graph_{i}_output_mean', out.mean().item(), on_step=True, on_epoch=False)

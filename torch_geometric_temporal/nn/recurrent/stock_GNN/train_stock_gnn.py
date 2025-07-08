@@ -23,7 +23,7 @@ def main():
     model = DynamicGraphLightning(
         node_feat_dim=node_feat_dim,
         gru_hidden_dim=64,
-        gnn_hidden_dim=64,
+        gnn_hidden_dim=128,
         k_nn=8,
         lr=1e-3
     )
@@ -31,17 +31,17 @@ def main():
     # 可选：添加回调函数来更好地控制训练过程
     callbacks = [
         # 暂时注释掉这些回调，以确保能看到基本输出
-        # ModelCheckpoint(
-        #     monitor='val/loss',
-        #     filename='stock-gnn-{epoch:02d}-{val_loss:.2f}',
-        #     save_top_k=3,
-        #     mode='min',
-        # ),
-        # EarlyStopping(
-        #     monitor='val/loss',
-        #     patience=10,
-        #     mode='min',
-        # )
+        ModelCheckpoint(
+            monitor='val/loss',
+            filename='stock-gnn-{epoch:02d}-{val_loss:.2f}',
+            save_top_k=3,
+            mode='min',
+        ),
+        EarlyStopping(
+            monitor='val/loss',
+            patience=10,
+            mode='min',
+        )
     ]
 
     # 3) Trainer
