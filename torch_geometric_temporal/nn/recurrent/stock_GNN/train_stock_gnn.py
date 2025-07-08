@@ -28,9 +28,10 @@ def main():
     )
 
     # 3) Trainer
-    trainer = pl.Trainer(
+    trainer = pl.Trainer(       
         max_epochs=20,
-        gpus=1,
+        accelerator="gpu",
+        devices=1,
         log_every_n_steps=10,
     )
 
