@@ -66,7 +66,7 @@ class StockDataModule(pl.LightningDataModule):
     """股票数据模块"""
     
     def __init__(self,
-                 data_dir: str = './clean_data',
+                 data_dir: str = '/home/xu/clean_data',
                  use_factors: bool = True,
                  sequence_length: int = 20,
                  prediction_horizons: List[int] = [1, 5, 10, 20],
