@@ -8,7 +8,7 @@ class AccumulativeGainLoss(nn.Module):
         self.penalty_weight = penalty_weight
         self.eps = eps
 
-    def forward(self, preds: torch.Tensor, y_ts: torch.Tensor, importance: torch.Tensor = torch.Tensor([1,0,0])) -> torch.Tensor:
+    def forward(self, preds: torch.Tensor, y_ts: torch.Tensor, importance: torch.Tensor = torch.tensor([1.0, 0.0, 0.0])) -> torch.Tensor:
         """
         Args:
             preds: [B, N, K] 模型输出因子（每个 batch 一个图）
@@ -21,6 +21,9 @@ class AccumulativeGainLoss(nn.Module):
         B, N, K = preds.shape
         _, T, _, D = y_ts.shape
         device = preds.device
+        
+        # 确保 importance 张量在正确的设备上
+        importance = importance.to(device)
 
         total_loss_r2 = 0.0
         total_loss_corr = 0.0
