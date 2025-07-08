@@ -97,29 +97,18 @@ class DynamicGraphLightning(pl.LightningModule):
         # 现在直接选择top-k，不需要+1
         topk_vals, topk_idx = sim_masked.topk(self.k_nn, dim=-1, sorted=True)
         
-        # 创建源节点索引
-        edge_src = torch.arange(n, device=sim.device).view(1, n, 1).expand(b, n, self.k_nn)
-        edge_dst = topk_idx  # [b, n, k]
-        edge_weight = topk_vals  # [b, n, k]
-        
-        # 调试信息
-        print(f"Debug: b={b}, n={n}, k_nn={self.k_nn}")
-        print(f"Debug: sim shape={sim.shape}")
-        print(f"Debug: topk_vals shape={topk_vals.shape}, topk_idx shape={topk_idx.shape}")
-        print(f"Debug: edge_weight shape={edge_weight.shape}")
-        print(f"Debug: edge_dst shape={edge_dst.shape}")
-        print(f"Debug: edge_src shape={edge_src.shape}")
-        print(f"Debug: expected total edges={b * n * self.k_nn}")
-        print(f"Debug: actual edge_weight size={edge_weight.numel()}")
-        print(f"Debug: actual edge_dst size={edge_dst.numel()}")
-        print(f"Debug: actual edge_src size={edge_src.numel()}")
+        # 创建源节点索引，确保内存布局连续
+        edge_src = torch.arange(n, device=sim.device).unsqueeze(0).unsqueeze(2).expand(b, n, self.k_nn).contiguous()
+        edge_dst = topk_idx.contiguous()  # [b, n, k]
+        edge_weight = topk_vals.contiguous()  # [b, n, k]
 
         data_list = []
         for i in range(b):
             # Flatten edge indices and weights for this batch item
-            src_flat = edge_src[i].view(-1)  # [n*k]
-            dst_flat = edge_dst[i].view(-1)  # [n*k]
-            weight_flat = edge_weight[i].view(-1)  # [n*k]
+            # 使用 contiguous() 确保张量内存布局连续
+            src_flat = edge_src[i].contiguous().view(-1)  # [n*k]
+            dst_flat = edge_dst[i].contiguous().view(-1)  # [n*k]
+            weight_flat = edge_weight[i].contiguous().view(-1)  # [n*k]
             
             data = Data(
                 x=h[i],  # [n, feat_dim]
