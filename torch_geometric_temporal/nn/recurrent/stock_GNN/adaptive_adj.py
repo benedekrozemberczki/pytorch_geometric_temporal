@@ -60,7 +60,7 @@ class DynamicGraphLightning(pl.LightningModule):
     
     def _forward_batch_tensor(self, x_seq: torch.Tensor) -> torch.Tensor:
         """处理固定大小的批量图数据"""
-        print(f"x's shape:{x_seq.shape}")
+        # print(f"x's shape:{x_seq.shape}")
         # ——— 1. GRU 编码 ——————————————
         if x_seq.dim() == 3:
             # If input is [batch_size, num_nodes, feat_dim], add seq_len dimension

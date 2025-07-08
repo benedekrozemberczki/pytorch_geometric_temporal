@@ -1,5 +1,6 @@
 # train.py (放在项目根目录)
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from torch_geometric_temporal.nn.recurrent.stock_GNN.stock_dataset import StockDataModule
 from torch_geometric_temporal.nn.recurrent.stock_GNN.adaptive_adj import DynamicGraphLightning
 
@@ -27,12 +28,32 @@ def main():
         lr=1e-3
     )
 
+    # 可选：添加回调函数来更好地控制训练过程
+    callbacks = [
+        ModelCheckpoint(
+            monitor='val/loss',
+            filename='stock-gnn-{epoch:02d}-{val_loss:.2f}',
+            save_top_k=3,
+            mode='min',
+        ),
+        EarlyStopping(
+            monitor='val/loss',
+            patience=10,
+            mode='min',
+        )
+    ]
+
     # 3) Trainer
     trainer = pl.Trainer(       
-        max_epochs=20,
+        max_epochs=50,
         accelerator="gpu",
         devices=1,
-        log_every_n_steps=10,
+        log_every_n_steps=10,        # 每10步打印一次日志
+        enable_progress_bar=True,    # 启用进度条 (默认True)
+        enable_model_summary=True,   # 启用模型摘要 (默认True)
+        # 如果您想要更详细的日志，可以添加：
+        # logger=True,               # 启用日志记录器 (默认True)
+        callbacks=callbacks,         # 可以添加自定义回调   
     )
 
     # 4) 训练 + 验证
