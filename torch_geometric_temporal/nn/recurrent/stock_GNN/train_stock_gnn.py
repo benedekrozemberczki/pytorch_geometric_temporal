@@ -30,17 +30,18 @@ def main():
 
     # 可选：添加回调函数来更好地控制训练过程
     callbacks = [
-        ModelCheckpoint(
-            monitor='val/loss',
-            filename='stock-gnn-{epoch:02d}-{val_loss:.2f}',
-            save_top_k=3,
-            mode='min',
-        ),
-        EarlyStopping(
-            monitor='val/loss',
-            patience=10,
-            mode='min',
-        )
+        # 暂时注释掉这些回调，以确保能看到基本输出
+        # ModelCheckpoint(
+        #     monitor='val/loss',
+        #     filename='stock-gnn-{epoch:02d}-{val_loss:.2f}',
+        #     save_top_k=3,
+        #     mode='min',
+        # ),
+        # EarlyStopping(
+        #     monitor='val/loss',
+        #     patience=10,
+        #     mode='min',
+        # )
     ]
 
     # 3) Trainer
@@ -48,19 +49,30 @@ def main():
         max_epochs=50,
         accelerator="gpu",
         devices=1,
-        log_every_n_steps=10,        # 每10步打印一次日志
+        log_every_n_steps=1,         # 每1步打印一次日志（更频繁）
         enable_progress_bar=True,    # 启用进度条 (默认True)
         enable_model_summary=True,   # 启用模型摘要 (默认True)
-        # 如果您想要更详细的日志，可以添加：
-        # logger=True,               # 启用日志记录器 (默认True)
-        callbacks=callbacks,         # 可以添加自定义回调   
+        callbacks=callbacks,         # 可以添加自定义回调
+        # 添加这些参数来确保能看到损失
+        logger=True,                 # 明确启用日志记录器
+        enable_checkpointing=True,   # 启用检查点
+        check_val_every_n_epoch=1,   # 每个epoch都验证
     )
 
     # 4) 训练 + 验证
+    print("开始训练...")
+    print(f"特征维度: {node_feat_dim}")
+    print(f"股票数量: {dm.get_stock_num()}")
+    print(f"预测期数: {dm.get_prediction_horizons()}")
+    
     trainer.fit(model, datamodule=dm)
+    
+    print("训练完成！")
 
     # 5) 测试
+    print("开始测试...")
     trainer.test(model, datamodule=dm)
+    print("测试完成！")
 
 if __name__ == "__main__":
     main()
