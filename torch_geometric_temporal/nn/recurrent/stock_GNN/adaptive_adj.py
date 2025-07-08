@@ -78,16 +78,14 @@ class DynamicGraphLightning(pl.LightningModule):
 
         h = gru_out[-1].view(b, n, -1)  # 取最后一个时间步的输出: [batch_size, num_nodes, gru_hidden_dim]
         # TensorBoard logging: log GRU output stats
-        if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-            self.logger.experiment.add_scalar('stats/gru_output_mean', h.mean().item(), self.global_step)
-            self.logger.experiment.add_scalar('stats/gru_output_std', h.std().item(), self.global_step)
+        self.log('stats/gru_output_mean', h.mean().item(), on_step=True, on_epoch=False)
+        self.log('stats/gru_output_std', h.std().item(), on_step=True, on_epoch=False)
         # ——— 2. 动态构图（相似度 + Top-k） —————
         # 计算节点两两点积
         sim = torch.einsum("bni,bmi->bnm", h, h)  # [b, n, n]
         # TensorBoard logging: log similarity stats
-        if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-            self.logger.experiment.add_scalar('stats/sim_mean', sim.mean().item(), self.global_step)
-            self.logger.experiment.add_scalar('stats/sim_std', sim.std().item(), self.global_step)
+        self.log('stats/sim_mean', sim.mean().item(), on_step=True, on_epoch=False)
+        self.log('stats/sim_std', sim.std().item(), on_step=True, on_epoch=False)
         # Top-k
         topk_vals, topk_idx = sim.topk(self.k_nn + 1, dim=-1)  # 包含自己
         # 去掉自环
@@ -143,9 +141,8 @@ class DynamicGraphLightning(pl.LightningModule):
         out = self.predictor(out2)  # [N_total, 1]
         final_out = out.view(b, n, -1)  # [batch, num_nodes, 1]
         # TensorBoard logging: log output stats
-        if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-            self.logger.experiment.add_scalar('stats/final_output_mean', final_out.mean().item(), self.global_step)
-            self.logger.experiment.add_scalar('stats/final_output_std', final_out.std().item(), self.global_step)
+        self.log('stats/final_output_mean', final_out.mean().item(), on_step=True, on_epoch=False)
+        self.log('stats/final_output_std', final_out.std().item(), on_step=True, on_epoch=False)
         return final_out
     
     def _forward_graph_list(self, graph_list: list) -> list:
@@ -166,8 +163,7 @@ class DynamicGraphLightning(pl.LightningModule):
                 l, f, n = graph_seq.shape  # [seq_len, feat_dim, num_nodes]
             
             # TensorBoard logging for individual graphs
-            if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_num_nodes', n, self.global_step)
+            self.log(f'graph_stats/graph_{i}_num_nodes', n, on_step=True, on_epoch=False)
             
             # ——— 1. GRU 编码 ——————————————
             # Reshape for GRU: [seq_len, num_nodes, feat_dim]
@@ -178,18 +174,16 @@ class DynamicGraphLightning(pl.LightningModule):
             h = gru_out[-1]  # 取最后一个时间步: [num_nodes, gru_hidden_dim]
             
             # TensorBoard logging: log GRU output stats for this graph
-            if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_gru_output_mean', h.mean().item(), self.global_step)
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_gru_output_std', h.std().item(), self.global_step)
+            self.log(f'graph_stats/graph_{i}_gru_output_mean', h.mean().item(), on_step=True, on_epoch=False)
+            self.log(f'graph_stats/graph_{i}_gru_output_std', h.std().item(), on_step=True, on_epoch=False)
             
             # ——— 2. 动态构图（相似度 + Top-k） —————
             # 计算节点两两点积 [num_nodes, num_nodes]
             sim = torch.einsum("ni,mi->nm", h, h)
             
             # TensorBoard logging: log similarity stats for this graph
-            if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_sim_mean', sim.mean().item(), self.global_step)
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_sim_std', sim.std().item(), self.global_step)
+            self.log(f'graph_stats/graph_{i}_sim_mean', sim.mean().item(), on_step=True, on_epoch=False)
+            self.log(f'graph_stats/graph_{i}_sim_std', sim.std().item(), on_step=True, on_epoch=False)
             
             # 确保k_nn不超过节点数-1
             k = min(self.k_nn, n - 1)
@@ -246,9 +240,8 @@ class DynamicGraphLightning(pl.LightningModule):
             out = self.predictor(out2)  # [num_nodes, 1]
             
             # TensorBoard logging: log output stats for this graph
-            if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_output_mean', out.mean().item(), self.global_step)
-                self.logger.experiment.add_scalar(f'graph_stats/graph_{i}_output_std', out.std().item(), self.global_step)
+            self.log(f'graph_stats/graph_{i}_output_mean', out.mean().item(), on_step=True, on_epoch=False)
+            self.log(f'graph_stats/graph_{i}_output_std', out.std().item(), on_step=True, on_epoch=False)
             
             results.append(out)
         
@@ -275,9 +268,8 @@ class DynamicGraphLightning(pl.LightningModule):
             loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
         
         # TensorBoard logging: log training loss
-        if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-            self.logger.experiment.add_scalar('loss/train', loss.item(), self.global_step)
         self.log("train/loss", loss, on_step=False, on_epoch=True)
+        self.log("train/loss_step", loss, on_step=True, on_epoch=False)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -300,9 +292,8 @@ class DynamicGraphLightning(pl.LightningModule):
             loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
         
         # TensorBoard logging: log validation loss
-        if hasattr(self, 'logger') and self.logger is not None and hasattr(self.logger, 'experiment') and self.global_rank == 0:
-            self.logger.experiment.add_scalar('loss/val', loss.item(), self.global_step)
         self.log("val/loss", loss, on_step=False, on_epoch=True)
+        self.log("val/loss_step", loss, on_step=True, on_epoch=False)
 
 
     def test_step(self, batch, batch_idx):
@@ -321,7 +312,7 @@ class DynamicGraphLightning(pl.LightningModule):
         self.log("test/loss", loss, on_step=False, on_epoch=True)
         return loss
 
-        
+
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)
 

@@ -365,7 +365,7 @@ class StockDataModule(pl.LightningDataModule):
         
         # 7.1 特征标准化
         if self.normalize_features:
-            print("  对特征进行标准化...")
+            print("  对特征进行标准化 (按特征在所有股票上标准化)...")
             # Stack features: [T, F, N]
             features_array = np.stack(feature_list, axis=1)
             
@@ -378,6 +378,13 @@ class StockDataModule(pl.LightningDataModule):
             print(f"  原始特征范围: [{features_array.min():.4f}, {features_array.max():.4f}]")
             print(f"  标准化后范围: [{normalized_features.min():.4f}, {normalized_features.max():.4f}]")
             
+            # 验证标准化效果：每个特征在所有股票上的均值和标准差
+            for f in range(features_array.shape[1]):
+                feature_data = features_array[:, f, :].flatten()  # 展平时间和股票维度
+                norm_feature_data = normalized_features[:, f, :].flatten()
+                print(f"    特征 {f}: 原始均值={feature_data.mean():.4f}, 标准差={feature_data.std():.4f}")
+                print(f"    特征 {f}: 标准化后均值={norm_feature_data.mean():.4f}, 标准差={norm_feature_data.std():.4f}")
+            
             self.features = torch.tensor(normalized_features, dtype=torch.float32)
         else:
             # features: [T, F, N]
@@ -385,7 +392,7 @@ class StockDataModule(pl.LightningDataModule):
         
         # 7.2 目标标准化
         if self.normalize_targets:
-            print("  对目标进行标准化...")
+            print("  对目标进行标准化 (按预测期在所有股票上标准化)...")
             # Stack targets: [T, N, H]
             targets_array = np.stack(target_list, axis=2)
             
@@ -397,6 +404,13 @@ class StockDataModule(pl.LightningDataModule):
             print(f"  目标标准化完成: {self.normalization_method}")
             print(f"  原始目标范围: [{targets_array.min():.4f}, {targets_array.max():.4f}]")
             print(f"  标准化后范围: [{normalized_targets.min():.4f}, {normalized_targets.max():.4f}]")
+            
+            # 验证标准化效果：每个预测期在所有股票上的均值和标准差
+            for h in range(targets_array.shape[2]):
+                target_data = targets_array[:, :, h].flatten()  # 展平时间和股票维度
+                norm_target_data = normalized_targets[:, :, h].flatten()
+                print(f"    预测期 {h}: 原始均值={target_data.mean():.4f}, 标准差={target_data.std():.4f}")
+                print(f"    预测期 {h}: 标准化后均值={norm_target_data.mean():.4f}, 标准差={norm_target_data.std():.4f}")
             
             self.targets = torch.tensor(normalized_targets, dtype=torch.float32)
         else:
@@ -502,10 +516,10 @@ class StockDataModule(pl.LightningDataModule):
     
     def _normalize_data(self, data: np.ndarray, stats: Optional[Dict] = None, fit: bool = True) -> Tuple[np.ndarray, Dict]:
         """
-        标准化数据
+        标准化数据 - 按特征在所有股票上进行标准化
         
         Args:
-            data: 输入数据 [T, ...]
+            data: 输入数据 [T, F, N] 或 [T, N, H]
             stats: 已有的统计信息 (用于验证/测试集)
             fit: 是否计算统计信息 (True for training, False for val/test)
             
@@ -515,10 +529,30 @@ class StockDataModule(pl.LightningDataModule):
         """
         if self.normalization_method == 'zscore':
             if fit or stats is None:
-                # 在时间维度上计算统计量，保持其他维度
-                mean = np.mean(data, axis=0, keepdims=True)
-                std = np.std(data, axis=0, keepdims=True)
-                std = np.where(std == 0, 1.0, std)  # 避免除零
+                if data.ndim == 3 and data.shape[1] > data.shape[2]:  # Features: [T, F, N]
+                    # 对每个特征F，在时间T和股票N维度上计算统计量
+                    # 重塑为 [T*N, F] 来计算每个特征的全局统计量
+                    reshaped_data = data.transpose(1, 0, 2).reshape(data.shape[1], -1)  # [F, T*N]
+                    mean = np.mean(reshaped_data, axis=1, keepdims=True)  # [F, 1]
+                    std = np.std(reshaped_data, axis=1, keepdims=True)    # [F, 1]
+                    std = np.where(std == 0, 1.0, std)  # 避免除零
+                    
+                    # 重塑回原始形状用于广播
+                    mean = mean.reshape(1, -1, 1)  # [1, F, 1]
+                    std = std.reshape(1, -1, 1)    # [1, F, 1]
+                    
+                else:  # Targets: [T, N, H]
+                    # 对每个预测期H，在时间T和股票N维度上计算统计量
+                    # 重塑为 [T*N, H] 来计算每个预测期的全局统计量
+                    reshaped_data = data.reshape(-1, data.shape[2])  # [T*N, H]
+                    mean = np.mean(reshaped_data, axis=0, keepdims=True)  # [1, H]
+                    std = np.std(reshaped_data, axis=0, keepdims=True)    # [1, H]
+                    std = np.where(std == 0, 1.0, std)  # 避免除零
+                    
+                    # 重塑回原始形状用于广播
+                    mean = mean.reshape(1, 1, -1)  # [1, 1, H]
+                    std = std.reshape(1, 1, -1)    # [1, 1, H]
+                
                 stats = {'mean': mean, 'std': std}
             else:
                 mean = stats['mean']
@@ -528,11 +562,30 @@ class StockDataModule(pl.LightningDataModule):
             
         elif self.normalization_method == 'minmax':
             if fit or stats is None:
-                # 在时间维度上计算min和max
-                data_min = np.min(data, axis=0, keepdims=True)
-                data_max = np.max(data, axis=0, keepdims=True)
-                data_range = data_max - data_min
-                data_range = np.where(data_range == 0, 1.0, data_range)  # 避免除零
+                if data.ndim == 3 and data.shape[1] > data.shape[2]:  # Features: [T, F, N]
+                    # 对每个特征F，在时间T和股票N维度上计算min/max
+                    reshaped_data = data.transpose(1, 0, 2).reshape(data.shape[1], -1)  # [F, T*N]
+                    data_min = np.min(reshaped_data, axis=1, keepdims=True)  # [F, 1]
+                    data_max = np.max(reshaped_data, axis=1, keepdims=True)  # [F, 1]
+                    data_range = data_max - data_min
+                    data_range = np.where(data_range == 0, 1.0, data_range)  # 避免除零
+                    
+                    # 重塑回原始形状用于广播
+                    data_min = data_min.reshape(1, -1, 1)    # [1, F, 1]
+                    data_range = data_range.reshape(1, -1, 1)  # [1, F, 1]
+                    
+                else:  # Targets: [T, N, H]
+                    # 对每个预测期H，在时间T和股票N维度上计算min/max
+                    reshaped_data = data.reshape(-1, data.shape[2])  # [T*N, H]
+                    data_min = np.min(reshaped_data, axis=0, keepdims=True)  # [1, H]
+                    data_max = np.max(reshaped_data, axis=0, keepdims=True)  # [1, H]
+                    data_range = data_max - data_min
+                    data_range = np.where(data_range == 0, 1.0, data_range)  # 避免除零
+                    
+                    # 重塑回原始形状用于广播
+                    data_min = data_min.reshape(1, 1, -1)    # [1, 1, H]
+                    data_range = data_range.reshape(1, 1, -1)  # [1, 1, H]
+                
                 stats = {'min': data_min, 'max': data_max, 'range': data_range}
             else:
                 data_min = stats['min']
@@ -550,7 +603,7 @@ class StockDataModule(pl.LightningDataModule):
         反标准化目标数据
         
         Args:
-            normalized_targets: 标准化的目标数据
+            normalized_targets: 标准化的目标数据 [..., H]
             
         Returns:
             原始尺度的目标数据
@@ -561,11 +614,29 @@ class StockDataModule(pl.LightningDataModule):
         if self.normalization_method == 'zscore':
             mean = torch.tensor(self.target_stats['mean'], dtype=torch.float32)
             std = torch.tensor(self.target_stats['std'], dtype=torch.float32)
+            
+            # 确保维度匹配用于广播
+            if normalized_targets.dim() == 3:  # [B, N, H]
+                mean = mean.view(1, 1, -1)
+                std = std.view(1, 1, -1)
+            elif normalized_targets.dim() == 2:  # [B*N, H] 或 [N, H]
+                mean = mean.view(1, -1)
+                std = std.view(1, -1)
+            
             return normalized_targets * std + mean
             
         elif self.normalization_method == 'minmax':
             data_min = torch.tensor(self.target_stats['min'], dtype=torch.float32)
             data_range = torch.tensor(self.target_stats['range'], dtype=torch.float32)
+            
+            # 确保维度匹配用于广播
+            if normalized_targets.dim() == 3:  # [B, N, H]
+                data_min = data_min.view(1, 1, -1)
+                data_range = data_range.view(1, 1, -1)
+            elif normalized_targets.dim() == 2:  # [B*N, H] 或 [N, H]
+                data_min = data_min.view(1, -1)
+                data_range = data_range.view(1, -1)
+            
             return normalized_targets * data_range + data_min
         
         return normalized_targets
