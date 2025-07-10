@@ -278,8 +278,8 @@ class DynamicGraphLightning(pl.LightningModule):
             loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
         
         # TensorBoard logging: log training loss
-        self.log("train/loss", loss, on_step=False, on_epoch=True, prog_bar = True, logger=True)
-        self.log("train/loss_step", loss, on_step=True, on_epoch=False, prog_bar = True, logger=True)
+        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+        self.log("train_loss_step", loss, on_step=True, on_epoch=False, prog_bar=True, logger=True, sync_dist=True)
         
         # 添加打印语句确保能看到损失
         # if batch_idx % 10 == 0:  # 每10个batch打印一次
@@ -307,8 +307,8 @@ class DynamicGraphLightning(pl.LightningModule):
             loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
         
         # TensorBoard logging: log validation loss
-        self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar = True, logger=True)
-        self.log("val/loss_step", loss, on_step=True, on_epoch=False, prog_bar = True, logger=True)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+        self.log("val_loss_step", loss, on_step=True, on_epoch=False, prog_bar=True, logger=True, sync_dist=True)
         
         return loss
 

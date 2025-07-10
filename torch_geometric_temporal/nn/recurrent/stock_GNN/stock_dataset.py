@@ -77,7 +77,8 @@ class StockDataModule(pl.LightningDataModule):
                  num_workers: int = 4,
                  normalize_features: bool = True,
                  normalize_targets: bool = True,
-                 normalization_method: str = 'zscore'):
+                 normalization_method: str = 'zscore',
+                 debug: bool = False):
         """
         Args:
             data_dir: 数据目录
@@ -92,6 +93,7 @@ class StockDataModule(pl.LightningDataModule):
             normalize_features: 是否对特征进行标准化
             normalize_targets: 是否对目标进行标准化
             normalization_method: 标准化方法 ('zscore', 'minmax')
+            debug: 是否开启调试模式（打印详细信息）
         """
         super().__init__()
         self.data_dir = data_dir
@@ -106,6 +108,7 @@ class StockDataModule(pl.LightningDataModule):
         self.normalize_features = normalize_features
         self.normalize_targets = normalize_targets
         self.normalization_method = normalization_method
+        self.debug = debug  # 添加调试选项
         
         # 数据文件定义
         price_files = [
@@ -141,6 +144,15 @@ class StockDataModule(pl.LightningDataModule):
         self.val_dataset = None
         self.test_dataset = None
     
+    def _debug_print(self, *args, **kwargs):
+        """调试打印方法 - 只在debug模式下打印"""
+        if self.debug:
+            print(*args, **kwargs)
+    
+    def _print(self, *args, **kwargs):
+        """普通打印方法 - 总是打印"""
+        print(*args, **kwargs)
+    
     def load_pkl_safe(self, filename: str) -> Optional[pd.DataFrame]:
         """安全加载pkl文件"""
         filepath = os.path.join(self.data_dir, filename)
@@ -154,7 +166,7 @@ class StockDataModule(pl.LightningDataModule):
     
     def prepare_data(self):
         """准备数据（下载、预处理等）"""
-        print("=== 准备股票数据 ===")
+        self._print("=== 准备股票数据 ===")
         
         # 检查必要文件是否存在
         required_files = self.price_files + self.return_files
@@ -168,10 +180,10 @@ class StockDataModule(pl.LightningDataModule):
                 missing_files.append(file)
         
         if missing_files:
-            print(f"缺少文件: {missing_files}")
+            self._print(f"缺少文件: {missing_files}")
             raise FileNotFoundError(f"缺少必要的数据文件: {missing_files}")
         
-        print("✓ 所有必要文件都存在")
+        self._print("✓ 所有必要文件都存在")
     
     def setup(self, stage: Optional[str] = None):
         """设置数据集"""
@@ -186,51 +198,51 @@ class StockDataModule(pl.LightningDataModule):
     
     def _load_and_process_data(self):
         """加载并处理数据"""
-        print("=== 加载数据 ===")
+        self._print("=== 加载数据 ===")
         
         # 1. 加载价格数据
-        print("1. 加载价格数据...")
+        self._debug_print("1. 加载价格数据...")
         price_data = {}
         for file in self.price_files:
             data = self.load_pkl_safe(file)
             if data is not None:
                 price_data[file.replace('.pkl', '')] = data
-                print(f"  ✓ {file}: {data.shape}")
+                self._debug_print(f"  ✓ {file}: {data.shape}")
             else:
-                print(f"  ✗ {file}: 加载失败")
+                self._debug_print(f"  ✗ {file}: 加载失败")
         
         # 2. 加载因子数据（如果使用）
         factor_data = {}
         if self.use_factors:
-            print("2. 加载因子数据...")
+            self._debug_print("2. 加载因子数据...")
             for file in self.factor_files:
                 data = self.load_pkl_safe(file)
                 if data is not None:
                     factor_data[file.replace('.pkl', '')] = data
-                    print(f"  ✓ {file}: {data.shape}")
+                    self._debug_print(f"  ✓ {file}: {data.shape}")
                 else:
-                    print(f"  ✗ {file}: 加载失败")
+                    self._debug_print(f"  ✗ {file}: 加载失败")
         
         # 3. 加载收益率数据
-        print("3. 加载收益率数据...")
+        self._debug_print("3. 加载收益率数据...")
         return_data = {}
         for file in self.return_files:
             data = self.load_pkl_safe(file)
             if data is not None:
                 return_data[file.replace('.pkl', '')] = data
-                print(f"  ✓ {file}: {data.shape}")
+                self._debug_print(f"  ✓ {file}: {data.shape}")
             else:
-                print(f"  ✗ {file}: 加载失败")
+                self._debug_print(f"  ✗ {file}: 加载失败")
         
         # 4. 数据对齐、划分和标准化
-        print("4. 数据对齐、时间划分和标准化...")
+        self._debug_print("4. 数据对齐、时间划分和标准化...")
         self._align_split_and_normalize_data(price_data, factor_data, return_data)
     
     def _align_split_and_normalize_data(self, price_data: Dict, factor_data: Dict, return_data: Dict):
         """对齐数据，划分时间序列，并进行标准化"""
         
         # === 1. 数据对齐 ===
-        print("=== 1. 数据对齐 ===")
+        self._debug_print("=== 1. 数据对齐 ===")
         
         # 找到公共的股票和时间
         all_data = {**price_data, **factor_data, **return_data}
@@ -248,7 +260,7 @@ class StockDataModule(pl.LightningDataModule):
             raise ValueError("没有找到公共股票")
         
         common_stocks = sorted(list(common_stocks))
-        print(f"  公共股票数量: {len(common_stocks)}")
+        self._print(f"  公共股票数量: {len(common_stocks)}")
         
         # 获取公共时间范围
         if self.use_factors and factor_data:
@@ -284,10 +296,10 @@ class StockDataModule(pl.LightningDataModule):
             
             common_dates = sorted(list(common_dates))
         
-        print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
+        self._debug_print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
         
         # === 2. 时间划分 ===
-        print("=== 2. 时间划分 ===")
+        self._debug_print("=== 2. 时间划分 ===")
         
         total_time = len(common_dates)
         train_size = int(total_time * self.train_ratio)
@@ -300,13 +312,13 @@ class StockDataModule(pl.LightningDataModule):
         val_dates = common_dates[train_end:val_end]
         test_dates = common_dates[val_end:]
         
-        print(f"总时间步数: {total_time}")
-        print(f"训练集: {train_dates[0]} 到 {train_dates[-1]} ({len(train_dates)} 天)")
-        print(f"验证集: {val_dates[0]} 到 {val_dates[-1]} ({len(val_dates)} 天)")
-        print(f"测试集: {test_dates[0]} 到 {test_dates[-1]} ({len(test_dates)} 天)")
+        self._print(f"总时间步数: {total_time}")
+        self._debug_print(f"训练集: {train_dates[0]} 到 {train_dates[-1]} ({len(train_dates)} 天)")
+        self._debug_print(f"验证集: {val_dates[0]} 到 {val_dates[-1]} ({len(val_dates)} 天)")
+        self._debug_print(f"测试集: {test_dates[0]} 到 {test_dates[-1]} ({len(test_dates)} 天)")
         
         # === 3. 处理特征数据 ===
-        print("=== 3. 处理特征数据 ===")
+        self._debug_print("=== 3. 处理特征数据 ===")
         
         feature_list = []
         feature_names = []
@@ -314,7 +326,7 @@ class StockDataModule(pl.LightningDataModule):
         # 处理价格特征
         for name, data in price_data.items():
             if data is not None:
-                print(f"  处理价格特征: {name}")
+                self._debug_print(f"  处理价格特征: {name}")
                 # 对齐数据
                 aligned_data = data.reindex(index=common_dates, columns=common_stocks)
                 
@@ -334,7 +346,7 @@ class StockDataModule(pl.LightningDataModule):
         if self.use_factors:
             for name, data in factor_data.items():
                 if data is not None:
-                    print(f"  处理因子特征: {name}")
+                    self._debug_print(f"  处理因子特征: {name}")
                     # 对齐数据
                     aligned_data = data.reindex(index=common_dates, columns=common_stocks)
                     
@@ -351,13 +363,13 @@ class StockDataModule(pl.LightningDataModule):
                     feature_names.append(name)
         
         # === 4. 处理目标数据 ===
-        print("=== 4. 处理目标数据 ===")
+        self._debug_print("=== 4. 处理目标数据 ===")
         
         target_list = []
         for horizon in self.prediction_horizons:
             return_key = f'returns_{horizon}d'
             if return_key in return_data and return_data[return_key] is not None:
-                print(f"  处理目标: {return_key}")
+                self._debug_print(f"  处理目标: {return_key}")
                 # 对齐数据
                 aligned_data = return_data[return_key].reindex(index=common_dates, columns=common_stocks)
                 
@@ -374,7 +386,7 @@ class StockDataModule(pl.LightningDataModule):
                 target_list.append(normalized_data.values)  # [T, N]
         
         # === 5. 构建最终数据 ===
-        print("=== 5. 构建最终数据 ===")
+        self._debug_print("=== 5. 构建最终数据 ===")
         
         # 检查是否有有效数据
         if len(feature_list) == 0:
@@ -391,20 +403,20 @@ class StockDataModule(pl.LightningDataModule):
         self.stock_names = common_stocks
         self.date_index = common_dates
         
-        print(f"  特征矩阵形状: {self.features.shape}")
-        print(f"  目标矩阵形状: {self.targets.shape}")
-        print(f"  特征名称: {self.feature_names}")
-        print(f"  预测期数: {self.prediction_horizons}")
+        self._print(f"  特征矩阵形状: {self.features.shape}")
+        self._print(f"  目标矩阵形状: {self.targets.shape}")
+        self._debug_print(f"  特征名称: {self.feature_names}")
+        self._debug_print(f"  预测期数: {self.prediction_horizons}")
         
         # 数据质量检查
-        print("=== 6. 数据质量检查 ===")
+        self._debug_print("=== 6. 数据质量检查 ===")
         feature_nan_count = torch.isnan(self.features).sum().item()
         target_nan_count = torch.isnan(self.targets).sum().item()
-        print(f"  特征数据NaN数量: {feature_nan_count}")
-        print(f"  目标数据NaN数量: {target_nan_count}")
+        self._debug_print(f"  特征数据NaN数量: {feature_nan_count}")
+        self._debug_print(f"  目标数据NaN数量: {target_nan_count}")
         
         if feature_nan_count > 0 or target_nan_count > 0:
-            print("  警告: 数据中仍有NaN值，可能影响训练")
+            self._print("  警告: 数据中仍有NaN值，可能影响训练")
 
     def _normalize_single_feature(self, df: pd.DataFrame, train_dates: List, 
                                  val_dates: List, test_dates: List, feature_name: str, 
@@ -422,7 +434,7 @@ class StockDataModule(pl.LightningDataModule):
             feature_name: 特征名称
             is_target: 是否为目标变量（影响填充策略）
         """
-        print(f"    标准化{'目标' if is_target else '特征'}: {feature_name}")
+        self._debug_print(f"    标准化{'目标' if is_target else '特征'}: {feature_name}")
         
         # 1. 对DataFrame进行填充
         if is_target:
@@ -432,7 +444,7 @@ class StockDataModule(pl.LightningDataModule):
             # 特征用前向后向填充
             filled_df = df.ffill().bfill()
         
-        print(f"      填充前形状: {df.shape}, 填充后形状: {filled_df.shape}")
+        self._debug_print(f"      填充前形状: {df.shape}, 填充后形状: {filled_df.shape}")
         
         # 2. 分割训练集数据以计算统计量
         train_data = filled_df.loc[train_dates]
@@ -441,11 +453,11 @@ class StockDataModule(pl.LightningDataModule):
         train_mean = train_data.values.mean()
         train_std = train_data.values.std()
         
-        print(f"      训练集原始统计: 均值={train_mean:.6f}, 标准差={train_std:.6f}")
+        self._debug_print(f"      训练集原始统计: 均值={train_mean:.6f}, 标准差={train_std:.6f}")
         
         # 4. 避免除零
         if train_std == 0 or np.isnan(train_std):
-            print(f"      警告: {feature_name} 的训练集标准差为0或NaN，使用1.0代替")
+            self._debug_print(f"      警告: {feature_name} 的训练集标准差为0或NaN，使用1.0代替")
             train_std = 1.0
         
         # 5. 对填充后的整个数据集应用训练集的统计量进行标准化
@@ -460,29 +472,29 @@ class StockDataModule(pl.LightningDataModule):
         # 训练集应该接近标准正态分布
         train_norm_mean = train_normalized.values.mean()
         train_norm_std = train_normalized.values.std()
-        print(f"      标准化后训练集: 均值={train_norm_mean:.6f}, 标准差={train_norm_std:.6f}")
+        self._debug_print(f"      标准化后训练集: 均值={train_norm_mean:.6f}, 标准差={train_norm_std:.6f}")
         
         # 验证集和测试集的统计量
         if val_normalized is not None:
             val_norm_mean = val_normalized.values.mean()
             val_norm_std = val_normalized.values.std()
-            print(f"      标准化后验证集: 均值={val_norm_mean:.6f}, 标准差={val_norm_std:.6f}")
+            self._debug_print(f"      标准化后验证集: 均值={val_norm_mean:.6f}, 标准差={val_norm_std:.6f}")
         
         if test_normalized is not None:
             test_norm_mean = test_normalized.values.mean()
             test_norm_std = test_normalized.values.std()
-            print(f"      标准化后测试集: 均值={test_norm_mean:.6f}, 标准差={test_norm_std:.6f}")
+            self._debug_print(f"      标准化后测试集: 均值={test_norm_mean:.6f}, 标准差={test_norm_std:.6f}")
         
         # 7. 检查是否还有NaN值
         nan_count = normalized_df.isna().sum().sum()
         if nan_count > 0:
-            print(f"      警告: 标准化后仍有 {nan_count} 个NaN值")
+            self._debug_print(f"      警告: 标准化后仍有 {nan_count} 个NaN值")
         
         return normalized_df
     
     def _split_data(self):
         """按时间划分数据集"""
-        print("=== 划分数据集 ===")
+        self._debug_print("=== 划分数据集 ===")
         
         total_time = self.features.shape[0]
         train_size = int(total_time * self.train_ratio)
@@ -491,10 +503,10 @@ class StockDataModule(pl.LightningDataModule):
         train_end = train_size
         val_end = train_size + val_size
         
-        print(f"总时间步数: {total_time}")
-        print(f"训练集: 0 - {train_end} ({train_end} 步)")
-        print(f"验证集: {train_end} - {val_end} ({val_end - train_end} 步)")
-        print(f"测试集: {val_end} - {total_time} ({total_time - val_end} 步)")
+        self._debug_print(f"总时间步数: {total_time}")
+        self._debug_print(f"训练集: 0 - {train_end} ({train_end} 步)")
+        self._debug_print(f"验证集: {train_end} - {val_end} ({val_end - train_end} 步)")
+        self._debug_print(f"测试集: {val_end} - {total_time} ({total_time - val_end} 步)")
         
         # 创建数据集
         self.train_dataset = StockDataset(
@@ -515,9 +527,9 @@ class StockDataModule(pl.LightningDataModule):
             sequence_length=self.sequence_length
         )
         
-        print(f"训练样本数: {len(self.train_dataset)}")
-        print(f"验证样本数: {len(self.val_dataset)}")
-        print(f"测试样本数: {len(self.test_dataset)}")
+        self._print(f"训练样本数: {len(self.train_dataset)}")
+        self._print(f"验证样本数: {len(self.val_dataset)}")
+        self._print(f"测试样本数: {len(self.test_dataset)}")
     
     def train_dataloader(self):
         return DataLoader(
@@ -525,7 +537,9 @@ class StockDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=True
+            pin_memory=True,
+            persistent_workers=True,  # 添加：提高DDP性能
+            drop_last=True,           # 添加：确保DDP中batch大小一致
         )
     
     def val_dataloader(self):
@@ -534,7 +548,9 @@ class StockDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
-            pin_memory=True
+            pin_memory=True,
+            persistent_workers=True,  # 添加：提高DDP性能
+            drop_last=False,          # 验证集不丢弃最后一个batch
         )
     
     def test_dataloader(self):
@@ -543,7 +559,9 @@ class StockDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
-            pin_memory=True
+            pin_memory=True,
+            persistent_workers=True,  # 添加：提高DDP性能
+            drop_last=False,          # 测试集不丢弃最后一个batch
         )
     
     def get_feature_dim(self):
