@@ -222,12 +222,16 @@ class StockDataModule(pl.LightningDataModule):
             else:
                 print(f"  ✗ {file}: 加载失败")
         
-        # 4. 数据对齐和处理
-        print("4. 数据对齐...")
-        self._align_and_process_data(price_data, factor_data, return_data)
+        # 4. 数据对齐、划分和标准化
+        print("4. 数据对齐、时间划分和标准化...")
+        self._align_split_and_normalize_data(price_data, factor_data, return_data)
     
-    def _align_and_process_data(self, price_data: Dict, factor_data: Dict, return_data: Dict):
-        """对齐并处理数据"""
+    def _align_split_and_normalize_data(self, price_data: Dict, factor_data: Dict, return_data: Dict):
+        """对齐数据，划分时间序列，并进行标准化"""
+        
+        # === 1. 数据对齐 ===
+        print("=== 1. 数据对齐 ===")
+        
         # 找到公共的股票和时间
         all_data = {**price_data, **factor_data, **return_data}
         
@@ -246,8 +250,7 @@ class StockDataModule(pl.LightningDataModule):
         common_stocks = sorted(list(common_stocks))
         print(f"  公共股票数量: {len(common_stocks)}")
         
-        # 获取公共时间范围 - 修改版本：按可用数据保留
-        print("4. 确定时间范围...")
+        # 获取公共时间范围
         if self.use_factors and factor_data:
             # 如果使用因子数据，以因子数据的时间范围为准
             common_dates = None
@@ -261,98 +264,117 @@ class StockDataModule(pl.LightningDataModule):
             if common_dates is None:
                 raise ValueError("因子数据没有公共时间")
             
-            common_dates = sorted(list(common_dates))
-            print(f"  因子数据时间范围: {min(common_dates)} 到 {max(common_dates)}")
-            
-            # 检查价格数据和收益率数据的可用性，但不强制要求完整覆盖
-            available_dates_by_source = {}
+            # 检查其他数据源的覆盖率
+            all_available_dates = set(common_dates)
             for name, data in {**price_data, **return_data}.items():
                 if data is not None:
                     available_dates = set(data.index)
-                    overlap = set(common_dates).intersection(available_dates)
-                    available_dates_by_source[name] = overlap
-                    coverage = len(overlap) / len(common_dates) * 100
-                    print(f"  {name} 覆盖率: {coverage:.1f}% ({len(overlap)}/{len(common_dates)})")
-            
-            # 更新common_dates为所有数据源都有的日期
-            all_available_dates = set(common_dates)
-            for name, dates in available_dates_by_source.items():
-                all_available_dates = all_available_dates.intersection(dates)
+                    all_available_dates = all_available_dates.intersection(available_dates)
             
             common_dates = sorted(list(all_available_dates))
-            print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
-            
         else:
             # 如果不使用因子数据，以价格数据的时间范围为准
             common_dates = None
-            for name, data in price_data.items():
+            for name, data in {**price_data, **return_data}.items():
                 if data is not None and not data.empty:
                     if common_dates is None:
                         common_dates = set(data.index)
                     else:
                         common_dates = common_dates.intersection(set(data.index))
             
-            if common_dates is None:
-                raise ValueError("价格数据没有公共时间")
-            
-            # 检查收益率数据的可用性
-            available_dates_by_source = {}
-            for name, data in return_data.items():
-                if data is not None:
-                    available_dates = set(data.index)
-                    overlap = set(common_dates).intersection(available_dates)
-                    available_dates_by_source[name] = overlap
-                    coverage = len(overlap) / len(common_dates) * 100
-                    print(f"  {name} 覆盖率: {coverage:.1f}% ({len(overlap)}/{len(common_dates)})")
-            
-            # 更新common_dates为所有数据源都有的日期
-            all_available_dates = set(common_dates)
-            for name, dates in available_dates_by_source.items():
-                all_available_dates = all_available_dates.intersection(dates)
-            
-            common_dates = sorted(list(all_available_dates))
-            print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
+            common_dates = sorted(list(common_dates))
         
-        # 构建特征矩阵
-        print("5. 构建特征矩阵...")
+        print(f"  最终时间范围: {min(common_dates)} 到 {max(common_dates)} (共{len(common_dates)}天)")
+        
+        # === 2. 时间划分 ===
+        print("=== 2. 时间划分 ===")
+        
+        total_time = len(common_dates)
+        train_size = int(total_time * self.train_ratio)
+        val_size = int(total_time * self.val_ratio)
+        
+        train_end = train_size
+        val_end = train_size + val_size
+        
+        train_dates = common_dates[:train_end]
+        val_dates = common_dates[train_end:val_end]
+        test_dates = common_dates[val_end:]
+        
+        print(f"总时间步数: {total_time}")
+        print(f"训练集: {train_dates[0]} 到 {train_dates[-1]} ({len(train_dates)} 天)")
+        print(f"验证集: {val_dates[0]} 到 {val_dates[-1]} ({len(val_dates)} 天)")
+        print(f"测试集: {test_dates[0]} 到 {test_dates[-1]} ({len(test_dates)} 天)")
+        
+        # === 3. 处理特征数据 ===
+        print("=== 3. 处理特征数据 ===")
+        
         feature_list = []
         feature_names = []
         
-        # 添加价格特征
+        # 处理价格特征
         for name, data in price_data.items():
             if data is not None:
-                # 只保留common_dates和common_stocks的交集
+                print(f"  处理价格特征: {name}")
+                # 对齐数据
                 aligned_data = data.reindex(index=common_dates, columns=common_stocks)
-                # 对于缺失值，先用前向填充，然后用0填充
-                aligned_data = aligned_data.fillna(method='ffill').fillna(0)
-                feature_list.append(aligned_data.values)  # [T, N]
+                
+                # 按您的需求进行标准化处理（内部包含填充操作）
+                if self.normalize_features:
+                    normalized_data = self._normalize_single_feature(
+                        aligned_data, train_dates, val_dates, test_dates, name
+                    )
+                else:
+                    # 如果不标准化，仍需填充缺失值
+                    normalized_data = aligned_data.ffill().bfill()
+                
+                feature_list.append(normalized_data.values)  # [T, N]
                 feature_names.append(name)
-                print(f"  添加特征: {name}, 形状: {aligned_data.shape}")
         
-        # 添加因子特征（如果使用）
+        # 处理因子特征（如果使用）
         if self.use_factors:
             for name, data in factor_data.items():
                 if data is not None:
-                    # 只保留common_dates和common_stocks的交集
+                    print(f"  处理因子特征: {name}")
+                    # 对齐数据
                     aligned_data = data.reindex(index=common_dates, columns=common_stocks)
-                    # 对于缺失值，先用前向填充，然后用0填充
-                    aligned_data = aligned_data.fillna(method='ffill').fillna(0)
-                    feature_list.append(aligned_data.values)  # [T, N]
+                    
+                    # 按您的需求进行标准化处理（内部包含填充操作）
+                    if self.normalize_features:
+                        normalized_data = self._normalize_single_feature(
+                            aligned_data, train_dates, val_dates, test_dates, name
+                        )
+                    else:
+                        # 如果不标准化，仍需填充缺失值
+                        normalized_data = aligned_data.ffill().bfill()
+                    
+                    feature_list.append(normalized_data.values)  # [T, N]
                     feature_names.append(name)
-                    print(f"  添加特征: {name}, 形状: {aligned_data.shape}")
         
-        # 构建目标矩阵
-        print("6. 构建目标矩阵...")
+        # === 4. 处理目标数据 ===
+        print("=== 4. 处理目标数据 ===")
+        
         target_list = []
         for horizon in self.prediction_horizons:
             return_key = f'returns_{horizon}d'
             if return_key in return_data and return_data[return_key] is not None:
-                # 只保留common_dates和common_stocks的交集
+                print(f"  处理目标: {return_key}")
+                # 对齐数据
                 aligned_data = return_data[return_key].reindex(index=common_dates, columns=common_stocks)
-                # 目标值的缺失用0填充（表示无收益）
-                aligned_data = aligned_data.fillna(0)
-                target_list.append(aligned_data.values)  # [T, N]
-                print(f"  添加目标: {return_key}, 形状: {aligned_data.shape}")
+                
+                # 按您的需求进行标准化处理
+                if self.normalize_targets:
+                    # 对目标值也应用相同的标准化逻辑
+                    normalized_data = self._normalize_single_feature(
+                        aligned_data, train_dates, val_dates, test_dates, return_key, is_target=True
+                    )
+                else:
+                    # 如果不标准化，填充缺失值（目标值通常用0填充表示无收益）
+                    normalized_data = aligned_data.fillna(0)
+                
+                target_list.append(normalized_data.values)  # [T, N]
+        
+        # === 5. 构建最终数据 ===
+        print("=== 5. 构建最终数据 ===")
         
         # 检查是否有有效数据
         if len(feature_list) == 0:
@@ -360,62 +382,10 @@ class StockDataModule(pl.LightningDataModule):
         if len(target_list) == 0:
             raise ValueError("没有有效的目标数据")
         
-        # 转换为张量前先进行标准化处理
-        print("7. 数据标准化...")
-        
-        # 7.1 特征标准化
-        if self.normalize_features:
-            print("  对特征进行标准化 (按特征在所有股票上标准化)...")
-            # Stack features: [T, F, N]
-            features_array = np.stack(feature_list, axis=1)
-            
-            # 标准化处理
-            normalized_features, self.feature_stats = self._normalize_data(
-                features_array, fit=True
-            )
-            
-            print(f"  特征标准化完成: {self.normalization_method}")
-            print(f"  原始特征范围: [{features_array.min():.4f}, {features_array.max():.4f}]")
-            print(f"  标准化后范围: [{normalized_features.min():.4f}, {normalized_features.max():.4f}]")
-            
-            # 验证标准化效果：每个特征在所有股票上的均值和标准差
-            for f in range(features_array.shape[1]):
-                feature_data = features_array[:, f, :].flatten()  # 展平时间和股票维度
-                norm_feature_data = normalized_features[:, f, :].flatten()
-                print(f"    特征 {f}: 原始均值={feature_data.mean():.4f}, 标准差={feature_data.std():.4f}")
-                print(f"    特征 {f}: 标准化后均值={norm_feature_data.mean():.4f}, 标准差={norm_feature_data.std():.4f}")
-            
-            self.features = torch.tensor(normalized_features, dtype=torch.float32)
-        else:
-            # features: [T, F, N]
-            self.features = torch.tensor(np.stack(feature_list, axis=1), dtype=torch.float32)
-        
-        # 7.2 目标标准化
-        if self.normalize_targets:
-            print("  对目标进行标准化 (按预测期在所有股票上标准化)...")
-            # Stack targets: [T, N, H]
-            targets_array = np.stack(target_list, axis=2)
-            
-            # 标准化处理
-            normalized_targets, self.target_stats = self._normalize_data(
-                targets_array, fit=True
-            )
-            
-            print(f"  目标标准化完成: {self.normalization_method}")
-            print(f"  原始目标范围: [{targets_array.min():.4f}, {targets_array.max():.4f}]")
-            print(f"  标准化后范围: [{normalized_targets.min():.4f}, {normalized_targets.max():.4f}]")
-            
-            # 验证标准化效果：每个预测期在所有股票上的均值和标准差
-            for h in range(targets_array.shape[2]):
-                target_data = targets_array[:, :, h].flatten()  # 展平时间和股票维度
-                norm_target_data = normalized_targets[:, :, h].flatten()
-                print(f"    预测期 {h}: 原始均值={target_data.mean():.4f}, 标准差={target_data.std():.4f}")
-                print(f"    预测期 {h}: 标准化后均值={norm_target_data.mean():.4f}, 标准差={norm_target_data.std():.4f}")
-            
-            self.targets = torch.tensor(normalized_targets, dtype=torch.float32)
-        else:
-            # targets: [T, N, H] (H是预测期数)
-            self.targets = torch.tensor(np.stack(target_list, axis=2), dtype=torch.float32)
+        # Stack features: [T, F, N]
+        self.features = torch.tensor(np.stack(feature_list, axis=1), dtype=torch.float32)
+        # Stack targets: [T, N, H]
+        self.targets = torch.tensor(np.stack(target_list, axis=2), dtype=torch.float32)
         
         self.feature_names = feature_names
         self.stock_names = common_stocks
@@ -427,7 +397,7 @@ class StockDataModule(pl.LightningDataModule):
         print(f"  预测期数: {self.prediction_horizons}")
         
         # 数据质量检查
-        print("8. 数据质量检查...")
+        print("=== 6. 数据质量检查 ===")
         feature_nan_count = torch.isnan(self.features).sum().item()
         target_nan_count = torch.isnan(self.targets).sum().item()
         print(f"  特征数据NaN数量: {feature_nan_count}")
@@ -435,6 +405,80 @@ class StockDataModule(pl.LightningDataModule):
         
         if feature_nan_count > 0 or target_nan_count > 0:
             print("  警告: 数据中仍有NaN值，可能影响训练")
+
+    def _normalize_single_feature(self, df: pd.DataFrame, train_dates: List, 
+                                 val_dates: List, test_dates: List, feature_name: str, 
+                                 is_target: bool = False) -> pd.DataFrame:
+        """
+        按照您的需求对单个特征进行标准化
+        df_zscore = ((df.ffill().bfill()) - df.values.mean()) / df.values.std()
+        只使用训练集的mean和std
+        
+        Args:
+            df: 要标准化的DataFrame
+            train_dates: 训练集日期
+            val_dates: 验证集日期  
+            test_dates: 测试集日期
+            feature_name: 特征名称
+            is_target: 是否为目标变量（影响填充策略）
+        """
+        print(f"    标准化{'目标' if is_target else '特征'}: {feature_name}")
+        
+        # 1. 对DataFrame进行填充
+        if is_target:
+            # 目标值用0填充（表示无收益）
+            filled_df = df.fillna(0)
+        else:
+            # 特征用前向后向填充
+            filled_df = df.ffill().bfill()
+        
+        print(f"      填充前形状: {df.shape}, 填充后形状: {filled_df.shape}")
+        
+        # 2. 分割训练集数据以计算统计量
+        train_data = filled_df.loc[train_dates]
+        
+        # 3. 只用训练集计算统计量
+        train_mean = train_data.values.mean()
+        train_std = train_data.values.std()
+        
+        print(f"      训练集原始统计: 均值={train_mean:.6f}, 标准差={train_std:.6f}")
+        
+        # 4. 避免除零
+        if train_std == 0 or np.isnan(train_std):
+            print(f"      警告: {feature_name} 的训练集标准差为0或NaN，使用1.0代替")
+            train_std = 1.0
+        
+        # 5. 对填充后的整个数据集应用训练集的统计量进行标准化
+        # df_zscore = ((df.ffill().bfill()) - train_mean) / train_std
+        normalized_df = (filled_df - train_mean) / train_std
+        
+        # 6. 验证标准化效果
+        train_normalized = normalized_df.loc[train_dates]
+        val_normalized = normalized_df.loc[val_dates] if len(val_dates) > 0 else None
+        test_normalized = normalized_df.loc[test_dates] if len(test_dates) > 0 else None
+        
+        # 训练集应该接近标准正态分布
+        train_norm_mean = train_normalized.values.mean()
+        train_norm_std = train_normalized.values.std()
+        print(f"      标准化后训练集: 均值={train_norm_mean:.6f}, 标准差={train_norm_std:.6f}")
+        
+        # 验证集和测试集的统计量
+        if val_normalized is not None:
+            val_norm_mean = val_normalized.values.mean()
+            val_norm_std = val_normalized.values.std()
+            print(f"      标准化后验证集: 均值={val_norm_mean:.6f}, 标准差={val_norm_std:.6f}")
+        
+        if test_normalized is not None:
+            test_norm_mean = test_normalized.values.mean()
+            test_norm_std = test_normalized.values.std()
+            print(f"      标准化后测试集: 均值={test_norm_mean:.6f}, 标准差={test_norm_std:.6f}")
+        
+        # 7. 检查是否还有NaN值
+        nan_count = normalized_df.isna().sum().sum()
+        if nan_count > 0:
+            print(f"      警告: 标准化后仍有 {nan_count} 个NaN值")
+        
+        return normalized_df
     
     def _split_data(self):
         """按时间划分数据集"""
@@ -514,89 +558,13 @@ class StockDataModule(pl.LightningDataModule):
         """获取预测期数"""
         return self.prediction_horizons
     
-    def _normalize_data(self, data: np.ndarray, stats: Optional[Dict] = None, fit: bool = True) -> Tuple[np.ndarray, Dict]:
-        """
-        标准化数据 - 按特征在所有股票上进行标准化
-        
-        Args:
-            data: 输入数据 [T, F, N] 或 [T, N, H]
-            stats: 已有的统计信息 (用于验证/测试集)
-            fit: 是否计算统计信息 (True for training, False for val/test)
-            
-        Returns:
-            normalized_data: 标准化后的数据
-            stats: 统计信息字典
-        """
-        if self.normalization_method == 'zscore':
-            if fit or stats is None:
-                if data.ndim == 3 and data.shape[1] > data.shape[2]:  # Features: [T, F, N]
-                    # 对每个特征F，在时间T和股票N维度上计算统计量
-                    # 重塑为 [T*N, F] 来计算每个特征的全局统计量
-                    reshaped_data = data.transpose(1, 0, 2).reshape(data.shape[1], -1)  # [F, T*N]
-                    mean = np.mean(reshaped_data, axis=1, keepdims=True)  # [F, 1]
-                    std = np.std(reshaped_data, axis=1, keepdims=True)    # [F, 1]
-                    std = np.where(std == 0, 1.0, std)  # 避免除零
-                    
-                    # 重塑回原始形状用于广播
-                    mean = mean.reshape(1, -1, 1)  # [1, F, 1]
-                    std = std.reshape(1, -1, 1)    # [1, F, 1]
-                    
-                else:  # Targets: [T, N, H]
-                    # 对每个预测期H，在时间T和股票N维度上计算统计量
-                    # 重塑为 [T*N, H] 来计算每个预测期的全局统计量
-                    reshaped_data = data.reshape(-1, data.shape[2])  # [T*N, H]
-                    mean = np.mean(reshaped_data, axis=0, keepdims=True)  # [1, H]
-                    std = np.std(reshaped_data, axis=0, keepdims=True)    # [1, H]
-                    std = np.where(std == 0, 1.0, std)  # 避免除零
-                    
-                    # 重塑回原始形状用于广播
-                    mean = mean.reshape(1, 1, -1)  # [1, 1, H]
-                    std = std.reshape(1, 1, -1)    # [1, 1, H]
-                
-                stats = {'mean': mean, 'std': std}
-            else:
-                mean = stats['mean']
-                std = stats['std']
-            
-            normalized_data = (data - mean) / std
-            
-        elif self.normalization_method == 'minmax':
-            if fit or stats is None:
-                if data.ndim == 3 and data.shape[1] > data.shape[2]:  # Features: [T, F, N]
-                    # 对每个特征F，在时间T和股票N维度上计算min/max
-                    reshaped_data = data.transpose(1, 0, 2).reshape(data.shape[1], -1)  # [F, T*N]
-                    data_min = np.min(reshaped_data, axis=1, keepdims=True)  # [F, 1]
-                    data_max = np.max(reshaped_data, axis=1, keepdims=True)  # [F, 1]
-                    data_range = data_max - data_min
-                    data_range = np.where(data_range == 0, 1.0, data_range)  # 避免除零
-                    
-                    # 重塑回原始形状用于广播
-                    data_min = data_min.reshape(1, -1, 1)    # [1, F, 1]
-                    data_range = data_range.reshape(1, -1, 1)  # [1, F, 1]
-                    
-                else:  # Targets: [T, N, H]
-                    # 对每个预测期H，在时间T和股票N维度上计算min/max
-                    reshaped_data = data.reshape(-1, data.shape[2])  # [T*N, H]
-                    data_min = np.min(reshaped_data, axis=0, keepdims=True)  # [1, H]
-                    data_max = np.max(reshaped_data, axis=0, keepdims=True)  # [1, H]
-                    data_range = data_max - data_min
-                    data_range = np.where(data_range == 0, 1.0, data_range)  # 避免除零
-                    
-                    # 重塑回原始形状用于广播
-                    data_min = data_min.reshape(1, 1, -1)    # [1, 1, H]
-                    data_range = data_range.reshape(1, 1, -1)  # [1, 1, H]
-                
-                stats = {'min': data_min, 'max': data_max, 'range': data_range}
-            else:
-                data_min = stats['min']
-                data_range = stats['range']
-            
-            normalized_data = (data - data_min) / data_range
-            
-        else:
-            raise ValueError(f"不支持的标准化方法: {self.normalization_method}")
-        
-        return normalized_data, stats
+    # ===== 旧版标准化方法（已废弃） =====
+    # def _normalize_data(self, data: np.ndarray, stats: Optional[Dict] = None, fit: bool = True) -> Tuple[np.ndarray, Dict]:
+    #     """
+    #     标准化数据 - 按特征在所有股票上进行标准化 (DEPRECATED)
+    #     使用新的 _normalize_single_feature 方法替代
+    #     """
+    #     pass
 
     def denormalize_targets(self, normalized_targets: torch.Tensor) -> torch.Tensor:
         """
