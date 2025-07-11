@@ -1,0 +1,50 @@
+# PyTorch Lightning callbacks configuration
+# @package callbacks
+
+# Model checkpointing
+model_checkpoint:
+  _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  monitor: "val_loss"
+  filename: "stock-gnn-{epoch:02d}-{val_loss:.4f}"
+  save_top_k: 3
+  mode: "min"
+  auto_insert_metric_name: false
+  save_last: true
+  verbose: true
+  every_n_epochs: 1
+
+# Early stopping
+early_stopping:
+  _target_: pytorch_lightning.callbacks.EarlyStopping
+  monitor: "val_loss"
+  patience: 20
+  mode: "min"
+  verbose: true
+  strict: true
+  check_finite: true
+  stopping_threshold: null
+  divergence_threshold: null
+
+# Learning rate monitoring
+lr_monitor:
+  _target_: pytorch_lightning.callbacks.LearningRateMonitor
+  logging_interval: "epoch"
+  log_momentum: false
+
+# # GPU stats monitoring (optional)
+# gpu_stats: 
+#   _target_: pytorch_lightning.callbacks.DeviceStatsMonitor
+#   cpu_stats: false
+
+# # Rich progress bar (optional, requires rich package)
+# rich_progress: 
+#   _target_: pytorch_lightning.callbacks.RichProgressBar
+#   refresh_rate: 1
+#   leave: true
+
+# # Model summary
+# model_summary: 
+#   _target_: pytorch_lightning.callbacks.RichModelSummary
+#   max_depth: 2
+
+# Additional custom callbacks can be added here

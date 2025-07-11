@@ -1,0 +1,31 @@
+# Example configuration for hyperparameter sweeps
+# @package _global_
+
+defaults:
+  - override /data: stock_data
+  - override /model: dynamic_graph
+  - override /trainer: ddp_gpu
+  - override /loss: accumulative_gain
+
+# Experiment settings
+experiment:
+  name: "stock_gnn_sweep"
+  
+# Hydra sweep configuration
+hydra:
+  mode: MULTIRUN
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.Launcher
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+    params:
+      model.lr: 1e-4,5e-4,1e-3,5e-3
+      model.gru_hidden_dim: 32,64,128
+      model.gnn_hidden_dim: 64,128,256
+      data.batch_size: 16,32,64
+      loss.value_decay: 0.8,0.9,0.95
+
+# Override trainer for sweep
+trainer:
+  max_epochs: 50  # Shorter for sweep

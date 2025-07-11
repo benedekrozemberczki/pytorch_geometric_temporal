@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from torch import nn
-from torch_geometric.nn import GCNConv  # 或者 GATConv, GraphConv…
+from torch_geometric.nn import GCNConv, GATConv  # Add GATConv import
 from torch_geometric.data import Batch
 from torch_geometric_temporal.nn.recurrent.stock_GNN.adp_adj_loss import AccumulativeGainLoss  # 假设你有这个自定义损失函数
 from torch_geometric.data import Data, Batch
@@ -19,6 +19,12 @@ class DynamicGraphLightning(pl.LightningModule):
         lr: float = 1e-3,
         loss_fn: nn.Module = AccumulativeGainLoss(value_decay=0.9, penalty_weight=0.1, eps=1e-8),
         add_self_loops: bool = True,
+        metric_compute_frequency: int = 10,  # Compute metrics every N epochs
+        weight_decay: float = 1e-4,
+        scheduler_config: dict = None,
+        gnn_type: str = "gcn",  # Options: "gcn", "gat"
+        gat_heads: int = 4,  # Number of attention heads for GAT
+        gat_dropout: float = 0.1,  # Dropout for GAT attention
     ):
         super().__init__()
         # 1) 用于序列编码的 GRU（或 LSTM/GRUCell）
@@ -28,16 +34,59 @@ class DynamicGraphLightning(pl.LightningModule):
             batch_first=True,
         )
         # 2) 用于图消息传递的 GNN 层
-        self.gnn1 = GCNConv(gru_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
-        self.gnn2 = GCNConv(gnn_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
+        self.gnn_type = gnn_type.lower()
+        self.gat_heads = gat_heads
+        self.gat_dropout = gat_dropout
+        
+        if self.gnn_type == "gat":
+            # GAT layers with multi-head attention
+            self.gnn1 = GATConv(
+                gru_hidden_dim, 
+                gnn_hidden_dim // gat_heads,  # Output dim per head
+                heads=gat_heads,
+                dropout=gat_dropout,
+                add_self_loops=add_self_loops,
+                concat=True  # Concatenate multi-head outputs
+            )
+            self.gnn2 = GATConv(
+                gnn_hidden_dim,  # Input is concatenated output from gnn1 (heads * out_dim)
+                gnn_hidden_dim,  # Final output dimension
+                heads=1,  # Single head for final layer
+                dropout=gat_dropout,
+                add_self_loops=add_self_loops,
+                concat=False  # Don't concatenate (only 1 head anyway)
+            )
+            # Final dimension is what we specify for gnn2
+            self.final_gnn_dim = gnn_hidden_dim
+        else:
+            # Default GCN layers
+            self.gnn1 = GCNConv(gru_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
+            self.gnn2 = GCNConv(gnn_hidden_dim, gnn_hidden_dim, add_self_loops=add_self_loops)
+            self.final_gnn_dim = gnn_hidden_dim
+            
         # 3) 最后预测层（添加BatchNorm）
-        self.batch_norm = nn.BatchNorm1d(gnn_hidden_dim)
-        self.predictor = nn.Linear(gnn_hidden_dim, 32)  # 回归示例
+        self.batch_norm = nn.BatchNorm1d(self.final_gnn_dim)
+        self.predictor = nn.Linear(self.final_gnn_dim, 32)  # 回归示例
 
         self.k_nn = k_nn
         self.lr = lr
         self.loss_fn = loss_fn
         self.add_self_loops = add_self_loops
+        self.metric_compute_frequency = metric_compute_frequency
+        self.weight_decay = weight_decay
+        self.scheduler_config = scheduler_config or {}
+        
+        # Log model configuration
+        print(f"🏗️  GNN Architecture: {self.gnn_type.upper()}")
+        if self.gnn_type == "gat":
+            print(f"   - GAT heads: {self.gat_heads}")
+            print(f"   - GAT dropout: {self.gat_dropout}")
+            print(f"   - Final GNN dim: {self.final_gnn_dim}")
+
+    def _should_compute_metrics(self) -> bool:
+        """Determine if metrics should be computed based on current epoch and frequency."""
+        current_epoch = self.current_epoch
+        return (current_epoch % self.metric_compute_frequency == 0) or (current_epoch == 0)
 
     def forward(self, data_input) -> list:
         """
@@ -129,17 +178,25 @@ class DynamicGraphLightning(pl.LightningModule):
         x_all    = batch_data.x            # [b*n, feat_dim]
         e_idx    = batch_data.edge_index   # [2, b*n*k]
         e_w      = batch_data.edge_weight  # [b*n*k]
-        if(self.add_self_loops):
+        
+        # Add self loops only for GCN (GAT handles them internally)
+        if self.gnn_type == "gcn" and self.add_self_loops:
             e_idx, e_w = add_self_loops(
                 batch_data.edge_index,
                 batch_data.edge_weight,
                 fill_value=1.0,       # 或其他你想给自环的权重
                 num_nodes=batch_data.num_nodes
             )
-        # 第一层
-        out1 = F.relu(self.gnn1(x_all, e_idx, edge_weight=e_w))
-        # 第二层
-        out2 = F.relu(self.gnn2(out1, e_idx, edge_weight=e_w)) #[b*n, feat_dim]
+        
+        # GNN message passing (different for GCN vs GAT)
+        if self.gnn_type == "gat":
+            # GAT doesn't use edge weights directly in the same way
+            out1 = F.relu(self.gnn1(x_all, e_idx))
+            out2 = F.relu(self.gnn2(out1, e_idx))
+        else:
+            # GCN uses edge weights
+            out1 = F.relu(self.gnn1(x_all, e_idx, edge_weight=e_w))
+            out2 = F.relu(self.gnn2(out1, e_idx, edge_weight=e_w))
 
         # ——— 4. 预测输出 ——————————————
         # 应用 BatchNorm 然后预测
@@ -233,16 +290,22 @@ class DynamicGraphLightning(pl.LightningModule):
                                     dtype=torch.long, device=h.device)
             edge_weight = torch.tensor(edge_weights, dtype=torch.float, device=h.device)
             
-            # 添加自环（如果需要）
-            if self.add_self_loops:
+            # 添加自环（如果需要且使用GCN）
+            if self.gnn_type == "gcn" and self.add_self_loops:
                 edge_index, edge_weight = add_self_loops(
                     edge_index, edge_weight,
                     fill_value=1.0, num_nodes=n
                 )
             
             # ——— 3. GNN 消息传递 ——————————————
-            out1 = F.relu(self.gnn1(h, edge_index, edge_weight=edge_weight))
-            out2 = F.relu(self.gnn2(out1, edge_index, edge_weight=edge_weight))
+            if self.gnn_type == "gat":
+                # GAT doesn't use edge weights directly
+                out1 = F.relu(self.gnn1(h, edge_index))
+                out2 = F.relu(self.gnn2(out1, edge_index))
+            else:
+                # GCN uses edge weights
+                out1 = F.relu(self.gnn1(h, edge_index, edge_weight=edge_weight))
+                out2 = F.relu(self.gnn2(out1, edge_index, edge_weight=edge_weight))
             
             # ——— 4. 预测输出 ——————————————
             # 应用 BatchNorm 然后预测
@@ -262,6 +325,9 @@ class DynamicGraphLightning(pl.LightningModule):
         x_t, y_t = batch
         y_pred = self(x_t)
         
+        # Determine if we should compute metrics this epoch
+        compute_metrics = False
+        
         # 处理不同的输出格式
         if isinstance(y_pred, list):
             # 变长图的情况
@@ -269,21 +335,36 @@ class DynamicGraphLightning(pl.LightningModule):
             total_nodes = 0
             for i, (pred, target) in enumerate(zip(y_pred, y_t)):
                 if isinstance(target, torch.Tensor):
-                    loss_i = self.loss_fn(pred.squeeze(-1), target.float())
+                    loss_i = self.loss_fn(pred.squeeze(-1), target.float(), compute_metrics=compute_metrics)
                     total_loss += loss_i * pred.size(0)  # 按节点数加权
                     total_nodes += pred.size(0)
             loss = total_loss / total_nodes if total_nodes > 0 else total_loss
         else:
             # 固定大小图的情况
-            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
+            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float(), compute_metrics=compute_metrics)
+            
+            # 只在计算指标的epoch记录RankIC和ICIR
+            if compute_metrics and hasattr(loss, 'rank_ic_info'):
+                rank_ic_info = loss.rank_ic_info
+                if rank_ic_info['mean_rank_ic'] != 0.0:
+                    self.log("train_rank_ic", rank_ic_info['mean_rank_ic'], 
+                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
+                    self.log("train_abs_rank_ic", rank_ic_info['mean_abs_rank_ic'], 
+                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
+                
+                if rank_ic_info['mean_icir'] != 0.0:
+                    self.log("train_icir", rank_ic_info['mean_icir'], 
+                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
+                    self.log("train_abs_icir", rank_ic_info['mean_abs_icir'], 
+                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
+                
+                # Log epoch info for debugging
+                self.log("metric_computed_epoch", float(self.current_epoch), 
+                        on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
         
         # TensorBoard logging: log training loss
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
         self.log("train_loss_step", loss, on_step=True, on_epoch=False, prog_bar=True, logger=True, sync_dist=True)
-        
-        # 添加打印语句确保能看到损失
-        # if batch_idx % 10 == 0:  # 每10个batch打印一次
-        #     print(f"Train Step {batch_idx}: Loss = {loss.item():.4f}")
         
         return loss
 
@@ -291,6 +372,9 @@ class DynamicGraphLightning(pl.LightningModule):
         x_t, y_t = batch
         y_pred = self(x_t)
         
+        # Determine if we should compute metrics this epoch
+        compute_metrics = self._should_compute_metrics()
+        
         # 处理不同的输出格式
         if isinstance(y_pred, list):
             # 变长图的情况
@@ -298,13 +382,21 @@ class DynamicGraphLightning(pl.LightningModule):
             total_nodes = 0
             for i, (pred, target) in enumerate(zip(y_pred, y_t)):
                 if isinstance(target, torch.Tensor):
-                    loss_i = self.loss_fn(pred.squeeze(-1), target.float())
+                    loss_i = self.loss_fn(pred.squeeze(-1), target.float(), compute_metrics=compute_metrics)
                     total_loss += loss_i * pred.size(0)  # 按节点数加权
                     total_nodes += pred.size(0)
             loss = total_loss / total_nodes if total_nodes > 0 else total_loss
         else:
             # 固定大小图的情况
-            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
+            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float(), compute_metrics=compute_metrics)
+            
+            # 只在计算指标的epoch记录RankIC和ICIR
+            if compute_metrics and hasattr(loss, 'rank_ic_info'):
+                rank_ic_info = loss.rank_ic_info
+                for metric_name, metric_value in rank_ic_info.items():
+                    if isinstance(metric_value, (int, float)) and metric_value != 0.0:
+                        self.log(f'val_{metric_name}', metric_value, 
+                                 on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
         
         # TensorBoard logging: log validation loss
         self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
@@ -316,20 +408,113 @@ class DynamicGraphLightning(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x_t, y_t = batch
         y_pred = self(x_t)
+        
+        # Always compute metrics during testing for final evaluation
+        compute_metrics = True
+        
         if isinstance(y_pred, list):
             total_loss = 0.0
             total_nodes = 0
             for pred, target in zip(y_pred, y_t):
-                loss_i = self.loss_fn(pred.squeeze(-1), target.float())
+                loss_i = self.loss_fn(pred.squeeze(-1), target.float(), compute_metrics=compute_metrics)
                 total_loss += loss_i * pred.size(0)
                 total_nodes += pred.size(0)
             loss = total_loss / total_nodes if total_nodes>0 else total_loss
         else:
-            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float())
-        self.log("test/loss", loss, on_step=False, on_epoch=True, prog_bar = True, logger=True)
+            loss = self.loss_fn(y_pred.squeeze(-1), y_t.float(), compute_metrics=compute_metrics)
+            
+            # Log all test metrics
+            if hasattr(loss, 'rank_ic_info'):
+                rank_ic_info = loss.rank_ic_info
+                for metric_name, metric_value in rank_ic_info.items():
+                    if isinstance(metric_value, (int, float)) and metric_value != 0.0:
+                        self.log(f'test_{metric_name}', metric_value, 
+                                 on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+                        print(f"Final test {metric_name}: {metric_value:.6f}")
+                        
+        self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar = True, logger=True)
         return loss
 
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.lr)
+        optimizer = torch.optim.Adam(
+            self.parameters(), 
+            lr=self.lr, 
+            weight_decay=self.weight_decay
+        )
+        
+        # Check if scheduler is configured
+        scheduler_type = self.scheduler_config.get('type', None)
+        
+        if scheduler_type is None:
+            # No scheduler
+            return optimizer
+        
+        elif scheduler_type == 'plateau':
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode='min',  # Monitor validation loss (minimize)
+                factor=self.scheduler_config.get('factor', 0.5),
+                patience=self.scheduler_config.get('patience', 5),
+                min_lr=self.scheduler_config.get('min_lr', 1e-6),
+                verbose=True
+            )
+            return {
+                'optimizer': optimizer,
+                'lr_scheduler': {
+                    'scheduler': scheduler,
+                    'monitor': 'val_loss',  # Monitor validation loss
+                    'interval': 'epoch',
+                    'frequency': 1,
+                }
+            }
+        
+        elif scheduler_type == 'cosine':
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer,
+                T_max=self.scheduler_config.get('T_max', 100),
+                eta_min=self.scheduler_config.get('min_lr', 1e-6)
+            )
+            return {
+                'optimizer': optimizer,
+                'lr_scheduler': {
+                    'scheduler': scheduler,
+                    'interval': 'epoch',
+                    'frequency': 1,
+                }
+            }
+        
+        elif scheduler_type == 'step':
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer,
+                step_size=self.scheduler_config.get('step_size', 30),
+                gamma=self.scheduler_config.get('gamma', 0.1)
+            )
+            return {
+                'optimizer': optimizer,
+                'lr_scheduler': {
+                    'scheduler': scheduler,
+                    'interval': 'epoch',
+                    'frequency': 1,
+                }
+            }
+        
+        elif scheduler_type == 'exponential':
+            scheduler = torch.optim.lr_scheduler.ExponentialLR(
+                optimizer,
+                gamma=self.scheduler_config.get('gamma', 0.95)
+            )
+            return {
+                'optimizer': optimizer,
+                'lr_scheduler': {
+                    'scheduler': scheduler,
+                    'interval': 'epoch',
+                    'frequency': 1,
+                }
+            }
+        
+        else:
+            # Unknown scheduler type, return optimizer only
+            print(f"Warning: Unknown scheduler type '{scheduler_type}', using no scheduler")
+            return optimizer
 

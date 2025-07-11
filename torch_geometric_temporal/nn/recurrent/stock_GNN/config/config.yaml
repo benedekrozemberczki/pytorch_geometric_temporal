@@ -1,0 +1,40 @@
+# Main configuration file for Stock GNN training pipeline
+# This file defines the overall structure and default configurations
+
+defaults:
+  - data: stock_data
+  - model: dynamic_graph
+  - loss: accumulative_gain
+  - trainer: ddp_gpu
+  - callbacks: default
+  - logger: tensorboard
+  - experiment: null  # Can be overridden with experiment=<name>
+  - _self_
+
+# Global experiment settings
+experiment:
+  name: "stock_gnn_factor_mining"
+  version: null  # Auto-generated if null
+  description: "Dynamic GNN for A-share risk factor mining"
+  tags: ["stock", "gnn", "factor_mining", "temporal"]
+
+# Random seed for reproducibility
+seed: 42
+
+# Output directory structure
+output_dir: "outputs"
+log_dir: "logs"
+
+# Debug settings
+debug:
+  enabled: false
+  verbose_data_loading: false
+  sample_size: null  # Use small subset for debugging if set
+
+# Hydra settings
+hydra:
+  run:
+    dir: ${output_dir}/${experiment.name}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: ${output_dir}/${experiment.name}/multirun/${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${hydra.job.num}

@@ -1,0 +1,48 @@
+# CPU trainer configuration for testing/debugging
+# @package trainer
+
+# Basic training settings
+max_epochs: 50  # Reduced for CPU training
+min_epochs: 5
+check_val_every_n_epoch: 1
+
+# Hardware settings
+accelerator: "cpu"
+devices: 1
+strategy: "auto"
+precision: "32-true"  # No mixed precision on CPU
+
+# Performance optimizations
+benchmark: false  # Less effective on CPU
+deterministic: true  # Better for debugging
+
+# Training behavior
+gradient_clip_val: 1.0
+gradient_clip_algorithm: "norm"
+accumulate_grad_batches: 1
+
+# Logging and monitoring
+log_every_n_steps: 10  # Less frequent logging for CPU
+enable_progress_bar: true
+enable_model_summary: true
+
+# Validation and testing
+limit_train_batches: 0.1  # Use smaller subset for CPU
+limit_val_batches: 0.1
+limit_test_batches: 0.1
+val_check_interval: 1.0
+
+# Checkpointing
+enable_checkpointing: true
+default_root_dir: null
+
+# CPU specific
+sync_batchnorm: false
+
+# Debugging
+fast_dev_run: false
+overfit_batches: 0
+detect_anomaly: true  # Enable for CPU debugging
+
+# Early stopping patience
+patience: 5

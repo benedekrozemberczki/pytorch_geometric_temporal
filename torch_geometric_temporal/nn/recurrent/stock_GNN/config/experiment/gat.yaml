@@ -1,0 +1,45 @@
+# GAT experiment configuration
+# @package _global_
+
+defaults:
+  - override /data: stock_data
+  - override /model: gat
+  - override /trainer: ddp_gpu
+  - override /loss: accumulative_gain
+  - override /logger: tensorboard
+
+# Experiment settings
+experiment:
+  name: "stock_gnn_gat"
+  description: "Training with Graph Attention Network (GAT)"
+  tags: ["gat", "attention", "dynamic_graph"]
+
+# GAT-specific optimizations
+model:
+  gru_hidden_dim: 64
+  gnn_hidden_dim: 128
+  gat_heads: 8
+  gat_dropout: 0.2
+  k_nn: 12
+  lr: 2e-4
+  weight_decay: 5e-4
+  metric_compute_frequency: 10
+  scheduler:
+    type: "cosine"
+    T_max: 200
+    min_lr: 1e-6
+
+data:
+  batch_size: 32
+  num_workers: 4
+  sequence_length: 20
+  prediction_horizons: [1, 5, 10]
+
+trainer:
+  max_epochs: 200
+  gradient_clip_val: 0.5
+  precision: 32
+
+loss:
+  value_decay: 0.9
+  penalty_weight: 0.1

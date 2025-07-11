@@ -1,0 +1,44 @@
+# Production configuration for full training
+# @package _global_
+
+defaults:
+  - override /data: stock_data
+  - override /model: dynamic_graph
+  - override /trainer: ddp_gpu
+  - override /loss: accumulative_gain
+  - override /logger: tensorboard
+
+# Experiment settings
+experiment:
+  name: "stock_gnn_production"
+  description: "Production training with full dataset"
+  tags: ["production", "full_dataset", "ddp"]
+
+# Production optimizations
+model:
+  gru_hidden_dim: 128
+  gnn_hidden_dim: 256
+  k_nn: 10
+  lr: 5e-4
+  weight_decay: 1e-4
+  metric_compute_frequency: 20  # Compute metrics every 20 epochs for efficiency
+  scheduler:
+    type: "cosine"  # Use cosine annealing for production
+    T_max: 500  # Match max_epochs
+    min_lr: 1e-6
+
+data:
+  batch_size: 64
+  num_workers: 8
+  sequence_length: 30
+  prediction_horizons : [1, 5, 10]
+  # prediction_horizons: [1, 3, 5, 10, 20]
+
+trainer:
+  max_epochs: 500
+  gradient_clip_val: 1.0
+  precision: "16-mixed"
+
+loss:
+  value_decay: 0.95
+  penalty_weight: 0.05

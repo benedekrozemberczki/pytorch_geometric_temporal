@@ -1,0 +1,12 @@
+# CSV logger configuration (alternative to TensorBoard)
+# @package logger
+
+_target_: pytorch_lightning.loggers.CSVLogger
+save_dir: "logs"
+name: "stock_gnn"
+version: null  # Auto-generated
+prefix: ""
+flush_logs_every_n_steps: 100
+
+# CSV specific settings
+log_hyperparams: true

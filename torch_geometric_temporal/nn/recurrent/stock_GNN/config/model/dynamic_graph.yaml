@@ -1,0 +1,54 @@
+# Dynamic Graph Lightning model configuration
+# @package model
+
+# Model architecture
+node_feat_dim: null  # Will be set automatically based on data
+gru_hidden_dim: 128
+gnn_hidden_dim: 256
+k_nn: 8  # Number of nearest neighbors for dynamic adjacency
+add_self_loops: true
+
+# Output layer
+output_dim: 32  # Factor prediction dimension
+
+# Optimization
+lr: 1e-3
+weight_decay: 1e-4
+scheduler:
+  type: "plateau"  # Options: "plateau", "cosine", "step", "exponential", null
+  # ReduceLROnPlateau parameters
+  patience: 5
+  factor: 0.5
+  min_lr: 1e-6
+  # CosineAnnealingLR parameters  
+  T_max: 100  # For cosine scheduler
+  # StepLR parameters
+  step_size: 30  # For step scheduler
+  gamma: 0.1  # For step/exponential scheduler
+
+# Metric computation efficiency
+metric_compute_frequency: 10  # Compute RankIC/ICIR metrics every N epochs (1 = every epoch)
+
+# Model regularization
+dropout: 0.1
+batch_norm: true
+
+# Graph construction
+adjacency:
+  method: "knn"  # Method for constructing dynamic adjacency
+  symmetric: true
+  add_self_loops: ${model.add_self_loops}
+  
+# GNN layers
+gnn:
+  num_layers: 2
+  layer_type: "gcn"  # Options: "gcn", "gat", "sage"
+  activation: "relu"
+  normalize: true
+
+# GNN type and parameters
+gnn_type: "gcn"  # Options: "gcn", "gat"
+
+# GAT-specific parameters (only used if gnn_type="gat")
+gat_heads: 4  # Number of attention heads
+gat_dropout: 0.1  # Dropout for attention mechanism

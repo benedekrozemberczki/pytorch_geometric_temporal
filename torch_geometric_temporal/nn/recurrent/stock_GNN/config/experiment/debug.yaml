@@ -1,0 +1,31 @@
+# Quick debug configuration
+# @package _global_
+
+defaults:
+  - override /data: debug
+  - override /model: dynamic_graph
+  - override /trainer: cpu_debug
+  - override /loss: accumulative_gain
+  - override /logger: csv
+
+# Experiment settings
+experiment:
+  name: "stock_gnn_debug"
+  
+# Enable debug mode
+debug:
+  enabled: true
+  verbose_data_loading: true
+
+# Override for quick testing
+model:
+  gru_hidden_dim: 32
+  gnn_hidden_dim: 32
+  k_nn: 4
+
+trainer:
+  max_epochs: 5
+  fast_dev_run: false
+  limit_train_batches: 10
+  limit_val_batches: 5
+  limit_test_batches: 5

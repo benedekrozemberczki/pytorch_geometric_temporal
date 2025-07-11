@@ -1,0 +1,21 @@
+# TensorBoard logger configuration
+# @package logger
+
+_target_: pytorch_lightning.loggers.TensorBoardLogger
+save_dir: "logs"
+name: "stock_gnn"
+version: null  # Auto-generated
+log_graph: true
+default_hp_metric: true
+prefix: ""
+
+# TensorBoard specific settings
+comment: "Stock GNN Factor Mining"
+purge_step: null
+max_queue: 10
+flush_secs: 120
+filename_suffix: ""
+
+# What to log
+# log_hyperparams: true
+# log_model: false  # Set to true to log model architecture

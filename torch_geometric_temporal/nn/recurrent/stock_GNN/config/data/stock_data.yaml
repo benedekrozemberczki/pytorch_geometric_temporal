@@ -1,0 +1,35 @@
+# Stock data configuration
+# @package data
+
+# Data source and paths
+data_dir: "/home/xu/clean_data"
+use_factors: true
+
+# Sequence and prediction settings
+sequence_length: 30
+prediction_horizons: [1, 5, 10]  # Prediction time horizons in days
+
+# Data splitting
+train_ratio: 0.7
+val_ratio: 0.15
+test_ratio: 0.15
+
+# Data loading
+batch_size: 32
+num_workers: 4
+
+# Data preprocessing
+normalize_features: true
+normalize_targets: true
+normalization_method: "zscore"  # Options: "zscore", "minmax"
+
+# DataLoader settings for DDP
+persistent_workers: true
+drop_last: true
+pin_memory: true
+shuffle_train: true
+
+# Optional data filtering/sampling
+max_stocks: null  # Limit number of stocks for debugging
+start_date: null  # "YYYY-MM-DD" format
+end_date: null    # "YYYY-MM-DD" format

@@ -14,7 +14,7 @@ from typing import Dict, Any, Optional
 
 import torch
 import pytorch_lightning as pl
-from pytorch_lightning.utilities.seed import seed_everything
+from pytorch_lightning import seed_everything
 from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.core.config_store import ConfigStore
@@ -121,6 +121,12 @@ def create_model(cfg: DictConfig, node_feat_dim: int) -> DynamicGraphLightning:
         lr=model_cfg.lr,
         loss_fn=loss_fn,
         add_self_loops=model_cfg.add_self_loops,
+        metric_compute_frequency=getattr(model_cfg, 'metric_compute_frequency', 10),
+        weight_decay=getattr(model_cfg, 'weight_decay', 1e-4),
+        scheduler_config=getattr(model_cfg, 'scheduler', {}),
+        gnn_type=getattr(model_cfg, 'gnn_type', 'gcn'),
+        gat_heads=getattr(model_cfg, 'gat_heads', 4),
+        gat_dropout=getattr(model_cfg, 'gat_dropout', 0.1),
     )
     
     print(f"🧠 Created model:")
@@ -129,6 +135,9 @@ def create_model(cfg: DictConfig, node_feat_dim: int) -> DynamicGraphLightning:
     print(f"   - GNN hidden: {model_cfg.gnn_hidden_dim}")
     print(f"   - K-NN: {model_cfg.k_nn}")
     print(f"   - Learning rate: {model_cfg.lr}")
+    print(f"   - Weight decay: {getattr(model_cfg, 'weight_decay', 1e-4)}")
+    print(f"   - Scheduler: {getattr(model_cfg, 'scheduler', {}).get('type', 'None')}")
+    print(f"   - Metric frequency: {getattr(model_cfg, 'metric_compute_frequency', 10)} epochs")
     print(f"   - Loss function: {loss_cfg._target_}")
     
     return model

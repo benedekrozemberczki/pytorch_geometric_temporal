@@ -1,0 +1,26 @@
+# Debug configuration for data module
+# @package data
+
+# Inherit from stock_data but with debug settings
+defaults:
+  - stock_data
+
+# Override for debugging
+batch_size: 8  # Smaller batch size
+num_workers: 0  # Single-threaded for debugging
+max_stocks: 100  # Limit number of stocks
+sequence_length: 10  # Shorter sequences
+
+# Debug specific settings
+persistent_workers: false  # Not needed with 0 workers
+drop_last: false  # Keep all data for debugging
+pin_memory: false  # Disable for CPU debugging
+
+# Data subset for quick testing
+train_ratio: 0.8
+val_ratio: 0.1
+test_ratio: 0.1
+
+# Disable some preprocessing for speed
+normalize_features: true
+normalize_targets: true
