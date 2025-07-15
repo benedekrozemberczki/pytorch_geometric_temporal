@@ -56,7 +56,7 @@ class PemsAllLADatasetLoader(object):
             if not os.path.isfile(
             os.path.join(self.raw_data_dir,key)
             ):
-                print("Downloading ", key, flush=True)
+                print("Downloading to", key, flush=True)
                 
                 response = requests.get(PeMS_file_links[key], stream=True)
                 file_size = int(response.headers.get('content-length', 0))
