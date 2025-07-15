@@ -9,6 +9,8 @@ from ..signal import StaticGraphTemporalSignal
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
 from typing import Tuple
+import requests 
+from tqdm import tqdm
 
 class PemsBayDatasetLoader(object):
     """A traffic forecasting dataset as described in Diffusion Convolution Layer Paper.
@@ -39,13 +41,25 @@ class PemsBayDatasetLoader(object):
             self.IndexDataset = IndexDataset 
 
     def _download_url(self, url, save_path):  # pragma: no cover
-        context = ssl._create_unverified_context()
-        with urllib.request.urlopen(url, context=context) as dl_file:
-            with open(save_path, "wb") as out_file:
-                out_file.write(dl_file.read())
+        
+        # Check if file is in data folder from working directory, otherwise download
+        if not os.path.isfile(
+        os.path.join(self.raw_data_dir,save_path)
+        ):
+            print("Downloading to", save_path, flush=True)
+            
+            response = requests.get(url, stream=True)
+            file_size = int(response.headers.get('content-length', 0))
 
+            with open(os.path.join(self.raw_data_dir, save_path), "wb") as file, tqdm(
+                total=file_size, unit="B", unit_scale=True, unit_divisor=1024
+            ) as progress_bar:
+                for chunk in response.iter_content(chunk_size=33554432):
+                    file.write(chunk)
+                    progress_bar.update(len(chunk))
+                    
     def _read_web_data(self):            
-        url = "https://graphmining.ai/temporal_datasets/PEMS-BAY.zip"
+        url = "https://anl.app.box.com/shared/static/7ealcaw862pm12sglyt5g71743eu7s5l"
 
         # Check if zip file is in data folder from working directory, otherwise download
         if not os.path.isfile(

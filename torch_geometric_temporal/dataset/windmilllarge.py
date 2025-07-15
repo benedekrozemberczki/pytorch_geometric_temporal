@@ -5,7 +5,9 @@ import numpy as np
 from ..signal import StaticGraphTemporalSignal
 import torch
 from torch.utils.data import DataLoader
-
+import os
+import requests 
+from tqdm import tqdm
 
 class WindmillOutputLargeDatasetLoader(object):
     """Hourly energy output of windmills from a European country
@@ -18,21 +20,35 @@ class WindmillOutputLargeDatasetLoader(object):
             Defaults to False.
     """
 
-    def __init__(self, index=False):
+    def __init__(self, raw_data_dir=os.path.join(os.getcwd(), "data"), index=False):
+        self.raw_data_dir = raw_data_dir
         self._read_web_data()
         self.index = index
-
         if index:
             from ..signal.index_dataset import IndexDataset
             self.IndexDataset = IndexDataset 
 
 
     def _read_web_data(self):
-        url = "https://graphmining.ai/temporal_datasets/windmill_output.json"
-        context = ssl._create_unverified_context()
-        self._dataset = json.loads(
-            urllib.request.urlopen(url, context=context).read().decode()
-        )
+        if not os.path.isfile(
+            os.path.join(self.raw_data_dir, "windmill_output.json")
+        ):  
+            url = "https://anl.app.box.com/shared/static/wgwb75lt3ty3pv5a15y9bilx1mjhcq59"
+            save_path = f"{self.raw_data_dir}/windmill_output.json"
+            print("Downloading to", save_path, flush=True)
+            
+            response = requests.get(url, stream=True)
+            file_size = int(response.headers.get('content-length', 0))
+
+            with open(os.path.join(self.raw_data_dir, save_path), "wb") as file, tqdm(
+                total=file_size, unit="B", unit_scale=True, unit_divisor=1024
+            ) as progress_bar:
+                for chunk in response.iter_content(chunk_size=33554432):
+                    file.write(chunk)
+                    progress_bar.update(len(chunk))
+       
+        with open(f"{self.raw_data_dir}/windmill_output.json", 'r') as f:
+            self._dataset = json.load(f)
 
     def _get_edges(self):
         self._edges = np.array(self._dataset["edges"]).T

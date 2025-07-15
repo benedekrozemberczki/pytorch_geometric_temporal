@@ -9,7 +9,8 @@ from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from typing import Tuple
 from ..signal import StaticGraphTemporalSignal
-
+import requests 
+from tqdm import tqdm
 
 class METRLADatasetLoader(object):
     """A traffic forecasting dataset based on Los Angeles
@@ -35,13 +36,24 @@ class METRLADatasetLoader(object):
             self.IndexDataset = IndexDataset 
 
     def _download_url(self, url, save_path):  # pragma: no cover
-        context = ssl._create_unverified_context()
-        with urllib.request.urlopen(url, context=context) as dl_file:
-            with open(save_path, "wb") as out_file:
-                out_file.write(dl_file.read())
+        # Check if file is in data folder from working directory, otherwise download
+        if not os.path.isfile(
+        os.path.join(self.raw_data_dir,save_path)
+        ):
+            print("Downloading to", save_path, flush=True)
+            
+            response = requests.get(url, stream=True)
+            file_size = int(response.headers.get('content-length', 0))
+
+            with open(os.path.join(self.raw_data_dir, save_path), "wb") as file, tqdm(
+                total=file_size, unit="B", unit_scale=True, unit_divisor=1024
+            ) as progress_bar:
+                for chunk in response.iter_content(chunk_size=33554432):
+                    file.write(chunk)
+                    progress_bar.update(len(chunk))
 
     def _read_web_data(self):
-        url = "https://graphmining.ai/temporal_datasets/METR-LA.zip"
+        url = "https://anl.app.box.com/shared/static/plgsv3te0akmqluiuqva34su60nn93c2"
 
         # Check if zip file is in data folder from working directory, otherwise download
         if not os.path.isfile(
