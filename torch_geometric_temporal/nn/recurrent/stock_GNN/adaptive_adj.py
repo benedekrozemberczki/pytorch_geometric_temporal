@@ -344,7 +344,8 @@ class DynamicGraphLightning(pl.LightningModule):
         y_pred = self(x_t)
         
         # Determine if we should compute metrics this epoch
-        compute_metrics = self._should_compute_metrics()
+        # compute_metrics = self._should_compute_metrics()
+        compute_metrics = False
         
         # 处理不同的输出格式
         if isinstance(y_pred, list):

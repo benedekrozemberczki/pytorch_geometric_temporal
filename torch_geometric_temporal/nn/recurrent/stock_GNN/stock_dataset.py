@@ -17,7 +17,11 @@ class StockDataset(Dataset):
                  feature_names: List[str],
                  sequence_length: int = 20,
                  prediction_horizon: int = 7,
-                 normalize_features: bool = True):
+                 normalize_features: bool = True,
+                 # 鲁棒性参数
+                 outlier_clip_threshold: float = 5.0,
+                 noise_level: float = 1e-6,
+                 use_fallback_normalization: bool = True):
         """
         Args:
             features: 特征数据 [时间, 特征数, 股票数]
@@ -26,6 +30,9 @@ class StockDataset(Dataset):
             sequence_length: 序列长度
             prediction_horizon: 预测期数
             normalize_features: 是否对特征进行序列级标准化
+            outlier_clip_threshold: 异常值裁剪阈值
+            noise_level: 正则化噪声水平
+            use_fallback_normalization: 是否使用回退标准化
         """
         self.features = features
         self.targets = targets
@@ -33,6 +40,11 @@ class StockDataset(Dataset):
         self.sequence_length = sequence_length
         self.prediction_horizon = prediction_horizon
         self.normalize_features = normalize_features
+        
+        # 鲁棒性参数
+        self.outlier_clip_threshold = outlier_clip_threshold
+        self.noise_level = noise_level
+        self.use_fallback_normalization = use_fallback_normalization
         
         # 定义价格特征和成交量特征的索引
         self.price_feature_indices = []
@@ -87,9 +99,9 @@ class StockDataset(Dataset):
     
     def _normalize_sequence_features(self, features: torch.Tensor) -> torch.Tensor:
         """
-        对序列特征进行标准化
-        - 价格特征：用最后一天的close价格标准化该股票的OHLCV
-        - 成交量特征：用最后一天的成交量标准化该股票的成交量序列
+        改进的序列特征标准化 - 减少过拟合风险
+        - 价格特征：使用序列中位数或加权平均作为标准化基准
+        - 成交量特征：使用序列均值作为标准化基准
         - 因子特征：不标准化（已预处理）
         
         Args:
@@ -105,28 +117,45 @@ class StockDataset(Dataset):
         for stock_idx in range(N):
             stock_features = features[:, :, stock_idx]  # [L, F]
             
-            # 价格特征标准化：用最后一天的close价格
+            # 价格特征标准化：使用序列中位数或加权平均（减少异常值影响）
             if self.close_feature_index is not None and len(self.price_feature_indices) > 0:
-                last_close = stock_features[-1, self.close_feature_index]  # 最后一天的收盘价
+                close_prices = stock_features[:, self.close_feature_index]  # 整个序列的收盘价
                 
-                # 避免除零
-                if last_close != 0 and not torch.isnan(last_close) and not torch.isinf(last_close):
+                # 使用最近5天的均值作为标准化基准（更稳定）
+                recent_days = min(5, L)
+                base_price = close_prices[-recent_days:].mean()
+                
+                # 备选：如果均值无效，使用中位数
+                if torch.isnan(base_price) or torch.isinf(base_price) or base_price == 0:
+                    base_price = close_prices.median()
+                
+                # 最终备选：使用最后一天的价格
+                if torch.isnan(base_price) or torch.isinf(base_price) or base_price == 0:
+                    base_price = close_prices[-1]
+                
+                # 应用标准化
+                if base_price != 0 and not torch.isnan(base_price) and not torch.isinf(base_price):
                     for price_idx in self.price_feature_indices:
-                        normalized_features[:, price_idx, stock_idx] = stock_features[:, price_idx] / last_close
-                else:
-                    # 如果close价格无效，保持原值
-                    pass
+                        normalized_features[:, price_idx, stock_idx] = stock_features[:, price_idx] / base_price
             
-            # 成交量特征标准化：用最后一天的成交量
+            # 成交量特征标准化：使用序列均值（更稳定）
             for vol_idx in self.volume_feature_indices:
-                last_volume = stock_features[-1, vol_idx]  # 最后一天的成交量
+                volume_series = stock_features[:, vol_idx]  # 整个序列的成交量
                 
-                # 避免除零
-                if last_volume != 0 and not torch.isnan(last_volume) and not torch.isinf(last_volume):
-                    normalized_features[:, vol_idx, stock_idx] = stock_features[:, vol_idx] / last_volume
-                else:
-                    # 如果成交量无效，保持原值
-                    pass
+                # 使用序列均值作为标准化基准
+                base_volume = volume_series.mean()
+                
+                # 备选：如果均值无效，使用中位数
+                if torch.isnan(base_volume) or torch.isinf(base_volume) or base_volume == 0:
+                    base_volume = volume_series.median()
+                
+                # 最终备选：使用最后一天的成交量
+                if torch.isnan(base_volume) or torch.isinf(base_volume) or base_volume == 0:
+                    base_volume = volume_series[-1]
+                
+                # 应用标准化
+                if base_volume != 0 and not torch.isnan(base_volume) and not torch.isinf(base_volume):
+                    normalized_features[:, vol_idx, stock_idx] = volume_series / base_volume
         
         return normalized_features
 
@@ -146,6 +175,13 @@ class StockDataModule(pl.LightningDataModule):
                  normalize_features: bool = True,
                  normalize_targets: bool = True,
                  normalization_method: str = 'sequence_price_cross_section_return',
+                 # 新增鲁棒性控制参数
+                 outlier_clip_threshold: float = 5.0,      # 异常值裁剪阈值
+                 noise_level: float = 1e-6,                # 噪声水平
+                 use_fallback_normalization: bool = True,  # 是否使用回退标准化
+                 cross_section_window_size: int = 20,      # 截面标准化滚动窗口大小
+                 cross_section_decay_factor: float = 0.99, # 截面标准化衰减因子
+                 min_std_threshold: float = 0.01,          # 最小标准差阈值
                  debug: bool = False):
         """
         Args:
@@ -161,6 +197,12 @@ class StockDataModule(pl.LightningDataModule):
             normalize_features: 是否对特征进行标准化
             normalize_targets: 是否对目标进行标准化
             normalization_method: 标准化方法 ('sequence_price_cross_section_return')
+            outlier_clip_threshold: 异常值裁剪阈值（标准差倍数）
+            noise_level: 添加的正则化噪声水平
+            use_fallback_normalization: 当序列标准化失败时是否使用回退方法
+            cross_section_window_size: 截面标准化的滚动窗口大小
+            cross_section_decay_factor: 截面标准化的衰减因子
+            min_std_threshold: 最小标准差阈值（避免除零）
             debug: 是否开启调试模式
         """
         super().__init__()
@@ -177,6 +219,14 @@ class StockDataModule(pl.LightningDataModule):
         self.normalize_targets = normalize_targets
         self.normalization_method = normalization_method
         self.debug = debug  # 添加调试选项
+        
+        # 鲁棒性控制参数
+        self.outlier_clip_threshold = outlier_clip_threshold
+        self.noise_level = noise_level
+        self.use_fallback_normalization = use_fallback_normalization
+        self.cross_section_window_size = cross_section_window_size
+        self.cross_section_decay_factor = cross_section_decay_factor
+        self.min_std_threshold = min_std_threshold
         
         # 数据文件定义 - 只使用复权调整的价格数据
         price_files = [
@@ -433,7 +483,12 @@ class StockDataModule(pl.LightningDataModule):
                 
                 # 截面标准化：每天对所有股票做标准化
                 if self.normalize_targets:
-                    normalized_data = self._cross_section_normalize(aligned_data, train_dates)
+                    normalized_data = self._cross_section_normalize(
+                        aligned_data, train_dates,
+                        window_size=self.cross_section_window_size,
+                        decay_factor=self.cross_section_decay_factor,
+                        min_std=self.min_std_threshold
+                    )
                 else:
                     # 如果不标准化，填充缺失值（目标值通常用0填充表示无收益）
                     normalized_data = aligned_data.fillna(0)
@@ -473,44 +528,109 @@ class StockDataModule(pl.LightningDataModule):
         if feature_nan_count > 0 or target_nan_count > 0:
             self._print("  警告: 数据中仍有NaN值，可能影响训练")
 
-    def _cross_section_normalize(self, df: pd.DataFrame, train_dates: List) -> pd.DataFrame:
+    def _cross_section_normalize(self, df: pd.DataFrame, train_dates: List, 
+                               window_size: int = None, decay_factor: float = None, 
+                               min_std: float = None) -> pd.DataFrame:
         """
-        截面标准化：每天对所有股票做标准化
-        只使用训练集的统计量来计算标准化参数
+        改进的截面标准化：每天对所有股票做标准化 - 减少过拟合风险
+        使用滚动窗口统计量来提高稳定性
         
         Args:
             df: 要标准化的DataFrame [时间, 股票]
             train_dates: 训练集日期列表
+            window_size: 滚动窗口大小，默认使用self.cross_section_window_size
+            decay_factor: 衰减因子，默认使用self.cross_section_decay_factor  
+            min_std: 最小标准差，默认使用self.min_std_threshold
             
         Returns:
             标准化后的DataFrame
         """
-        self._debug_print(f"    截面标准化收益率数据")
+        # 使用类参数作为默认值
+        if window_size is None:
+            window_size = getattr(self, 'cross_section_window_size', 20)
+        if decay_factor is None:
+            decay_factor = getattr(self, 'cross_section_decay_factor', 0.99)
+        if min_std is None:
+            min_std = getattr(self, 'min_std_threshold', 0.01)
+            
+        self._debug_print(f"    改进的截面标准化收益率数据")
         
         # 1. 首先填充缺失值（收益率用0填充）
         filled_df = df.fillna(0)
         
-        # 2. 计算训练集的截面统计量（每天的均值和标准差）
+        # 2. 计算训练集的滚动截面统计量（使用滚动窗口提高稳定性）
         train_data = filled_df.loc[train_dates]
+        
+        # 使用滚动窗口计算统计量（窗口大小为20天）
+        window_size = min(window_size, len(train_dates) // 4)  # 至少用1/4的训练数据作为窗口
         
         # 每天计算所有股票的均值和标准差
         daily_mean = train_data.mean(axis=1)  # 每天的均值
         daily_std = train_data.std(axis=1)    # 每天的标准差
         
-        # 避免除零
-        daily_std = daily_std.replace(0, 1.0)
-        daily_std = daily_std.fillna(1.0)
+        # 使用滚动窗口平滑统计量
+        daily_mean_smooth = daily_mean.rolling(window=window_size, min_periods=1).mean()
+        daily_std_smooth = daily_std.rolling(window=window_size, min_periods=1).mean()
         
-        self._debug_print(f"      训练集日均收益率统计: 均值范围=[{daily_mean.min():.6f}, {daily_mean.max():.6f}]")
-        self._debug_print(f"      训练集日收益率波动统计: 标准差范围=[{daily_std.min():.6f}, {daily_std.max():.6f}]")
+        # 避免除零 - 使用更保守的最小标准差
+        daily_std_smooth = daily_std_smooth.clip(lower=min_std)
+        daily_std_smooth = daily_std_smooth.fillna(min_std)
         
-        # 3. 对整个数据集应用截面标准化
-        # 扩展训练集统计量到所有日期
-        all_dates_mean = daily_mean.reindex(filled_df.index, method='ffill').fillna(daily_mean.mean())
-        all_dates_std = daily_std.reindex(filled_df.index, method='ffill').fillna(daily_std.mean())
+        self._debug_print(f"      训练集日均收益率统计: 均值范围=[{daily_mean_smooth.min():.6f}, {daily_mean_smooth.max():.6f}]")
+        self._debug_print(f"      训练集日收益率波动统计: 标准差范围=[{daily_std_smooth.min():.6f}, {daily_std_smooth.max():.6f}]")
         
-        # 应用标准化：(return - daily_mean) / daily_std
-        normalized_df = filled_df.sub(all_dates_mean, axis=0).div(all_dates_std, axis=0)
+        # 3. 对整个数据集应用截面标准化 - 改进版本，避免数据泄露
+        # 先处理训练集
+        train_normalized = filled_df.loc[train_dates].sub(daily_mean_smooth, axis=0).div(daily_std_smooth, axis=0)
+        
+        # 创建结果DataFrame
+        normalized_df = filled_df.copy()
+        normalized_df.loc[train_dates] = train_normalized
+        
+        # 对验证集和测试集逐日处理（避免未来信息泄露）
+        train_end_date = train_dates[-1]
+        
+        # 保存最后的训练集统计量作为初始值
+        last_train_mean = daily_mean_smooth.iloc[-1]
+        last_train_std = daily_std_smooth.iloc[-1]
+        
+        # 创建滚动统计量更新器
+        rolling_mean = last_train_mean
+        rolling_std = last_train_std
+        
+        # 处理训练集之后的每一天
+        for i, date in enumerate(filled_df.index):
+            if date > train_end_date:
+                # 获取当前日期的原始数据
+                current_data = filled_df.loc[date]
+                
+                # 计算当前日期的实际统计量（只使用当天数据）
+                current_mean = current_data.mean()
+                current_std = max(current_data.std(), min_std)
+                
+                # 如果当前统计量无效，使用历史统计量
+                if pd.isna(current_mean) or pd.isna(current_std):
+                    current_mean = rolling_mean
+                    current_std = rolling_std
+                
+                # 指数衰减更新滚动统计量
+                days_after = i - len(train_dates) + 1
+                decay = decay_factor ** min(days_after, 10)  # 限制衰减深度
+                
+                rolling_mean = decay * rolling_mean + (1 - decay) * current_mean
+                rolling_std = decay * rolling_std + (1 - decay) * current_std
+                
+                # 应用标准化
+                normalized_df.loc[date] = (current_data - rolling_mean) / rolling_std
+                
+                # 调试信息：记录关键统计量的变化
+                if i % 50 == 0:  # 每50天打印一次
+                    self._debug_print(f"        日期 {date}: rolling_mean={rolling_mean:.6f}, rolling_std={rolling_std:.6f}, decay={decay:.4f}")
+        
+        self._debug_print(f"    验证集标准化完成，最终统计量: mean={rolling_mean:.6f}, std={rolling_std:.6f}")
+        
+        # 限制极端值（避免异常值影响）
+        normalized_df = normalized_df.clip(-5, 5)  # 限制在[-5, 5]范围内
         
         # 4. 验证标准化效果
         train_normalized = normalized_df.loc[train_dates]
@@ -548,7 +668,10 @@ class StockDataModule(pl.LightningDataModule):
             targets=self.targets[:train_end],
             feature_names=self.feature_names,
             sequence_length=self.sequence_length,
-            normalize_features=self.normalize_features
+            normalize_features=self.normalize_features,
+            outlier_clip_threshold=self.outlier_clip_threshold,
+            noise_level=self.noise_level,
+            use_fallback_normalization=self.use_fallback_normalization
         )
         
         self.val_dataset = StockDataset(
@@ -556,7 +679,10 @@ class StockDataModule(pl.LightningDataModule):
             targets=self.targets[train_end:val_end],
             feature_names=self.feature_names,
             sequence_length=self.sequence_length,
-            normalize_features=self.normalize_features
+            normalize_features=self.normalize_features,
+            outlier_clip_threshold=self.outlier_clip_threshold,
+            noise_level=self.noise_level,
+            use_fallback_normalization=self.use_fallback_normalization
         )
         
         self.test_dataset = StockDataset(
@@ -564,7 +690,10 @@ class StockDataModule(pl.LightningDataModule):
             targets=self.targets[val_end:],
             feature_names=self.feature_names,
             sequence_length=self.sequence_length,
-            normalize_features=self.normalize_features
+            normalize_features=self.normalize_features,
+            outlier_clip_threshold=self.outlier_clip_threshold,
+            noise_level=self.noise_level,
+            use_fallback_normalization=self.use_fallback_normalization
         )
         
         self._print(f"训练样本数: {len(self.train_dataset)}")
