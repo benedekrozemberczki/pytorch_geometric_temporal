@@ -18,10 +18,11 @@ test_ratio: 0.15
 batch_size: 32
 num_workers: 4
 
-# Data preprocessing
-normalize_features: true
-normalize_targets: true
-normalization_method: "zscore"  # Options: "zscore", "minmax"
+# Data preprocessing - NEW NORMALIZATION STRATEGY
+normalize_features: true  # Enable sequence-level price/volume normalization
+normalize_targets: true   # Enable cross-section return normalization
+normalization_method: "sequence_price_cross_section_return"  # New method
+debug: false  # Enable detailed normalization logging
 
 # DataLoader settings for DDP
 persistent_workers: true

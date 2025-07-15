@@ -1,0 +1,8 @@
+Requirement already satisfied: tensorboard in /home/xu/ASTGNN/lib/python3.10/site-packages (1.10.0)
+Requirement already satisfied: numpy>=1.12.0 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (2.2.6)
+Requirement already satisfied: six>=1.10.0 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (1.17.0)
+Requirement already satisfied: protobuf>=3.4.0 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (6.31.1)
+Requirement already satisfied: werkzeug>=0.11.10 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (3.1.3)
+Requirement already satisfied: markdown>=2.6.8 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (3.8.2)
+Requirement already satisfied: wheel>=0.26 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (0.45.1)
+Requirement already satisfied: MarkupSafe>=2.1.1 in /home/xu/ASTGNN/lib/python3.10/site-packages (from werkzeug>=0.11.10->tensorboard) (3.0.2)

@@ -3,8 +3,8 @@
 
 # Model architecture
 node_feat_dim: null  # Will be set automatically based on data
-gru_hidden_dim: 128
-gnn_hidden_dim: 256
+gru_hidden_dim: 64
+gnn_hidden_dim: 128
 k_nn: 8  # Number of nearest neighbors for dynamic adjacency
 add_self_loops: true
 
@@ -52,3 +52,4 @@ gnn_type: "gcn"  # Options: "gcn", "gat"
 # GAT-specific parameters (only used if gnn_type="gat")
 gat_heads: 4  # Number of attention heads
 gat_dropout: 0.1  # Dropout for attention mechanism
+predict_return: False

@@ -1,0 +1,23 @@
+# AccumulativeGainLoss configuration
+# @package loss
+
+# Loss function type
+_target_: torch_geometric_temporal.nn.recurrent.stock_GNN.return_loss.ReturnLoss
+
+# Loss function parameters
+value_decay: 0.9
+penalty_weight: 0.1
+eps: 1e-8
+
+# Importance weights for different return horizons
+importance_weights: [1.0, 0.0, 0.0]  # [short, medium, long] term importance
+
+# Loss scaling and regularization
+# loss_scale: 1.0
+# gradient_clip: 1.0  # Max gradient norm
+
+# # Multi-task loss weighting (if applicable)
+# task_weights:
+#   factor_prediction: 1.0
+#   return_prediction: 0.1
+#   correlation_penalty: 0.05

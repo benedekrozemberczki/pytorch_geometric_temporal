@@ -129,6 +129,7 @@ class AccumulativeGainLoss(nn.Module):
 
         total_loss_r2 = 0.0
         total_loss_corr = 0.0
+        total_loss_mse = 0.0  # 用于记录线性规划的MSE
         
         # 用于存储所有batch的RankIC值
         batch_rank_ics = []
@@ -179,14 +180,22 @@ class AccumulativeGainLoss(nn.Module):
             loss_corr = (off_diag ** 2).sum()
             total_loss_corr += loss_corr
 
+            # === 计算线性规划的MSE ===
+            y_t_selected = y_b[0, :, 0]  # 选择 T 维度第一个和 D 维度第一个 [N]
+            y_hat_selected = F_b @ (pseudo_inv @ y_t_selected)  # [N]
+            mse_loss = torch.mean((y_hat_selected - y_t_selected) ** 2)  # MSE loss
+            total_loss_mse += mse_loss
+
         # 求所有 batch 平均
         mean_loss_r2 = total_loss_r2 / B
+        mean_loss_mse = total_loss_mse / B
         loss = mean_loss_r2 + self.penalty_weight * (total_loss_corr / B)
         
         # 将RankIC和ICIR信息作为属性附加到loss tensor上
         # 这样外部可以直接访问而不需要重新计算
         if compute_metrics:
             loss.rank_ic_info = {
+                'loss_mse': float(mean_loss_mse.item()),  # 转换为Python float
                 'mean_rank_ic': np.mean(batch_rank_ics) if batch_rank_ics else 0.0,
                 'mean_abs_rank_ic': np.mean(batch_abs_rank_ics) if batch_abs_rank_ics else 0.0,
                 'mean_icir': np.mean(batch_icirs) if batch_icirs else 0.0,

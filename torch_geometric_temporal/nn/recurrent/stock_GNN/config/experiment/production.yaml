@@ -1,8 +1,8 @@
-# Production configuration for full training
+# Production configuration for full training with NEW NORMALIZATION
 # @package _global_
 
 defaults:
-  - override /data: stock_data
+  - override /data: advanced_norm  # Use new normalization strategy
   - override /model: dynamic_graph
   - override /trainer: ddp_gpu
   - override /loss: accumulative_gain
@@ -10,9 +10,9 @@ defaults:
 
 # Experiment settings
 experiment:
-  name: "stock_gnn_production"
-  description: "Production training with full dataset"
-  tags: ["production", "full_dataset", "ddp"]
+  name: "stock_gnn_production_new_norm"
+  description: "Production training with new normalization strategy"
+  tags: ["production", "full_dataset", "ddp", "new_normalization"]
 
 # Production optimizations
 model:

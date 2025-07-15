@@ -1,0 +1,23 @@
+Collecting tensorboard
+  Using cached tensorboard-2.19.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting absl-py>=0.4 (from tensorboard)
+  Using cached absl_py-2.3.1-py3-none-any.whl.metadata (3.3 kB)
+Collecting grpcio>=1.48.2 (from tensorboard)
+  Using cached grpcio-1.73.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.8 kB)
+Requirement already satisfied: markdown>=2.6.8 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (3.8.2)
+Requirement already satisfied: numpy>=1.12.0 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (2.2.6)
+Requirement already satisfied: packaging in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (25.0)
+Requirement already satisfied: protobuf!=4.24.0,>=3.19.6 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (6.31.1)
+Requirement already satisfied: setuptools>=41.0.0 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (80.3.1)
+Requirement already satisfied: six>1.9 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (1.17.0)
+Collecting tensorboard-data-server<0.8.0,>=0.7.0 (from tensorboard)
+  Using cached tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl.metadata (1.1 kB)
+Requirement already satisfied: werkzeug>=1.0.1 in /home/xu/ASTGNN/lib/python3.10/site-packages (from tensorboard) (3.1.3)
+Requirement already satisfied: MarkupSafe>=2.1.1 in /home/xu/ASTGNN/lib/python3.10/site-packages (from werkzeug>=1.0.1->tensorboard) (3.0.2)
+Using cached tensorboard-2.19.0-py3-none-any.whl (5.5 MB)
+Using cached tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl (6.6 MB)
+Downloading absl_py-2.3.1-py3-none-any.whl (135 kB)
+Using cached grpcio-1.73.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (6.0 MB)
+Installing collected packages: tensorboard-data-server, grpcio, absl-py, tensorboard
+
+Successfully installed absl-py-2.3.1 grpcio-1.73.1 tensorboard-2.19.0 tensorboard-data-server-0.7.2

@@ -27,6 +27,7 @@ sys.path.insert(0, str(project_root))
 from torch_geometric_temporal.nn.recurrent.stock_GNN.stock_dataset import StockDataModule
 from torch_geometric_temporal.nn.recurrent.stock_GNN.adaptive_adj import DynamicGraphLightning
 from torch_geometric_temporal.nn.recurrent.stock_GNN.adp_adj_loss import AccumulativeGainLoss
+from torch_geometric_temporal.nn.recurrent.stock_GNN.return_loss import ReturnLoss
 
 # Optimize RTX 4090 Tensor Core performance
 torch.set_float32_matmul_precision('medium')
@@ -75,9 +76,10 @@ def create_data_module(cfg: DictConfig) -> StockDataModule:
     """Create the data module from config"""
     data_cfg = cfg.data
     
-    # Extract debug settings
-    debug_enabled = cfg.get("debug", {}).get("enabled", False)
+    # Extract debug settings - support both data.debug and global debug
+    debug_enabled = data_cfg.get("debug", False) or cfg.get("debug", {}).get("enabled", False)
     verbose_data = cfg.get("debug", {}).get("verbose_data_loading", False)
+    final_debug = debug_enabled or verbose_data
     
     dm = StockDataModule(
         data_dir=data_cfg.data_dir,
@@ -92,7 +94,7 @@ def create_data_module(cfg: DictConfig) -> StockDataModule:
         normalize_features=data_cfg.normalize_features,
         normalize_targets=data_cfg.normalize_targets,
         normalization_method=data_cfg.normalization_method,
-        debug=debug_enabled or verbose_data,
+        debug=final_debug,  # Pass debug flag to enable detailed logging
     )
     
     print(f"📊 Created data module:")
@@ -100,7 +102,10 @@ def create_data_module(cfg: DictConfig) -> StockDataModule:
     print(f"   - Batch size: {data_cfg.batch_size}")
     print(f"   - Sequence length: {data_cfg.sequence_length}")
     print(f"   - Prediction horizons: {data_cfg.prediction_horizons}")
-    print(f"   - Debug mode: {debug_enabled or verbose_data}")
+    print(f"   - Normalization method: {data_cfg.normalization_method}")
+    print(f"   - Features normalization: {data_cfg.normalize_features}")
+    print(f"   - Targets normalization: {data_cfg.normalize_targets}")
+    print(f"   - Debug mode: {final_debug}")
     
     return dm
 
@@ -127,6 +132,7 @@ def create_model(cfg: DictConfig, node_feat_dim: int) -> DynamicGraphLightning:
         gnn_type=getattr(model_cfg, 'gnn_type', 'gcn'),
         gat_heads=getattr(model_cfg, 'gat_heads', 4),
         gat_dropout=getattr(model_cfg, 'gat_dropout', 0.1),
+        predict_return=getattr(model_cfg, "predict_return", False),
     )
     
     print(f"🧠 Created model:")

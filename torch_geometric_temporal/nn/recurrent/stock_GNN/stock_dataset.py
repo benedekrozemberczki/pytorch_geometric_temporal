@@ -10,23 +10,42 @@ import gzip
 from datetime import datetime
 
 class StockDataset(Dataset):
-    """股票数据集"""
+    """股票数据集 - 支持序列级别的价格标准化"""
     def __init__(self, 
-                 features: torch.Tensor,  # [T, F, N] 或 [T, N, F]
-                 targets: torch.Tensor,   # [T, N, future_periods]
+                 features: torch.Tensor,  # [T, F, N] 
+                 targets: torch.Tensor,   # [T, N, H]
+                 feature_names: List[str],
                  sequence_length: int = 20,
-                 prediction_horizon: int = 7):
+                 prediction_horizon: int = 7,
+                 normalize_features: bool = True):
         """
         Args:
             features: 特征数据 [时间, 特征数, 股票数]
             targets: 目标数据 [时间, 股票数, 预测期数]
+            feature_names: 特征名称列表
             sequence_length: 序列长度
             prediction_horizon: 预测期数
+            normalize_features: 是否对特征进行序列级标准化
         """
         self.features = features
         self.targets = targets
+        self.feature_names = feature_names
         self.sequence_length = sequence_length
         self.prediction_horizon = prediction_horizon
+        self.normalize_features = normalize_features
+        
+        # 定义价格特征和成交量特征的索引
+        self.price_feature_indices = []
+        self.volume_feature_indices = []
+        self.close_feature_index = None
+        
+        for i, name in enumerate(feature_names):
+            if any(price_name in name for price_name in ['open_adj', 'high_adj', 'low_adj', 'close_adj', 'vwap_adj']):
+                self.price_feature_indices.append(i)
+                if 'close_adj' in name:
+                    self.close_feature_index = i
+            elif any(vol_name in name for vol_name in ['volume_adj', 'turnover']):
+                self.volume_feature_indices.append(i)
         
         # 计算有效样本数量
         self.valid_indices = self._get_valid_indices()
@@ -56,11 +75,60 @@ class StockDataset(Dataset):
         end_idx = current_idx
         features = self.features[start_idx:end_idx]  # [L, F, N]
         
+        # 如果需要标准化特征，应用序列级别的标准化
+        if self.normalize_features:
+            features = self._normalize_sequence_features(features)
+        
         # 获取未来 T 期的收益率
         end_target_idx = current_idx + self.prediction_horizon
         targets = self.targets[current_idx:end_target_idx]  # [T, N]
         
         return features, targets
+    
+    def _normalize_sequence_features(self, features: torch.Tensor) -> torch.Tensor:
+        """
+        对序列特征进行标准化
+        - 价格特征：用最后一天的close价格标准化该股票的OHLCV
+        - 成交量特征：用最后一天的成交量标准化该股票的成交量序列
+        - 因子特征：不标准化（已预处理）
+        
+        Args:
+            features: [L, F, N] 序列特征
+            
+        Returns:
+            normalized_features: [L, F, N] 标准化后的序列特征
+        """
+        L, F, N = features.shape
+        normalized_features = features.clone()
+        
+        # 对每只股票分别进行标准化
+        for stock_idx in range(N):
+            stock_features = features[:, :, stock_idx]  # [L, F]
+            
+            # 价格特征标准化：用最后一天的close价格
+            if self.close_feature_index is not None and len(self.price_feature_indices) > 0:
+                last_close = stock_features[-1, self.close_feature_index]  # 最后一天的收盘价
+                
+                # 避免除零
+                if last_close != 0 and not torch.isnan(last_close) and not torch.isinf(last_close):
+                    for price_idx in self.price_feature_indices:
+                        normalized_features[:, price_idx, stock_idx] = stock_features[:, price_idx] / last_close
+                else:
+                    # 如果close价格无效，保持原值
+                    pass
+            
+            # 成交量特征标准化：用最后一天的成交量
+            for vol_idx in self.volume_feature_indices:
+                last_volume = stock_features[-1, vol_idx]  # 最后一天的成交量
+                
+                # 避免除零
+                if last_volume != 0 and not torch.isnan(last_volume) and not torch.isinf(last_volume):
+                    normalized_features[:, vol_idx, stock_idx] = stock_features[:, vol_idx] / last_volume
+                else:
+                    # 如果成交量无效，保持原值
+                    pass
+        
+        return normalized_features
 
 class StockDataModule(pl.LightningDataModule):
     """股票数据模块"""
@@ -77,7 +145,7 @@ class StockDataModule(pl.LightningDataModule):
                  num_workers: int = 4,
                  normalize_features: bool = True,
                  normalize_targets: bool = True,
-                 normalization_method: str = 'zscore',
+                 normalization_method: str = 'sequence_price_cross_section_return',
                  debug: bool = False):
         """
         Args:
@@ -92,8 +160,8 @@ class StockDataModule(pl.LightningDataModule):
             num_workers: 数据加载进程数
             normalize_features: 是否对特征进行标准化
             normalize_targets: 是否对目标进行标准化
-            normalization_method: 标准化方法 ('zscore', 'minmax')
-            debug: 是否开启调试模式（打印详细信息）
+            normalization_method: 标准化方法 ('sequence_price_cross_section_return')
+            debug: 是否开启调试模式
         """
         super().__init__()
         self.data_dir = data_dir
@@ -110,13 +178,17 @@ class StockDataModule(pl.LightningDataModule):
         self.normalization_method = normalization_method
         self.debug = debug  # 添加调试选项
         
-        # 数据文件定义
+        # 数据文件定义 - 只使用复权调整的价格数据
         price_files = [
-            'open.pkl', 'high.pkl', 'low.pkl', 'close.pkl', 'vwap.pkl',
             'open_adj.pkl', 'high_adj.pkl', 'low_adj.pkl', 'close_adj.pkl', 'vwap_adj.pkl',
-            'volume.pkl', 'volume_adj.pkl', 'total_mv.pkl', 'total_share.pkl', 'turnover.pkl'
+            'volume_adj.pkl', 'turnover.pkl'
         ]
         self.price_files = [f"filtered_{filename}" for filename in price_files]
+        
+        # 定义价格特征和成交量特征
+        self.price_features = ['filtered_open_adj', 'filtered_high_adj', 'filtered_low_adj', 
+                              'filtered_close_adj', 'filtered_vwap_adj']
+        self.volume_features = ['filtered_volume_adj', 'filtered_turnover']
         
         factor_files = [
             'momentum.pkl', 'resvol.pkl', 'beta.pkl', 'srisk.pkl', 'ltrevrsl.pkl',
@@ -197,49 +269,49 @@ class StockDataModule(pl.LightningDataModule):
                 self._split_data()
     
     def _load_and_process_data(self):
-        """加载并处理数据"""
+        """加载并处理数据 - 新的标准化策略"""
         self._print("=== 加载数据 ===")
         
         # 1. 加载价格数据
-        self._debug_print("1. 加载价格数据...")
+        self._print("1. 加载价格数据...")
         price_data = {}
         for file in self.price_files:
             data = self.load_pkl_safe(file)
             if data is not None:
                 price_data[file.replace('.pkl', '')] = data
-                self._debug_print(f"  ✓ {file}: {data.shape}")
+                self._print(f"  ✓ {file}: {data.shape}")
             else:
-                self._debug_print(f"  ✗ {file}: 加载失败")
+                self._print(f"  ✗ {file}: 加载失败")
         
         # 2. 加载因子数据（如果使用）
         factor_data = {}
         if self.use_factors:
-            self._debug_print("2. 加载因子数据...")
+            self._print("2. 加载因子数据...")
             for file in self.factor_files:
                 data = self.load_pkl_safe(file)
                 if data is not None:
                     factor_data[file.replace('.pkl', '')] = data
-                    self._debug_print(f"  ✓ {file}: {data.shape}")
+                    self._print(f"  ✓ {file}: {data.shape}")
                 else:
-                    self._debug_print(f"  ✗ {file}: 加载失败")
+                    self._print(f"  ✗ {file}: 加载失败")
         
         # 3. 加载收益率数据
-        self._debug_print("3. 加载收益率数据...")
+        self._print("3. 加载收益率数据...")
         return_data = {}
         for file in self.return_files:
             data = self.load_pkl_safe(file)
             if data is not None:
                 return_data[file.replace('.pkl', '')] = data
-                self._debug_print(f"  ✓ {file}: {data.shape}")
+                self._print(f"  ✓ {file}: {data.shape}")
             else:
-                self._debug_print(f"  ✗ {file}: 加载失败")
+                self._print(f"  ✗ {file}: 加载失败")
         
-        # 4. 数据对齐、划分和标准化
-        self._debug_print("4. 数据对齐、时间划分和标准化...")
-        self._align_split_and_normalize_data(price_data, factor_data, return_data)
+        # 4. 数据对齐和组织（不进行预标准化）
+        self._print("4. 数据对齐和组织...")
+        self._align_and_organize_data(price_data, factor_data, return_data)
     
-    def _align_split_and_normalize_data(self, price_data: Dict, factor_data: Dict, return_data: Dict):
-        """对齐数据，划分时间序列，并进行标准化"""
+    def _align_and_organize_data(self, price_data: Dict, factor_data: Dict, return_data: Dict):
+        """对齐数据并组织，不进行预标准化"""
         
         # === 1. 数据对齐 ===
         self._debug_print("=== 1. 数据对齐 ===")
@@ -317,52 +389,38 @@ class StockDataModule(pl.LightningDataModule):
         self._debug_print(f"验证集: {val_dates[0]} 到 {val_dates[-1]} ({len(val_dates)} 天)")
         self._debug_print(f"测试集: {test_dates[0]} 到 {test_dates[-1]} ({len(test_dates)} 天)")
         
-        # === 3. 处理特征数据 ===
-        self._debug_print("=== 3. 处理特征数据 ===")
+        # === 3. 组织特征数据（不标准化）===
+        self._debug_print("=== 3. 组织特征数据 ===")
         
         feature_list = []
         feature_names = []
         
-        # 处理价格特征
+        # 处理价格特征（只填充，不标准化）
         for name, data in price_data.items():
             if data is not None:
                 self._debug_print(f"  处理价格特征: {name}")
                 # 对齐数据
                 aligned_data = data.reindex(index=common_dates, columns=common_stocks)
+                # 只填充，不标准化
+                filled_data = aligned_data.ffill().bfill()
                 
-                # 按您的需求进行标准化处理（内部包含填充操作）
-                if self.normalize_features:
-                    normalized_data = self._normalize_single_feature(
-                        aligned_data, train_dates, val_dates, test_dates, name
-                    )
-                else:
-                    # 如果不标准化，仍需填充缺失值
-                    normalized_data = aligned_data.ffill().bfill()
-                
-                feature_list.append(normalized_data.values)  # [T, N]
+                feature_list.append(filled_data.values)  # [T, N]
                 feature_names.append(name)
         
-        # 处理因子特征（如果使用）
+        # 处理因子特征（如果使用，不标准化）
         if self.use_factors:
             for name, data in factor_data.items():
                 if data is not None:
                     self._debug_print(f"  处理因子特征: {name}")
                     # 对齐数据
                     aligned_data = data.reindex(index=common_dates, columns=common_stocks)
+                    # 因子数据已经标准化，只填充
+                    filled_data = aligned_data.ffill().bfill()
                     
-                    # 按您的需求进行标准化处理（内部包含填充操作）
-                    if self.normalize_features:
-                        normalized_data = self._normalize_single_feature(
-                            aligned_data, train_dates, val_dates, test_dates, name
-                        )
-                    else:
-                        # 如果不标准化，仍需填充缺失值
-                        normalized_data = aligned_data.ffill().bfill()
-                    
-                    feature_list.append(normalized_data.values)  # [T, N]
+                    feature_list.append(filled_data.values)  # [T, N]
                     feature_names.append(name)
         
-        # === 4. 处理目标数据 ===
+        # === 4. 处理目标数据（截面标准化）===
         self._debug_print("=== 4. 处理目标数据 ===")
         
         target_list = []
@@ -373,12 +431,9 @@ class StockDataModule(pl.LightningDataModule):
                 # 对齐数据
                 aligned_data = return_data[return_key].reindex(index=common_dates, columns=common_stocks)
                 
-                # 按您的需求进行标准化处理
+                # 截面标准化：每天对所有股票做标准化
                 if self.normalize_targets:
-                    # 对目标值也应用相同的标准化逻辑
-                    normalized_data = self._normalize_single_feature(
-                        aligned_data, train_dates, val_dates, test_dates, return_key, is_target=True
-                    )
+                    normalized_data = self._cross_section_normalize(aligned_data, train_dates)
                 else:
                     # 如果不标准化，填充缺失值（目标值通常用0填充表示无收益）
                     normalized_data = aligned_data.fillna(0)
@@ -418,83 +473,62 @@ class StockDataModule(pl.LightningDataModule):
         if feature_nan_count > 0 or target_nan_count > 0:
             self._print("  警告: 数据中仍有NaN值，可能影响训练")
 
-    def _normalize_single_feature(self, df: pd.DataFrame, train_dates: List, 
-                                 val_dates: List, test_dates: List, feature_name: str, 
-                                 is_target: bool = False) -> pd.DataFrame:
+    def _cross_section_normalize(self, df: pd.DataFrame, train_dates: List) -> pd.DataFrame:
         """
-        按照您的需求对单个特征进行标准化
-        df_zscore = ((df.ffill().bfill()) - df.values.mean()) / df.values.std()
-        只使用训练集的mean和std
+        截面标准化：每天对所有股票做标准化
+        只使用训练集的统计量来计算标准化参数
         
         Args:
-            df: 要标准化的DataFrame
-            train_dates: 训练集日期
-            val_dates: 验证集日期  
-            test_dates: 测试集日期
-            feature_name: 特征名称
-            is_target: 是否为目标变量（影响填充策略）
+            df: 要标准化的DataFrame [时间, 股票]
+            train_dates: 训练集日期列表
+            
+        Returns:
+            标准化后的DataFrame
         """
-        self._debug_print(f"    标准化{'目标' if is_target else '特征'}: {feature_name}")
+        self._debug_print(f"    截面标准化收益率数据")
         
-        # 1. 对DataFrame进行填充
-        if is_target:
-            # 目标值用0填充（表示无收益）
-            filled_df = df.fillna(0)
-        else:
-            # 特征用前向后向填充
-            filled_df = df.ffill().bfill()
+        # 1. 首先填充缺失值（收益率用0填充）
+        filled_df = df.fillna(0)
         
-        self._debug_print(f"      填充前形状: {df.shape}, 填充后形状: {filled_df.shape}")
-        
-        # 2. 分割训练集数据以计算统计量
+        # 2. 计算训练集的截面统计量（每天的均值和标准差）
         train_data = filled_df.loc[train_dates]
         
-        # 3. 只用训练集计算统计量
-        train_mean = train_data.values.mean()
-        train_std = train_data.values.std()
+        # 每天计算所有股票的均值和标准差
+        daily_mean = train_data.mean(axis=1)  # 每天的均值
+        daily_std = train_data.std(axis=1)    # 每天的标准差
         
-        self._debug_print(f"      训练集原始统计: 均值={train_mean:.6f}, 标准差={train_std:.6f}")
+        # 避免除零
+        daily_std = daily_std.replace(0, 1.0)
+        daily_std = daily_std.fillna(1.0)
         
-        # 4. 避免除零
-        if train_std == 0 or np.isnan(train_std):
-            self._debug_print(f"      警告: {feature_name} 的训练集标准差为0或NaN，使用1.0代替")
-            train_std = 1.0
+        self._debug_print(f"      训练集日均收益率统计: 均值范围=[{daily_mean.min():.6f}, {daily_mean.max():.6f}]")
+        self._debug_print(f"      训练集日收益率波动统计: 标准差范围=[{daily_std.min():.6f}, {daily_std.max():.6f}]")
         
-        # 5. 对填充后的整个数据集应用训练集的统计量进行标准化
-        # df_zscore = ((df.ffill().bfill()) - train_mean) / train_std
-        normalized_df = (filled_df - train_mean) / train_std
+        # 3. 对整个数据集应用截面标准化
+        # 扩展训练集统计量到所有日期
+        all_dates_mean = daily_mean.reindex(filled_df.index, method='ffill').fillna(daily_mean.mean())
+        all_dates_std = daily_std.reindex(filled_df.index, method='ffill').fillna(daily_std.mean())
         
-        # 6. 验证标准化效果
+        # 应用标准化：(return - daily_mean) / daily_std
+        normalized_df = filled_df.sub(all_dates_mean, axis=0).div(all_dates_std, axis=0)
+        
+        # 4. 验证标准化效果
         train_normalized = normalized_df.loc[train_dates]
-        val_normalized = normalized_df.loc[val_dates] if len(val_dates) > 0 else None
-        test_normalized = normalized_df.loc[test_dates] if len(test_dates) > 0 else None
+        train_daily_mean = train_normalized.mean(axis=1).mean()  # 整个训练期的日均值的均值
+        train_daily_std = train_normalized.std(axis=1).mean()   # 整个训练期的日标准差的均值
         
-        # 训练集应该接近标准正态分布
-        train_norm_mean = train_normalized.values.mean()
-        train_norm_std = train_normalized.values.std()
-        self._debug_print(f"      标准化后训练集: 均值={train_norm_mean:.6f}, 标准差={train_norm_std:.6f}")
+        self._debug_print(f"      标准化后训练集统计: 日均值={train_daily_mean:.6f}, 日标准差={train_daily_std:.6f}")
         
-        # 验证集和测试集的统计量
-        if val_normalized is not None:
-            val_norm_mean = val_normalized.values.mean()
-            val_norm_std = val_normalized.values.std()
-            self._debug_print(f"      标准化后验证集: 均值={val_norm_mean:.6f}, 标准差={val_norm_std:.6f}")
-        
-        if test_normalized is not None:
-            test_norm_mean = test_normalized.values.mean()
-            test_norm_std = test_normalized.values.std()
-            self._debug_print(f"      标准化后测试集: 均值={test_norm_mean:.6f}, 标准差={test_norm_std:.6f}")
-        
-        # 7. 检查是否还有NaN值
+        # 检查NaN值
         nan_count = normalized_df.isna().sum().sum()
         if nan_count > 0:
-            self._debug_print(f"      警告: 标准化后仍有 {nan_count} 个NaN值")
+            self._debug_print(f"      警告: 截面标准化后仍有 {nan_count} 个NaN值")
         
         return normalized_df
-    
+
     def _split_data(self):
         """按时间划分数据集"""
-        self._debug_print("=== 划分数据集 ===")
+        self._print("=== 划分数据集 ===")
         
         total_time = self.features.shape[0]
         train_size = int(total_time * self.train_ratio)
@@ -503,28 +537,34 @@ class StockDataModule(pl.LightningDataModule):
         train_end = train_size
         val_end = train_size + val_size
         
-        self._debug_print(f"总时间步数: {total_time}")
-        self._debug_print(f"训练集: 0 - {train_end} ({train_end} 步)")
-        self._debug_print(f"验证集: {train_end} - {val_end} ({val_end - train_end} 步)")
-        self._debug_print(f"测试集: {val_end} - {total_time} ({total_time - val_end} 步)")
+        self._print(f"总时间步数: {total_time}")
+        self._print(f"训练集: 0 - {train_end} ({train_end} 步)")
+        self._print(f"验证集: {train_end} - {val_end} ({val_end - train_end} 步)")
+        self._print(f"测试集: {val_end} - {total_time} ({total_time - val_end} 步)")
         
-        # 创建数据集
+        # 创建数据集，传递feature_names和normalize_features参数
         self.train_dataset = StockDataset(
             features=self.features[:train_end],
             targets=self.targets[:train_end],
-            sequence_length=self.sequence_length
+            feature_names=self.feature_names,
+            sequence_length=self.sequence_length,
+            normalize_features=self.normalize_features
         )
         
         self.val_dataset = StockDataset(
             features=self.features[train_end:val_end],
             targets=self.targets[train_end:val_end],
-            sequence_length=self.sequence_length
+            feature_names=self.feature_names,
+            sequence_length=self.sequence_length,
+            normalize_features=self.normalize_features
         )
         
         self.test_dataset = StockDataset(
             features=self.features[val_end:],
             targets=self.targets[val_end:],
-            sequence_length=self.sequence_length
+            feature_names=self.feature_names,
+            sequence_length=self.sequence_length,
+            normalize_features=self.normalize_features
         )
         
         self._print(f"训练样本数: {len(self.train_dataset)}")
@@ -537,9 +577,7 @@ class StockDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=True,
-            persistent_workers=True,  # 添加：提高DDP性能
-            drop_last=True,           # 添加：确保DDP中batch大小一致
+            pin_memory=True
         )
     
     def val_dataloader(self):
@@ -548,9 +586,7 @@ class StockDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
-            pin_memory=True,
-            persistent_workers=True,  # 添加：提高DDP性能
-            drop_last=False,          # 验证集不丢弃最后一个batch
+            pin_memory=True
         )
     
     def test_dataloader(self):
@@ -559,9 +595,7 @@ class StockDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
-            pin_memory=True,
-            persistent_workers=True,  # 添加：提高DDP性能
-            drop_last=False,          # 测试集不丢弃最后一个batch
+            pin_memory=True
         )
     
     def get_feature_dim(self):
@@ -576,79 +610,47 @@ class StockDataModule(pl.LightningDataModule):
         """获取预测期数"""
         return self.prediction_horizons
     
-    # ===== 旧版标准化方法（已废弃） =====
-    # def _normalize_data(self, data: np.ndarray, stats: Optional[Dict] = None, fit: bool = True) -> Tuple[np.ndarray, Dict]:
-    #     """
-    #     标准化数据 - 按特征在所有股票上进行标准化 (DEPRECATED)
-    #     使用新的 _normalize_single_feature 方法替代
-    #     """
-    #     pass
-
     def denormalize_targets(self, normalized_targets: torch.Tensor) -> torch.Tensor:
         """
         反标准化目标数据
+        注意：由于采用截面标准化，反标准化需要对应的日期信息
+        这里提供简化版本，实际使用时可能需要更复杂的逻辑
         
         Args:
             normalized_targets: 标准化的目标数据 [..., H]
             
         Returns:
-            原始尺度的目标数据
+            原始尺度的目标数据（截面标准化情况下较复杂）
         """
-        if not self.normalize_targets or self.target_stats is None:
-            return normalized_targets
-        
-        if self.normalization_method == 'zscore':
-            mean = torch.tensor(self.target_stats['mean'], dtype=torch.float32)
-            std = torch.tensor(self.target_stats['std'], dtype=torch.float32)
-            
-            # 确保维度匹配用于广播
-            if normalized_targets.dim() == 3:  # [B, N, H]
-                mean = mean.view(1, 1, -1)
-                std = std.view(1, 1, -1)
-            elif normalized_targets.dim() == 2:  # [B*N, H] 或 [N, H]
-                mean = mean.view(1, -1)
-                std = std.view(1, -1)
-            
-            return normalized_targets * std + mean
-            
-        elif self.normalization_method == 'minmax':
-            data_min = torch.tensor(self.target_stats['min'], dtype=torch.float32)
-            data_range = torch.tensor(self.target_stats['range'], dtype=torch.float32)
-            
-            # 确保维度匹配用于广播
-            if normalized_targets.dim() == 3:  # [B, N, H]
-                data_min = data_min.view(1, 1, -1)
-                data_range = data_range.view(1, 1, -1)
-            elif normalized_targets.dim() == 2:  # [B*N, H] 或 [N, H]
-                data_min = data_min.view(1, -1)
-                data_range = data_range.view(1, -1)
-            
-            return normalized_targets * data_range + data_min
-        
+        # 截面标准化的反标准化较为复杂，需要知道具体的日期
+        # 这里返回原值，实际应用中可能需要更精细的处理
         return normalized_targets
 
     def get_normalization_stats(self):
         """获取标准化统计信息"""
         return {
-            'feature_stats': self.feature_stats,
-            'target_stats': self.target_stats,
-            'normalization_method': self.normalization_method
+            'normalization_method': self.normalization_method,
+            'normalize_features': self.normalize_features,
+            'normalize_targets': self.normalize_targets,
+            'price_features': self.price_features,
+            'volume_features': self.volume_features
         }
 
 # 使用示例
 def main():
-    """使用示例"""
+    """使用示例 - 新的标准化策略"""
     
-    # 示例1：只使用价格数据
-    print("=== 示例1：只使用价格数据 ===")
+    # 示例1：只使用价格数据，序列标准化
+    print("=== 示例1：只使用价格数据，序列标准化 ===")
     price_datamodule = StockDataModule(
         use_factors=False,
         sequence_length=20,
         prediction_horizons=[1, 5, 10],
         batch_size=32,
-        normalize_features=True,
-        normalize_targets=True,
-        normalization_method='zscore'
+        normalize_features=True,  # 启用序列级价格标准化
+        normalize_targets=True,   # 启用截面标准化
+        normalization_method='sequence_price_cross_section_return',
+        debug=True  # 开启调试输出
     )
     
     price_datamodule.prepare_data()
@@ -660,20 +662,30 @@ def main():
     features, targets = batch
     
     print(f"特征形状: {features.shape}")  # [B, L, F, N]
-    print(f"目标形状: {targets.shape}")   # [B, N, H]
+    print(f"目标形状: {targets.shape}")   # [B, H, N]
     print(f"特征维度: {price_datamodule.get_feature_dim()}")
     print(f"股票数量: {price_datamodule.get_stock_num()}")
     
+    # 检查标准化效果
+    print(f"\n价格特征标准化检查:")
+    if price_datamodule.train_dataset.close_feature_index is not None:
+        close_idx = price_datamodule.train_dataset.close_feature_index
+        print(f"Close价格特征索引: {close_idx}")
+        # 检查最后一天的close价格是否接近1.0（相对标准化）
+        last_day_close = features[15, -1, close_idx, :]  # 第一个样本，最后一天，close特征，所有股票
+        print(f"标准化后最后一天close价格统计: 均值={last_day_close.mean():.4f}, 标准差={last_day_close.std():.4f}")
+    
     # 示例2：使用因子数据和价格数据
-    print("\n=== 示例2：使用因子数据和价格数据 ===")
+    print("\n=== 示例2：使用因子+价格数据，新标准化策略 ===")
     factor_datamodule = StockDataModule(
         use_factors=True,
         sequence_length=20,
         prediction_horizons=[1, 5, 10],
         batch_size=32,
-        normalize_features=True,
-        normalize_targets=True,
-        normalization_method='zscore'
+        normalize_features=True,  # 序列级价格标准化，因子不标准化
+        normalize_targets=True,   # 截面标准化
+        normalization_method='sequence_price_cross_section_return',
+        debug=True  # 关闭调试输出
     )
     
     factor_datamodule.prepare_data()
@@ -685,9 +697,19 @@ def main():
     features, targets = batch
     
     print(f"特征形状: {features.shape}")  # [B, L, F, N]
-    print(f"目标形状: {targets.shape}")   # [B, N, H]
+    print(f"目标形状: {targets.shape}")   # [B, H, N]
     print(f"特征维度: {factor_datamodule.get_feature_dim()}")
     print(f"股票数量: {factor_datamodule.get_stock_num()}")
+    
+    # 检查目标值的截面标准化效果
+    print(f"\n收益率截面标准化检查:")
+    # targets的形状是 [B, H, N]，检查每个horizon每天的均值和标准差
+    for h in range(targets.shape[1]):
+        horizon_targets = targets[:, h, :]  # [B, N]
+        daily_means = horizon_targets.mean(dim=1)  # [B] - 每个样本（日期）的股票均值
+        daily_stds = horizon_targets.std(dim=1)    # [B] - 每个样本（日期）的股票标准差
+        print(f"  Horizon {h+1}: 日均值范围=[{daily_means.min():.4f}, {daily_means.max():.4f}], "
+              f"日标准差范围=[{daily_stds.min():.4f}, {daily_stds.max():.4f}]")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,36 @@
+# Debug configuration specifically for new normalization strategy validation
+# @package data
+
+# Inherit from advanced normalization config
+defaults:
+  - advanced_norm
+
+# Debug overrides
+batch_size: 4             # Small batch for detailed inspection
+num_workers: 0            # Single-threaded for debugging
+max_stocks: 50            # Limited stocks for faster processing
+sequence_length: 10       # Shorter sequences for quick validation
+
+# Enable detailed logging for normalization validation
+debug: true               # Enable detailed normalization logging
+persistent_workers: false # Not needed with 0 workers
+drop_last: false         # Keep all data for validation
+pin_memory: false        # Disable for CPU debugging
+
+# Quick data splits for validation
+train_ratio: 0.8
+val_ratio: 0.1
+test_ratio: 0.1
+
+# Single prediction horizon for focused testing
+prediction_horizons: [5]
+
+# Comments for debugging usage:
+# Use this config to validate the new normalization strategy:
+# python train_stock_gnn_hydra.py data=debug_norm_validation
+# 
+# This will:
+# 1. Print detailed normalization statistics
+# 2. Validate that price features are properly normalized by close
+# 3. Validate that returns are cross-section normalized
+# 4. Use small batches for manual inspection

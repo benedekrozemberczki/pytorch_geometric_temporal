@@ -25,6 +25,8 @@ class DynamicGraphLightning(pl.LightningModule):
         gnn_type: str = "gcn",  # Options: "gcn", "gat"
         gat_heads: int = 4,  # Number of attention heads for GAT
         gat_dropout: float = 0.1,  # Dropout for GAT attention
+        predict_return: bool = False, # whether predict the final return
+        output_factor_dim: int = 32,
     ):
         super().__init__()
         # 1) 用于序列编码的 GRU（或 LSTM/GRUCell）
@@ -66,8 +68,14 @@ class DynamicGraphLightning(pl.LightningModule):
             
         # 3) 最后预测层（添加BatchNorm）
         self.batch_norm = nn.BatchNorm1d(self.final_gnn_dim)
-        self.predictor = nn.Linear(self.final_gnn_dim, 32)  # 回归示例
-
+        self.output_factor_dim = output_factor_dim
+        self.predictor = nn.Linear(self.final_gnn_dim, self.output_factor_dim)  # 回归示例
+        self.predict_return = predict_return
+        if self.predict_return:
+            self.return_predictor = self.return_predictor = nn.ModuleList([
+                nn.ReLU(),  # ReLU activation
+                nn.Linear(self.output_factor_dim, 1)  # Linear layer
+            ])
         self.k_nn = k_nn
         self.lr = lr
         self.loss_fn = loss_fn
@@ -202,7 +210,10 @@ class DynamicGraphLightning(pl.LightningModule):
         # 应用 BatchNorm 然后预测
         out2_normalized = self.batch_norm(out2)  # [N_total, gnn_hidden_dim]
         out = self.predictor(out2_normalized)  # [N_total, 32]
-        final_out = out.view(b, n, -1)  # [batch, num_nodes, 32]
+        return_output = out
+        if self.predict_return:
+            return_output = self.forward_return(out)  # Pass normalized output through return predictor
+        final_out = return_output.view(b, n, -1)  # [batch, num_nodes, 32/1]
         # TensorBoard logging: log output stats
         self.log('stats/final_output_mean', final_out.mean().item(), on_step=True, on_epoch=False)
         self.log('stats/final_output_std', final_out.std().item(), on_step=True, on_epoch=False)
@@ -320,13 +331,20 @@ class DynamicGraphLightning(pl.LightningModule):
         
         return results
 
+
+    def forward_return(self, x):
+        for layer in self.return_predictor:
+            x = layer(x)
+        return x
+
+
     def training_step(self, batch, batch_idx):
         # batch: 来自你的 DataLoader，格式可以是 (x_t, y_t)
         x_t, y_t = batch
         y_pred = self(x_t)
         
         # Determine if we should compute metrics this epoch
-        compute_metrics = False
+        compute_metrics = self._should_compute_metrics()
         
         # 处理不同的输出格式
         if isinstance(y_pred, list):
@@ -346,21 +364,10 @@ class DynamicGraphLightning(pl.LightningModule):
             # 只在计算指标的epoch记录RankIC和ICIR
             if compute_metrics and hasattr(loss, 'rank_ic_info'):
                 rank_ic_info = loss.rank_ic_info
-                if rank_ic_info['mean_rank_ic'] != 0.0:
-                    self.log("train_rank_ic", rank_ic_info['mean_rank_ic'], 
-                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
-                    self.log("train_abs_rank_ic", rank_ic_info['mean_abs_rank_ic'], 
-                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
-                
-                if rank_ic_info['mean_icir'] != 0.0:
-                    self.log("train_icir", rank_ic_info['mean_icir'], 
-                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
-                    self.log("train_abs_icir", rank_ic_info['mean_abs_icir'], 
-                            on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
-                
-                # Log epoch info for debugging
-                self.log("metric_computed_epoch", float(self.current_epoch), 
-                        on_step=False, on_epoch=True, prog_bar=False, logger=True, sync_dist=True)
+                for metric_name, metric_value in rank_ic_info.items():
+                    if isinstance(metric_value, (int, float)) and metric_value != 0.0:
+                        self.log(f'train_{metric_name}', metric_value, 
+                                 on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
         
         # TensorBoard logging: log training loss
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)

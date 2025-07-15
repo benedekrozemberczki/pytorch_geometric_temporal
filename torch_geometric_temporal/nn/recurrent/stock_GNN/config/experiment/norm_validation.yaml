@@ -1,0 +1,50 @@
+# Experiment configuration for validating new normalization strategy
+# @package _global_
+
+defaults:
+  - override /data: debug_norm_validation  # Use debug config for normalization validation
+  - override /model: dynamic_graph
+  - override /trainer: cpu_debug
+  - override /loss: accumulative_gain
+  - override /logger: csv
+
+# Experiment settings
+experiment:
+  name: "normalization_validation"
+  description: "Validate new sequence-price cross-section-return normalization"
+  tags: ["validation", "normalization", "debug"]
+
+# Validation specific settings
+model:
+  gru_hidden_dim: 32      # Small model for fast validation
+  gnn_hidden_dim: 64
+  k_nn: 5
+  lr: 1e-3
+  weight_decay: 1e-4
+  metric_compute_frequency: 1  # Compute metrics every epoch for validation
+
+trainer:
+  max_epochs: 5           # Short training for validation
+  log_every_n_steps: 1    # Log frequently for validation
+  val_check_interval: 1.0 # Validate every epoch
+  enable_checkpointing: false  # No need for checkpoints
+  enable_progress_bar: true
+  enable_model_summary: true
+
+# Additional settings for validation
+loss:
+  l1_weight: 1.0
+  l2_weight: 1.0
+  rank_ic_weight: 5.0
+  use_absolute_ic: true
+  normalize_by_stock_count: true
+
+# Comments for usage:
+# Run this experiment to validate the new normalization strategy:
+# python train_stock_gnn_hydra.py experiment=norm_validation
+#
+# This will:
+# 1. Use debug data config with detailed logging
+# 2. Run short training to verify everything works
+# 3. Print detailed normalization statistics
+# 4. Validate that features and targets are properly normalized

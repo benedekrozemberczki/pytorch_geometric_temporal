@@ -1,0 +1,30 @@
+# Advanced stock data configuration with new normalization strategy
+# @package data
+
+# Inherit from basic stock_data configuration
+defaults:
+  - stock_data
+
+# Override with new normalization strategy
+normalization_method: "sequence_price_cross_section_return"
+debug: false  # Enable for detailed normalization logging
+
+# Advanced settings for the new normalization approach
+normalize_features: true   # Enable sequence-level price/volume normalization
+normalize_targets: true    # Enable cross-section return normalization
+
+# Optimized settings for production use
+sequence_length: 20        # Optimal for sequence normalization
+batch_size: 64            # Larger batch for better cross-section statistics
+prediction_horizons: [1, 5, 10, 20]  # Multiple horizons
+
+# Memory optimization
+persistent_workers: true
+pin_memory: true
+drop_last: true
+
+# Comments explaining the new strategy:
+# 1. Price features (OHLCV): normalized by last day's close price within each sequence
+# 2. Volume features: normalized by last day's volume within each sequence  
+# 3. Factor features: kept as-is (already preprocessed)
+# 4. Returns: cross-section normalized (each day across all stocks)

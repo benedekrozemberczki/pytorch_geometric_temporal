@@ -21,6 +21,8 @@ train_ratio: 0.8
 val_ratio: 0.1
 test_ratio: 0.1
 
-# Disable some preprocessing for speed
+# Enable detailed normalization logging for debugging
 normalize_features: true
 normalize_targets: true
+normalization_method: "sequence_price_cross_section_return"
+debug: true  # Enable detailed logging
