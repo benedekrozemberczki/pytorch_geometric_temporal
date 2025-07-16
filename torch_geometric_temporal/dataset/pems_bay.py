@@ -186,7 +186,8 @@ class PemsBayDatasetLoader(object):
 
         # setup data
         data = np.load(os.path.join(self.raw_data_dir, "pems_node_values.npy")).transpose((1, 2, 0))
-        
+        data = data.astype(np.float32)
+
         if allGPU != -1:
             data = torch.tensor(data,dtype=torch.float).to(f"cuda:{allGPU}")
             means = torch.mean(data, dim=(0, 2), keepdim=True)
