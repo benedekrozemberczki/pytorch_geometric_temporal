@@ -10,7 +10,7 @@ install_requires = [
     "numpy",
     "networkx",
 ]
-tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm"]
+tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm",'dask', "pandas", "tables"]
 index_require = ['dask', "pandas", "tables"]
 ddp_require = ["dask[distributed]", "dask_pytorch_ddp", "pandas", "tables"]
 
