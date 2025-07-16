@@ -335,7 +335,7 @@ def test_wiki():
 
 
 def test_windmilllarge():
-    loader = WindmillOutputLargeDatasetLoader()
+    loader = WindmillOutputLargeDatasetLoader(raw_data_dir="/tmp/")
     dataset = loader.get_dataset()
     for epoch in range(2):
         for snapshot in dataset:

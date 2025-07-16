@@ -30,6 +30,7 @@ class WindmillOutputLargeDatasetLoader(object):
 
 
     def _read_web_data(self):
+        os.makedirs(self.raw_data_dir, exist_ok=True)
         if not os.path.isfile(
             os.path.join(self.raw_data_dir, "windmill_output.json")
         ):  
