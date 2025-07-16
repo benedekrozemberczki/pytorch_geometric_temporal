@@ -13,6 +13,7 @@ class WindmillOutputMediumDatasetLoader(object):
     """
 
     def __init__(self):
+        raise RuntimeError("The WindmillMedium dataset is no longer accessible via 'graphmining.ai'. If you have a local copy, please contact the PGT maintainers, and we will re-upload the dataset. ")
         self._read_web_data()
 
     def _read_web_data(self):
