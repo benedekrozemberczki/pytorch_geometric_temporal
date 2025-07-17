@@ -67,7 +67,6 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
         t1 = time.time()
         i = 1
         total = len(train_dataloader)
-        mae_total = 0
         for batch in train_dataloader:
             X_batch, y_batch = batch
             
@@ -121,27 +120,18 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
                 # Mean squared error
                 loss = loss_fn(y_hat, y_batch)
                 total_loss.append(loss.item())
-
-                mae_total += masked_mae_loss(y_hat, y_batch)
                 
                 if debug:
                     print(f"Val Batch: {i}/{total}", end="\r")
                     i += 1
                 
-        mae = mae_total / len(val_dataloader)   
         t2 = time.time()
-        print("Epoch {} time: {:.4f} train RMSE: {:.4f} Test MSE: {:.4f} Test MAE: {:.4f}".format(epoch,t2 - t1, sum(loss_list)/len(loss_list), sum(total_loss)/len(total_loss), mae))
+        print("Epoch {} time: {:.4f} train MSE: {:.4f} Test MSE: {:.4f}".format(epoch,t2 - t1, sum(loss_list)/len(loss_list), sum(total_loss)/len(total_loss)))
         stats.append([epoch, t2-t1, sum(loss_list)/len(loss_list), sum(total_loss)/len(total_loss)])
         t_mse.append(sum(loss_list)/len(loss_list))
         v_mse.append(sum(total_loss)/len(total_loss))
     return min(t_mse), min(v_mse)
         
-
-  
-
-
-
-
 
 def main():
     args = parse_arguments()

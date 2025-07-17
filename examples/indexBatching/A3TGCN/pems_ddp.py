@@ -190,7 +190,7 @@ def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, lo
             val_loss = val_tensor[0]/ val_tensor[1]
             
             t2 = time.time()
-            print("Epoch {} time: {:.4f} Train RMSE: {:.4f} Validation MSE: {:.4f}".format(epoch,t2 - t1, sum(loss_list)/len(loss_list), val_loss.item()))
+            print("Epoch {} time: {:.4f} Train MSE: {:.4f} Validation MSE: {:.4f}".format(epoch,t2 - t1, sum(loss_list)/len(loss_list), val_loss.item()))
             stats.append([epoch, t2-t1, sum(loss_list)/len(loss_list), val_loss.item()])
             t_mse.append(sum(loss_list)/len(loss_list))
             v_mse.append(val_loss.item())

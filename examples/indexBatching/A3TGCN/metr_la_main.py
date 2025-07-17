@@ -45,8 +45,6 @@ class TemporalGNN(torch.nn.Module):
         h = self.linear(h)
         return h
 
-
-
 def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, allGPU=False, debug=False):
     
     # Create model and optimizers
@@ -78,8 +76,8 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
                 y_batch = y_batch[...,0].permute(0, 2, 1).to(DEVICE)
             
 
-
             y_hat = model(X_batch, edges)         # Get model predictions
+
             loss = loss_fn(y_hat, y_batch) # Mean squared error #loss = torch.mean((y_hat-labels)**2)  sqrt to change it to rmse
             loss.backward()
             optimizer.step()
@@ -100,6 +98,8 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
         total = len(val_dataloader)
         if debug:
             print("                      ", end="\r")
+        
+        
         with torch.no_grad():
             for batch in val_dataloader:
                 X_batch, y_batch = batch
@@ -118,25 +118,19 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
                 # Mean squared error
                 loss = loss_fn(y_hat, y_batch)
                 total_loss.append(loss.item())
-                
+
                 if debug:
                     print(f"Val Batch: {i}/{total}", end="\r")
                     i += 1
                 
-            
         t2 = time.time()
-        print("Epoch {} time: {:.4f} train RMSE: {:.4f} Test MSE: {:.4f}".format(epoch,t2 - t1, sum(loss_list)/len(loss_list), sum(total_loss)/len(total_loss)))
+        print("Epoch {} time: {:.4f} train MSE: {:.4f} Test MSE: {:.4f}".format(epoch,t2 - t1, sum(loss_list)/len(loss_list), sum(total_loss)/len(total_loss)))
         stats.append([epoch, t2-t1, sum(loss_list)/len(loss_list), sum(total_loss)/len(total_loss)])
         t_mse.append(sum(loss_list)/len(loss_list))
         v_mse.append(sum(total_loss)/len(total_loss))
+    
     return min(t_mse), min(v_mse)
         
-
-  
-
-
-
-
 
 def main():
     args = parse_arguments()

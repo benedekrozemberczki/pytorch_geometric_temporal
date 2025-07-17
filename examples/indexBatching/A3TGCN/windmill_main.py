@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 from torch_geometric_temporal.nn.recurrent import A3TGCN2
-from torch_geometric_temporal.dataset import PemsDatasetLoader
+from torch_geometric_temporal.dataset import WindmillOutputLargeDatasetLoader
 import argparse
 from utils import *
 
@@ -51,7 +51,7 @@ class TemporalGNN(torch.nn.Module):
 def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, allGPU=False, debug=False):
     
     # Create model and optimizers
-    model = TemporalGNN(node_features=2, periods=12, batch_size=batch_size).to(DEVICE)
+    model = TemporalGNN(node_features=1, periods=8, batch_size=batch_size).to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     loss_fn = torch.nn.MSELoss()
     
@@ -70,7 +70,7 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
         
         for batch in train_dataloader:
             X_batch, y_batch = batch
-            
+
             # Need to permute based on expected input shape for ATGCN
             if allGPU:
                 X_batch = X_batch.permute(0, 2, 3, 1)
@@ -78,7 +78,7 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
             else:
                 X_batch = X_batch.permute(0, 2, 3, 1).to(DEVICE).float()
                 y_batch = y_batch[...,0].permute(0, 2, 1).to(DEVICE).float()
-            
+
 
             y_hat = model(X_batch, edges)         # Get model predictions
             loss = loss_fn(y_hat, y_batch) # Mean squared error #loss = torch.mean((y_hat-labels)**2)  sqrt to change it to rmse
@@ -119,7 +119,7 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
                 # Mean squared error
                 loss = loss_fn(y_hat, y_batch)
                 total_loss.append(loss.item())
-                
+
                 if debug:
                     print(f"Val Batch: {i}/{total}", end="\r")
                     i += 1
@@ -151,7 +151,7 @@ def main():
 
     start = time.time()
     p1 = time.time() 
-    indexLoader = PemsDatasetLoader(index=True)
+    indexLoader = WindmillOutputLargeDatasetLoader(index=True)
     if allGPU:
         train_dataloader, val_dataloader, test_dataloader, edges, edge_weights, mean, std = indexLoader.get_index_dataset(batch_size=batch_size, shuffle=shuffle, allGPU=0) 
     else:
