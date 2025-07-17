@@ -200,6 +200,11 @@ def train(args=None, epochs=None, batch_size=None, allGPU=False, debug=False, lo
     print(f"Runtime: {round(t2 - start_time,2)}; Best Train MSE: {min(t_mse)}; Best Validation MSE: {v_mse}", flush=True)
 
 def main():
+    """
+    Note that error (MSE) is calculated over the standardized data values to mimic the existing A3T-GCN2 workflow. 
+    For comparision to existing work, it is better to reverse the standardization proccess
+    and use MAE as error.
+    """
     args = parse_arguments()
     allGPU = args.gpu.lower() in ["true", "y", "t", "yes"]
     debug = args.debug.lower() in ["true", "y", "t", "yes"]

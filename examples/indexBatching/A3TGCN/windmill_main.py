@@ -139,6 +139,11 @@ def train(train_dataloader, val_dataloader, batch_size, epochs, edges, DEVICE, a
 
 
 def main():
+    """
+    Note that error (MSE) is calculated over the standardized data values to mimic the existing A3T-GCN2 workflow. 
+    For comparision to existing work, it is better to reverse the standardization proccess
+    and use MAE as error.
+    """
     args = parse_arguments()
     allGPU = args.gpu.lower() in ["true", "y", "t", "yes"]
     debug = args.debug.lower() in ["true", "y", "t", "yes"]
