@@ -6,17 +6,32 @@ Introduction
 
 Citing
 =======================
-If you find *PyTorch Geometric Temporal* useful in your research, please consider adding the following citation:
+
+If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the following citation of the original work and its more recent extension:
 
 .. code-block:: latex
 
-    >@inproceedings{rozemberczki2021pytorch,
-                    author = {Benedek Rozemberczki and Paul Scherer and Yixuan He and George Panagopoulos and Alexander Riedel and Maria Astefanoaei and Oliver Kiss and Ferenc Beres and Guzman Lopez and Nicolas Collignon and Rik Sarkar},
+    @inproceedings{rozemberczki2021pytorch,
+                    author = {Benedek Rozemberczki and Paul Scherer and Yixuan He and George Panagopoulos and Alexander Riedel and Maria Astefanoaei and Oliver Kiss and Ferenc Beres and and Guzman Lopez and Nicolas Collignon and Rik Sarkar},
                     title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
                     year = {2021},
                     booktitle={Proceedings of the 30th ACM International Conference on Information and Knowledge Management},
                     pages = {4564–4573},
     }
+
+.. code-block:: latex
+
+    @misc{ockerman2025pgtiscalingspatiotemporalgnns,
+      title={PGT-I: Scaling Spatiotemporal GNNs with Memory-Efficient Distributed Training}, 
+      author={Seth Ockerman and Amal Gueroudji and Tanwi Mallick and Yixuan He and Line Pouchard and Robert Ross and Shivaram Venkataraman},
+      year={2025},
+      eprint={2507.11683},
+      archivePrefix={arXiv},
+      primaryClass={cs.DC},
+      url={https://arxiv.org/abs/2507.11683}, 
+    }
+
+
 
 We briefly overview the fundamental concepts and features of PyTorch Geometric Temporal through simple examples.
 

@@ -11,15 +11,6 @@ PyTorch Geometric Temporal includes support for index-batching - a new batching 
 
 .. The package interfaces well with `Pytorch Lightning <https://pytorch-lightning.readthedocs.io>`_ which allows training on CPUs, single and multiple GPUs out-of-the-box. Take a look at this introductory example of using PyTorch Geometric Temporal with Pytorch Lighning.
 
-.. code-block:: latex
-
-    >@inproceedings{rozemberczki2021pytorch,
-                    author = {Benedek Rozemberczki and Paul Scherer and Yixuan He and George Panagopoulos and Alexander Riedel and Maria Astefanoaei and Oliver Kiss and Ferenc Beres and and Guzman Lopez and Nicolas Collignon and Rik Sarkar},
-                    title = {{PyTorch Geometric Temporal: Spatiotemporal Signal Processing with Neural Machine Learning Models}},
-                    year = {2021},
-                    booktitle={Proceedings of the 30th ACM International Conference on Information and Knowledge Management},
-                    pages = {4564–4573},
-    }
 
 .. toctree::
    :glob:
