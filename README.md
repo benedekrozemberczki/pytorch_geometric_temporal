@@ -19,11 +19,14 @@
 
 [![PyPI Version][pypi-image]][pypi-url]
 [![Docs Status][docs-image]][docs-url]
-<!-- [![Code Coverage][coverage-image]][coverage-url] -->
 [![Build Status][build-image]][build-url]
+
 [![Arxiv](https://img.shields.io/badge/ArXiv-2104.07788-orange.svg)](https://arxiv.org/abs/2104.07788)
+[![Arxiv](https://img.shields.io/badge/ArXiv-2507.11683-blue.svg)](https://arxiv.org/abs/2507.11683)
+
 [![benedekrozemberczki](https://img.shields.io/twitter/follow/benrozemberczki?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=benrozemberczki)
 
+<!-- [![Code Coverage][coverage-image]][coverage-url] -->
 **[Documentation](https://pytorch-geometric-temporal.readthedocs.io)** | **[External Resources](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/resources.html)** | **[Datasets](https://pytorch-geometric-temporal.readthedocs.io/en/latest/notes/introduction.html#discrete-time-datasets)**
 
 *PyTorch Geometric Temporal* is a temporal (dynamic) extension library for [PyTorch Geometric](https://github.com/rusty1s/pytorch_geometric).
@@ -53,7 +56,7 @@ We provide in-depth case study tutorials in the [Documentation](https://pytorch
 **Citing**
 
 
-If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the following citation:
+If you find *PyTorch Geometric Temporal* and the new datasets useful in your research, please consider adding the following citation of the orignal work and its more recent extension:
 
 ```bibtex
 @inproceedings{rozemberczki2021pytorch,
@@ -63,6 +66,20 @@ If you find *PyTorch Geometric Temporal* and the new datasets useful in your res
                booktitle={Proceedings of the 30th ACM International Conference on Information and Knowledge Management},
                pages = {4564–4573},
 }
+
+```
+
+```bibtex
+@misc{ockerman2025pgtiscalingspatiotemporalgnns,
+      title={PGT-I: Scaling Spatiotemporal GNNs with Memory-Efficient Distributed Training}, 
+      author={Seth Ockerman and Amal Gueroudji and Tanwi Mallick and Yixuan He and Line Pouchard and Robert Ross and Shivaram Venkataraman},
+      year={2025},
+      eprint={2507.11683},
+      archivePrefix={arXiv},
+      primaryClass={cs.DC},
+      url={https://arxiv.org/abs/2507.11683}, 
+}
+
 ```
 
 --------------------------------------------------------------------------------
