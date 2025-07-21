@@ -9,7 +9,7 @@ Index-batching is a technique that reduces the memory cost of training ST-GNNs w
 * **PeMSAllLA**
 * **PeMS**
 
-This folder contains examples with DCRNN and A3TGCN. We hope to build out our examples over time. 
+This folder contains examples with a few existing PGT models. Wherever possible, we follow the existing workflow for a given model. We hope to build out our examples over time. 
 
 
 Utilizing index-batching requires minimal modifications to the existing PGT workflow. For example, the following is a sample training loop with static graph dataset with temporal signal:
