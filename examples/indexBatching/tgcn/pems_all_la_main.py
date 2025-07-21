@@ -61,6 +61,10 @@ def train(train_dataloader, val_dataloader, mean, std, batch_size, epochs, edge_
 
     edge_index = edge_index.to(DEVICE)
     edge_weight = edge_weight.to(DEVICE)
+    
+    if not allGPU:
+        mean = mean.to(DEVICE)
+        std = std.to(DEVICE)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -76,10 +80,12 @@ def train(train_dataloader, val_dataloader, mean, std, batch_size, epochs, edge_
         for x, y in train_dataloader:
             
             if allGPU:
-                x = x.permute(0,2,3,1)
+                x = x.permute(0,2,3,1).float()
+                y = y.float()
+
             else:
-                x = x.permute(0,2,3,1).to(DEVICE)
-                y = y.to(DEVICE)
+                x = x.permute(0,2,3,1).to(DEVICE).float()
+                y = y.to(DEVICE).float()
         
             y_hat = model(x, edge_index, edge_weight).squeeze()            
             loss = masked_mae_loss((y_hat * std) + mean, (y * std) + mean)
@@ -101,11 +107,11 @@ def train(train_dataloader, val_dataloader, mean, std, batch_size, epochs, edge_
         with torch.no_grad():
             for x, y in val_dataloader:
                 if allGPU:
-                    x = x.permute(0,2,3,1)
-                    # y = y[...,0]
+                    x = x.permute(0,2,3,1).float()
+                    y = y.float()
                 else:
-                    x = x.permute(0,2,3,1).to(DEVICE)
-                    y = y.to(DEVICE)
+                    x = x.permute(0,2,3,1).to(DEVICE).float()
+                    y = y.to(DEVICE).float()
 
                 y_hat = model(x, edge_index, edge_weight).squeeze()
 
