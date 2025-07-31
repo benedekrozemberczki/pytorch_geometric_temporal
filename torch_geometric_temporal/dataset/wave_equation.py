@@ -48,7 +48,8 @@ class WaveEquationDatasetLoader(object):
         stacked_data = self._dataset
         
         self.features = [
-            stacked_data[i, :, :] for i in range(stacked_data.shape[0] - self.lags)
+            stacked_data[i : i + self.lags, :, :].transpose(1, 0, 2).reshape(stacked_data.shape[1], -1)
+            for i in range(stacked_data.shape[0] - self.lags)
         ]
         self.targets = [
             stacked_data[i + self.lags, :, :] for i in range(stacked_data.shape[0] - self.lags)

@@ -13,7 +13,10 @@ class SIDiffusionDatasetLoader(object):
     
     Contains spatio-temporal dynamics of epidemic spread with susceptible (S) and 
     infected (I) population compartments. Static graph with 400 nodes and 2088 edges
-    across 9100 time steps. For details see this paper:
+    across 9100 time steps. Features contain both populations (index 0: S, index 1: I) 
+    across time lags, while targets include only the infected population (I).
+    
+    For details see this paper:
     `"Synthetic Spatio-Temporal Graphs for Temporal Graph Learning." <https://openreview.net/forum?id=EguDBMechn>`_
     """
 
@@ -48,10 +51,11 @@ class SIDiffusionDatasetLoader(object):
         stacked_data = self._dataset
         
         self.features = [
-            stacked_data[i, :, :] for i in range(stacked_data.shape[0] - self.lags)
+            stacked_data[i : i + self.lags, :, :].transpose(1, 2, 0)
+            for i in range(stacked_data.shape[0] - self.lags)
         ]
         self.targets = [
-            stacked_data[i + self.lags, :, :] for i in range(stacked_data.shape[0] - self.lags)
+            stacked_data[i + self.lags, :, 1:2] for i in range(stacked_data.shape[0] - self.lags)
         ]
 
     def get_dataset(self, lags: int = 4) -> StaticGraphTemporalSignal:
