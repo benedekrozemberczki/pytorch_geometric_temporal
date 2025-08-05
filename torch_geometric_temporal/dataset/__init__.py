@@ -13,3 +13,7 @@ from .mtm import MTMDatasetLoader
 
 from .pemsAllLA import PemsAllLADatasetLoader
 from .pems import PemsDatasetLoader
+
+from .si_diffusion import SIDiffusionDatasetLoader
+from .advection_diffusion import AdvectionDiffusionDatasetLoader
+from .wave_equation import WaveEquationDatasetLoader
