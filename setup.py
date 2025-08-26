@@ -4,8 +4,6 @@ install_requires = [
     "decorator==4.4.2",
     "torch",
     "cython",
-    "torch_sparse",
-    "torch_scatter",
     "torch_geometric",
     "numpy",
     "networkx",
