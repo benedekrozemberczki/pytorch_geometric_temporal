@@ -4,7 +4,7 @@ import torch
 from torch import Tensor
 from torch.nn import GRU
 from torch_geometric.typing import Adj, OptTensor
-from torch_sparse import SparseTensor
+from torch_geometric.typing import SparseTensor
 from torch_geometric.nn.inits import glorot
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.nn.conv.gcn_conv import gcn_norm
@@ -142,7 +142,7 @@ class EvolveGCNO(torch.nn.Module):
         self.weight = None
         self._create_layers()
         self.reset_parameters()
-    
+
     def reset_parameters(self):
         glorot(self.initial_weight)
 
@@ -182,7 +182,7 @@ class EvolveGCNO(torch.nn.Module):
         Return types:
             * **X** *(PyTorch Float Tensor)* - Output matrix for all nodes.
         """
-        
+
         if self.weight is None:
             _, self.weight = self.recurrent_layer(self.initial_weight, self.initial_weight)
         else:

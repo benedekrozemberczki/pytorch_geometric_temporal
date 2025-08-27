@@ -4,13 +4,11 @@ install_requires = [
     "decorator==4.4.2",
     "torch",
     "cython",
-    "torch_sparse",
-    "torch_scatter",
     "torch_geometric",
     "numpy",
     "networkx",
 ]
-tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm",'dask', "pandas", "tables"]
+tests_require = ["pytest", "pytest-cov", "mock", "networkx", "tqdm",'dask', "pandas", "tables", "scipy"]
 index_require = ['dask', "pandas", "tables"]
 ddp_require = ["dask[distributed]", "dask_pytorch_ddp", "pandas", "tables"]
 
