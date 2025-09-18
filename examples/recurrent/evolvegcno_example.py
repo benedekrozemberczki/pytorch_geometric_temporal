@@ -47,6 +47,9 @@ for epoch in tqdm(range(200)):
     optimizer.step()
     optimizer.zero_grad()
     
+    # cutoff the graph of the hidden state between epochs
+    model.recurrent.weight = model.recurrent.weight.detach()
+    
 model.eval()
 cost = 0
 for time, snapshot in enumerate(test_dataset):

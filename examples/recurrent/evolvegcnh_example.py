@@ -34,16 +34,21 @@ model = RecurrentGCN(node_features = 4, node_count = 20)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
+torch.autograd.set_detect_anomaly(True)
 
 for epoch in tqdm(range(200)):
     cost = 0
     for time, snapshot in enumerate(train_dataset):
         y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
         cost = cost + torch.mean((y_hat-snapshot.y)**2)
+
     cost = cost / (time+1)
     cost.backward()
     optimizer.step()
     optimizer.zero_grad()
+    
+    # cutoff the graph of the hidden state between epochs
+    model.recurrent.weight = model.recurrent.weight.detach()
     
 model.eval()
 cost = 0
