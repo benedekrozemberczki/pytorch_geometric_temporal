@@ -34,7 +34,6 @@ model = RecurrentGCN(node_features = 4, node_count = 20)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
 model.train()
-torch.autograd.set_detect_anomaly(True)
 
 for epoch in tqdm(range(200)):
     cost = 0
